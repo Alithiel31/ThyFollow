@@ -1,0 +1,78 @@
+/* src/pages/ProfilePage.module.css */
+
+.page { max-width: 720px; }
+
+.header {
+  display: flex; align-items: center; gap: 20px;
+  margin-bottom: 36px;
+}
+
+.avatar {
+  width: 64px; height: 64px; flex-shrink: 0;
+  background: var(--accent-soft); border: 2px solid var(--accent-glow);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 1.8rem; color: var(--accent);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 1.9rem; color: var(--text); letter-spacing: -0.02em;
+}
+
+.email { font-size: 0.875rem; color: var(--text-muted); margin-top: 2px; }
+
+/* ── Sections */
+.section {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); margin-bottom: 16px; overflow: hidden;
+}
+
+.sectionTitle {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.875rem; font-weight: 600; color: var(--text-dim);
+  padding: 16px 22px; border-bottom: 1px solid var(--border);
+  background: var(--bg-raised);
+}
+
+.sectionBody { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+
+.hint { font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 4px; }
+
+/* ── Form elements */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+.field { display: flex; flex-direction: column; gap: 5px; }
+
+.label { font-size: 0.78rem; font-weight: 500; color: var(--text-dim); }
+
+.input {
+  background: var(--bg-raised); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 9px 12px;
+  color: var(--text); font-family: var(--font-body); font-size: 0.9rem;
+  outline: none; transition: border-color 0.15s; width: 100%;
+}
+.input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.input::placeholder { color: var(--text-muted); }
+
+/* ── Save button */
+.saveBtn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; margin-top: 8px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px;
+  color: var(--text-muted); font-family: var(--font-body); font-size: 0.95rem; font-weight: 500;
+  cursor: pointer; transition: all 0.2s;
+}
+
+.saveBtnDirty {
+  background: var(--accent); border-color: var(--accent); color: #fff;
+}
+.saveBtnDirty:hover { opacity: 0.88; }
+.saveBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+@media (max-width: 600px) {
+  .grid2, .grid3 { grid-template-columns: 1fr 1fr; }
+  .header { flex-direction: column; align-items: flex-start; }
+}

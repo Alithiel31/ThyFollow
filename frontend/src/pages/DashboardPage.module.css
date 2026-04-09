@@ -1,0 +1,298 @@
+/* src/pages/DashboardPage.module.css */
+
+.page { max-width: 1200px; }
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.greeting {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.date {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  text-transform: capitalize;
+}
+
+.logBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+.logBtn:hover { opacity: 0.85; }
+
+/* ── KPI Strip */
+.kpiRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.kpiCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.kpiIcon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.kpiLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.kpiValue {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kpiBadge {
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+
+/* ── Main grid */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.sideCol {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Card */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.cardTitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-dim);
+}
+
+.cardLink {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-family: var(--font-body);
+  padding: 0;
+}
+
+.chartWrap { margin: 0 -4px; }
+
+.legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.empty {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 12px 0;
+}
+
+/* ── Lab list */
+.labList { display: flex; flex-direction: column; gap: 10px; }
+
+.labRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.labDate {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  width: 56px;
+  flex-shrink: 0;
+}
+
+.labBar { flex: 1; }
+
+.tshBar {
+  position: relative;
+  height: 6px;
+  background: var(--bg-raised);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.tshBarNormal {
+  position: absolute;
+  top: 0; bottom: 0;
+  background: rgba(0,212,180,0.15);
+  border-left: 1px solid rgba(0,212,180,0.3);
+  border-right: 1px solid rgba(0,212,180,0.3);
+}
+
+.tshBarFill {
+  position: absolute;
+  top: 1px; bottom: 1px; left: 0;
+  border-radius: 4px;
+  height: 4px;
+  transition: width 0.5s ease;
+}
+
+/* ── Appointment */
+.apptRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.apptIcon {
+  width: 38px; height: 38px;
+  background: var(--accent-soft);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.apptType {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.apptDate {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  text-transform: capitalize;
+}
+
+/* ── Medications */
+.medRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+}
+.medRow:first-of-type { border-top: none; padding-top: 0; }
+
+.medIcon {
+  width: 30px; height: 30px;
+  background: var(--teal-soft);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--teal);
+  flex-shrink: 0;
+}
+
+.medName {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.medDose {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ── CTA Banner */
+.ctaBanner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-glow);
+  border-radius: var(--radius);
+  padding: 16px 22px;
+  color: var(--accent);
+  font-size: 0.9rem;
+}
+
+.ctaBanner span { flex: 1; }
+
+.ctaBanner button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.ctaBanner button:hover { opacity: 0.85; }
+
+/* ── Responsive */
+@media (max-width: 1024px) {
+  .mainGrid { grid-template-columns: 1fr; }
+  .kpiRow { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .header { flex-direction: column; gap: 16px; align-items: stretch; }
+  .logBtn { width: 100%; justify-content: center; }
+  .kpiRow { grid-template-columns: 1fr 1fr; }
+  .greeting { font-size: 1.5rem; }
+}
