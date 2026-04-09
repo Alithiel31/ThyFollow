@@ -1,0 +1,322 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// USER
+// ─────────────────────────────────────────────
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  birthDate DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  profile      UserProfile?
+  entries      DailyEntry[]
+  medications  Medication[]
+  labResults   LabResult[]
+  appointments Appointment[]
+  symptoms     SymptomLibrary[]
+  notifications NotificationSetting?
+
+  @@map("users")
+}
+
+// ─────────────────────────────────────────────
+// USER PROFILE (thyroid context)
+// ─────────────────────────────────────────────
+model UserProfile {
+  id                String          @id @default(cuid())
+  userId            String          @unique
+  diagnosisType     DiagnosisType?  // hypothyroidism, hyperthyroidism, hashimoto, graves, etc.
+  diagnosisDate     DateTime?
+  thyroidStatus     ThyroidStatus?  // intact, partial, total, radioiodine
+  endocrinologistName String?
+  targetTSH_min     Float?          // personalized TSH target range
+  targetTSH_max     Float?
+  targetFT4_min     Float?
+  targetFT4_max     Float?
+  targetFT3_min     Float?
+  targetFT3_max     Float?
+  timezone          String          @default("Europe/Paris")
+  weightUnit        WeightUnit      @default(KG)
+  temperatureUnit   TempUnit        @default(CELSIUS)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+// ─────────────────────────────────────────────
+// DAILY ENTRY (core of the app, like Clue's daily log)
+// ─────────────────────────────────────────────
+model DailyEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime @db.Date
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // ── Energy & Mood
+  energyLevel     Int?   // 1-5
+  moodScore       Int?   // 1-5
+  anxietyLevel    Int?   // 1-5
+  brainFogLevel   Int?   // 1-5
+
+  // ── Physical
+  weight          Float?
+  bodyTemperature Float?
+  heartRate       Int?
+  bloodPressureSys Int?
+  bloodPressureDia Int?
+
+  // ── Thyroid-specific symptoms
+  coldSensitivity  Int?   // 1-5
+  heatSensitivity  Int?   // 1-5
+  hairLoss         Int?   // 1-5
+  drySkin          Int?   // 1-5
+  constipation     Int?   // 1-5
+  bloating         Int?   // 1-5
+  muscleWeakness   Int?   // 1-5
+  jointPain        Int?   // 1-5
+  neckPain         Int?   // 1-5 (goiter / throat discomfort)
+  swelling         Int?   // 1-5 (face, eyes, legs)
+  tremors          Int?   // 1-5
+
+  // ── Sleep
+  sleepHours      Float?
+  sleepQuality    Int?   // 1-5
+
+  // ── Medication
+  medicationTaken      Boolean @default(false)
+  medicationTime       DateTime?
+  medicationNotes      String?
+
+  // ── Notes
+  notes           String?
+  tags            String[]   // free tags
+
+  // Relations
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  symptomLogs     SymptomLog[]
+
+  @@unique([userId, date])
+  @@map("daily_entries")
+}
+
+// ─────────────────────────────────────────────
+// CUSTOM SYMPTOMS (user-defined, like Clue)
+// ─────────────────────────────────────────────
+model SymptomLibrary {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  icon      String?  // emoji or icon name
+  color     String?
+  category  SymptomCategory @default(OTHER)
+  createdAt DateTime @default(now())
+
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logs SymptomLog[]
+
+  @@map("symptom_library")
+}
+
+model SymptomLog {
+  id         String   @id @default(cuid())
+  entryId    String
+  symptomId  String
+  severity   Int      // 1-5
+  note       String?
+
+  entry   DailyEntry     @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  symptom SymptomLibrary @relation(fields: [symptomId], references: [id], onDelete: Cascade)
+
+  @@map("symptom_logs")
+}
+
+// ─────────────────────────────────────────────
+// MEDICATIONS
+// ─────────────────────────────────────────────
+model Medication {
+  id           String   @id @default(cuid())
+  userId       String
+  name         String   // Levothyrox, Euthyrox, L-Thyroxine...
+  brand        String?
+  dosageMcg    Float    // micrograms
+  frequency    MedFrequency @default(DAILY)
+  intakeTime   String?  // "07:00" - time of day
+  startDate    DateTime
+  endDate      DateTime?
+  active       Boolean  @default(true)
+  instructions String?  // "à jeun 30 min avant le repas"
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("medications")
+}
+
+// ─────────────────────────────────────────────
+// LAB RESULTS (TSH, FT4, FT3, etc.)
+// ─────────────────────────────────────────────
+model LabResult {
+  id          String   @id @default(cuid())
+  userId      String
+  date        DateTime @db.Date
+  lab         String?  // nom du laboratoire
+  orderedBy   String?  // médecin prescripteur
+
+  // Core thyroid markers
+  tsh         Float?   // mUI/L
+  ft4         Float?   // pmol/L
+  ft3         Float?   // pmol/L
+  t4          Float?   // nmol/L (total T4)
+  t3          Float?   // nmol/L (total T3)
+
+  // Autoimmune markers
+  antiTPO     Float?   // Anti-TPO (UI/mL)
+  antiTG      Float?   // Anti-Thyroglobulin
+  antiTSHR    Float?   // Anti-récepteurs TSH (Graves)
+  thyroglobulin Float? // Thyroglobuline (suivi cancer)
+
+  // Associated markers
+  ferritin    Float?   // µg/L
+  vitaminD    Float?   // nmol/L
+  vitaminB12  Float?   // pmol/L
+  magnesium   Float?   // mmol/L
+  selenium    Float?   // µg/L
+  cholesterol Float?   // mmol/L
+  glucose     Float?   // mmol/L
+  hemoglobin  Float?   // g/dL
+
+  notes       String?
+  documentUrl String?  // PDF upload link
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("lab_results")
+}
+
+// ─────────────────────────────────────────────
+// APPOINTMENTS
+// ─────────────────────────────────────────────
+model Appointment {
+  id          String          @id @default(cuid())
+  userId      String
+  date        DateTime
+  type        AppointmentType
+  doctorName  String?
+  specialty   String?
+  location    String?
+  notes       String?
+  reminder    Boolean         @default(true)
+  reminderDays Int            @default(2)
+  status      AppointmentStatus @default(UPCOMING)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("appointments")
+}
+
+// ─────────────────────────────────────────────
+// NOTIFICATION SETTINGS
+// ─────────────────────────────────────────────
+model NotificationSetting {
+  id                  String  @id @default(cuid())
+  userId              String  @unique
+  dailyLogReminder    Boolean @default(true)
+  dailyLogTime        String  @default("20:00")
+  medicationReminder  Boolean @default(true)
+  labResultReminder   Boolean @default(true)
+  labReminderWeeks    Int     @default(12) // every N weeks
+  appointmentReminder Boolean @default(true)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_settings")
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+enum DiagnosisType {
+  HYPOTHYROIDISM
+  HYPERTHYROIDISM
+  HASHIMOTO
+  GRAVES
+  THYROID_CANCER
+  NODULES
+  GOITER
+  OTHER
+}
+
+enum ThyroidStatus {
+  INTACT
+  PARTIAL_REMOVAL
+  TOTAL_REMOVAL
+  RADIOIODINE_ABLATION
+  RADIOIODINE_PARTIAL
+}
+
+enum MedFrequency {
+  DAILY
+  EVERY_OTHER_DAY
+  WEEKLY
+  AS_NEEDED
+}
+
+enum WeightUnit {
+  KG
+  LBS
+}
+
+enum TempUnit {
+  CELSIUS
+  FAHRENHEIT
+}
+
+enum SymptomCategory {
+  ENERGY
+  MOOD
+  PHYSICAL
+  DIGESTIVE
+  SKIN_HAIR
+  COGNITIVE
+  SLEEP
+  PAIN
+  OTHER
+}
+
+enum AppointmentType {
+  ENDOCRINOLOGIST
+  GENERAL_PRACTITIONER
+  ULTRASOUND
+  BLOOD_TEST
+  SCINTIGRAPHY
+  BIOPSY
+  OTHER
+}
+
+enum AppointmentStatus {
+  UPCOMING
+  COMPLETED
+  CANCELLED
+}

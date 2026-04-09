@@ -1,0 +1,261 @@
+// src/pages/LabResultsPage.tsx
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+import { Plus, Trash2, FlaskConical, TrendingUp } from 'lucide-react';
+import { labApi } from '../lib/api';
+import { formatDate, tshStatus } from '../lib/utils';
+import { LAB_RANGES, type LabResult } from '../types';
+import { useAuthStore } from '../lib/store';
+import {
+  LineChart, Line, XAxis, YAxis, Tooltip,
+  ResponsiveContainer, ReferenceLine, CartesianGrid
+} from 'recharts';
+import { parseISO, format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import styles from './LabResultsPage.module.css';
+
+const EMPTY_FORM: Partial<LabResult> = {
+  date: '', lab: '', orderedBy: '', tsh: undefined, ft4: undefined, ft3: undefined,
+  antiTPO: undefined, antiTG: undefined, ferritin: undefined,
+  vitaminD: undefined, vitaminB12: undefined, notes: '',
+};
+
+export function LabResultsPage() {
+  const { user } = useAuthStore();
+  const qc = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [editItem, setEditItem] = useState<LabResult | null>(null);
+  const [form, setForm] = useState<Partial<LabResult>>(EMPTY_FORM);
+
+  const { data: results = [], isLoading } = useQuery({
+    queryKey: ['lab-results'],
+    queryFn: () => labApi.list().then((r) => r.data),
+  });
+
+  const createMut = useMutation({
+    mutationFn: (d: Partial<LabResult> & { date: string }) => labApi.create(d),
+    onSuccess: () => { toast.success('Analyse ajoutée'); qc.invalidateQueries({ queryKey: ['lab-results'] }); resetForm(); },
+    onError: () => toast.error('Erreur'),
+  });
+
+  const updateMut = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<LabResult> }) => labApi.update(id, data),
+    onSuccess: () => { toast.success('Mis à jour'); qc.invalidateQueries({ queryKey: ['lab-results'] }); resetForm(); },
+    onError: () => toast.error('Erreur'),
+  });
+
+  const deleteMut = useMutation({
+    mutationFn: (id: string) => labApi.delete(id),
+    onSuccess: () => { toast.success('Supprimé'); qc.invalidateQueries({ queryKey: ['lab-results'] }); },
+    onError: () => toast.error('Erreur'),
+  });
+
+  const resetForm = () => { setShowForm(false); setEditItem(null); setForm(EMPTY_FORM); };
+
+  const openEdit = (r: LabResult) => {
+    setEditItem(r);
+    setForm({ ...r, date: r.date.split('T')[0] });
+    setShowForm(true);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.date) return toast.error('La date est requise');
+    const payload = { ...form, date: form.date };
+    const clean = Object.fromEntries(
+      Object.entries(payload).map(([k, v]) => [k, v === '' ? null : v])
+    ) as Partial<LabResult> & { date: string };
+
+    if (editItem) updateMut.mutate({ id: editItem.id, data: clean });
+    else createMut.mutate(clean);
+  };
+
+  const set = (key: keyof LabResult) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const val = e.target.type === 'number' ? (e.target.value ? parseFloat(e.target.value) : undefined) : e.target.value;
+    setForm((f) => ({ ...f, [key]: val }));
+  };
+
+  // Chart data: TSH over time
+  const chartData = [...results]
+    .filter((r) => r.tsh != null)
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map((r) => ({
+      date: format(parseISO(r.date), 'd MMM yy', { locale: fr }),
+      tsh: r.tsh,
+      ft4: r.ft4,
+    }));
+
+  const profile = user?.profile;
+
+  return (
+    <div className={styles.page}>
+      {/* Header */}
+      <div className={styles.header}>
+        <div>
+          <h1 className={styles.title}>Analyses sanguines</h1>
+          <p className={styles.sub}>Suivez l'évolution de vos marqueurs thyroïdiens</p>
+        </div>
+        <button className={styles.addBtn} onClick={() => { setEditItem(null); setForm(EMPTY_FORM); setShowForm(true); }}>
+          <Plus size={16} /> Ajouter
+        </button>
+      </div>
+
+      {/* TSH Chart */}
+      {chartData.length > 1 && (
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <TrendingUp size={16} />
+            <span>Évolution du TSH</span>
+          </div>
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: -20 }}>
+              <CartesianGrid stroke="rgba(255,255,255,0.04)" vertical={false} />
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} tickLine={false} axisLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} tickLine={false} axisLine={false} />
+              <Tooltip contentStyle={{ background: 'var(--bg-raised)', border: '1px solid var(--border)', borderRadius: 10, fontSize: 12, color: 'var(--text)' }} />
+              <ReferenceLine y={profile?.targetTSH_min ?? LAB_RANGES.tsh.min} stroke="rgba(0,212,180,0.3)" strokeDasharray="4 4" />
+              <ReferenceLine y={profile?.targetTSH_max ?? LAB_RANGES.tsh.max} stroke="rgba(0,212,180,0.3)" strokeDasharray="4 4" label={{ value: 'Zone cible', position: 'right', fontSize: 10, fill: 'var(--teal)' }} />
+              <Line type="monotone" dataKey="tsh" stroke="var(--accent)" strokeWidth={2.5} dot={{ r: 4, fill: 'var(--accent)' }} connectNulls />
+            </LineChart>
+          </ResponsiveContainer>
+          <p className={styles.chartNote}>Zone verte = plage cible TSH ({profile?.targetTSH_min ?? LAB_RANGES.tsh.min}–{profile?.targetTSH_max ?? LAB_RANGES.tsh.max} mUI/L)</p>
+        </div>
+      )}
+
+      {/* Form modal */}
+      {showForm && (
+        <div className={styles.overlay} onClick={(e) => e.target === e.currentTarget && resetForm()}>
+          <div className={styles.modal}>
+            <h2 className={styles.modalTitle}>
+              <FlaskConical size={18} />
+              {editItem ? 'Modifier l\'analyse' : 'Nouvelle analyse'}
+            </h2>
+            <form onSubmit={handleSubmit} className={styles.form}>
+              <div className={styles.grid2}>
+                <Field label="Date *">
+                  <input className={styles.input} type="date" value={form.date as string ?? ''} onChange={set('date')} required />
+                </Field>
+                <Field label="Laboratoire">
+                  <input className={styles.input} placeholder="Ex: Laborizon" value={form.lab ?? ''} onChange={set('lab')} />
+                </Field>
+              </div>
+              <Field label="Prescrit par">
+                <input className={styles.input} placeholder="Dr. Nom" value={form.orderedBy ?? ''} onChange={set('orderedBy')} />
+              </Field>
+
+              <div className={styles.formSection}>Marqueurs principaux</div>
+              <div className={styles.grid3}>
+                <NumField label={`TSH (${LAB_RANGES.tsh.unit})`} field="tsh" form={form} set={set} step="0.01" placeholder="1.50" />
+                <NumField label={`FT4 (${LAB_RANGES.ft4.unit})`} field="ft4" form={form} set={set} step="0.1" placeholder="15.0" />
+                <NumField label={`FT3 (${LAB_RANGES.ft3.unit})`} field="ft3" form={form} set={set} step="0.1" placeholder="4.5" />
+              </div>
+
+              <div className={styles.formSection}>Marqueurs auto-immuns</div>
+              <div className={styles.grid3}>
+                <NumField label="Anti-TPO (UI/mL)" field="antiTPO" form={form} set={set} step="1" placeholder="< 34" />
+                <NumField label="Anti-TG (UI/mL)" field="antiTG" form={form} set={set} step="1" placeholder="—" />
+                <NumField label="Anti-TSHR" field="antiTSHR" form={form} set={set} step="0.1" placeholder="—" />
+              </div>
+
+              <div className={styles.formSection}>Carences associées</div>
+              <div className={styles.grid3}>
+                <NumField label="Ferritine (µg/L)" field="ferritin" form={form} set={set} step="0.1" placeholder="80" />
+                <NumField label="Vitamine D (nmol/L)" field="vitaminD" form={form} set={set} step="0.1" placeholder="75" />
+                <NumField label="Vitamine B12 (pmol/L)" field="vitaminB12" form={form} set={set} step="0.1" placeholder="300" />
+              </div>
+
+              <Field label="Notes">
+                <textarea className={styles.textarea} rows={3} value={form.notes ?? ''} onChange={set('notes')} placeholder="Observations, contexte..." />
+              </Field>
+
+              <div className={styles.formActions}>
+                <button type="button" className={styles.cancelBtn} onClick={resetForm}>Annuler</button>
+                <button type="submit" className={styles.submitBtn} disabled={createMut.isPending || updateMut.isPending}>
+                  {createMut.isPending || updateMut.isPending ? 'Enregistrement…' : editItem ? 'Mettre à jour' : 'Enregistrer'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Results list */}
+      {isLoading ? (
+        <div className={styles.loader}><div className="spinner" /></div>
+      ) : results.length === 0 ? (
+        <div className={styles.empty}>
+          <FlaskConical size={40} strokeWidth={1} />
+          <p>Aucune analyse enregistrée</p>
+          <button className={styles.addBtn} onClick={() => setShowForm(true)}>Ajouter ma première analyse</button>
+        </div>
+      ) : (
+        <div className={styles.list}>
+          {results.map((r) => {
+            const tshInfo = r.tsh != null ? tshStatus(r.tsh, profile?.targetTSH_min, profile?.targetTSH_max) : null;
+            return (
+              <div key={r.id} className={styles.resultCard} onClick={() => openEdit(r)}>
+                <div className={styles.resultDate}>{formatDate(r.date)}</div>
+                {r.lab && <div className={styles.resultLab}>{r.lab}</div>}
+                <div className={styles.markers}>
+                  {r.tsh != null && (
+                    <Marker label="TSH" value={r.tsh} unit="mUI/L" color={tshInfo?.color} badge={tshInfo?.label} />
+                  )}
+                  {r.ft4 != null && <Marker label="FT4" value={r.ft4} unit="pmol/L" />}
+                  {r.ft3 != null && <Marker label="FT3" value={r.ft3} unit="pmol/L" />}
+                  {r.antiTPO != null && (
+                    <Marker label="Anti-TPO" value={r.antiTPO} unit="UI/mL"
+                      color={r.antiTPO > LAB_RANGES.antiTPO.max ? 'var(--rose)' : 'var(--teal)'} />
+                  )}
+                </div>
+                {r.notes && <p className={styles.resultNotes}>{r.notes}</p>}
+                <button className={styles.deleteBtn}
+                  onClick={(e) => { e.stopPropagation(); if (confirm('Supprimer cette analyse ?')) deleteMut.mutate(r.id); }}>
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className={styles.field}>
+      <label className={styles.label}>{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function NumField({ label, field, form, set, step, placeholder }: {
+  label: string; field: keyof LabResult;
+  form: Partial<LabResult>;
+  set: (k: keyof LabResult) => (e: React.ChangeEvent<HTMLInputElement>) => void;
+  step: string; placeholder: string;
+}) {
+  return (
+    <Field label={label}>
+      <input className={styles.input} type="number" step={step} placeholder={placeholder}
+        value={(form[field] as number | undefined) ?? ''}
+        onChange={set(field) as (e: React.ChangeEvent<HTMLInputElement>) => void} />
+    </Field>
+  );
+}
+
+function Marker({ label, value, unit, color, badge }: {
+  label: string; value: number; unit: string; color?: string; badge?: string;
+}) {
+  return (
+    <div className={styles.marker}>
+      <span className={styles.markerLabel}>{label}</span>
+      <span className={styles.markerValue} style={{ color: color ?? 'var(--text)' }}>
+        {value} <span className={styles.markerUnit}>{unit}</span>
+      </span>
+      {badge && <span className={styles.markerBadge} style={{ color: color, background: `${color}22` }}>{badge}</span>}
+    </div>
+  );
+}

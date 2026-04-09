@@ -1,0 +1,71 @@
+/* src/index.css */
+:root {
+  /* ── Palette */
+  --bg: #0b0d14;
+  --bg-card: #13151f;
+  --bg-raised: #1a1d2e;
+  --border: rgba(255,255,255,0.07);
+  --border-hover: rgba(255,255,255,0.14);
+
+  --accent: #7b61ff;
+  --accent-soft: rgba(123,97,255,0.15);
+  --accent-glow: rgba(123,97,255,0.4);
+
+  --teal: #00d4b4;
+  --teal-soft: rgba(0,212,180,0.12);
+  --rose: #ff6b8a;
+  --rose-soft: rgba(255,107,138,0.12);
+  --amber: #ffb347;
+  --amber-soft: rgba(255,179,71,0.12);
+
+  --text: #e8eaf2;
+  --text-muted: #6b7090;
+  --text-dim: #9296b0;
+
+  /* ── Typography */
+  --font-display: 'DM Serif Display', serif;
+  --font-body: 'DM Sans', sans-serif;
+
+  /* ── Radius */
+  --radius-sm: 8px;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+
+  /* ── Shadows */
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --shadow-accent: 0 0 40px rgba(123,97,255,0.15);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* Focus */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Utilities */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border-width: 0;
+}
