@@ -7,7 +7,7 @@
   justify-content: center;
   padding: 24px;
   background:
-    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(123,97,255,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 50% -10%, var(--accent-soft) 0%, transparent 60%),
     var(--bg);
 }
 
@@ -37,14 +37,14 @@
 }
 
 .logoText {
-  font-family: var(--font-display);
+  font-family: var(--font-display); font-style: italic; font-weight: 500;
   font-size: 1.3rem;
   color: var(--text);
 }
 
 .title {
-  font-family: var(--font-display);
-  font-size: 1.8rem;
+  font-family: var(--font-display); font-style: italic; font-weight: 500;
+  font-size: 1.5rem;
   color: var(--text);
   margin-bottom: 6px;
   letter-spacing: -0.02em;
@@ -97,7 +97,7 @@
 .btn {
   margin-top: 8px;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   border: none;
   border-radius: var(--radius-sm);
   padding: 12px;
@@ -131,7 +131,7 @@
   margin-top: 16px;
   padding: 10px 14px;
   background: var(--amber-soft);
-  border: 1px solid rgba(255,179,71,0.2);
+  border: 1px solid var(--warn-soft);
   border-radius: var(--radius-sm);
   font-size: 0.78rem;
   color: var(--amber);

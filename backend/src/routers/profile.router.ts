@@ -1,8 +1,8 @@
 // src/routers/profile.router.ts
 import { Router } from 'express';
-import { profileController } from '../controllers/profile.controller';
-import { asyncHandler } from '../middleware/asyncHandler';
-import { authenticate } from '../middleware/auth';
+import { profileController } from '../controllers/profile.controller.js';
+import { asyncHandler } from '../middleware/asyncHandler.js';
+import { authenticate } from '../middleware/auth.js';
 
 const router = Router();
 router.use(authenticate);

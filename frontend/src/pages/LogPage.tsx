@@ -3,7 +3,10 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { ChevronLeft, ChevronRight, Check, Save } from 'lucide-react';
+import {
+  ChevronLeft, ChevronRight, Check, Save, Pill,
+  Sparkles, Activity, Dumbbell, Moon, Ruler, FileText, FileDown,
+} from 'lucide-react';
 import { entriesApi } from '../lib/api';
 import { toISODate, formatDate, SYMPTOM_LABELS } from '../lib/utils';
 import { addDays, subDays, parseISO } from 'date-fns';
@@ -20,27 +23,25 @@ type ScoreField = keyof Pick<DailyEntry,
 const SECTIONS = [
   {
     title: 'Bien-être général',
-    emoji: '✨',
+    icon: Sparkles,
     fields: ['energyLevel', 'moodScore', 'anxietyLevel', 'brainFogLevel'] as ScoreField[],
   },
   {
     title: 'Symptômes thyroïdiens',
-    emoji: '🦋',
+    icon: Activity,
     fields: ['coldSensitivity', 'heatSensitivity', 'hairLoss', 'drySkin', 'neckPain', 'swelling', 'tremors'] as ScoreField[],
   },
   {
-    title: 'Digestif & Musculaire',
-    emoji: '💪',
+    title: 'Digestif & musculaire',
+    icon: Dumbbell,
     fields: ['constipation', 'bloating', 'muscleWeakness', 'jointPain'] as ScoreField[],
   },
   {
     title: 'Sommeil',
-    emoji: '🌙',
+    icon: Moon,
     fields: ['sleepQuality'] as ScoreField[],
   },
 ];
-
-const SCORE_EMOJIS = ['', '😰', '😕', '😐', '🙂', '😊'];
 
 export function LogPage() {
   const { date: dateParam } = useParams();
@@ -52,6 +53,9 @@ export function LogPage() {
 
   const [form, setForm] = useState<Partial<DailyEntry>>({ medicationTaken: false, tags: [] });
   const [dirty, setDirty] = useState(false);
+  const [showExport, setShowExport] = useState(false);
+  const [exportFrom, setExportFrom] = useState(toISODate(subDays(new Date(), 29)));
+  const [exportTo, setExportTo] = useState(today);
 
   const { data: existing, isLoading } = useQuery({
     queryKey: ['entry', date],
@@ -123,6 +127,44 @@ export function LogPage() {
         </button>
       </div>
 
+      {/* ── Export de rapport */}
+      <div className={styles.exportRow}>
+        <button className={styles.exportBtn} onClick={() => setShowExport(true)}>
+          <FileDown size={15} /> Exporter un rapport
+        </button>
+      </div>
+
+      {showExport && (
+        <div className={styles.overlay} onClick={(e) => e.target === e.currentTarget && setShowExport(false)}>
+          <div className={styles.exportModal}>
+            <h2 className={styles.exportTitle}><FileDown size={18} /> Rapport de période</h2>
+            <p className={styles.exportHint}>
+              Moyennes du journal, observance et analyses sur la période choisie —
+              à imprimer, enregistrer en PDF ou exporter en CSV.
+            </p>
+            <div className={styles.exportGrid}>
+              <label className={styles.exportField}>
+                <span>Du</span>
+                <input type="date" value={exportFrom} max={exportTo}
+                  onChange={(e) => setExportFrom(e.target.value)} />
+              </label>
+              <label className={styles.exportField}>
+                <span>Au</span>
+                <input type="date" value={exportTo} min={exportFrom} max={today}
+                  onChange={(e) => setExportTo(e.target.value)} />
+              </label>
+            </div>
+            <div className={styles.exportActions}>
+              <button className={styles.exportCancel} onClick={() => setShowExport(false)}>Annuler</button>
+              <button className={styles.exportGo}
+                onClick={() => navigate(`/report?from=${exportFrom}&to=${exportTo}`)}>
+                Générer le rapport
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {isFuture ? (
         <div className={styles.futureMsg}>Vous ne pouvez pas remplir un journal futur.</div>
       ) : (
@@ -133,11 +175,11 @@ export function LogPage() {
             onClick={() => setField('medicationTaken', !form.medicationTaken)}
           >
             <div className={styles.medPillIcon}>
-              {form.medicationTaken ? <Check size={16} /> : '💊'}
+              {form.medicationTaken ? <Check size={16} /> : <Pill size={16} />}
             </div>
             <div>
               <p className={styles.medPillTitle}>
-                {form.medicationTaken ? 'Médicament pris ✓' : 'Médicament pris ?'}
+                {form.medicationTaken ? 'Médicament pris' : 'Médicament pris ?'}
               </p>
               <p className={styles.medPillSub}>Touchez pour marquer</p>
             </div>
@@ -147,7 +189,7 @@ export function LogPage() {
           {SECTIONS.map((section) => (
             <div key={section.title} className={styles.section}>
               <h2 className={styles.sectionTitle}>
-                {section.emoji} {section.title}
+                <section.icon size={16} strokeWidth={1.8} /> {section.title}
               </h2>
               <div className={styles.scoreGrid}>
                 {section.fields.map((field) => (
@@ -164,7 +206,7 @@ export function LogPage() {
 
           {/* ── Physical metrics */}
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>📊 Mesures</h2>
+            <h2 className={styles.sectionTitle}><Ruler size={16} strokeWidth={1.8} /> Mesures</h2>
             <div className={styles.metricsGrid}>
               <MetricInput label="Poids (kg)" value={form.weight ?? ''}
                 onChange={(v) => setField('weight', v ? parseFloat(v) : null)}
@@ -183,7 +225,7 @@ export function LogPage() {
 
           {/* ── Notes */}
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>📝 Notes</h2>
+            <h2 className={styles.sectionTitle}><FileText size={16} strokeWidth={1.8} /> Notes</h2>
             <textarea
               className={styles.textarea}
               value={form.notes ?? ''}
@@ -225,8 +267,9 @@ function ScoreRow({ label, value, onChange }: {
             className={`${styles.scoreBtn} ${value === s ? styles.scoreBtnActive : ''}`}
             onClick={() => onChange(s)}
             title={`${s}/5`}
+            aria-pressed={value === s}
           >
-            {value === s ? SCORE_EMOJIS[s] : s}
+            {s}
           </button>
         ))}
       </div>

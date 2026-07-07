@@ -25,11 +25,12 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           position="bottom-center"
           toastOptions={{
             style: {
-              background: '#1a1d2e',
-              color: '#e8eaf2',
-              border: '1px solid rgba(255,255,255,0.07)',
+              background: 'var(--bg-raised)',
+              color: 'var(--text)',
+              border: '1px solid var(--border)',
               borderRadius: '14px',
-              fontFamily: 'DM Sans, sans-serif',
+              boxShadow: 'var(--shadow)',
+              fontFamily: 'var(--font-body)',
             },
           }}
         />

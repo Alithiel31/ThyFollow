@@ -4,16 +4,17 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { xss } from 'express-xss-sanitizer';
-import { config } from './config';
-import { logger } from './lib/logger';
-import authRouter from './routers/auth.router';
-import entriesRouter from './routers/entries.router';
-import labResultsRouter from './routers/labResults.router';
-import medicationsRouter from './routers/medications.router';
-import appointmentsRouter from './routers/appointments.router';
-import profileRouter from './routers/profile.router';
-import analyticsRouter from './routers/analytics.router';
-import { errorHandler } from './middleware/errorHandler';
+import { config } from './config.js';
+import { logger } from './lib/logger.js';
+import authRouter from './routers/auth.router.js';
+import entriesRouter from './routers/entries.router.js';
+import labResultsRouter from './routers/labResults.router.js';
+import medicationsRouter from './routers/medications.router.js';
+import appointmentsRouter from './routers/appointments.router.js';
+import profileRouter from './routers/profile.router.js';
+import analyticsRouter from './routers/analytics.router.js';
+import articlesRouter from './routers/articles.router.js';
+import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
 
@@ -61,6 +62,7 @@ app.use('/api/medications', medicationsRouter);
 app.use('/api/appointments', appointmentsRouter);
 app.use('/api/profile', profileRouter);
 app.use('/api/analytics', analyticsRouter);
+app.use('/api/articles', articlesRouter);
 
 // ── Error handler
 app.use(errorHandler);

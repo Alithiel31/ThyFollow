@@ -1,8 +1,8 @@
 // src/routers/labResults.router.ts
 import { Router } from 'express';
-import { labResultsController } from '../controllers/labResults.controller';
-import { asyncHandler } from '../middleware/asyncHandler';
-import { authenticate } from '../middleware/auth';
+import { labResultsController } from '../controllers/labResults.controller.js';
+import { asyncHandler } from '../middleware/asyncHandler.js';
+import { authenticate } from '../middleware/auth.js';
 
 const router = Router();
 router.use(authenticate);

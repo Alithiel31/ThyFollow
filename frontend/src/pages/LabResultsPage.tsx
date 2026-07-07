@@ -110,13 +110,13 @@ export function LabResultsPage() {
           </div>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: -20 }}>
-              <CartesianGrid stroke="rgba(255,255,255,0.04)" vertical={false} />
+              <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
               <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} tickLine={false} axisLine={false} />
               <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} tickLine={false} axisLine={false} />
-              <Tooltip contentStyle={{ background: 'var(--bg-raised)', border: '1px solid var(--border)', borderRadius: 10, fontSize: 12, color: 'var(--text)' }} />
-              <ReferenceLine y={profile?.targetTSH_min ?? LAB_RANGES.tsh.min} stroke="rgba(0,212,180,0.3)" strokeDasharray="4 4" />
-              <ReferenceLine y={profile?.targetTSH_max ?? LAB_RANGES.tsh.max} stroke="rgba(0,212,180,0.3)" strokeDasharray="4 4" label={{ value: 'Zone cible', position: 'right', fontSize: 10, fill: 'var(--teal)' }} />
-              <Line type="monotone" dataKey="tsh" stroke="var(--accent)" strokeWidth={2.5} dot={{ r: 4, fill: 'var(--accent)' }} connectNulls />
+              <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, fontSize: 12, color: 'var(--text)', boxShadow: 'var(--shadow)' }} />
+              <ReferenceLine y={profile?.targetTSH_min ?? LAB_RANGES.tsh.min} stroke="var(--success)" strokeOpacity={0.35} strokeDasharray="4 4" />
+              <ReferenceLine y={profile?.targetTSH_max ?? LAB_RANGES.tsh.max} stroke="var(--success)" strokeOpacity={0.35} strokeDasharray="4 4" label={{ value: 'Zone cible', position: 'right', fontSize: 10, fill: 'var(--success)' }} />
+              <Line type="monotone" dataKey="tsh" stroke="var(--chart-1)" strokeWidth={2.5} dot={{ r: 4, fill: 'var(--chart-1)', strokeWidth: 0 }} connectNulls />
             </LineChart>
           </ResponsiveContainer>
           <p className={styles.chartNote}>Zone verte = plage cible TSH ({profile?.targetTSH_min ?? LAB_RANGES.tsh.min}–{profile?.targetTSH_max ?? LAB_RANGES.tsh.max} mUI/L)</p>
@@ -199,7 +199,7 @@ export function LabResultsPage() {
                 {r.lab && <div className={styles.resultLab}>{r.lab}</div>}
                 <div className={styles.markers}>
                   {r.tsh != null && (
-                    <Marker label="TSH" value={r.tsh} unit="mUI/L" color={tshInfo?.color} badge={tshInfo?.label} />
+                    <Marker label="TSH" value={r.tsh} unit="mUI/L" color={tshInfo?.color} bg={tshInfo?.bg} badge={tshInfo?.label} />
                   )}
                   {r.ft4 != null && <Marker label="FT4" value={r.ft4} unit="pmol/L" />}
                   {r.ft3 != null && <Marker label="FT3" value={r.ft3} unit="pmol/L" />}
@@ -246,8 +246,8 @@ function NumField({ label, field, form, set, step, placeholder }: {
   );
 }
 
-function Marker({ label, value, unit, color, badge }: {
-  label: string; value: number; unit: string; color?: string; badge?: string;
+function Marker({ label, value, unit, color, bg, badge }: {
+  label: string; value: number; unit: string; color?: string; bg?: string; badge?: string;
 }) {
   return (
     <div className={styles.marker}>
@@ -255,7 +255,7 @@ function Marker({ label, value, unit, color, badge }: {
       <span className={styles.markerValue} style={{ color: color ?? 'var(--text)' }}>
         {value} <span className={styles.markerUnit}>{unit}</span>
       </span>
-      {badge && <span className={styles.markerBadge} style={{ color: color, background: `${color}22` }}>{badge}</span>}
+      {badge && <span className={styles.markerBadge} style={{ color, background: bg ?? 'var(--bg-raised)' }}>{badge}</span>}
     </div>
   );
 }

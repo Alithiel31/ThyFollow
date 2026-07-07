@@ -1,42 +1,155 @@
-/* src/index.css */
+/* src/index.css — Design system ThyroTrack
+   Thème clair par défaut (:root), sombre via [data-theme="dark"] (choix manuel)
+   ou prefers-color-scheme (mode auto). Les pages ne consomment QUE ces tokens. */
+
 :root {
-  /* ── Palette */
-  --bg: #0b0d14;
-  --bg-card: #13151f;
-  --bg-raised: #1a1d2e;
-  --border: rgba(255,255,255,0.07);
-  --border-hover: rgba(255,255,255,0.14);
+  color-scheme: light;
 
-  --accent: #7b61ff;
-  --accent-soft: rgba(123,97,255,0.15);
-  --accent-glow: rgba(123,97,255,0.4);
+  /* ── Surfaces */
+  --bg: #faf6f1;            /* fond de page : blanc cassé chaud (maquette jour) */
+  --bg-card: #ffffff;       /* cartes */
+  --bg-raised: #f3ede5;     /* inputs, hovers, éléments posés sur une carte */
+  --border: rgba(20, 30, 50, 0.08);
+  --border-hover: rgba(20, 30, 50, 0.18);
 
-  --teal: #00d4b4;
-  --teal-soft: rgba(0,212,180,0.12);
-  --rose: #ff6b8a;
-  --rose-soft: rgba(255,107,138,0.12);
-  --amber: #ffb347;
-  --amber-soft: rgba(255,179,71,0.12);
+  /* ── Couleur principale : bleu */
+  --accent: #3b7bf6;
+  --accent-strong: #2159d1;
+  --accent-soft: rgba(59, 123, 246, 0.12);
+  --on-accent: #ffffff;
 
-  --text: #e8eaf2;
-  --text-muted: #6b7090;
-  --text-dim: #9296b0;
+  /* ── Secondaire : orange */
+  --lav: #e8650f;
+  --lav-soft: rgba(232, 101, 15, 0.12);
 
-  /* ── Typography */
-  --font-display: 'DM Serif Display', serif;
-  --font-body: 'DM Sans', sans-serif;
+  /* ── Statuts */
+  --success: #2f8a5d;
+  --success-soft: rgba(47, 138, 93, 0.12);
+  --danger: #dc3d3d;
+  --danger-soft: rgba(220, 61, 61, 0.10);
+  --warn: #c07a1a;
+  --warn-soft: rgba(192, 122, 26, 0.14);
 
-  /* ── Radius */
-  --radius-sm: 8px;
+  /* ── Alias hérités (anciens noms utilisés par les modules) */
+  --teal: var(--success);
+  --teal-soft: var(--success-soft);
+  --rose: var(--danger);
+  --rose-soft: var(--danger-soft);
+  --amber: var(--warn);
+  --amber-soft: var(--warn-soft);
+  --accent-glow: var(--accent-soft);
+
+  /* ── Graphiques (bleu / orange, comme la maquette) */
+  --chart-1: #3b7bf6;
+  --chart-2: #e8650f;
+  --chart-grid: rgba(20, 30, 50, 0.07);
+
+  /* ── Texte */
+  --text: #241f1a;
+  --text-dim: #5c554d;
+  --text-muted: #8a8078;
+
+  /* ── Typographie */
+  --font-body: 'Manrope', system-ui, sans-serif;
+  --font-display: 'Newsreader', Georgia, serif;
+
+  /* ── Rayons */
+  --radius-sm: 10px;
   --radius: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
 
-  /* ── Shadows */
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
-  --shadow: 0 4px 24px rgba(0,0,0,0.4);
-  --shadow-accent: 0 0 40px rgba(123,97,255,0.15);
+  /* ── Ombres */
+  --shadow-sm: 0 1px 2px rgba(60, 40, 20, 0.04);
+  --shadow: 0 4px 12px rgba(60, 40, 20, 0.04);
+  --shadow-accent: 0 8px 20px rgba(59, 123, 246, 0.25);
+
+  /* ── Overlay des modales (fonctionne sur les deux thèmes) */
+  --overlay: rgba(10, 12, 18, 0.45);
+
+  /* ── Tactile */
+  --tap: 44px;
 }
+
+/* Jeu nuit : bleu nuit profond de la maquette */
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #0a0c12;
+  --bg-card: #14161f;
+  --bg-raised: #1e2230;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-hover: rgba(255, 255, 255, 0.16);
+
+  --accent: #3b7bf6;
+  --accent-strong: #6ea8ff;
+  --accent-soft: rgba(59, 123, 246, 0.16);
+  --on-accent: #ffffff;
+
+  --lav: #f2761f;
+  --lav-soft: rgba(242, 118, 31, 0.15);
+
+  --success: #5cb87f;
+  --success-soft: rgba(92, 184, 127, 0.14);
+  --danger: #ef4444;
+  --danger-soft: rgba(239, 68, 68, 0.14);
+  --warn: #f2a71f;
+  --warn-soft: rgba(242, 167, 31, 0.14);
+
+  --chart-1: #3b7bf6;
+  --chart-2: #f2761f;
+  --chart-grid: rgba(255, 255, 255, 0.06);
+
+  --text: #eceefb;
+  --text-dim: #a6aac2;
+  --text-muted: #5c6180;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow: 0 2px 6px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.30);
+  --shadow-accent: 0 8px 20px rgba(59, 123, 246, 0.28);
+}
+
+/* Mode auto : suit le système tant qu'aucun thème n'est forcé */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --bg: #0a0c12;
+    --bg-card: #14161f;
+    --bg-raised: #1e2230;
+    --border: rgba(255, 255, 255, 0.07);
+    --border-hover: rgba(255, 255, 255, 0.16);
+
+    --accent: #3b7bf6;
+    --accent-strong: #6ea8ff;
+    --accent-soft: rgba(59, 123, 246, 0.16);
+    --on-accent: #ffffff;
+
+    --lav: #f2761f;
+    --lav-soft: rgba(242, 118, 31, 0.15);
+
+    --success: #5cb87f;
+    --success-soft: rgba(92, 184, 127, 0.14);
+    --danger: #ef4444;
+    --danger-soft: rgba(239, 68, 68, 0.14);
+    --warn: #f2a71f;
+    --warn-soft: rgba(242, 167, 31, 0.14);
+
+    --chart-1: #3b7bf6;
+    --chart-2: #f2761f;
+    --chart-grid: rgba(255, 255, 255, 0.06);
+
+    --text: #eceefb;
+    --text-dim: #a6aac2;
+    --text-muted: #5c6180;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+    --shadow: 0 2px 6px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.30);
+    --shadow-accent: 0 8px 20px rgba(59, 123, 246, 0.28);
+  }
+}
+
+/* ── Base ─────────────────────────────────── */
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -49,21 +162,45 @@ body {
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+button, input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 
-/* Focus */
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 6px; }
+
+/* Focus clavier */
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-/* Utilities */
+/* Spinner global */
+.spinner {
+  width: 34px;
+  height: 34px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Respect des préférences d'animation réduite */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+/* Utilitaires */
 .sr-only {
   position: absolute; width: 1px; height: 1px;
   padding: 0; margin: -1px; overflow: hidden;

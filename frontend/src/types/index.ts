@@ -1,9 +1,12 @@
 // src/types/index.ts
 
+export type Role = 'USER' | 'ADMIN';
+
 export interface User {
   id: string;
   email: string;
   name: string;
+  role: Role;
   birthDate?: string;
   createdAt: string;
   profile?: UserProfile;
@@ -159,3 +162,37 @@ export const THYROID_STATUS_LABELS: Record<ThyroidStatus, string> = {
   RADIOIODINE_ABLATION: 'Ablation à l\'iode radioactif',
   RADIOIODINE_PARTIAL: 'Iode radioactif (partiel)',
 };
+
+// ── Contenu éditorial ──────────────────────────
+export type ArticleKind = 'ARTICLE' | 'TIP';
+
+export interface Article {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt?: string | null;
+  content: string;
+  kind: ArticleKind;
+  published: boolean;
+  publishedAt?: string | null;
+  updatedAt: string;
+}
+
+// Liste : le contenu n'est renvoyé que pour les encarts (courts)
+export type ArticleSummary = Omit<Article, 'content'> & { content?: string };
+
+// ── Rapport de période ─────────────────────────
+export interface ReportData {
+  period: { from: string; to: string };
+  totalEntries: number;
+  scores: Record<string, number | null>;
+  physical: {
+    weight: number | null;
+    bodyTemperature: number | null;
+    heartRate: number | null;
+    sleepHours: number | null;
+  };
+  medicationAdherence: number | null;
+  activeMedications: Pick<Medication, 'name' | 'brand' | 'dosageMcg' | 'frequency' | 'intakeTime'>[];
+  labResults: LabResult[];
+}
