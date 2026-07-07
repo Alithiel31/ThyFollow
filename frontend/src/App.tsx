@@ -13,6 +13,9 @@ import { LabResultsPage } from './pages/LabResultsPage';
 import { MedicationsPage } from './pages/MedicationsPage';
 import { AppointmentsPage } from './pages/AppointmentsPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { ArticlesPage } from './pages/ArticlesPage';
+import { AdminArticlesPage } from './pages/AdminArticlesPage';
+import { ReportPage } from './pages/ReportPage';
 import { AppShell } from './components/AppShell';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -46,17 +49,6 @@ export default function App() {
 
   return (
     <>
-      <style>{`
-        .spinner {
-          width: 36px; height: 36px;
-          border: 3px solid var(--border);
-          border-top-color: var(--accent);
-          border-radius: 50%;
-          animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-      `}</style>
-
       <Routes>
         {/* Public */}
         <Route path="/login" element={<LoginPage />} />
@@ -71,8 +63,14 @@ export default function App() {
           <Route path="/lab-results" element={<LabResultsPage />} />
           <Route path="/medications" element={<MedicationsPage />} />
           <Route path="/appointments" element={<AppointmentsPage />} />
+          <Route path="/learn" element={<ArticlesPage />} />
+          <Route path="/learn/:slug" element={<ArticlesPage />} />
+          <Route path="/admin/articles" element={<AdminArticlesPage />} />
           <Route path="/profile" element={<ProfilePage />} />
         </Route>
+
+        {/* Rapport imprimable : authentifié mais hors AppShell (pas de sidebar sur le papier) */}
+        <Route path="/report" element={<RequireAuth><ReportPage /></RequireAuth>} />
 
         {/* 404 */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

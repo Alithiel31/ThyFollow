@@ -29,22 +29,21 @@ export function scoreToLabel(score: number): string {
   return labels[score] ?? '';
 }
 
+// Couleurs exprimées en tokens CSS : elles suivent automatiquement le thème.
 export function scoreToColor(score: number): string {
-  if (score <= 1) return '#ff6b8a';
-  if (score === 2) return '#ffb347';
-  if (score === 3) return '#ffd700';
-  if (score === 4) return '#00d4b4';
-  return '#7b61ff';
+  if (score <= 2) return 'var(--danger)';
+  if (score === 3) return 'var(--warn)';
+  return 'var(--success)';
 }
 
 export function tshStatus(tsh: number, profileMin?: number, profileMax?: number): {
-  label: string; color: string; status: 'low' | 'normal' | 'high';
+  label: string; color: string; bg: string; status: 'low' | 'normal' | 'high';
 } {
   const min = profileMin ?? LAB_RANGES.tsh.min;
   const max = profileMax ?? LAB_RANGES.tsh.max;
-  if (tsh < min) return { label: 'Bas', color: '#7b61ff', status: 'low' };
-  if (tsh > max) return { label: 'Élevé', color: '#ff6b8a', status: 'high' };
-  return { label: 'Normal', color: '#00d4b4', status: 'normal' };
+  if (tsh < min) return { label: 'Bas', color: 'var(--lav)', bg: 'var(--lav-soft)', status: 'low' };
+  if (tsh > max) return { label: 'Élevé', color: 'var(--danger)', bg: 'var(--danger-soft)', status: 'high' };
+  return { label: 'Normal', color: 'var(--success)', bg: 'var(--success-soft)', status: 'normal' };
 }
 
 export function cn(...classes: (string | undefined | false | null)[]): string {

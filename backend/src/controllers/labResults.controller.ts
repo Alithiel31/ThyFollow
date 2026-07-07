@@ -1,9 +1,9 @@
 // src/controllers/labResults.controller.ts
 import { Response } from 'express';
 import { z } from 'zod';
-import { prisma } from '../lib/prisma';
-import { AuthRequest } from '../middleware/auth';
-import { NotFoundError } from '../lib/errors';
+import { prisma } from '../lib/prisma.js';
+import { AuthRequest } from '../middleware/auth.js';
+import { NotFoundError } from '../lib/errors.js';
 
 const labSchema = z.object({
   date: z.string(),

@@ -1,8 +1,8 @@
 // src/routers/appointments.router.ts
 import { Router } from 'express';
-import { appointmentsController } from '../controllers/appointments.controller';
-import { asyncHandler } from '../middleware/asyncHandler';
-import { authenticate } from '../middleware/auth';
+import { appointmentsController } from '../controllers/appointments.controller.js';
+import { asyncHandler } from '../middleware/asyncHandler.js';
+import { authenticate } from '../middleware/auth.js';
 
 const router = Router();
 router.use(authenticate);

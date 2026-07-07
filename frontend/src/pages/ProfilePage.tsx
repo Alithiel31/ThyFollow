@@ -2,10 +2,10 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { User, Save } from 'lucide-react';
+import { User, Save, Target, Settings } from 'lucide-react';
 import { profileApi } from '../lib/api';
 import { useAuthStore } from '../lib/store';
-import { DIAGNOSIS_LABELS, THYROID_STATUS_LABELS, type UserProfile, type DiagnosisType, type ThyroidStatus } from '../types';
+import { DIAGNOSIS_LABELS, THYROID_STATUS_LABELS, type UserProfile } from '../types';
 import styles from './ProfilePage.module.css';
 
 export function ProfilePage() {
@@ -58,7 +58,7 @@ export function ProfilePage() {
 
       <form onSubmit={handleSubmit}>
         {/* ── Diagnosis */}
-        <Section title="🦋 Mon diagnostic" icon={<User size={16} />}>
+        <Section title="Mon diagnostic" icon={<User size={16} strokeWidth={1.8} />}>
           <div className={styles.grid2}>
             <div className={styles.field}>
               <label className={styles.label}>Type de pathologie</label>
@@ -92,7 +92,7 @@ export function ProfilePage() {
         </Section>
 
         {/* ── Target ranges */}
-        <Section title="🎯 Plages cibles personnalisées">
+        <Section title="Plages cibles personnalisées" icon={<Target size={16} strokeWidth={1.8} />}>
           <p className={styles.hint}>Ces valeurs sont définies avec votre endocrinologue. Elles servent à coloriser vos analyses.</p>
           <div className={styles.grid3}>
             <div className={styles.field}>
@@ -131,7 +131,7 @@ export function ProfilePage() {
         </Section>
 
         {/* ── Preferences */}
-        <Section title="⚙️ Préférences">
+        <Section title="Préférences" icon={<Settings size={16} strokeWidth={1.8} />}>
           <div className={styles.grid2}>
             <div className={styles.field}>
               <label className={styles.label}>Unité de poids</label>

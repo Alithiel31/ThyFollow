@@ -1,7 +1,7 @@
 // src/controllers/analytics.controller.ts
 import { Response } from 'express';
-import { prisma } from '../lib/prisma';
-import { AuthRequest } from '../middleware/auth';
+import { prisma } from '../lib/prisma.js';
+import { AuthRequest } from '../middleware/auth.js';
 
 // Parse ?days=N en retombant sur `fallback` si absent/invalide.
 // Note: `parseInt(x) || fallback` a un bug quand x==="0" (0 est falsy en JS
@@ -85,6 +85,71 @@ export const analyticsController = {
       labHistory: labResults,
       nextAppointment,
       timeSeries: entries,
+    });
+  },
+
+
+  // GET /api/analytics/report?from=2026-01-01&to=2026-03-31
+  // Rapport de synthèse sur une période libre : moyennes de tous les
+  // indicateurs du journal + analyses de la période. Sert l'export PDF/CSV.
+  report: async (req: AuthRequest, res: Response): Promise<void> => {
+    const from = new Date(req.query.from as string);
+    const to = new Date(req.query.to as string);
+
+    if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime()) || from > to) {
+      res.status(400).json({ error: 'Période invalide (from/to au format YYYY-MM-DD)' });
+      return;
+    }
+
+    const [entries, labResults, medications] = await Promise.all([
+      prisma.dailyEntry.findMany({
+        where: { userId: req.userId, date: { gte: from, lte: to } },
+        orderBy: { date: 'asc' },
+      }),
+      prisma.labResult.findMany({
+        where: { userId: req.userId, date: { gte: from, lte: to } },
+        orderBy: { date: 'asc' },
+      }),
+      prisma.medication.findMany({
+        where: { userId: req.userId, active: true },
+        select: { name: true, brand: true, dosageMcg: true, frequency: true, intakeTime: true },
+      }),
+    ]);
+
+    // Moyenne d'un champ numérique en ignorant les null
+    const avg = (field: keyof (typeof entries)[0]): number | null => {
+      const values = entries
+        .map((e) => e[field])
+        .filter((v): v is number => typeof v === 'number');
+      if (values.length === 0) return null;
+      return Math.round((values.reduce((s, v) => s + v, 0) / values.length) * 100) / 100;
+    };
+
+    const scoreFields = [
+      'energyLevel', 'moodScore', 'anxietyLevel', 'brainFogLevel',
+      'coldSensitivity', 'heatSensitivity', 'hairLoss', 'drySkin',
+      'constipation', 'bloating', 'muscleWeakness', 'jointPain',
+      'neckPain', 'swelling', 'tremors', 'sleepQuality',
+    ] as const;
+
+    const scores: Record<string, number | null> = {};
+    for (const f of scoreFields) scores[f] = avg(f);
+
+    res.json({
+      period: { from, to },
+      totalEntries: entries.length,
+      scores,
+      physical: {
+        weight: avg('weight'),
+        bodyTemperature: avg('bodyTemperature'),
+        heartRate: avg('heartRate'),
+        sleepHours: avg('sleepHours'),
+      },
+      medicationAdherence: entries.length
+        ? Math.round((entries.filter((e) => e.medicationTaken).length / entries.length) * 100)
+        : null,
+      activeMedications: medications,
+      labResults,
     });
   },
 

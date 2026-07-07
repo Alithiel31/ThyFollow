@@ -5,15 +5,14 @@
   min-height: 100dvh;
 }
 
-/* ── Sidebar ──────────────────────────────── */
+/* ── Sidebar (desktop) ─────────────────────── */
 .sidebar {
   width: 240px;
-  min-height: 100dvh;
   background: var(--bg-card);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  padding: 24px 16px;
+  padding: 24px 14px;
   position: fixed;
   left: 0; top: 0; bottom: 0;
   z-index: 50;
@@ -23,25 +22,54 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 8px;
-  margin-bottom: 36px;
+  padding: 0 10px;
+  margin-bottom: 32px;
   cursor: pointer;
 }
 
 .logoIcon {
-  width: 34px; height: 34px;
-  background: var(--accent-soft);
-  border: 1px solid var(--accent-glow);
-  border-radius: 10px;
+  width: 30px; height: 30px;
+  background: var(--bg-card);
+  border: 1px solid var(--accent-soft);
+  border-radius: 9px;
   display: flex; align-items: center; justify-content: center;
-  color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* Papillon : deux lobes bleu / orange (maquette) */
+.wings {
+  position: relative;
+  width: 16px; height: 12px;
+}
+
+.wingLeft, .wingRight {
+  position: absolute;
+  top: 1px;
+  width: 8px; height: 10px;
+  display: block;
+}
+
+.wingLeft {
+  left: 0;
+  border-radius: 7px 7px 7px 1px;
+  background: linear-gradient(140deg, #8fb8ff, #3b7bf6);
+  transform: rotate(-9deg);
+}
+
+.wingRight {
+  right: 0;
+  border-radius: 7px 7px 1px 7px;
+  background: linear-gradient(220deg, #ff9d4d, #e8650f);
+  transform: rotate(9deg);
 }
 
 .logoText {
   font-family: var(--font-display);
-  font-size: 1.2rem;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.1rem;
   color: var(--text);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 .nav {
@@ -54,46 +82,69 @@
 .navItem {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
+  gap: 11px;
+  padding: 11px 12px;
+  min-height: var(--tap);
   border-radius: var(--radius-sm);
-  color: var(--text-muted);
+  color: var(--text-dim);
   text-decoration: none;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   font-weight: 400;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .navItem:hover {
   background: var(--bg-raised);
-  color: var(--text-dim);
+  color: var(--text);
 }
 
 .navItemActive {
-  background: var(--accent-soft) !important;
-  color: var(--accent) !important;
+  background: var(--accent-soft);
+  color: var(--accent);
   font-weight: 500;
 }
 
+.navItemActive:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* ── Pied de sidebar ───────────────────────── */
 .sidebarFooter {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px;
+  gap: 6px;
+  padding: 10px;
   background: var(--bg-raised);
   border-radius: var(--radius);
   margin-top: 16px;
 }
 
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+/* Avatar cerclé d'un dégradé bleu → orange (maquette) */
 .avatar {
   width: 32px; height: 32px;
-  background: var(--accent-soft);
+  padding: 2px;
+  background: linear-gradient(135deg, var(--accent), var(--lav));
   border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--accent);
-  font-size: 0.8rem;
-  font-weight: 600;
   flex-shrink: 0;
+}
+
+.avatarInner {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  background: var(--bg-card);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text);
+  font-size: 0.75rem;
+  font-weight: 700;
 }
 
 .userMeta {
@@ -120,37 +171,74 @@
   text-overflow: ellipsis;
 }
 
-.logoutBtn {
+.footerBtn {
   background: none;
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  padding: 4px;
-  border-radius: 6px;
-  display: flex; align-items: center;
-  transition: color 0.15s;
+  width: 34px; height: 34px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background-color 0.15s ease, color 0.15s ease;
   flex-shrink: 0;
 }
 
-.logoutBtn:hover { color: var(--rose); }
+.footerBtn:hover {
+  background: var(--bg-card);
+  color: var(--text);
+}
 
-/* ── Main ──────────────────────────────────── */
+/* ── Header mobile ─────────────────────────── */
+.mobileHeader {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: calc(56px + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) 12px 0 16px;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  z-index: 50;
+}
+
+.mobileHeader .logo { margin-bottom: 0; padding: 0; }
+.mobileHeader .logoIcon { width: 30px; height: 30px; }
+.mobileHeader .logoText { font-size: 1rem; }
+
+.mobileHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.avatarBtn {
+  width: 32px; height: 32px;
+  padding: 2px;
+  background: linear-gradient(135deg, var(--accent), var(--lav));
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ── Contenu principal ─────────────────────── */
 .main {
   flex: 1;
   margin-left: 240px;
-  padding: 40px 48px;
+  padding: 36px 44px 48px;
   min-height: 100dvh;
-  padding-bottom: 32px;
+  max-width: 1200px;
 }
 
-/* ── Mobile nav ────────────────────────────── */
+/* ── Nav basse mobile ──────────────────────── */
 .mobileNav {
   display: none;
   position: fixed;
   bottom: 0; left: 0; right: 0;
   background: var(--bg-card);
   border-top: 1px solid var(--border);
-  padding: 8px 0 env(safe-area-inset-bottom);
+  padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
   z-index: 50;
 }
 
@@ -159,21 +247,43 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  padding: 6px 4px;
+  justify-content: center;
+  gap: 5px;
+  min-height: var(--tap);
+  padding: 4px;
+  border-radius: var(--radius-sm);
   color: var(--text-muted);
   text-decoration: none;
-  font-size: 0.65rem;
-  transition: color 0.15s;
+  font-size: 0.66rem;
+  transition: color 0.15s ease;
+}
+
+/* Point cerclé (inactif) → plein bleu (actif), comme la maquette */
+.navDot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-hover);
+  background: transparent;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .mobileNavItemActive {
-  color: var(--accent);
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+
+.mobileNavItemActive .navDot {
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 /* ── Responsive ────────────────────────────── */
 @media (max-width: 768px) {
   .sidebar { display: none; }
-  .main { margin-left: 0; padding: 20px 16px 80px; }
+  .mobileHeader { display: flex; }
   .mobileNav { display: flex; }
+  .main {
+    margin-left: 0;
+    padding: calc(72px + env(safe-area-inset-top)) 16px calc(84px + env(safe-area-inset-bottom));
+  }
 }

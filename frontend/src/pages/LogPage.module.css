@@ -27,8 +27,8 @@
 .dateInfo { flex: 1; text-align: center; }
 
 .dateTitle {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-family: var(--font-display); font-style: italic; font-weight: 500;
+  font-size: 1.25rem;
   color: var(--text);
   text-transform: capitalize;
   letter-spacing: -0.01em;
@@ -86,7 +86,7 @@
 
 .medPillActive .medPillIcon {
   background: var(--teal);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .medPillTitle {
@@ -244,7 +244,7 @@
 .saveBtnDirty {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .saveBtnDirty:hover { opacity: 0.88; }
@@ -256,3 +256,62 @@
   .scoreButtons { gap: 4px; }
   .scoreBtn { width: 32px; height: 32px; }
 }
+
+/* ── Export de rapport ─────────────────────── */
+.exportRow { display: flex; justify-content: flex-end; margin: -8px 0 16px; }
+
+.exportBtn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 14px; min-height: 38px;
+  background: none; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text-dim);
+  font-size: 0.82rem; cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.exportBtn:hover { border-color: var(--border-hover); color: var(--text); }
+
+.overlay {
+  position: fixed; inset: 0; background: var(--overlay);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; z-index: 100;
+}
+
+.exportModal {
+  width: 100%; max-width: 420px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 28px;
+  box-shadow: var(--shadow);
+}
+
+.exportTitle {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 1.15rem; font-weight: 600; margin-bottom: 8px;
+}
+
+.exportHint { font-size: 0.83rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
+
+.exportGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 22px; }
+
+.exportField { display: flex; flex-direction: column; gap: 6px; font-size: 0.8rem; color: var(--text-dim); }
+.exportField input {
+  background: var(--bg-raised); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 12px; min-height: var(--tap);
+  color: var(--text); font-size: 0.9rem; outline: none;
+}
+.exportField input:focus { border-color: var(--accent); }
+
+.exportActions { display: flex; justify-content: flex-end; gap: 10px; }
+
+.exportCancel {
+  background: none; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 16px; min-height: var(--tap);
+  color: var(--text-dim); font-size: 0.875rem; cursor: pointer;
+}
+.exportCancel:hover { border-color: var(--border-hover); }
+
+.exportGo {
+  background: var(--accent); border: none;
+  border-radius: var(--radius-sm); padding: 10px 18px; min-height: var(--tap);
+  color: var(--on-accent); font-size: 0.875rem; font-weight: 500; cursor: pointer;
+}
+.exportGo:hover { opacity: 0.9; }

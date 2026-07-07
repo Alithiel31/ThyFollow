@@ -79,6 +79,8 @@ export const apptApi = {
 export const analyticsApi = {
   overview: (days = 90) =>
     api.get<import('../types').AnalyticsOverview>('/analytics/overview', { params: { days } }),
+  report: (from: string, to: string) =>
+    api.get<import('../types').ReportData>('/analytics/report', { params: { from, to } }),
   symptoms: (days = 30) =>
     api.get<{ period: object; frequency: Record<string, { count: number; avgSeverity: number }> }>(
       '/analytics/symptoms', { params: { days } }
@@ -89,4 +91,17 @@ export const analyticsApi = {
 export const profileApi = {
   get: () => api.get<import('../types').UserProfile>('/profile'),
   update: (data: Partial<import('../types').UserProfile>) => api.put<import('../types').UserProfile>('/profile', data),
+};
+
+// ── Articles & encarts
+export const articlesApi = {
+  list: (kind?: import('../types').ArticleKind) =>
+    api.get<import('../types').ArticleSummary[]>('/articles', { params: kind ? { kind } : undefined }),
+  get: (slug: string) => api.get<import('../types').Article>(`/articles/${slug}`),
+  adminList: () => api.get<import('../types').Article[]>('/articles/admin/all'),
+  create: (data: Partial<import('../types').Article> & { title: string; content: string }) =>
+    api.post<import('../types').Article>('/articles/admin', data),
+  update: (id: string, data: Partial<import('../types').Article>) =>
+    api.put<import('../types').Article>(`/articles/admin/${id}`, data),
+  delete: (id: string) => api.delete(`/articles/admin/${id}`),
 };

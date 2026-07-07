@@ -1,13 +1,13 @@
 // src/pages/DashboardPage.tsx
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { analyticsApi } from '../lib/api';
+import { analyticsApi, articlesApi } from '../lib/api';
 import { useAuthStore } from '../lib/store';
 import { formatDate, formatDateShort, tshStatus, toISODate } from '../lib/utils';
 import { LAB_RANGES } from '../types';
 import {
   Flame, TrendingUp, Pill, Calendar, FlaskConical,
-  Plus, ChevronRight, Activity
+  Plus, ChevronRight, Activity, BookOpen
 } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, Tooltip,
@@ -26,6 +26,15 @@ export function DashboardPage() {
     queryKey: ['analytics', 'overview'],
     queryFn: () => analyticsApi.overview(90).then((r) => r.data),
   });
+
+  // Encart conseil : rotation quotidienne parmi les encarts publiés
+  const { data: tips } = useQuery({
+    queryKey: ['articles', 'tips'],
+    queryFn: () => articlesApi.list('TIP').then((r) => r.data),
+  });
+  const tip = tips?.length
+    ? tips[Math.floor(Date.now() / 86_400_000) % tips.length]
+    : null;
 
   const chartData = overview?.timeSeries.map((e) => ({
     date: format(parseISO(e.date as string), 'd MMM', { locale: fr }),
@@ -46,7 +55,7 @@ export function DashboardPage() {
       <div className={styles.header}>
         <div>
           <h1 className={styles.greeting}>
-            Bonjour, {user?.name?.split(' ')[0]} 👋
+            Bonjour, {user?.name?.split(' ')[0]}
           </h1>
           <p className={styles.date}>{formatDate(new Date())}</p>
         </div>
@@ -86,7 +95,7 @@ export function DashboardPage() {
           label="Dernier TSH"
           value={tsh != null ? `${tsh} mUI/L` : '—'}
           color={tshInfo?.color ?? 'var(--text-muted)'}
-          bg={tshInfo ? `${tshInfo.color}22` : 'var(--bg-raised)'}
+          bg={tshInfo?.bg ?? 'var(--bg-raised)'}
           badge={tshInfo?.label}
         />
       </div>
@@ -101,27 +110,28 @@ export function DashboardPage() {
           <div className={styles.chartWrap}>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: -20 }}>
-                <CartesianGrid stroke="rgba(255,255,255,0.04)" vertical={false} />
+                <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
                 <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--text-muted)' }}
                   tickLine={false} axisLine={false} interval={13} />
                 <YAxis domain={[1, 5]} tick={{ fontSize: 11, fill: 'var(--text-muted)' }}
                   tickLine={false} axisLine={false} ticks={[1, 2, 3, 4, 5]} />
                 <Tooltip
                   contentStyle={{
-                    background: 'var(--bg-raised)', border: '1px solid var(--border)',
+                    background: 'var(--bg-card)', border: '1px solid var(--border)',
                     borderRadius: 10, fontSize: 12, color: 'var(--text)',
+                    boxShadow: 'var(--shadow)',
                   }}
                 />
-                <Line type="monotone" dataKey="énergie" stroke="var(--accent)"
+                <Line type="monotone" dataKey="énergie" stroke="var(--chart-1)"
                   strokeWidth={2} dot={false} connectNulls />
-                <Line type="monotone" dataKey="humeur" stroke="var(--teal)"
+                <Line type="monotone" dataKey="humeur" stroke="var(--chart-2)"
                   strokeWidth={2} dot={false} connectNulls />
               </LineChart>
             </ResponsiveContainer>
           </div>
           <div className={styles.legend}>
-            <span><span style={{ color: 'var(--accent)' }}>●</span> Énergie</span>
-            <span><span style={{ color: 'var(--teal)' }}>●</span> Humeur</span>
+            <span><span style={{ color: 'var(--chart-1)' }}>●</span> Énergie</span>
+            <span><span style={{ color: 'var(--chart-2)' }}>●</span> Humeur</span>
           </div>
         </div>
 
@@ -210,6 +220,18 @@ export function DashboardPage() {
         </div>
       </div>
 
+      {/* ── Encart conseil du jour */}
+      {tip && (
+        <div className={styles.tipCard} onClick={() => navigate('/learn')} role="button" tabIndex={0}>
+          <div className={styles.tipIcon}><BookOpen size={16} /></div>
+          <div className={styles.tipBody}>
+            <p className={styles.tipTitle}>{tip.title}</p>
+            {tip.content && <p className={styles.tipText}>{tip.content}</p>}
+          </div>
+          <ChevronRight size={16} className={styles.tipChevron} />
+        </div>
+      )}
+
       {/* ── Quick log CTA */}
       <div className={styles.ctaBanner}>
         <Activity size={20} />
@@ -246,7 +268,7 @@ function TshBar({ value, min, max }: { value: number; min: number; max: number }
   const pct = Math.min((value / displayMax) * 100, 100);
   const normalStart = (min / displayMax) * 100;
   const normalEnd = (max / displayMax) * 100;
-  const color = value < min ? '#7b61ff' : value > max ? '#ff6b8a' : '#00d4b4';
+  const color = value < min ? 'var(--lav)' : value > max ? 'var(--danger)' : 'var(--success)';
 
   return (
     <div className={styles.tshBar}>

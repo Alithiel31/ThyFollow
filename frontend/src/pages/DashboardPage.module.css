@@ -10,8 +10,8 @@
 }
 
 .greeting {
-  font-family: var(--font-display);
-  font-size: 2rem;
+  font-family: var(--font-display); font-style: italic; font-weight: 500;
+  font-size: 1.6rem;
   color: var(--text);
   letter-spacing: -0.02em;
 }
@@ -28,7 +28,7 @@
   align-items: center;
   gap: 8px;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   border: none;
   border-radius: var(--radius-sm);
   padding: 10px 18px;
@@ -182,9 +182,9 @@
 .tshBarNormal {
   position: absolute;
   top: 0; bottom: 0;
-  background: rgba(0,212,180,0.15);
-  border-left: 1px solid rgba(0,212,180,0.3);
-  border-right: 1px solid rgba(0,212,180,0.3);
+  background: var(--success-soft);
+  border-left: 1px solid var(--success-soft);
+  border-right: 1px solid var(--success-soft);
 }
 
 .tshBarFill {
@@ -271,7 +271,7 @@
 
 .ctaBanner button {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   border: none;
   border-radius: var(--radius-sm);
   padding: 8px 16px;
@@ -296,3 +296,30 @@
   .kpiRow { grid-template-columns: 1fr 1fr; }
   .greeting { font-size: 1.5rem; }
 }
+
+/* ── Encart conseil du jour ────────────────── */
+.tipCard {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: var(--lav-soft);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  padding: 16px 18px; margin-top: 20px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.tipCard:hover { border-color: var(--lav); }
+
+.tipIcon {
+  width: 32px; height: 32px; flex-shrink: 0;
+  background: var(--bg-card); border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--lav);
+}
+
+.tipBody { flex: 1; min-width: 0; }
+.tipTitle { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.tipText {
+  font-size: 0.83rem; color: var(--text-dim); line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.tipChevron { color: var(--text-muted); flex-shrink: 0; margin-top: 8px; }

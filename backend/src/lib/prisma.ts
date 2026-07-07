@@ -1,6 +1,6 @@
 // src/lib/prisma.ts
 import { PrismaClient } from '@prisma/client';
-import { config } from '../config';
+import { config } from '../config.js';
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;

@@ -7,3 +7,6 @@ dist/
 prisma/migrations/*.sql.bak
 frontend/dist/
 backend/dist/
+.claude/
+thyro-track-conceptArt.pdf
+ThyroTrack Mobile (standalone).html

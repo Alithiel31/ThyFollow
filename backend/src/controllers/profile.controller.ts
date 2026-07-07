@@ -1,8 +1,8 @@
 // src/controllers/profile.controller.ts
 import { Response } from 'express';
 import { z } from 'zod';
-import { prisma } from '../lib/prisma';
-import { AuthRequest } from '../middleware/auth';
+import { prisma } from '../lib/prisma.js';
+import { AuthRequest } from '../middleware/auth.js';
 
 const profileSchema = z.object({
   diagnosisType: z.enum(['HYPOTHYROIDISM', 'HYPERTHYROIDISM', 'HASHIMOTO', 'GRAVES', 'THYROID_CANCER', 'NODULES', 'GOITER', 'OTHER']).optional().nullable(),

@@ -2,6 +2,7 @@ services:
 
   postgres:
     image: postgres:16-alpine
+    container_name: thyrotrack-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: thyro
@@ -14,12 +15,14 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      - thyrotrack-network
 
-  api:
+  backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
-      target: production
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: thyrotrack-backend
     restart: unless-stopped
     depends_on:
       postgres:
@@ -29,8 +32,41 @@ services:
       JWT_SECRET: ${JWT_SECRET:-change_me_in_production}
       NODE_ENV: production
       PORT: 3001
+      # Frontend et API partagent la même origine via Nginx (le navigateur
+      # parle uniquement à nginx sur le port public). CORS_ORIGIN reste un
+      # garde-fou si jamais le backend est appelé directement.
+      FRONTEND_URL: http://localhost:8080
+    networks:
+      - thyrotrack-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: thyrotrack-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - thyrotrack-network
+
+  nginx:
+    build:
+      context: ./nginx
+    container_name: thyrotrack-nginx
+    restart: unless-stopped
     ports:
-      - "80:3001"
+      - "8080:80"
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - thyrotrack-network
+
+networks:
+  thyrotrack-network:
+    driver: bridge
 
 volumes:
   postgres_data:
+    driver: local

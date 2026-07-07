@@ -1,0 +1,112 @@
+/* src/pages/AdminArticlesPage.module.css */
+
+.page { max-width: 760px; }
+
+.header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; gap: 12px; }
+.title { font-family: var(--font-display); font-style: italic; font-weight: 500; font-size: 1.5rem; color: var(--text); letter-spacing: -0.02em; }
+.sub { font-size: 0.875rem; color: var(--text-muted); margin-top: 4px; }
+
+.addBtn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent); color: var(--on-accent); border: none;
+  border-radius: var(--radius-sm); padding: 10px 16px; min-height: var(--tap);
+  font-size: 0.875rem; font-weight: 500; cursor: pointer; flex-shrink: 0;
+}
+.addBtn:hover { opacity: 0.9; }
+
+.loader { display: flex; justify-content: center; padding: 60px; }
+.empty { padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
+
+.list { display: flex; flex-direction: column; gap: 10px; }
+
+.row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 16px;
+  cursor: pointer; transition: border-color 0.15s ease;
+}
+.row:hover { border-color: var(--border-hover); }
+
+.rowBody { display: flex; align-items: center; gap: 12px; min-width: 0; }
+
+.kindBadge {
+  flex-shrink: 0; font-size: 0.7rem; font-weight: 600;
+  padding: 4px 10px; border-radius: 99px;
+  background: var(--accent-soft); color: var(--accent);
+}
+.kindTip { background: var(--lav-soft); color: var(--lav); }
+
+.rowTitle { font-size: 0.92rem; font-weight: 500; color: var(--text); }
+.rowMeta { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+.rowActions { display: flex; gap: 4px; flex-shrink: 0; }
+.iconBtn {
+  background: none; border: none; cursor: pointer;
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted); transition: background-color 0.15s ease;
+}
+.iconBtn:hover { background: var(--bg-raised); color: var(--text); }
+
+/* Modale */
+.overlay {
+  position: fixed; inset: 0; background: var(--overlay);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; z-index: 100; overflow-y: auto;
+}
+.modal {
+  width: 100%; max-width: 640px; max-height: 90dvh; overflow-y: auto;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow);
+}
+.modalTitle {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-display); font-style: italic; font-weight: 500; font-size: 1.2rem;
+  margin-bottom: 22px;
+}
+
+.form { display: flex; flex-direction: column; gap: 16px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.label { font-size: 0.8rem; font-weight: 500; color: var(--text-dim); }
+
+.input {
+  background: var(--bg-raised); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 13px; min-height: var(--tap);
+  color: var(--text); font-size: 0.9rem; outline: none; width: 100%;
+  transition: border-color 0.15s ease;
+}
+.input:focus { border-color: var(--accent); }
+
+.textarea {
+  background: var(--bg-raised); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px 13px;
+  color: var(--text); font-size: 0.9rem; outline: none; width: 100%;
+  resize: vertical; font-family: var(--font-body); line-height: 1.6;
+}
+.textarea:focus { border-color: var(--accent); }
+
+.checkRow {
+  display: flex; align-items: center; gap: 10px;
+  min-height: var(--tap); padding: 0 4px;
+  font-size: 0.9rem; color: var(--text); cursor: pointer;
+}
+.checkRow input { width: 18px; height: 18px; accent-color: var(--accent); }
+
+.formActions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px; }
+.cancelBtn {
+  background: none; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 16px; min-height: var(--tap);
+  color: var(--text-dim); font-size: 0.875rem; cursor: pointer;
+}
+.submitBtn {
+  background: var(--accent); border: none;
+  border-radius: var(--radius-sm); padding: 10px 18px; min-height: var(--tap);
+  color: var(--on-accent); font-size: 0.875rem; font-weight: 500; cursor: pointer;
+}
+.submitBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+@media (max-width: 640px) {
+  .grid2 { grid-template-columns: 1fr; }
+  .modal { padding: 20px; }
+}

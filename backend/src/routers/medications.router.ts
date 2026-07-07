@@ -1,8 +1,8 @@
 // src/routers/medications.router.ts
 import { Router } from 'express';
-import { medicationsController } from '../controllers/medications.controller';
-import { asyncHandler } from '../middleware/asyncHandler';
-import { authenticate } from '../middleware/auth';
+import { medicationsController } from '../controllers/medications.controller.js';
+import { asyncHandler } from '../middleware/asyncHandler.js';
+import { authenticate } from '../middleware/auth.js';
 
 const router = Router();
 router.use(authenticate);

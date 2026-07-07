@@ -2,7 +2,11 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { Plus, Calendar, Trash2, Check } from 'lucide-react';
+import {
+  Plus, Calendar, Trash2, Check, CalendarPlus,
+  Stethoscope, Syringe, Microscope, Waves, Radiation, HeartPulse,
+} from 'lucide-react';
+import { downloadICS, googleCalendarUrl } from '../lib/calendar';
 import { apptApi } from '../lib/api';
 import { formatDate } from '../lib/utils';
 import type { Appointment, AppointmentType } from '../types';
@@ -18,9 +22,14 @@ const TYPE_LABELS: Record<AppointmentType, string> = {
   OTHER: 'Autre',
 };
 
-const TYPE_EMOJIS: Record<AppointmentType, string> = {
-  ENDOCRINOLOGIST: '🩺', GENERAL_PRACTITIONER: '👨‍⚕️', ULTRASOUND: '🔬',
-  BLOOD_TEST: '💉', SCINTIGRAPHY: '☢️', BIOPSY: '🧪', OTHER: '📅',
+const TYPE_ICONS: Record<AppointmentType, typeof Calendar> = {
+  ENDOCRINOLOGIST: Stethoscope,
+  GENERAL_PRACTITIONER: HeartPulse,
+  ULTRASOUND: Waves,
+  BLOOD_TEST: Syringe,
+  SCINTIGRAPHY: Radiation,
+  BIOPSY: Microscope,
+  OTHER: Calendar,
 };
 
 const STATUS_LABELS = { UPCOMING: 'À venir', COMPLETED: 'Terminé', CANCELLED: 'Annulé' };
@@ -170,7 +179,9 @@ export function AppointmentsPage() {
           {filtered.map((a) => (
             <div key={a.id} className={`${styles.apptCard} ${a.status === 'COMPLETED' ? styles.apptDone : ''} ${a.status === 'CANCELLED' ? styles.apptCancelled : ''}`}
               onClick={() => openEdit(a)}>
-              <div className={styles.apptEmoji}>{TYPE_EMOJIS[a.type]}</div>
+              <div className={styles.apptEmoji}>
+                {(() => { const Icon = TYPE_ICONS[a.type]; return <Icon size={18} strokeWidth={1.8} />; })()}
+              </div>
               <div className={styles.apptInfo}>
                 <div className={styles.apptType}>{TYPE_LABELS[a.type]}</div>
                 <div className={styles.apptDate}>{formatDate(a.date, "EEEE d MMMM yyyy 'à' HH'h'mm")}</div>
@@ -179,9 +190,19 @@ export function AppointmentsPage() {
               </div>
               <div className={styles.apptActions} onClick={(e) => e.stopPropagation()}>
                 {a.status === 'UPCOMING' && (
-                  <button className={styles.doneBtn} onClick={() => markDone(a)} title="Marquer comme terminé">
-                    <Check size={14} />
-                  </button>
+                  <>
+                    <button className={styles.iconBtn} onClick={() => downloadICS(a, TYPE_LABELS[a.type])}
+                      title="Ajouter à mon agenda (.ics)">
+                      <CalendarPlus size={16} />
+                    </button>
+                    <a className={styles.iconBtn} href={googleCalendarUrl(a, TYPE_LABELS[a.type])}
+                      target="_blank" rel="noopener noreferrer" title="Ajouter à Google Agenda">
+                      <span className={styles.gcal}>G</span>
+                    </a>
+                    <button className={styles.doneBtn} onClick={() => markDone(a)} title="Marquer comme terminé">
+                      <Check size={14} />
+                    </button>
+                  </>
                 )}
                 <span className={`${styles.statusBadge} ${styles[`status_${a.status}`]}`}>
                   {STATUS_LABELS[a.status]}

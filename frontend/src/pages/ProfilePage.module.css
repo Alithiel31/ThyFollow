@@ -12,12 +12,12 @@
   background: var(--accent-soft); border: 2px solid var(--accent-glow);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-display); font-size: 1.8rem; color: var(--accent);
+  font-family: var(--font-display); font-style: italic; font-weight: 500; font-size: 1.8rem; color: var(--accent);
 }
 
 .title {
-  font-family: var(--font-display);
-  font-size: 1.9rem; color: var(--text); letter-spacing: -0.02em;
+  font-family: var(--font-display); font-style: italic; font-weight: 500;
+  font-size: 1.5rem; color: var(--text); letter-spacing: -0.02em;
 }
 
 .email { font-size: 0.875rem; color: var(--text-muted); margin-top: 2px; }
@@ -67,7 +67,7 @@
 }
 
 .saveBtnDirty {
-  background: var(--accent); border-color: var(--accent); color: #fff;
+  background: var(--accent); border-color: var(--accent); color: var(--on-accent);
 }
 .saveBtnDirty:hover { opacity: 0.88; }
 .saveBtn:disabled { opacity: 0.5; cursor: not-allowed; }
