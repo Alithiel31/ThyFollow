@@ -1,14 +1,15 @@
 // src/controllers/articles.controller.ts
 import { Response } from 'express';
 import { z } from 'zod';
+import type { TFunction } from 'i18next';
 import { prisma } from '../lib/prisma.js';
 import { AuthRequest } from '../middleware/auth.js';
 import { NotFoundError } from '../lib/errors.js';
 
-const articleSchema = z.object({
-  title: z.string().min(3, 'Titre trop court'),
+const articleSchema = (t: TFunction) => z.object({
+  title: z.string().min(3, t('validation.titleTooShort')),
   excerpt: z.string().optional().nullable(),
-  content: z.string().min(1, 'Contenu requis'),
+  content: z.string().min(1, t('validation.contentRequired')),
   kind: z.enum(['ARTICLE', 'TIP']).default('ARTICLE'),
   published: z.boolean().default(false),
 });
@@ -58,7 +59,7 @@ export const articlesController = {
     const article = await prisma.article.findFirst({
       where: { slug: req.params.slug, published: true },
     });
-    if (!article) throw new NotFoundError('Article');
+    if (!article) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.article') }));
     res.json(article);
   },
 
@@ -74,7 +75,7 @@ export const articlesController = {
 
   // POST /api/articles/admin
   create: async (req: AuthRequest, res: Response): Promise<void> => {
-    const data = articleSchema.parse(req.body);
+    const data = articleSchema(req.t).parse(req.body);
     const article = await prisma.article.create({
       data: {
         ...data,
@@ -87,9 +88,9 @@ export const articlesController = {
 
   // PUT /api/articles/admin/:id
   update: async (req: AuthRequest, res: Response): Promise<void> => {
-    const data = articleSchema.partial().parse(req.body);
+    const data = articleSchema(req.t).partial().parse(req.body);
     const existing = await prisma.article.findUnique({ where: { id: req.params.id } });
-    if (!existing) throw new NotFoundError('Article');
+    if (!existing) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.article') }));
 
     const article = await prisma.article.update({
       where: { id: existing.id },
@@ -106,7 +107,7 @@ export const articlesController = {
   // DELETE /api/articles/admin/:id
   remove: async (req: AuthRequest, res: Response): Promise<void> => {
     const existing = await prisma.article.findUnique({ where: { id: req.params.id } });
-    if (!existing) throw new NotFoundError('Article');
+    if (!existing) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.article') }));
     await prisma.article.delete({ where: { id: existing.id } });
     res.status(204).end();
   },

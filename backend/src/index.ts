@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 import { xss } from 'express-xss-sanitizer';
 import { config } from './config.js';
 import { logger } from './lib/logger.js';
+import i18next, { middleware as i18nextMiddleware } from './lib/i18n.js';
 import authRouter from './routers/auth.router.js';
 import entriesRouter from './routers/entries.router.js';
 import labResultsRouter from './routers/labResults.router.js';
@@ -18,12 +19,26 @@ import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
 
+// ── Fait confiance au reverse-proxy nginx placé devant (X-Forwarded-For),
+// nécessaire pour qu'express-rate-limit identifie correctement les IP clientes.
+app.set('trust proxy', 1);
+
 // ── Sécurité : en-têtes HTTP standards
 app.use(helmet());
 
+// ── Internationalisation : détecte la langue (Accept-Language / ?lng=) et
+// expose req.t() / req.language pour tout le reste de la chaîne.
+app.use(i18nextMiddleware.handle(i18next));
+
 // ── CORS
 app.use(cors({
-  origin: config.frontendUrl,
+  origin: (origin, callback) => {
+    if (!origin || config.frontendUrls.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS origin not allowed'));
+    }
+  },
   credentials: true,
 }));
 
@@ -32,7 +47,7 @@ app.use(
   rateLimit({
     windowMs: config.rateLimitWindowMs,
     max: config.rateLimitMax,
-    message: { error: 'Trop de requêtes, réessayez plus tard' },
+    message: (req: express.Request) => ({ error: req.t('errors.tooManyRequests') }),
   })
 );
 
@@ -40,7 +55,7 @@ app.use(
 const authLimiter = rateLimit({
   windowMs: config.authRateLimitWindowMs,
   max: config.authRateLimitMax,
-  message: { error: 'Trop de tentatives de connexion, réessayez plus tard' },
+  message: (req: express.Request) => ({ error: req.t('errors.tooManyLoginAttempts') }),
   skipSuccessfulRequests: true,
 });
 

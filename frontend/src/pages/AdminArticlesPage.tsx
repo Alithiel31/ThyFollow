@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { Plus, PenLine, Trash2, Eye, EyeOff } from 'lucide-react';
 import { articlesApi } from '../lib/api';
@@ -16,6 +17,7 @@ const EMPTY: Partial<Article> = {
 };
 
 export function AdminArticlesPage() {
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const qc = useQueryClient();
   const [showForm, setShowForm] = useState(false);
@@ -32,20 +34,20 @@ export function AdminArticlesPage() {
 
   const createMut = useMutation({
     mutationFn: (d: Partial<Article> & { title: string; content: string }) => articlesApi.create(d),
-    onSuccess: () => { toast.success('Créé'); invalidate(); resetForm(); },
-    onError: () => toast.error('Erreur'),
+    onSuccess: () => { toast.success(t('adminArticles.created')); invalidate(); resetForm(); },
+    onError: () => toast.error(t('adminArticles.error')),
   });
 
   const updateMut = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Article> }) => articlesApi.update(id, data),
-    onSuccess: () => { toast.success('Mis à jour'); invalidate(); resetForm(); },
-    onError: () => toast.error('Erreur'),
+    onSuccess: () => { toast.success(t('adminArticles.updated')); invalidate(); resetForm(); },
+    onError: () => toast.error(t('adminArticles.error')),
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => articlesApi.delete(id),
-    onSuccess: () => { toast.success('Supprimé'); invalidate(); },
-    onError: () => toast.error('Erreur'),
+    onSuccess: () => { toast.success(t('adminArticles.deleted')); invalidate(); },
+    onError: () => toast.error(t('adminArticles.error')),
   });
 
   // La garde : un non-admin est renvoyé au dashboard
@@ -60,7 +62,7 @@ export function AdminArticlesPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.title || !form.content) return toast.error('Titre et contenu obligatoires');
+    if (!form.title || !form.content) return toast.error(t('adminArticles.missingFields'));
     const payload = {
       title: form.title, excerpt: form.excerpt || null, content: form.content,
       kind: form.kind ?? 'ARTICLE', published: form.published ?? false,
@@ -73,11 +75,11 @@ export function AdminArticlesPage() {
     <div className={styles.page}>
       <div className={styles.header}>
         <div>
-          <h1 className={styles.title}>Rédaction</h1>
-          <p className={styles.sub}>Articles de la section Comprendre et encarts du tableau de bord</p>
+          <h1 className={styles.title}>{t('adminArticles.title')}</h1>
+          <p className={styles.sub}>{t('adminArticles.subtitle')}</p>
         </div>
         <button className={styles.addBtn} onClick={() => { resetForm(); setShowForm(true); }}>
-          <Plus size={16} /> Nouveau
+          <Plus size={16} /> {t('adminArticles.new')}
         </button>
       </div>
 
@@ -85,63 +87,63 @@ export function AdminArticlesPage() {
         <div className={styles.overlay} onClick={(e) => e.target === e.currentTarget && resetForm()}>
           <div className={styles.modal}>
             <h2 className={styles.modalTitle}>
-              <PenLine size={18} /> {editItem ? 'Modifier' : 'Nouveau contenu'}
+              <PenLine size={18} /> {editItem ? t('adminArticles.editTitle') : t('adminArticles.newTitle')}
             </h2>
             <form onSubmit={handleSubmit} className={styles.form}>
               <div className={styles.grid2}>
                 <div className={styles.field}>
-                  <label className={styles.label}>Type</label>
+                  <label className={styles.label}>{t('adminArticles.type')}</label>
                   <select className={styles.input} value={form.kind ?? 'ARTICLE'}
                     onChange={(e) => setForm((f) => ({ ...f, kind: e.target.value as ArticleKind }))}>
-                    <option value="ARTICLE">Article (section Comprendre)</option>
-                    <option value="TIP">Encart (tableau de bord)</option>
+                    <option value="ARTICLE">{t('adminArticles.typeArticle')}</option>
+                    <option value="TIP">{t('adminArticles.typeTip')}</option>
                   </select>
                 </div>
                 <div className={styles.field}>
-                  <label className={styles.label}>Statut</label>
+                  <label className={styles.label}>{t('adminArticles.status')}</label>
                   <label className={styles.checkRow}>
                     <input type="checkbox" checked={form.published ?? false}
                       onChange={(e) => setForm((f) => ({ ...f, published: e.target.checked }))} />
-                    <span>Publié</span>
+                    <span>{t('adminArticles.published')}</span>
                   </label>
                 </div>
               </div>
 
               <div className={styles.field}>
-                <label className={styles.label}>Titre *</label>
+                <label className={styles.label}>{t('adminArticles.titleField')}</label>
                 <input className={styles.input} value={form.title ?? ''}
                   onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-                  placeholder="Comprendre la TSH" required />
+                  placeholder={t('adminArticles.titlePlaceholder')} required />
               </div>
 
               {form.kind !== 'TIP' && (
                 <div className={styles.field}>
-                  <label className={styles.label}>Résumé (affiché dans la liste)</label>
+                  <label className={styles.label}>{t('adminArticles.excerpt')}</label>
                   <input className={styles.input} value={form.excerpt ?? ''}
                     onChange={(e) => setForm((f) => ({ ...f, excerpt: e.target.value }))}
-                    placeholder="En une phrase, de quoi parle cet article" />
+                    placeholder={t('adminArticles.excerptPlaceholder')} />
                 </div>
               )}
 
               <div className={styles.field}>
                 <label className={styles.label}>
-                  {form.kind === 'TIP' ? 'Texte de l\'encart *' : 'Contenu (markdown) *'}
+                  {form.kind === 'TIP' ? t('adminArticles.tipContent') : t('adminArticles.articleContent')}
                 </label>
                 <textarea className={styles.textarea}
                   rows={form.kind === 'TIP' ? 4 : 14}
                   value={form.content ?? ''}
                   onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
                   placeholder={form.kind === 'TIP'
-                    ? 'Un conseil court et actionnable…'
-                    : '## Titre de section\n\nVotre texte en **markdown**…'}
+                    ? t('adminArticles.tipPlaceholder')
+                    : t('adminArticles.articlePlaceholder')}
                   required />
               </div>
 
               <div className={styles.formActions}>
-                <button type="button" className={styles.cancelBtn} onClick={resetForm}>Annuler</button>
+                <button type="button" className={styles.cancelBtn} onClick={resetForm}>{t('common.cancel')}</button>
                 <button type="submit" className={styles.submitBtn}
                   disabled={createMut.isPending || updateMut.isPending}>
-                  {createMut.isPending || updateMut.isPending ? 'Enregistrement…' : 'Enregistrer'}
+                  {createMut.isPending || updateMut.isPending ? t('adminArticles.submitting') : t('common.save')}
                 </button>
               </div>
             </form>
@@ -157,34 +159,34 @@ export function AdminArticlesPage() {
             <div key={a.id} className={styles.row} onClick={() => openEdit(a)}>
               <div className={styles.rowBody}>
                 <span className={`${styles.kindBadge} ${a.kind === 'TIP' ? styles.kindTip : ''}`}>
-                  {a.kind === 'TIP' ? 'Encart' : 'Article'}
+                  {a.kind === 'TIP' ? t('adminArticles.kindTip') : t('adminArticles.kindArticle')}
                 </span>
                 <div>
                   <p className={styles.rowTitle}>{a.title}</p>
                   <p className={styles.rowMeta}>
                     {a.published && a.publishedAt
-                      ? `Publié le ${formatDate(a.publishedAt)}`
-                      : 'Brouillon'}
+                      ? t('adminArticles.publishedOn', { date: formatDate(a.publishedAt) })
+                      : t('adminArticles.draft')}
                   </p>
                 </div>
               </div>
               <div className={styles.rowActions} onClick={(e) => e.stopPropagation()}>
                 <button className={styles.iconBtn} onClick={() => togglePublish(a)}
-                  title={a.published ? 'Dépublier' : 'Publier'}>
+                  title={a.published ? t('adminArticles.unpublish') : t('adminArticles.publish')}>
                   {a.published
                     ? <Eye size={17} style={{ color: 'var(--success)' }} />
                     : <EyeOff size={17} />}
                 </button>
                 <button className={styles.iconBtn}
-                  onClick={() => { if (confirm('Supprimer ce contenu ?')) deleteMut.mutate(a.id); }}
-                  title="Supprimer">
+                  onClick={() => { if (confirm(t('adminArticles.deleteConfirm'))) deleteMut.mutate(a.id); }}
+                  title={t('adminArticles.delete')}>
                   <Trash2 size={15} />
                 </button>
               </div>
             </div>
           ))}
           {articles.length === 0 && (
-            <p className={styles.empty}>Aucun contenu — créez votre premier article ou encart.</p>
+            <p className={styles.empty}>{t('adminArticles.empty')}</p>
           )}
         </div>
       )}

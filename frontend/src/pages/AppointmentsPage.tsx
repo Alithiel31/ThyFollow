@@ -1,6 +1,7 @@
 // src/pages/AppointmentsPage.tsx
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import {
   Plus, Calendar, Trash2, Check, CalendarPlus,
@@ -12,16 +13,6 @@ import { formatDate } from '../lib/utils';
 import type { Appointment, AppointmentType } from '../types';
 import styles from './AppointmentsPage.module.css';
 
-const TYPE_LABELS: Record<AppointmentType, string> = {
-  ENDOCRINOLOGIST: 'Endocrinologue',
-  GENERAL_PRACTITIONER: 'Médecin généraliste',
-  ULTRASOUND: 'Échographie thyroïdienne',
-  BLOOD_TEST: 'Prise de sang',
-  SCINTIGRAPHY: 'Scintigraphie',
-  BIOPSY: 'Biopsie / Ponction',
-  OTHER: 'Autre',
-};
-
 const TYPE_ICONS: Record<AppointmentType, typeof Calendar> = {
   ENDOCRINOLOGIST: Stethoscope,
   GENERAL_PRACTITIONER: HeartPulse,
@@ -32,19 +23,34 @@ const TYPE_ICONS: Record<AppointmentType, typeof Calendar> = {
   OTHER: Calendar,
 };
 
-const STATUS_LABELS = { UPCOMING: 'À venir', COMPLETED: 'Terminé', CANCELLED: 'Annulé' };
-
 const EMPTY: Partial<Appointment> = {
   date: '', type: 'ENDOCRINOLOGIST', doctorName: '',
   location: '', notes: '', reminder: true, status: 'UPCOMING',
 };
 
 export function AppointmentsPage() {
+  const { t, i18n } = useTranslation();
   const qc = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editItem, setEditItem] = useState<Appointment | null>(null);
   const [form, setForm] = useState<Partial<Appointment>>(EMPTY);
   const [filter, setFilter] = useState<'UPCOMING' | 'COMPLETED' | 'ALL'>('UPCOMING');
+
+  const TYPE_LABELS: Record<AppointmentType, string> = {
+    ENDOCRINOLOGIST: t('appointments.types.ENDOCRINOLOGIST'),
+    GENERAL_PRACTITIONER: t('appointments.types.GENERAL_PRACTITIONER'),
+    ULTRASOUND: t('appointments.types.ULTRASOUND'),
+    BLOOD_TEST: t('appointments.types.BLOOD_TEST'),
+    SCINTIGRAPHY: t('appointments.types.SCINTIGRAPHY'),
+    BIOPSY: t('appointments.types.BIOPSY'),
+    OTHER: t('appointments.types.OTHER'),
+  };
+
+  const STATUS_LABELS = {
+    UPCOMING: t('appointments.status.UPCOMING'),
+    COMPLETED: t('appointments.status.COMPLETED'),
+    CANCELLED: t('appointments.status.CANCELLED'),
+  };
 
   const { data: appts = [], isLoading } = useQuery({
     queryKey: ['appointments'],
@@ -53,20 +59,20 @@ export function AppointmentsPage() {
 
   const createMut = useMutation({
     mutationFn: (d: Partial<Appointment> & { date: string; type: AppointmentType }) => apptApi.create(d),
-    onSuccess: () => { toast.success('Rendez-vous ajouté'); qc.invalidateQueries({ queryKey: ['appointments'] }); resetForm(); },
-    onError: () => toast.error('Erreur'),
+    onSuccess: () => { toast.success(t('appointments.added')); qc.invalidateQueries({ queryKey: ['appointments'] }); resetForm(); },
+    onError: () => toast.error(t('appointments.error')),
   });
 
   const updateMut = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Appointment> }) => apptApi.update(id, data),
-    onSuccess: () => { toast.success('Mis à jour'); qc.invalidateQueries({ queryKey: ['appointments'] }); resetForm(); },
-    onError: () => toast.error('Erreur'),
+    onSuccess: () => { toast.success(t('appointments.updated')); qc.invalidateQueries({ queryKey: ['appointments'] }); resetForm(); },
+    onError: () => toast.error(t('appointments.error')),
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => apptApi.delete(id),
-    onSuccess: () => { toast.success('Supprimé'); qc.invalidateQueries({ queryKey: ['appointments'] }); },
-    onError: () => toast.error('Erreur'),
+    onSuccess: () => { toast.success(t('appointments.deleted')); qc.invalidateQueries({ queryKey: ['appointments'] }); },
+    onError: () => toast.error(t('appointments.error')),
   });
 
   const resetForm = () => { setShowForm(false); setEditItem(null); setForm(EMPTY); };
@@ -83,7 +89,7 @@ export function AppointmentsPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.date || !form.type) return toast.error('Date et type obligatoires');
+    if (!form.date || !form.type) return toast.error(t('appointments.missingFields'));
     const payload = { ...form } as Partial<Appointment> & { date: string; type: AppointmentType };
     if (editItem) updateMut.mutate({ id: editItem.id, data: payload });
     else createMut.mutate(payload);
@@ -98,11 +104,11 @@ export function AppointmentsPage() {
     <div className={styles.page}>
       <div className={styles.header}>
         <div>
-          <h1 className={styles.title}>Rendez-vous</h1>
-          <p className={styles.sub}>Gérez votre agenda médical thyroïdien</p>
+          <h1 className={styles.title}>{t('appointments.title')}</h1>
+          <p className={styles.sub}>{t('appointments.subtitle')}</p>
         </div>
         <button className={styles.addBtn} onClick={() => { resetForm(); setShowForm(true); }}>
-          <Plus size={16} /> Ajouter
+          <Plus size={16} /> {t('appointments.add')}
         </button>
       </div>
 
@@ -111,7 +117,7 @@ export function AppointmentsPage() {
         {(['UPCOMING', 'ALL', 'COMPLETED'] as const).map((f) => (
           <button key={f} className={`${styles.filterBtn} ${filter === f ? styles.filterActive : ''}`}
             onClick={() => setFilter(f)}>
-            {f === 'UPCOMING' ? 'À venir' : f === 'ALL' ? 'Tous' : 'Terminés'}
+            {t(`appointments.filters.${f}`)}
           </button>
         ))}
       </div>
@@ -120,44 +126,44 @@ export function AppointmentsPage() {
       {showForm && (
         <div className={styles.overlay} onClick={(e) => e.target === e.currentTarget && resetForm()}>
           <div className={styles.modal}>
-            <h2 className={styles.modalTitle}><Calendar size={18} /> {editItem ? 'Modifier' : 'Nouveau rendez-vous'}</h2>
+            <h2 className={styles.modalTitle}><Calendar size={18} /> {editItem ? t('appointments.editTitle') : t('appointments.newTitle')}</h2>
             <form onSubmit={handleSubmit} className={styles.form}>
               <div className={styles.field}>
-                <label className={styles.label}>Type de rendez-vous *</label>
+                <label className={styles.label}>{t('appointments.typeLabel')}</label>
                 <select className={styles.input} value={form.type ?? 'ENDOCRINOLOGIST'} onChange={set('type') as (e: React.ChangeEvent<HTMLSelectElement>) => void}>
                   {Object.entries(TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
               </div>
               <div className={styles.field}>
-                <label className={styles.label}>Date et heure *</label>
+                <label className={styles.label}>{t('appointments.dateTime')}</label>
                 <input className={styles.input} type="datetime-local" value={form.date as string ?? ''} onChange={set('date')} required />
               </div>
               <div className={styles.grid2}>
                 <div className={styles.field}>
-                  <label className={styles.label}>Médecin</label>
-                  <input className={styles.input} placeholder="Dr. Nom" value={form.doctorName ?? ''} onChange={set('doctorName')} />
+                  <label className={styles.label}>{t('appointments.doctor')}</label>
+                  <input className={styles.input} placeholder={t('appointments.doctorPlaceholder')} value={form.doctorName ?? ''} onChange={set('doctorName')} />
                 </div>
                 <div className={styles.field}>
-                  <label className={styles.label}>Lieu</label>
-                  <input className={styles.input} placeholder="Cabinet, hôpital…" value={form.location ?? ''} onChange={set('location')} />
+                  <label className={styles.label}>{t('appointments.location')}</label>
+                  <input className={styles.input} placeholder={t('appointments.locationPlaceholder')} value={form.location ?? ''} onChange={set('location')} />
                 </div>
               </div>
               {editItem && (
                 <div className={styles.field}>
-                  <label className={styles.label}>Statut</label>
+                  <label className={styles.label}>{t('appointments.statusLabel')}</label>
                   <select className={styles.input} value={form.status ?? 'UPCOMING'} onChange={set('status') as (e: React.ChangeEvent<HTMLSelectElement>) => void}>
                     {Object.entries(STATUS_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                   </select>
                 </div>
               )}
               <div className={styles.field}>
-                <label className={styles.label}>Notes</label>
-                <textarea className={styles.textarea} rows={3} value={form.notes ?? ''} onChange={set('notes')} placeholder="Questions à poser, examens à apporter…" />
+                <label className={styles.label}>{t('appointments.notes')}</label>
+                <textarea className={styles.textarea} rows={3} value={form.notes ?? ''} onChange={set('notes')} placeholder={t('appointments.notesPlaceholder')} />
               </div>
               <div className={styles.formActions}>
-                <button type="button" className={styles.cancelBtn} onClick={resetForm}>Annuler</button>
+                <button type="button" className={styles.cancelBtn} onClick={resetForm}>{t('common.cancel')}</button>
                 <button type="submit" className={styles.submitBtn} disabled={createMut.isPending || updateMut.isPending}>
-                  {createMut.isPending || updateMut.isPending ? 'Enregistrement…' : editItem ? 'Mettre à jour' : 'Enregistrer'}
+                  {createMut.isPending || updateMut.isPending ? t('appointments.submitting') : editItem ? t('common.update') : t('common.save')}
                 </button>
               </div>
             </form>
@@ -171,8 +177,8 @@ export function AppointmentsPage() {
       ) : filtered.length === 0 ? (
         <div className={styles.empty}>
           <Calendar size={40} strokeWidth={1} />
-          <p>Aucun rendez-vous {filter === 'UPCOMING' ? 'à venir' : ''}</p>
-          <button className={styles.addBtn} onClick={() => setShowForm(true)}>Ajouter un rendez-vous</button>
+          <p>{t('appointments.empty', { suffix: filter === 'UPCOMING' ? t('appointments.emptyUpcomingSuffix') : '' })}</p>
+          <button className={styles.addBtn} onClick={() => setShowForm(true)}>{t('appointments.addFirst')}</button>
         </div>
       ) : (
         <div className={styles.list}>
@@ -184,7 +190,9 @@ export function AppointmentsPage() {
               </div>
               <div className={styles.apptInfo}>
                 <div className={styles.apptType}>{TYPE_LABELS[a.type]}</div>
-                <div className={styles.apptDate}>{formatDate(a.date, "EEEE d MMMM yyyy 'à' HH'h'mm")}</div>
+                <div className={styles.apptDate}>
+                  {formatDate(a.date, i18n.language?.startsWith('en') ? "EEEE MMMM d, yyyy 'at' h:mm a" : "EEEE d MMMM yyyy 'à' HH'h'mm")}
+                </div>
                 {a.doctorName && <div className={styles.apptMeta}>{a.doctorName}{a.location && ` · ${a.location}`}</div>}
                 {a.notes && <div className={styles.apptNotes}>{a.notes}</div>}
               </div>
@@ -192,14 +200,14 @@ export function AppointmentsPage() {
                 {a.status === 'UPCOMING' && (
                   <>
                     <button className={styles.iconBtn} onClick={() => downloadICS(a, TYPE_LABELS[a.type])}
-                      title="Ajouter à mon agenda (.ics)">
+                      title={t('appointments.addToCalendar')}>
                       <CalendarPlus size={16} />
                     </button>
                     <a className={styles.iconBtn} href={googleCalendarUrl(a, TYPE_LABELS[a.type])}
-                      target="_blank" rel="noopener noreferrer" title="Ajouter à Google Agenda">
+                      target="_blank" rel="noopener noreferrer" title={t('appointments.addToGoogleCalendar')}>
                       <span className={styles.gcal}>G</span>
                     </a>
-                    <button className={styles.doneBtn} onClick={() => markDone(a)} title="Marquer comme terminé">
+                    <button className={styles.doneBtn} onClick={() => markDone(a)} title={t('appointments.markDone')}>
                       <Check size={14} />
                     </button>
                   </>
@@ -207,7 +215,7 @@ export function AppointmentsPage() {
                 <span className={`${styles.statusBadge} ${styles[`status_${a.status}`]}`}>
                   {STATUS_LABELS[a.status]}
                 </span>
-                <button className={styles.iconBtn} onClick={() => { if (confirm('Supprimer ?')) deleteMut.mutate(a.id); }}>
+                <button className={styles.iconBtn} onClick={() => { if (confirm(t('appointments.deleteConfirm'))) deleteMut.mutate(a.id); }}>
                   <Trash2 size={14} />
                 </button>
               </div>

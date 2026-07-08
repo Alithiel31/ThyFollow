@@ -1,16 +1,17 @@
 // src/controllers/entries.controller.ts
 import { Response } from 'express';
 import { z } from 'zod';
+import type { TFunction } from 'i18next';
 import { prisma } from '../lib/prisma.js';
 import { AuthRequest } from '../middleware/auth.js';
 import { NotFoundError } from '../lib/errors.js';
 
-const dateParamSchema = z
+const dateParamSchema = (t: TFunction) => z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, 'Format de date invalide (YYYY-MM-DD)');
+  .regex(/^\d{4}-\d{2}-\d{2}$/, t('validation.invalidDateFormat'));
 
-const entrySchema = z.object({
-  date: dateParamSchema,
+const entrySchema = (t: TFunction) => z.object({
+  date: dateParamSchema(t),
   energyLevel: z.number().int().min(1).max(5).optional().nullable(),
   moodScore: z.number().int().min(1).max(5).optional().nullable(),
   anxietyLevel: z.number().int().min(1).max(5).optional().nullable(),
@@ -80,7 +81,7 @@ export const entriesController = {
 
   // GET /api/entries/:date
   getByDate: async (req: AuthRequest, res: Response): Promise<void> => {
-    const date = dateParamSchema.parse(req.params.date);
+    const date = dateParamSchema(req.t).parse(req.params.date);
 
     const entry = await prisma.dailyEntry.findUnique({
       where: {
@@ -94,7 +95,7 @@ export const entriesController = {
 
   // POST /api/entries - create ou update (upsert par date)
   upsert: async (req: AuthRequest, res: Response): Promise<void> => {
-    const { date, tags, medicationTime, ...data } = entrySchema.parse(req.body);
+    const { date, tags, medicationTime, ...data } = entrySchema(req.t).parse(req.body);
 
     const entry = await prisma.dailyEntry.upsert({
       where: {
@@ -120,13 +121,13 @@ export const entriesController = {
 
   // DELETE /api/entries/:date
   remove: async (req: AuthRequest, res: Response): Promise<void> => {
-    const date = dateParamSchema.parse(req.params.date);
+    const date = dateParamSchema(req.t).parse(req.params.date);
 
     const entry = await prisma.dailyEntry.findUnique({
       where: { userId_date: { userId: req.userId!, date: new Date(date) } },
     });
 
-    if (!entry) throw new NotFoundError('Entrée');
+    if (!entry) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.entry') }));
 
     await prisma.dailyEntry.delete({ where: { id: entry.id } });
     res.json({ success: true });

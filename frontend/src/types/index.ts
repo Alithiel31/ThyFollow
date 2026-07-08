@@ -144,24 +144,17 @@ export const LAB_RANGES = {
   antiTPO: { min: 0, max: 34, unit: 'UI/mL', label: 'Anti-TPO' },
 } as const;
 
-export const DIAGNOSIS_LABELS: Record<DiagnosisType, string> = {
-  HYPOTHYROIDISM: 'Hypothyroïdie',
-  HYPERTHYROIDISM: 'Hyperthyroïdie',
-  HASHIMOTO: 'Thyroïdite de Hashimoto',
-  GRAVES: 'Maladie de Basedow',
-  THYROID_CANCER: 'Cancer thyroïdien',
-  NODULES: 'Nodules thyroïdiens',
-  GOITER: 'Goitre',
-  OTHER: 'Autre',
-};
+// Les libellés sont traduits via i18next (namespaces "diagnosis" / "thyroidStatus") ;
+// ces tableaux ne servent qu'à itérer les valeurs possibles dans l'UI.
+export const DIAGNOSIS_LABEL_KEYS: DiagnosisType[] = [
+  'HYPOTHYROIDISM', 'HYPERTHYROIDISM', 'HASHIMOTO', 'GRAVES',
+  'THYROID_CANCER', 'NODULES', 'GOITER', 'OTHER',
+];
 
-export const THYROID_STATUS_LABELS: Record<ThyroidStatus, string> = {
-  INTACT: 'Thyroïde intacte',
-  PARTIAL_REMOVAL: 'Ablation partielle',
-  TOTAL_REMOVAL: 'Thyroïdectomie totale',
-  RADIOIODINE_ABLATION: 'Ablation à l\'iode radioactif',
-  RADIOIODINE_PARTIAL: 'Iode radioactif (partiel)',
-};
+export const THYROID_STATUS_LABEL_KEYS: ThyroidStatus[] = [
+  'INTACT', 'PARTIAL_REMOVAL', 'TOTAL_REMOVAL',
+  'RADIOIODINE_ABLATION', 'RADIOIODINE_PARTIAL',
+];
 
 // ── Contenu éditorial ──────────────────────────
 export type ArticleKind = 'ARTICLE' | 'TIP';

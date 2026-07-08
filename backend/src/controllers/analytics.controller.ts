@@ -97,7 +97,7 @@ export const analyticsController = {
     const to = new Date(req.query.to as string);
 
     if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime()) || from > to) {
-      res.status(400).json({ error: 'Période invalide (from/to au format YYYY-MM-DD)' });
+      res.status(400).json({ error: req.t('errors.invalidPeriod') });
       return;
     }
 

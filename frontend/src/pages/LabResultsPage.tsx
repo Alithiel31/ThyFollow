@@ -1,6 +1,7 @@
 // src/pages/LabResultsPage.tsx
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { Plus, Trash2, FlaskConical, TrendingUp } from 'lucide-react';
 import { labApi } from '../lib/api';
@@ -12,7 +13,7 @@ import {
   ResponsiveContainer, ReferenceLine, CartesianGrid
 } from 'recharts';
 import { parseISO, format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr, enUS } from 'date-fns/locale';
 import styles from './LabResultsPage.module.css';
 
 const EMPTY_FORM: Partial<LabResult> = {
@@ -22,11 +23,13 @@ const EMPTY_FORM: Partial<LabResult> = {
 };
 
 export function LabResultsPage() {
+  const { t, i18n } = useTranslation();
   const { user } = useAuthStore();
   const qc = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editItem, setEditItem] = useState<LabResult | null>(null);
   const [form, setForm] = useState<Partial<LabResult>>(EMPTY_FORM);
+  const dateLocale = i18n.language?.startsWith('en') ? enUS : fr;
 
   const { data: results = [], isLoading } = useQuery({
     queryKey: ['lab-results'],
@@ -35,20 +38,20 @@ export function LabResultsPage() {
 
   const createMut = useMutation({
     mutationFn: (d: Partial<LabResult> & { date: string }) => labApi.create(d),
-    onSuccess: () => { toast.success('Analyse ajoutée'); qc.invalidateQueries({ queryKey: ['lab-results'] }); resetForm(); },
-    onError: () => toast.error('Erreur'),
+    onSuccess: () => { toast.success(t('labResults.added')); qc.invalidateQueries({ queryKey: ['lab-results'] }); resetForm(); },
+    onError: () => toast.error(t('labResults.error')),
   });
 
   const updateMut = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<LabResult> }) => labApi.update(id, data),
-    onSuccess: () => { toast.success('Mis à jour'); qc.invalidateQueries({ queryKey: ['lab-results'] }); resetForm(); },
-    onError: () => toast.error('Erreur'),
+    onSuccess: () => { toast.success(t('labResults.updated')); qc.invalidateQueries({ queryKey: ['lab-results'] }); resetForm(); },
+    onError: () => toast.error(t('labResults.error')),
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => labApi.delete(id),
-    onSuccess: () => { toast.success('Supprimé'); qc.invalidateQueries({ queryKey: ['lab-results'] }); },
-    onError: () => toast.error('Erreur'),
+    onSuccess: () => { toast.success(t('labResults.deleted')); qc.invalidateQueries({ queryKey: ['lab-results'] }); },
+    onError: () => toast.error(t('labResults.error')),
   });
 
   const resetForm = () => { setShowForm(false); setEditItem(null); setForm(EMPTY_FORM); };
@@ -61,7 +64,7 @@ export function LabResultsPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.date) return toast.error('La date est requise');
+    if (!form.date) return toast.error(t('labResults.dateRequired'));
     const payload = { ...form, date: form.date };
     const clean = Object.fromEntries(
       Object.entries(payload).map(([k, v]) => [k, v === '' ? null : v])
@@ -81,7 +84,7 @@ export function LabResultsPage() {
     .filter((r) => r.tsh != null)
     .sort((a, b) => a.date.localeCompare(b.date))
     .map((r) => ({
-      date: format(parseISO(r.date), 'd MMM yy', { locale: fr }),
+      date: format(parseISO(r.date), 'd MMM yy', { locale: dateLocale }),
       tsh: r.tsh,
       ft4: r.ft4,
     }));
@@ -93,11 +96,11 @@ export function LabResultsPage() {
       {/* Header */}
       <div className={styles.header}>
         <div>
-          <h1 className={styles.title}>Analyses sanguines</h1>
-          <p className={styles.sub}>Suivez l'évolution de vos marqueurs thyroïdiens</p>
+          <h1 className={styles.title}>{t('labResults.title')}</h1>
+          <p className={styles.sub}>{t('labResults.subtitle')}</p>
         </div>
         <button className={styles.addBtn} onClick={() => { setEditItem(null); setForm(EMPTY_FORM); setShowForm(true); }}>
-          <Plus size={16} /> Ajouter
+          <Plus size={16} /> {t('labResults.add')}
         </button>
       </div>
 
@@ -106,7 +109,7 @@ export function LabResultsPage() {
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <TrendingUp size={16} />
-            <span>Évolution du TSH</span>
+            <span>{t('labResults.tshEvolution')}</span>
           </div>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: -20 }}>
@@ -115,11 +118,11 @@ export function LabResultsPage() {
               <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} tickLine={false} axisLine={false} />
               <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, fontSize: 12, color: 'var(--text)', boxShadow: 'var(--shadow)' }} />
               <ReferenceLine y={profile?.targetTSH_min ?? LAB_RANGES.tsh.min} stroke="var(--success)" strokeOpacity={0.35} strokeDasharray="4 4" />
-              <ReferenceLine y={profile?.targetTSH_max ?? LAB_RANGES.tsh.max} stroke="var(--success)" strokeOpacity={0.35} strokeDasharray="4 4" label={{ value: 'Zone cible', position: 'right', fontSize: 10, fill: 'var(--success)' }} />
+              <ReferenceLine y={profile?.targetTSH_max ?? LAB_RANGES.tsh.max} stroke="var(--success)" strokeOpacity={0.35} strokeDasharray="4 4" label={{ value: t('labResults.targetZone'), position: 'right', fontSize: 10, fill: 'var(--success)' }} />
               <Line type="monotone" dataKey="tsh" stroke="var(--chart-1)" strokeWidth={2.5} dot={{ r: 4, fill: 'var(--chart-1)', strokeWidth: 0 }} connectNulls />
             </LineChart>
           </ResponsiveContainer>
-          <p className={styles.chartNote}>Zone verte = plage cible TSH ({profile?.targetTSH_min ?? LAB_RANGES.tsh.min}–{profile?.targetTSH_max ?? LAB_RANGES.tsh.max} mUI/L)</p>
+          <p className={styles.chartNote}>{t('labResults.chartNote', { min: profile?.targetTSH_min ?? LAB_RANGES.tsh.min, max: profile?.targetTSH_max ?? LAB_RANGES.tsh.max })}</p>
         </div>
       )}
 
@@ -129,50 +132,50 @@ export function LabResultsPage() {
           <div className={styles.modal}>
             <h2 className={styles.modalTitle}>
               <FlaskConical size={18} />
-              {editItem ? 'Modifier l\'analyse' : 'Nouvelle analyse'}
+              {editItem ? t('labResults.editTitle') : t('labResults.newTitle')}
             </h2>
             <form onSubmit={handleSubmit} className={styles.form}>
               <div className={styles.grid2}>
-                <Field label="Date *">
+                <Field label={t('labResults.date')}>
                   <input className={styles.input} type="date" value={form.date as string ?? ''} onChange={set('date')} required />
                 </Field>
-                <Field label="Laboratoire">
-                  <input className={styles.input} placeholder="Ex: Laborizon" value={form.lab ?? ''} onChange={set('lab')} />
+                <Field label={t('labResults.lab')}>
+                  <input className={styles.input} placeholder={t('labResults.labPlaceholder')} value={form.lab ?? ''} onChange={set('lab')} />
                 </Field>
               </div>
-              <Field label="Prescrit par">
-                <input className={styles.input} placeholder="Dr. Nom" value={form.orderedBy ?? ''} onChange={set('orderedBy')} />
+              <Field label={t('labResults.orderedBy')}>
+                <input className={styles.input} placeholder={t('labResults.orderedByPlaceholder')} value={form.orderedBy ?? ''} onChange={set('orderedBy')} />
               </Field>
 
-              <div className={styles.formSection}>Marqueurs principaux</div>
+              <div className={styles.formSection}>{t('labResults.mainMarkers')}</div>
               <div className={styles.grid3}>
                 <NumField label={`TSH (${LAB_RANGES.tsh.unit})`} field="tsh" form={form} set={set} step="0.01" placeholder="1.50" />
                 <NumField label={`FT4 (${LAB_RANGES.ft4.unit})`} field="ft4" form={form} set={set} step="0.1" placeholder="15.0" />
                 <NumField label={`FT3 (${LAB_RANGES.ft3.unit})`} field="ft3" form={form} set={set} step="0.1" placeholder="4.5" />
               </div>
 
-              <div className={styles.formSection}>Marqueurs auto-immuns</div>
+              <div className={styles.formSection}>{t('labResults.autoimmuneMarkers')}</div>
               <div className={styles.grid3}>
-                <NumField label="Anti-TPO (UI/mL)" field="antiTPO" form={form} set={set} step="1" placeholder="< 34" />
-                <NumField label="Anti-TG (UI/mL)" field="antiTG" form={form} set={set} step="1" placeholder="—" />
-                <NumField label="Anti-TSHR" field="antiTSHR" form={form} set={set} step="0.1" placeholder="—" />
+                <NumField label={t('labResults.antiTPO')} field="antiTPO" form={form} set={set} step="1" placeholder="< 34" />
+                <NumField label={t('labResults.antiTG')} field="antiTG" form={form} set={set} step="1" placeholder="—" />
+                <NumField label={t('labResults.antiTSHR')} field="antiTSHR" form={form} set={set} step="0.1" placeholder="—" />
               </div>
 
-              <div className={styles.formSection}>Carences associées</div>
+              <div className={styles.formSection}>{t('labResults.deficiencyMarkers')}</div>
               <div className={styles.grid3}>
-                <NumField label="Ferritine (µg/L)" field="ferritin" form={form} set={set} step="0.1" placeholder="80" />
-                <NumField label="Vitamine D (nmol/L)" field="vitaminD" form={form} set={set} step="0.1" placeholder="75" />
-                <NumField label="Vitamine B12 (pmol/L)" field="vitaminB12" form={form} set={set} step="0.1" placeholder="300" />
+                <NumField label={t('labResults.ferritin')} field="ferritin" form={form} set={set} step="0.1" placeholder="80" />
+                <NumField label={t('labResults.vitaminD')} field="vitaminD" form={form} set={set} step="0.1" placeholder="75" />
+                <NumField label={t('labResults.vitaminB12')} field="vitaminB12" form={form} set={set} step="0.1" placeholder="300" />
               </div>
 
-              <Field label="Notes">
-                <textarea className={styles.textarea} rows={3} value={form.notes ?? ''} onChange={set('notes')} placeholder="Observations, contexte..." />
+              <Field label={t('labResults.notes')}>
+                <textarea className={styles.textarea} rows={3} value={form.notes ?? ''} onChange={set('notes')} placeholder={t('labResults.notesPlaceholder')} />
               </Field>
 
               <div className={styles.formActions}>
-                <button type="button" className={styles.cancelBtn} onClick={resetForm}>Annuler</button>
+                <button type="button" className={styles.cancelBtn} onClick={resetForm}>{t('common.cancel')}</button>
                 <button type="submit" className={styles.submitBtn} disabled={createMut.isPending || updateMut.isPending}>
-                  {createMut.isPending || updateMut.isPending ? 'Enregistrement…' : editItem ? 'Mettre à jour' : 'Enregistrer'}
+                  {createMut.isPending || updateMut.isPending ? t('labResults.submitting') : editItem ? t('common.update') : t('common.save')}
                 </button>
               </div>
             </form>
@@ -186,8 +189,8 @@ export function LabResultsPage() {
       ) : results.length === 0 ? (
         <div className={styles.empty}>
           <FlaskConical size={40} strokeWidth={1} />
-          <p>Aucune analyse enregistrée</p>
-          <button className={styles.addBtn} onClick={() => setShowForm(true)}>Ajouter ma première analyse</button>
+          <p>{t('labResults.empty')}</p>
+          <button className={styles.addBtn} onClick={() => setShowForm(true)}>{t('labResults.addFirst')}</button>
         </div>
       ) : (
         <div className={styles.list}>
@@ -210,7 +213,7 @@ export function LabResultsPage() {
                 </div>
                 {r.notes && <p className={styles.resultNotes}>{r.notes}</p>}
                 <button className={styles.deleteBtn}
-                  onClick={(e) => { e.stopPropagation(); if (confirm('Supprimer cette analyse ?')) deleteMut.mutate(r.id); }}>
+                  onClick={(e) => { e.stopPropagation(); if (confirm(t('labResults.deleteConfirm'))) deleteMut.mutate(r.id); }}>
                   <Trash2 size={14} />
                 </button>
               </div>

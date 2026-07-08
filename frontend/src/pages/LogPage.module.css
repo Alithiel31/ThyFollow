@@ -175,7 +175,7 @@
   gap: 14px;
 }
 
-.metricField { display: flex; flex-direction: column; gap: 6px; }
+.metricField { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 
 .metricLabel {
   font-size: 0.8rem;
@@ -252,13 +252,16 @@
 
 @media (max-width: 600px) {
   .scoreRow { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .metricsGrid { grid-template-columns: 1fr 1fr; }
   .scoreButtons { gap: 4px; }
   .scoreBtn { width: 32px; height: 32px; }
 }
 
+@media (max-width: 340px) {
+  .metricsGrid { grid-template-columns: 1fr; }
+}
+
 /* ── Export de rapport ─────────────────────── */
-.exportRow { display: flex; justify-content: flex-end; margin: -8px 0 16px; }
+.exportRow { display: flex; justify-content: flex-end; flex-wrap: wrap; margin: -8px 0 16px; }
 
 .exportBtn {
   display: inline-flex; align-items: center; gap: 7px;

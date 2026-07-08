@@ -123,8 +123,6 @@
 .userInfo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-width: 0;
   flex: 1;
 }
 
@@ -145,30 +143,6 @@
   color: var(--text);
   font-size: 0.75rem;
   font-weight: 700;
-}
-
-.userMeta {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  flex: 1;
-}
-
-.userName {
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.userEmail {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .footerBtn {
@@ -225,6 +199,7 @@
 /* ── Contenu principal ─────────────────────── */
 .main {
   flex: 1;
+  min-width: 0;
   margin-left: 240px;
   padding: 36px 44px 48px;
   min-height: 100dvh;
@@ -244,6 +219,7 @@
 
 .mobileNavItem {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -256,6 +232,13 @@
   text-decoration: none;
   font-size: 0.66rem;
   transition: color 0.15s ease;
+}
+
+.navLabel {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Point cerclé (inactif) → plein bleu (actif), comme la maquette */

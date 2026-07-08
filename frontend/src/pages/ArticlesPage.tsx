@@ -1,8 +1,9 @@
-// src/pages/ArticlesPage.tsx — section "Comprendre" : liste des articles
-// publiés et lecture (markdown). Une seule page pour les deux vues,
-// le paramètre :slug décide.
+// src/pages/ArticlesPage.tsx -- section "Comprendre" : liste des articles
+// publies et lecture (markdown). Une seule page pour les deux vues,
+// le parametre :slug decide.
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import { BookOpen, ArrowLeft, ChevronRight } from 'lucide-react';
 import { articlesApi } from '../lib/api';
@@ -15,6 +16,7 @@ export function ArticlesPage() {
 }
 
 function ArticleList() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: articles = [], isLoading } = useQuery({
     queryKey: ['articles', 'list'],
@@ -24,8 +26,8 @@ function ArticleList() {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Comprendre</h1>
-        <p className={styles.sub}>La thyroïde, les bonnes pratiques, et ce que disent vos analyses</p>
+        <h1 className={styles.title}>{t('articles.title')}</h1>
+        <p className={styles.sub}>{t('articles.subtitle')}</p>
       </div>
 
       {isLoading ? (
@@ -33,7 +35,7 @@ function ArticleList() {
       ) : articles.length === 0 ? (
         <div className={styles.empty}>
           <BookOpen size={40} strokeWidth={1} />
-          <p>Les premiers articles arrivent bientôt</p>
+          <p>{t('articles.comingSoon')}</p>
         </div>
       ) : (
         <div className={styles.list}>
@@ -53,14 +55,14 @@ function ArticleList() {
       )}
 
       <p className={styles.disclaimer}>
-        Ces contenus sont informatifs et ne remplacent pas un avis médical.
-        Parlez de votre situation avec votre médecin ou votre endocrinologue.
+        {t('articles.disclaimerList')}
       </p>
     </div>
   );
 }
 
 function ArticleView({ slug }: { slug: string }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: article, isLoading, isError } = useQuery({
     queryKey: ['articles', slug],
@@ -71,9 +73,9 @@ function ArticleView({ slug }: { slug: string }) {
   if (isError || !article) {
     return (
       <div className={styles.empty}>
-        <p>Article introuvable</p>
+        <p>{t('articles.notFound')}</p>
         <button className={styles.backBtn} onClick={() => navigate('/learn')}>
-          <ArrowLeft size={16} /> Retour aux articles
+          <ArrowLeft size={16} /> {t('articles.backToList')}
         </button>
       </div>
     );
@@ -82,7 +84,7 @@ function ArticleView({ slug }: { slug: string }) {
   return (
     <div className={styles.page}>
       <button className={styles.backBtn} onClick={() => navigate('/learn')}>
-        <ArrowLeft size={16} /> Tous les articles
+        <ArrowLeft size={16} /> {t('articles.allArticles')}
       </button>
 
       <article className={styles.article}>
@@ -96,7 +98,7 @@ function ArticleView({ slug }: { slug: string }) {
       </article>
 
       <p className={styles.disclaimer}>
-        Contenu informatif — ne remplace pas un avis médical.
+        {t('articles.disclaimerView')}
       </p>
     </div>
   );

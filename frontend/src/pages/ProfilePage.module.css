@@ -72,6 +72,17 @@
 .saveBtnDirty:hover { opacity: 0.88; }
 .saveBtn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* ── Logout button */
+.logoutBtn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; margin-top: 12px;
+  background: transparent; border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px;
+  color: var(--danger); font-family: var(--font-body); font-size: 0.95rem; font-weight: 500;
+  cursor: pointer; transition: all 0.2s;
+}
+.logoutBtn:hover { background: var(--danger-soft); border-color: var(--danger); }
+
 @media (max-width: 600px) {
   .grid2, .grid3 { grid-template-columns: 1fr 1fr; }
   .header { flex-direction: column; align-items: flex-start; }

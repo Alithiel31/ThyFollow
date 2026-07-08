@@ -45,7 +45,7 @@ export const labResultsController = {
     const result = await prisma.labResult.findFirst({
       where: { id: req.params.id, userId: req.userId },
     });
-    if (!result) throw new NotFoundError('Résultat');
+    if (!result) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.labResult') }));
     res.json(result);
   },
 
@@ -63,7 +63,7 @@ export const labResultsController = {
     const existing = await prisma.labResult.findFirst({
       where: { id: req.params.id, userId: req.userId },
     });
-    if (!existing) throw new NotFoundError('Résultat');
+    if (!existing) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.labResult') }));
 
     const { date, ...data } = labSchema.partial().parse(req.body);
     const result = await prisma.labResult.update({
@@ -78,7 +78,7 @@ export const labResultsController = {
     const existing = await prisma.labResult.findFirst({
       where: { id: req.params.id, userId: req.userId },
     });
-    if (!existing) throw new NotFoundError('Résultat');
+    if (!existing) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.labResult') }));
 
     await prisma.labResult.delete({ where: { id: req.params.id } });
     res.json({ success: true });

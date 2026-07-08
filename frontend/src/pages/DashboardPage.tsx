@@ -1,6 +1,7 @@
 // src/pages/DashboardPage.tsx
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { analyticsApi, articlesApi } from '../lib/api';
 import { useAuthStore } from '../lib/store';
 import { formatDate, formatDateShort, tshStatus, toISODate } from '../lib/utils';
@@ -14,13 +15,15 @@ import {
   ResponsiveContainer, CartesianGrid
 } from 'recharts';
 import { parseISO, format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr, enUS } from 'date-fns/locale';
 import styles from './DashboardPage.module.css';
 
 export function DashboardPage() {
+  const { t, i18n } = useTranslation();
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const today = toISODate(new Date());
+  const dateLocale = i18n.language?.startsWith('en') ? enUS : fr;
 
   const { data: overview, isLoading } = useQuery({
     queryKey: ['analytics', 'overview'],
@@ -37,15 +40,25 @@ export function DashboardPage() {
     : null;
 
   const chartData = overview?.timeSeries.map((e) => ({
-    date: format(parseISO(e.date as string), 'd MMM', { locale: fr }),
-    énergie: e.energyLevel,
-    humeur: e.moodScore,
+    date: format(parseISO(e.date as string), 'd MMM', { locale: dateLocale }),
+    energy: e.energyLevel,
+    mood: e.moodScore,
   })) ?? [];
 
   const tsh = overview?.latestLabResult?.tsh;
   const tshInfo = tsh != null
     ? tshStatus(tsh, user?.profile?.targetTSH_min, user?.profile?.targetTSH_max)
     : null;
+
+  const APPT_LABELS: Record<string, string> = {
+    ENDOCRINOLOGIST: t('dashboard.apptTypes.ENDOCRINOLOGIST'),
+    GENERAL_PRACTITIONER: t('dashboard.apptTypes.GENERAL_PRACTITIONER'),
+    ULTRASOUND: t('dashboard.apptTypes.ULTRASOUND'),
+    BLOOD_TEST: t('dashboard.apptTypes.BLOOD_TEST'),
+    SCINTIGRAPHY: t('dashboard.apptTypes.SCINTIGRAPHY'),
+    BIOPSY: t('dashboard.apptTypes.BIOPSY'),
+    OTHER: t('dashboard.apptTypes.OTHER'),
+  };
 
   if (isLoading) return <PageLoader />;
 
@@ -55,13 +68,13 @@ export function DashboardPage() {
       <div className={styles.header}>
         <div>
           <h1 className={styles.greeting}>
-            Bonjour, {user?.name?.split(' ')[0]}
+            {t('dashboard.greeting', { name: user?.name?.split(' ')[0] })}
           </h1>
           <p className={styles.date}>{formatDate(new Date())}</p>
         </div>
         <button className={styles.logBtn} onClick={() => navigate(`/log/${today}`)}>
           <Plus size={16} />
-          Journal du jour
+          {t('dashboard.logToday')}
         </button>
       </div>
 
@@ -69,14 +82,14 @@ export function DashboardPage() {
       <div className={styles.kpiRow}>
         <KpiCard
           icon={<Flame size={18} />}
-          label="Série active"
-          value={`${overview?.streak ?? 0} j`}
+          label={t('dashboard.kpi.streak')}
+          value={t('dashboard.kpi.streakUnit', { count: overview?.streak ?? 0 })}
           color="var(--amber)"
           bg="var(--amber-soft)"
         />
         <KpiCard
           icon={<Pill size={18} />}
-          label="Observance médicament"
+          label={t('dashboard.kpi.medicationAdherence')}
           value={overview?.medicationAdherence != null
             ? `${Math.round(overview.medicationAdherence)}%` : '—'}
           color="var(--teal)"
@@ -84,7 +97,7 @@ export function DashboardPage() {
         />
         <KpiCard
           icon={<TrendingUp size={18} />}
-          label="Énergie moy. (90j)"
+          label={t('dashboard.kpi.avgEnergy')}
           value={overview?.averages.energy != null
             ? `${overview.averages.energy.toFixed(1)} / 5` : '—'}
           color="var(--accent)"
@@ -92,7 +105,7 @@ export function DashboardPage() {
         />
         <KpiCard
           icon={<FlaskConical size={18} />}
-          label="Dernier TSH"
+          label={t('dashboard.kpi.lastTsh')}
           value={tsh != null ? `${tsh} mUI/L` : '—'}
           color={tshInfo?.color ?? 'var(--text-muted)'}
           bg={tshInfo?.bg ?? 'var(--bg-raised)'}
@@ -105,7 +118,7 @@ export function DashboardPage() {
         {/* Chart */}
         <div className={styles.card}>
           <div className={styles.cardHeader}>
-            <span className={styles.cardTitle}>Énergie & Humeur — 90 jours</span>
+            <span className={styles.cardTitle}>{t('dashboard.chartTitle')}</span>
           </div>
           <div className={styles.chartWrap}>
             <ResponsiveContainer width="100%" height={220}>
@@ -122,16 +135,16 @@ export function DashboardPage() {
                     boxShadow: 'var(--shadow)',
                   }}
                 />
-                <Line type="monotone" dataKey="énergie" stroke="var(--chart-1)"
+                <Line type="monotone" dataKey="energy" stroke="var(--chart-1)"
                   strokeWidth={2} dot={false} connectNulls />
-                <Line type="monotone" dataKey="humeur" stroke="var(--chart-2)"
+                <Line type="monotone" dataKey="mood" stroke="var(--chart-2)"
                   strokeWidth={2} dot={false} connectNulls />
               </LineChart>
             </ResponsiveContainer>
           </div>
           <div className={styles.legend}>
-            <span><span style={{ color: 'var(--chart-1)' }}>●</span> Énergie</span>
-            <span><span style={{ color: 'var(--chart-2)' }}>●</span> Humeur</span>
+            <span><span style={{ color: 'var(--chart-1)' }}>●</span> {t('dashboard.legendEnergy')}</span>
+            <span><span style={{ color: 'var(--chart-2)' }}>●</span> {t('dashboard.legendMood')}</span>
           </div>
         </div>
 
@@ -140,13 +153,13 @@ export function DashboardPage() {
           {/* TSH history */}
           <div className={styles.card}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>Historique TSH</span>
+              <span className={styles.cardTitle}>{t('dashboard.tshHistory')}</span>
               <button className={styles.cardLink} onClick={() => navigate('/lab-results')}>
-                Voir tout <ChevronRight size={14} />
+                {t('dashboard.seeAll')} <ChevronRight size={14} />
               </button>
             </div>
             {overview?.labHistory.length === 0 ? (
-              <p className={styles.empty}>Aucune analyse enregistrée</p>
+              <p className={styles.empty}>{t('dashboard.noLabResults')}</p>
             ) : (
               <div className={styles.labList}>
                 {overview?.labHistory.slice(0, 5).map((r, i) => {
@@ -172,9 +185,9 @@ export function DashboardPage() {
           {/* Next appointment */}
           <div className={styles.card}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>Prochain RDV</span>
+              <span className={styles.cardTitle}>{t('dashboard.nextAppointment')}</span>
               <button className={styles.cardLink} onClick={() => navigate('/appointments')}>
-                Gérer <ChevronRight size={14} />
+                {t('dashboard.manage')} <ChevronRight size={14} />
               </button>
             </div>
             {overview?.nextAppointment ? (
@@ -189,20 +202,20 @@ export function DashboardPage() {
                 </div>
               </div>
             ) : (
-              <p className={styles.empty}>Aucun rendez-vous prévu</p>
+              <p className={styles.empty}>{t('dashboard.noAppointment')}</p>
             )}
           </div>
 
           {/* Active medications */}
           <div className={styles.card}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>Traitement actif</span>
+              <span className={styles.cardTitle}>{t('dashboard.activeTreatment')}</span>
               <button className={styles.cardLink} onClick={() => navigate('/medications')}>
-                Gérer <ChevronRight size={14} />
+                {t('dashboard.manage')} <ChevronRight size={14} />
               </button>
             </div>
             {overview?.activeMedications.length === 0 ? (
-              <p className={styles.empty}>Aucun médicament actif</p>
+              <p className={styles.empty}>{t('dashboard.noActiveMedication')}</p>
             ) : (
               overview?.activeMedications.map((m, i) => (
                 <div key={i} className={styles.medRow}>
@@ -235,9 +248,9 @@ export function DashboardPage() {
       {/* ── Quick log CTA */}
       <div className={styles.ctaBanner}>
         <Activity size={20} />
-        <span>Avez-vous rempli votre journal aujourd'hui ?</span>
+        <span>{t('dashboard.ctaQuestion')}</span>
         <button onClick={() => navigate(`/log/${today}`)}>
-          Remplir maintenant
+          {t('dashboard.ctaButton')}
         </button>
       </div>
     </div>
@@ -285,13 +298,3 @@ function PageLoader() {
     </div>
   );
 }
-
-const APPT_LABELS: Record<string, string> = {
-  ENDOCRINOLOGIST: 'Endocrinologue',
-  GENERAL_PRACTITIONER: 'Médecin généraliste',
-  ULTRASOUND: 'Échographie',
-  BLOOD_TEST: 'Prise de sang',
-  SCINTIGRAPHY: 'Scintigraphie',
-  BIOPSY: 'Biopsie',
-  OTHER: 'Rendez-vous',
-};

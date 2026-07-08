@@ -44,7 +44,7 @@ export const medicationsController = {
     const existing = await prisma.medication.findFirst({
       where: { id: req.params.id, userId: req.userId },
     });
-    if (!existing) throw new NotFoundError('Médicament');
+    if (!existing) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.medication') }));
 
     const { startDate, endDate, ...data } = medSchema.partial().parse(req.body);
     const med = await prisma.medication.update({
@@ -62,7 +62,7 @@ export const medicationsController = {
     const existing = await prisma.medication.findFirst({
       where: { id: req.params.id, userId: req.userId },
     });
-    if (!existing) throw new NotFoundError('Médicament');
+    if (!existing) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.medication') }));
     await prisma.medication.delete({ where: { id: req.params.id } });
     res.json({ success: true });
   },

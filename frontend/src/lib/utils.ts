@@ -1,23 +1,29 @@
 // src/lib/utils.ts
 import { format, formatDistanceToNow, isToday, isYesterday, parseISO } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr, enUS } from 'date-fns/locale';
+import i18n from './i18n';
 import { LAB_RANGES } from '../types';
+
+// La locale date-fns suit la langue active de l'app (fr <-> en-US).
+function currentLocale() {
+  return i18n.language?.startsWith('en') ? enUS : fr;
+}
 
 export function formatDate(date: string | Date, pattern = 'd MMMM yyyy'): string {
   const d = typeof date === 'string' ? parseISO(date) : date;
-  return format(d, pattern, { locale: fr });
+  return format(d, pattern, { locale: currentLocale() });
 }
 
 export function formatDateShort(date: string | Date): string {
   const d = typeof date === 'string' ? parseISO(date) : date;
-  if (isToday(d)) return "Aujourd'hui";
-  if (isYesterday(d)) return 'Hier';
-  return format(d, 'd MMM', { locale: fr });
+  if (isToday(d)) return i18n.t('log.today', { defaultValue: "Aujourd'hui" });
+  if (isYesterday(d)) return i18n.t('common.yesterday', { defaultValue: 'Hier' });
+  return format(d, 'd MMM', { locale: currentLocale() });
 }
 
 export function formatRelative(date: string | Date): string {
   const d = typeof date === 'string' ? parseISO(date) : date;
-  return formatDistanceToNow(d, { addSuffix: true, locale: fr });
+  return formatDistanceToNow(d, { addSuffix: true, locale: currentLocale() });
 }
 
 export function toISODate(date: Date): string {
@@ -25,8 +31,7 @@ export function toISODate(date: Date): string {
 }
 
 export function scoreToLabel(score: number): string {
-  const labels = ['', 'Très faible', 'Faible', 'Moyen', 'Bon', 'Excellent'];
-  return labels[score] ?? '';
+  return i18n.t(`scoreLabels.${score}`, { defaultValue: '' });
 }
 
 // Couleurs exprimées en tokens CSS : elles suivent automatiquement le thème.
@@ -41,30 +46,17 @@ export function tshStatus(tsh: number, profileMin?: number, profileMax?: number)
 } {
   const min = profileMin ?? LAB_RANGES.tsh.min;
   const max = profileMax ?? LAB_RANGES.tsh.max;
-  if (tsh < min) return { label: 'Bas', color: 'var(--lav)', bg: 'var(--lav-soft)', status: 'low' };
-  if (tsh > max) return { label: 'Élevé', color: 'var(--danger)', bg: 'var(--danger-soft)', status: 'high' };
-  return { label: 'Normal', color: 'var(--success)', bg: 'var(--success-soft)', status: 'normal' };
+  if (tsh < min) return { label: i18n.t('tshStatus.low'), color: 'var(--lav)', bg: 'var(--lav-soft)', status: 'low' };
+  if (tsh > max) return { label: i18n.t('tshStatus.high'), color: 'var(--danger)', bg: 'var(--danger-soft)', status: 'high' };
+  return { label: i18n.t('tshStatus.normal'), color: 'var(--success)', bg: 'var(--success-soft)', status: 'normal' };
 }
 
 export function cn(...classes: (string | undefined | false | null)[]): string {
   return classes.filter(Boolean).join(' ');
 }
 
-export const SYMPTOM_LABELS: Record<string, string> = {
-  energyLevel: 'Énergie',
-  moodScore: 'Humeur',
-  anxietyLevel: 'Anxiété',
-  brainFogLevel: 'Brouillard mental',
-  coldSensitivity: 'Sensibilité au froid',
-  heatSensitivity: 'Sensibilité à la chaleur',
-  hairLoss: 'Perte de cheveux',
-  drySkin: 'Peau sèche',
-  constipation: 'Constipation',
-  bloating: 'Ballonnements',
-  muscleWeakness: 'Faiblesse musculaire',
-  jointPain: 'Douleurs articulaires',
-  neckPain: 'Gêne cervicale',
-  swelling: 'Gonflement',
-  tremors: 'Tremblements',
-  sleepQuality: 'Qualité du sommeil',
-};
+// Libellé traduit d'un champ symptôme (utilisé en dehors de composants React,
+// d'où l'appel direct à i18n.t plutôt qu'au hook useTranslation).
+export function symptomLabel(field: string): string {
+  return i18n.t(`symptoms.${field}`, { defaultValue: field });
+}
