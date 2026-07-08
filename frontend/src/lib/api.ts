@@ -1,4 +1,3 @@
-// src/lib/api.ts
 import axios from 'axios';
 
 export const api = axios.create({
@@ -30,7 +29,15 @@ export const authApi = {
   login: (email: string, password: string) =>
     api.post<{ user: import('../types').User; token: string }>('/auth/login', { email, password }),
   register: (data: { email: string; password: string; name: string; birthDate?: string }) =>
-    api.post<{ user: import('../types').User; token: string }>('/auth/register', data),
+    api.post<{ message: string }>('/auth/register', data),
+  verifyEmail: (token: string) =>
+    api.post<{ user: import('../types').User; token: string }>('/auth/verify-email', { token }),
+  resendVerification: (email: string) =>
+    api.post<{ message: string }>('/auth/resend-verification', { email }),
+  forgotPassword: (email: string) =>
+    api.post<{ message: string }>('/auth/forgot-password', { email }),
+  resetPassword: (token: string, password: string) =>
+    api.post<{ message: string }>('/auth/reset-password', { token, password }),
   me: () => api.get<import('../types').User>('/auth/me'),
 };
 

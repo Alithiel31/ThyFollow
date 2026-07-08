@@ -1,7 +1,8 @@
 // prisma/schema.prisma
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
 }
 
 datasource db {
@@ -21,6 +22,15 @@ model User {
   birthDate DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // ── Vérification d'email (activation de compte via Resend)
+  emailVerified              Boolean   @default(false)
+  verificationToken          String?   @unique
+  verificationTokenExpiresAt DateTime?
+
+  // ── Réinitialisation de mot de passe (lien envoyé par email, courte durée de vie)
+  resetToken          String?   @unique
+  resetTokenExpiresAt DateTime?
 
   // Relations
   profile      UserProfile?

@@ -11,7 +11,7 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
   const token = req.headers.authorization?.split(' ')[1];
 
   if (!token) {
-    res.status(401).json({ error: 'Token manquant' });
+    res.status(401).json({ error: req.t('errors.tokenMissing') });
     return;
   }
 
@@ -20,6 +20,6 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     req.userId = decoded.userId;
     next();
   } catch {
-    res.status(401).json({ error: 'Token invalide ou expiré' });
+    res.status(401).json({ error: req.t('errors.tokenInvalid') });
   }
 };

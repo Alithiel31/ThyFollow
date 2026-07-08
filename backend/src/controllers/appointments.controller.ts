@@ -38,7 +38,7 @@ export const appointmentsController = {
     const existing = await prisma.appointment.findFirst({
       where: { id: req.params.id, userId: req.userId },
     });
-    if (!existing) throw new NotFoundError('Rendez-vous');
+    if (!existing) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.appointment') }));
 
     const { date, ...data } = apptSchema.partial().parse(req.body);
     const appt = await prisma.appointment.update({
@@ -52,7 +52,7 @@ export const appointmentsController = {
     const existing = await prisma.appointment.findFirst({
       where: { id: req.params.id, userId: req.userId },
     });
-    if (!existing) throw new NotFoundError('Rendez-vous');
+    if (!existing) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.appointment') }));
     await prisma.appointment.delete({ where: { id: req.params.id } });
     res.json({ success: true });
   },

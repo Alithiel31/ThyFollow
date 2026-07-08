@@ -2,6 +2,8 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
+RUN apk add --no-cache openssl
+
 COPY package*.json ./
 COPY tsconfig.json ./
 COPY prisma ./prisma/
@@ -15,7 +17,7 @@ RUN npm run build
 FROM node:20-alpine
 WORKDIR /app
 
-RUN apk add --no-cache dumb-init
+RUN apk add --no-cache dumb-init openssl
 
 COPY package*.json ./
 COPY prisma ./prisma/
@@ -24,6 +26,8 @@ RUN npm install --omit=dev
 RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" npx prisma generate
 
 COPY --from=builder /app/dist ./dist/
+
+RUN chown -R node:node /app
 
 USER node
 

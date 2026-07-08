@@ -1,11 +1,12 @@
 // src/components/AppShell.tsx
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../lib/store';
 import { useThemeStore, type ThemeMode } from '../lib/theme';
 import {
   LayoutDashboard, FlaskConical, Pill, Calendar,
   ClipboardEdit, User, LogOut,
-  Sun, Moon, MonitorSmartphone, BookOpen, PenLine,
+  Sun, Moon, MonitorSmartphone, BookOpen, PenLine, Languages,
 } from 'lucide-react';
 import styles from './AppShell.module.css';
 
@@ -21,24 +22,27 @@ function LogoMark() {
   );
 }
 
-const NAV = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Tableau de bord' },
-  { to: '/log', icon: ClipboardEdit, label: 'Journal' },
-  { to: '/lab-results', icon: FlaskConical, label: 'Analyses' },
-  { to: '/medications', icon: Pill, label: 'Médicaments' },
-  { to: '/appointments', icon: Calendar, label: 'Rendez-vous' },
-  { to: '/learn', icon: BookOpen, label: 'Comprendre' },
-  { to: '/profile', icon: User, label: 'Mon profil' },
-];
-
-const THEME_META: Record<ThemeMode, { icon: typeof Sun; label: string }> = {
-  auto: { icon: MonitorSmartphone, label: 'Thème : automatique' },
-  light: { icon: Sun, label: 'Thème : clair' },
-  dark: { icon: Moon, label: 'Thème : sombre' },
-};
+function useNavItems() {
+  const { t } = useTranslation();
+  return [
+    { to: '/dashboard', icon: LayoutDashboard, label: t('nav.dashboard') },
+    { to: '/log', icon: ClipboardEdit, label: t('nav.log') },
+    { to: '/lab-results', icon: FlaskConical, label: t('nav.labResults') },
+    { to: '/medications', icon: Pill, label: t('nav.medications') },
+    { to: '/appointments', icon: Calendar, label: t('nav.appointments') },
+    { to: '/learn', icon: BookOpen, label: t('nav.learn') },
+    { to: '/profile', icon: User, label: t('nav.profile') },
+  ];
+}
 
 function ThemeToggle({ className }: { className?: string }) {
+  const { t } = useTranslation();
   const { mode, cycle } = useThemeStore();
+  const THEME_META: Record<ThemeMode, { icon: typeof Sun; label: string }> = {
+    auto: { icon: MonitorSmartphone, label: t('theme.auto') },
+    light: { icon: Sun, label: t('theme.light') },
+    dark: { icon: Moon, label: t('theme.dark') },
+  };
   const { icon: Icon, label } = THEME_META[mode];
   return (
     <button className={className} onClick={cycle} title={label} aria-label={label}>
@@ -47,9 +51,27 @@ function ThemeToggle({ className }: { className?: string }) {
   );
 }
 
+function LanguageToggle({ className }: { className?: string }) {
+  const { i18n } = useTranslation();
+  const next = i18n.language?.startsWith('en') ? 'fr' : 'en';
+  const label = i18n.language?.startsWith('en') ? 'Passer en français' : 'Switch to English';
+  return (
+    <button
+      className={className}
+      onClick={() => i18n.changeLanguage(next)}
+      title={label}
+      aria-label={label}
+    >
+      <Languages size={18} strokeWidth={1.8} />
+    </button>
+  );
+}
+
 export function AppShell() {
+  const { t } = useTranslation();
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
+  const NAV = useNavItems();
 
   return (
     <div className={styles.shell}>
@@ -57,7 +79,7 @@ export function AppShell() {
       <aside className={styles.sidebar}>
         <div className={styles.logo} onClick={() => navigate('/dashboard')}>
           <LogoMark />
-          <span className={styles.logoText}>ThyroTrack</span>
+          <span className={styles.logoText}>{t('app.name')}</span>
         </div>
 
         <nav className={styles.nav}>
@@ -82,25 +104,22 @@ export function AppShell() {
               }
             >
               <PenLine size={18} strokeWidth={1.8} />
-              <span>Rédaction</span>
+              <span>{t('nav.writing')}</span>
             </NavLink>
           )}
         </nav>
 
         <div className={styles.sidebarFooter}>
-          <div className={styles.userInfo}>
+          <div className={styles.userInfo} title={user ? `${user.name}\n${user.email}` : undefined}>
             <div className={styles.avatar}>
               <span className={styles.avatarInner}>
                 {user?.name?.charAt(0).toUpperCase()}
               </span>
             </div>
-            <div className={styles.userMeta}>
-              <span className={styles.userName}>{user?.name}</span>
-              <span className={styles.userEmail}>{user?.email}</span>
-            </div>
           </div>
+          <LanguageToggle className={styles.footerBtn} />
           <ThemeToggle className={styles.footerBtn} />
-          <button className={styles.footerBtn} onClick={logout} title="Se déconnecter" aria-label="Se déconnecter">
+          <button className={styles.footerBtn} onClick={logout} title={t('common.logout')} aria-label={t('common.logout')}>
             <LogOut size={16} />
           </button>
         </div>
@@ -110,14 +129,15 @@ export function AppShell() {
       <header className={styles.mobileHeader}>
         <div className={styles.logo} onClick={() => navigate('/dashboard')}>
           <LogoMark />
-          <span className={styles.logoText}>ThyroTrack</span>
+          <span className={styles.logoText}>{t('app.name')}</span>
         </div>
         <div className={styles.mobileHeaderActions}>
+          <LanguageToggle className={styles.footerBtn} />
           <ThemeToggle className={styles.footerBtn} />
           <button
             className={styles.avatarBtn}
             onClick={() => navigate('/profile')}
-            aria-label="Mon profil"
+            aria-label={t('common.myProfile')}
           >
             <span className={styles.avatarInner}>
               {user?.name?.charAt(0).toUpperCase()}
@@ -143,7 +163,7 @@ export function AppShell() {
             }
           >
             <span className={styles.navDot} aria-hidden="true" />
-            <span>{label.split(' ')[0]}</span>
+            <span className={styles.navLabel}>{label.split(' ')[0]}</span>
           </NavLink>
         ))}
       </nav>

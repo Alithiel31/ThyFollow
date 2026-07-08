@@ -1,0 +1,44 @@
+{
+  "errors": {
+    "tokenMissing": "Missing token",
+    "tokenInvalid": "Invalid or expired token",
+    "emailInUse": "This email is already in use",
+    "invalidCredentials": "Incorrect email or password",
+    "authenticationFailed": "Authentication failed",
+    "accessDenied": "Access denied",
+    "adminOnly": "Access restricted to administrators",
+    "notFound": "{{resource}} not found",
+    "resourceExists": "This resource already exists",
+    "resourceNotFound": "Resource not found",
+    "invalidDbOperation": "Invalid database operation",
+    "internalError": "Internal server error",
+    "invalidPeriod": "Invalid period (from/to in YYYY-MM-DD format)",
+    "corsNotAllowed": "Origin not allowed by CORS",
+    "tooManyRequests": "Too many requests, please try again later",
+    "tooManyLoginAttempts": "Too many login attempts, please try again later",
+    "emailNotVerified": "Please confirm your email before signing in",
+    "invalidOrExpiredToken": "Invalid or expired verification link",
+    "invalidOrExpiredResetToken": "Invalid or expired reset link"
+  },
+  "auth": {
+    "verificationEmailSent": "A confirmation email has been sent",
+    "passwordResetEmailSent": "If an account exists for this email, a reset link has been sent",
+    "passwordResetSuccess": "Password updated. You can now sign in."
+  },
+  "resources": {
+    "appointment": "Appointment",
+    "article": "Article",
+    "user": "User",
+    "entry": "Entry",
+    "labResult": "Lab result",
+    "medication": "Medication"
+  },
+  "validation": {
+    "emailInvalid": "Invalid email",
+    "passwordTooShort": "Password too short (min 8 characters)",
+    "nameTooShort": "Name too short",
+    "titleTooShort": "Title too short",
+    "contentRequired": "Content required",
+    "invalidDateFormat": "Invalid date format (YYYY-MM-DD)"
+  }
+}

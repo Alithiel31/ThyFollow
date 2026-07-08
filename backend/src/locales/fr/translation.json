@@ -1,0 +1,44 @@
+{
+  "errors": {
+    "tokenMissing": "Token manquant",
+    "tokenInvalid": "Token invalide ou expiré",
+    "emailInUse": "Cet email est déjà utilisé",
+    "invalidCredentials": "Email ou mot de passe incorrect",
+    "authenticationFailed": "Authentification échouée",
+    "accessDenied": "Accès refusé",
+    "adminOnly": "Accès réservé aux administrateurs",
+    "notFound": "{{resource}} introuvable",
+    "resourceExists": "Cette ressource existe déjà",
+    "resourceNotFound": "Ressource introuvable",
+    "invalidDbOperation": "Opération sur la base de données invalide",
+    "internalError": "Erreur interne du serveur",
+    "invalidPeriod": "Période invalide (from/to au format YYYY-MM-DD)",
+    "corsNotAllowed": "Origine non autorisée par CORS",
+    "tooManyRequests": "Trop de requêtes, réessayez plus tard",
+    "tooManyLoginAttempts": "Trop de tentatives de connexion, réessayez plus tard",
+    "emailNotVerified": "Veuillez confirmer votre email avant de vous connecter",
+    "invalidOrExpiredToken": "Lien de vérification invalide ou expiré",
+    "invalidOrExpiredResetToken": "Lien de réinitialisation invalide ou expiré"
+  },
+  "auth": {
+    "verificationEmailSent": "Un email de confirmation a été envoyé",
+    "passwordResetEmailSent": "Si un compte existe avec cet email, un lien de réinitialisation a été envoyé",
+    "passwordResetSuccess": "Mot de passe mis à jour. Vous pouvez vous connecter."
+  },
+  "resources": {
+    "appointment": "Rendez-vous",
+    "article": "Article",
+    "user": "Utilisateur",
+    "entry": "Entrée",
+    "labResult": "Résultat",
+    "medication": "Médicament"
+  },
+  "validation": {
+    "emailInvalid": "Email invalide",
+    "passwordTooShort": "Mot de passe trop court (min 8 caractères)",
+    "nameTooShort": "Nom trop court",
+    "titleTooShort": "Titre trop court",
+    "contentRequired": "Contenu requis",
+    "invalidDateFormat": "Format de date invalide (YYYY-MM-DD)"
+  }
+}

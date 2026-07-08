@@ -17,7 +17,7 @@ export const requireAdmin = async (
   });
 
   if (user?.role !== 'ADMIN') {
-    res.status(403).json({ error: 'Accès réservé aux administrateurs' });
+    res.status(403).json({ error: req.t('errors.adminOnly') });
     return;
   }
   next();

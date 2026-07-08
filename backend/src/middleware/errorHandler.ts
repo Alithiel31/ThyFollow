@@ -10,7 +10,7 @@ import { logger } from '../lib/logger.js';
 // axios lisent `err.response.data.error`).
 export const errorHandler = (
   err: Error,
-  _req: Request,
+  req: Request,
   res: Response,
   _next: NextFunction
 ): void => {
@@ -24,25 +24,25 @@ export const errorHandler = (
   // Erreurs Prisma connues
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     if (err.code === 'P2002') {
-      res.status(409).json({ error: 'Cette ressource existe déjà' });
+      res.status(409).json({ error: req.t('errors.resourceExists') });
       return;
     }
     if (err.code === 'P2025') {
-      res.status(404).json({ error: 'Ressource introuvable' });
+      res.status(404).json({ error: req.t('errors.resourceNotFound') });
       return;
     }
     logger.error(`Erreur Prisma ${err.code}`, err.message);
-    res.status(400).json({ error: 'Opération sur la base de données invalide' });
+    res.status(400).json({ error: req.t('errors.invalidDbOperation') });
     return;
   }
 
   // Erreurs applicatives typées (NotFoundError, ConflictError, etc.)
   if (err instanceof AppError) {
-    res.status(err.statusCode).json({ error: err.message });
+    res.status(err.statusCode).json({ error: err.message, ...(err.code ? { code: err.code } : {}) });
     return;
   }
 
   // Tout le reste : erreur inattendue, on ne fuite pas le détail au client
   logger.error('Erreur non gérée', err);
-  res.status(500).json({ error: 'Erreur interne du serveur' });
+  res.status(500).json({ error: req.t('errors.internalError') });
 };

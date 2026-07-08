@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: thyro
-      POSTGRES_PASSWORD: thyro_secret
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: thyrotrack
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -27,15 +27,16 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    env_file:
+      - ./backend/.env
     environment:
-      DATABASE_URL: postgresql://thyro:thyro_secret@postgres:5432/thyrotrack
-      JWT_SECRET: ${JWT_SECRET:-change_me_in_production}
+      DATABASE_URL: postgresql://thyro:${POSTGRES_PASSWORD}@postgres:5432/thyrotrack
       NODE_ENV: production
       PORT: 3001
       # Frontend et API partagent la même origine via Nginx (le navigateur
       # parle uniquement à nginx sur le port public). CORS_ORIGIN reste un
       # garde-fou si jamais le backend est appelé directement.
-      FRONTEND_URL: http://localhost:8080
+      FRONTEND_URL: http://caesura:8082,https://thyrotrack.alithiel31.dev
     networks:
       - thyrotrack-network
 
@@ -45,21 +46,10 @@ services:
       dockerfile: Dockerfile
     container_name: thyrotrack-frontend
     restart: unless-stopped
-    depends_on:
-      - backend
-    networks:
-      - thyrotrack-network
-
-  nginx:
-    build:
-      context: ./nginx
-    container_name: thyrotrack-nginx
-    restart: unless-stopped
     ports:
-      - "8080:80"
+      - "8082:80"
     depends_on:
       - backend
-      - frontend
     networks:
       - thyrotrack-network
 

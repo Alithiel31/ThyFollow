@@ -21,7 +21,10 @@
     "express-rate-limit": "^7.4.0",
     "express-xss-sanitizer": "^2.0.2",
     "helmet": "^8.0.0",
+    "i18next": "^26.3.4",
+    "i18next-http-middleware": "^3.9.7",
     "jsonwebtoken": "^9.0.2",
+    "resend": "^4.8.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
