@@ -15,6 +15,18 @@ export interface User {
   oauthAccounts?: { provider: string }[];
 }
 
+// Historique des connexions/liaisons Google (voir backend authEvents.ts),
+// affiché dans le Profil sous "Activité récente".
+export type AuthEventType = 'LOGIN_SUCCESS' | 'LOGIN_FAILED' | 'LINKED' | 'LINK_CONFLICT' | 'LINK_FAILED' | 'UNLINKED';
+
+export interface AuthEvent {
+  id: string;
+  provider: string;
+  type: AuthEventType;
+  userAgent: string | null;
+  createdAt: string;
+}
+
 export interface UserProfile {
   diagnosisType?: DiagnosisType;
   diagnosisDate?: string;

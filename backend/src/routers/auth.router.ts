@@ -18,6 +18,10 @@ router.get('/me', authenticate, asyncHandler(authController.me));
 // OpenID Connect / OAuth2 — "Se connecter avec Google"
 router.get('/oidc/google', asyncHandler(oidcController.googleAuthorize));
 router.get('/oidc/google/callback', asyncHandler(oidcController.googleCallback));
+// Échange le code opaque à usage unique reçu sur /oauth/callback contre le
+// JWT de session (voir lib/oidcExchange.ts) — non protégée par `authenticate`
+// puisque l'utilisateur n'est pas encore authentifié à ce stade.
+router.post('/oidc/exchange', asyncHandler(oidcController.googleExchange));
 // Liaison/déliaison de Google à un compte déjà connecté (ex: compte créé par
 // email/mot de passe qui veut ajouter "Se connecter avec Google").
 router.post('/oidc/google/link', authenticate, asyncHandler(oidcController.googleLinkStart));

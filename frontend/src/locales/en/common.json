@@ -53,7 +53,8 @@
       "resendSuccess": "Confirmation email resent",
       "forgotPassword": "Forgot password?",
       "orDivider": "or",
-      "continueWithGoogle": "Continue with Google"
+      "continueWithGoogle": "Continue with Google",
+      "googleError": "Sign-in with Google failed, please try again"
     },
     "oauthCallback": {
       "loading": "Signing in…",
@@ -379,6 +380,17 @@
       "linkConflict": "This Google account is already linked to another user",
       "unlinkedSuccess": "Google account unlinked",
       "unlinkError": "Error unlinking Google account"
+    },
+    "securityEvents": {
+      "title": "Recent activity",
+      "types": {
+        "LOGIN_SUCCESS": "Signed in with Google",
+        "LOGIN_FAILED": "Failed Google sign-in attempt",
+        "LINKED": "Google account linked",
+        "LINK_CONFLICT": "Linking attempt refused (account already linked elsewhere)",
+        "LINK_FAILED": "Failed Google linking attempt",
+        "UNLINKED": "Google account unlinked"
+      }
     }
   },
   "diagnosis": {
