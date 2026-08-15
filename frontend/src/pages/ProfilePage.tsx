@@ -5,10 +5,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { Save, LogOut } from 'lucide-react';
-import { authApi, profileApi } from '../lib/api';
+import { authApi, profileApi, securityApi } from '../lib/api';
 import { useAuthStore } from '../lib/store';
 import { GoogleIcon } from '../components/GoogleIcon';
-import { DIAGNOSIS_LABEL_KEYS, THYROID_STATUS_LABEL_KEYS, type UserProfile } from '../types';
+import { DIAGNOSIS_LABEL_KEYS, THYROID_STATUS_LABEL_KEYS, type AuthEventType, type UserProfile } from '../types';
 import styles from './ProfilePage.module.css';
 
 export function ProfilePage() {
@@ -80,6 +80,14 @@ export function ProfilePage() {
   const { data: profile, isLoading } = useQuery({
     queryKey: ['profile'],
     queryFn: () => profileApi.get().then((r) => r.data),
+  });
+
+  // ── Activité récente (traçabilité des connexions Google, voir
+  // backend authEvents.ts) : n'échoue jamais silencieusement l'affichage du
+  // reste du profil si la requête échoue (pas de gestion d'erreur dédiée).
+  const { data: securityEvents } = useQuery({
+    queryKey: ['securityEvents'],
+    queryFn: () => securityApi.events().then((r) => r.data),
   });
 
   useEffect(() => {
@@ -256,6 +264,19 @@ export function ProfilePage() {
           )}
         </div>
       </Section>
+
+      {securityEvents && securityEvents.length > 0 && (
+        <Section title={t('profile.securityEvents.title')}>
+          {securityEvents.map((event) => (
+            <div key={event.id} className={styles.eventRow}>
+              <span className={`${styles.eventLabel} ${event.type.endsWith('FAILED') || event.type === 'LINK_CONFLICT' ? styles.eventFailed : ''}`}>
+                {t(`profile.securityEvents.types.${event.type as AuthEventType}`)}
+              </span>
+              <span className={styles.eventMeta}>{new Date(event.createdAt).toLocaleString()}</span>
+            </div>
+          ))}
+        </Section>
+      )}
 
       <button type="button" className={styles.logoutBtn} onClick={logout}>
         <LogOut size={16} />

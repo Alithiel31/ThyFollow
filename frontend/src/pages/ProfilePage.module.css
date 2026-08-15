@@ -115,6 +115,16 @@
 .smallBtnDanger { color: var(--danger); }
 .smallBtnDanger:hover:not(:disabled) { border-color: var(--danger); background: var(--danger-soft); }
 
+/* ── Activité récente (traçabilité des connexions) */
+.eventRow {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  font-size: 0.82rem; padding: 6px 0; border-bottom: 1px solid var(--border);
+}
+.eventRow:last-child { border-bottom: none; }
+.eventLabel { color: var(--text); }
+.eventMeta { color: var(--text-muted); white-space: nowrap; }
+.eventFailed { color: var(--danger); }
+
 @media (max-width: 600px) {
   .grid2, .grid3 { grid-template-columns: 1fr 1fr; }
   .header { flex-direction: column; align-items: flex-start; }

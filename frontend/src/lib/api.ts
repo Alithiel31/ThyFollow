@@ -46,6 +46,14 @@ export const authApi = {
   // lui-même la navigation plein-page vers l'URL Google renvoyée.
   linkGoogle: () => api.post<{ url: string }>('/auth/oidc/google/link'),
   unlinkGoogle: () => api.delete<{ message: string }>('/auth/oidc/google/link'),
+  // Échange le code opaque à usage unique reçu sur /oauth/callback?code=...
+  // contre le JWT de session (voir backend oidc.controller.ts#googleExchange).
+  exchangeOidcCode: (code: string) => api.post<{ token: string }>('/auth/oidc/exchange', { code }),
+};
+
+// ── Sécurité du compte
+export const securityApi = {
+  events: () => api.get<import('../types').AuthEvent[]>('/profile/security/events'),
 };
 
 // ── Daily entries

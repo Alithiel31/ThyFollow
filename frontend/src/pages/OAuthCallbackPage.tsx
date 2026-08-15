@@ -1,9 +1,10 @@
 // src/pages/OAuthCallbackPage.tsx
 // Point d'atterrissage après un login OIDC réussi côté backend
-// (voir controllers/oidc.controller.ts, qui redirige ici avec ?token=...).
-// Le backend a déjà validé l'id_token Google et émis notre propre JWT de
-// session : ce composant se contente de le récupérer et de rejoindre le
-// même state d'auth que le login classique.
+// (voir controllers/oidc.controller.ts, qui redirige ici avec ?code=...).
+// Le backend a déjà validé l'id_token Google : plutôt que de nous envoyer
+// directement le JWT de session dans l'URL (exposé via historique
+// navigateur, logs serveur/proxy, Referer), il nous donne un code opaque à
+// usage unique, qu'on échange ici contre le vrai JWT via POST /oidc/exchange.
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -19,16 +20,18 @@ export function OAuthCallbackPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = searchParams.get('token');
-    if (!token) { setError(true); return; }
+    const code = searchParams.get('code');
+    if (!code) { setError(true); return; }
 
-    // authApi.me() lit le token depuis localStorage via l'intercepteur axios
-    // (lib/api.ts) : on doit donc l'y déposer avant l'appel.
-    localStorage.setItem('thyro_token', token);
-    authApi.me()
-      .then(({ data }) => {
-        setAuth(data, token);
-        navigate('/dashboard', { replace: true });
+    authApi.exchangeOidcCode(code)
+      .then(({ data: { token } }) => {
+        // authApi.me() lit le token depuis localStorage via l'intercepteur
+        // axios (lib/api.ts) : on doit donc l'y déposer avant l'appel.
+        localStorage.setItem('thyro_token', token);
+        return authApi.me().then(({ data }) => {
+          setAuth(data, token);
+          navigate('/dashboard', { replace: true });
+        });
       })
       .catch(() => {
         localStorage.removeItem('thyro_token');

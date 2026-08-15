@@ -53,7 +53,8 @@
       "resendSuccess": "Email de confirmation renvoyé",
       "forgotPassword": "Mot de passe oublié ?",
       "orDivider": "ou",
-      "continueWithGoogle": "Continuer avec Google"
+      "continueWithGoogle": "Continuer avec Google",
+      "googleError": "La connexion avec Google a échoué, veuillez réessayer"
     },
     "oauthCallback": {
       "loading": "Connexion en cours…",
@@ -379,6 +380,17 @@
       "linkConflict": "Ce compte Google est déjà lié à un autre utilisateur",
       "unlinkedSuccess": "Compte Google délié",
       "unlinkError": "Erreur lors de la déliaison du compte Google"
+    },
+    "securityEvents": {
+      "title": "Activité récente",
+      "types": {
+        "LOGIN_SUCCESS": "Connexion réussie via Google",
+        "LOGIN_FAILED": "Tentative de connexion Google échouée",
+        "LINKED": "Compte Google lié",
+        "LINK_CONFLICT": "Tentative de liaison refusée (compte déjà lié ailleurs)",
+        "LINK_FAILED": "Tentative de liaison Google échouée",
+        "UNLINKED": "Compte Google délié"
+      }
     }
   },
   "diagnosis": {
