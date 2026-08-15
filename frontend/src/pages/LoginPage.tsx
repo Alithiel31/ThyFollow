@@ -1,6 +1,6 @@
 // src/pages/LoginPage.tsx
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Activity } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -18,6 +18,17 @@ export function LoginPage() {
   const [resending, setResending] = useState(false);
   const { setAuth } = useAuthStore();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // ── Retour d'un login Google en échec : oidc.controller.ts redirige ici
+  // avec ?googleError=1 plutôt que d'afficher une erreur JSON brute (voir
+  // handleGoogleLoginCallback).
+  useEffect(() => {
+    if (!searchParams.get('googleError')) return;
+    toast.error(t('auth.login.googleError'));
+    searchParams.delete('googleError');
+    setSearchParams(searchParams, { replace: true });
+  }, []); // eslint-disable-line
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -16,6 +16,8 @@ import { AuthRequest } from '../middleware/auth.js';
 import { config } from '../config.js';
 import { prisma } from '../lib/prisma.js';
 import { buildGoogleAuthorizationUrl, handleGoogleCallback, type OidcFlowState } from '../lib/oidc.js';
+import { createExchangeCode, consumeExchangeCode } from '../lib/oidcExchange.js';
+import { recordAuthEvent } from '../lib/authEvents.js';
 import { AppError, ConflictError, NotFoundError, ValidationError } from '../lib/errors.js';
 
 const OIDC_COOKIE = 'thyro_oidc_google';
@@ -47,35 +49,119 @@ function signSessionToken(userId: string): string {
 // plutôt que d'afficher du JSON brut dans le navigateur.
 async function handleGoogleLinkCallback(req: AuthRequest, res: Response, rawCookie: string): Promise<void> {
   const profileUrl = new URL('/profile', config.appUrl);
+  let flow: OidcLinkFlowState | undefined;
 
   try {
-    const flow: OidcLinkFlowState = JSON.parse(rawCookie);
+    flow = JSON.parse(rawCookie);
     const callbackUrl = new URL(req.originalUrl, config.googleRedirectUri);
-    const identity = await handleGoogleCallback(callbackUrl, flow);
+    const identity = await handleGoogleCallback(callbackUrl, flow!);
 
     const existingLink = await prisma.oAuthAccount.findUnique({
       where: { provider_providerAccountId: { provider: 'google', providerAccountId: identity.providerAccountId } },
     });
 
-    if (existingLink && existingLink.userId !== flow.userId) {
+    if (existingLink && existingLink.userId !== flow!.userId) {
       // Ce compte Google est déjà relié à quelqu'un d'autre : on refuse
       // (sinon deux comptes ThyroTrack se retrouveraient reliés au même
       // compte Google, ce qui casserait l'unicité provider+providerAccountId).
       profileUrl.searchParams.set('googleLinkError', 'conflict');
+      await recordAuthEvent(prisma, { userId: flow!.userId, provider: 'google', type: 'LINK_CONFLICT', req });
     } else if (!existingLink) {
       await prisma.oAuthAccount.create({
-        data: { provider: 'google', providerAccountId: identity.providerAccountId, userId: flow.userId },
+        data: { provider: 'google', providerAccountId: identity.providerAccountId, userId: flow!.userId },
       });
       profileUrl.searchParams.set('googleLinked', '1');
+      await recordAuthEvent(prisma, { userId: flow!.userId, provider: 'google', type: 'LINKED', req });
     } else {
       // Déjà relié à ce même compte (ex: double clic) : idempotent, succès.
       profileUrl.searchParams.set('googleLinked', '1');
     }
   } catch {
     profileUrl.searchParams.set('googleLinkError', '1');
+    await recordAuthEvent(prisma, { userId: flow?.userId ?? null, provider: 'google', type: 'LINK_FAILED', req });
   }
 
   res.redirect(profileUrl.href);
+}
+
+// Traite le retour de Google pour le flux de login (utilisateur non
+// authentifié). Comme handleGoogleLinkCallback, cette requête est une
+// navigation plein-page initiée par Google : toute erreur (cookie de flow
+// absent/expiré, state/nonce invalide, code révoqué...) doit rediriger
+// proprement vers le frontend plutôt que de laisser errorHandler répondre
+// en JSON brut, qui s'afficherait tel quel dans le navigateur.
+async function handleGoogleLoginCallback(req: AuthRequest, res: Response, rawCookie: string | undefined): Promise<void> {
+  const loginUrl = new URL('/login', config.appUrl);
+
+  try {
+    if (!rawCookie) throw new ValidationError(req.t('errors.oidcFlowExpired'));
+
+    const flow: OidcFlowState = JSON.parse(rawCookie);
+
+    // openid-client compare `req.query.state` à `flow.state` (et valide
+    // signature/iss/aud/exp/nonce de l'id_token) à l'intérieur de cet appel.
+    const callbackUrl = new URL(req.originalUrl, config.googleRedirectUri);
+    const identity = await handleGoogleCallback(callbackUrl, flow);
+
+    if (!identity.email) {
+      throw new ValidationError(req.t('errors.oidcNoEmail'));
+    }
+
+    const existingLink = await prisma.oAuthAccount.findUnique({
+      where: { provider_providerAccountId: { provider: 'google', providerAccountId: identity.providerAccountId } },
+      include: { user: true },
+    });
+
+    let userId: string;
+
+    if (existingLink) {
+      userId = existingLink.userId;
+    } else {
+      // Pas encore de compte lié à ce `sub` Google. Si un compte existe déjà
+      // avec cet email, on le lie (federated identity linking) — mais
+      // seulement si Google certifie l'email vérifié, sinon un attaquant
+      // pourrait créer un compte Google sur l'email de quelqu'un d'autre
+      // pour prendre le contrôle de son compte ThyroTrack.
+      const existingUser = identity.emailVerified
+        ? await prisma.user.findUnique({ where: { email: identity.email } })
+        : null;
+
+      if (existingUser) {
+        await prisma.oAuthAccount.create({
+          data: { provider: 'google', providerAccountId: identity.providerAccountId, userId: existingUser.id },
+        });
+        userId = existingUser.id;
+      } else {
+        const created = await prisma.user.create({
+          data: {
+            email: identity.email,
+            password: null,
+            name: identity.name,
+            emailVerified: identity.emailVerified,
+            profile: { create: {} },
+            notifications: { create: {} },
+            oauthAccounts: { create: { provider: 'google', providerAccountId: identity.providerAccountId } },
+          },
+          select: { id: true },
+        });
+        userId = created.id;
+      }
+    }
+
+    await recordAuthEvent(prisma, { userId, provider: 'google', type: 'LOGIN_SUCCESS', req });
+
+    // Le JWT lui-même ne transite jamais dans l'URL : on ne redirige qu'avec
+    // un code d'échange opaque à usage unique, consommé par le frontend via
+    // POST /api/auth/oidc/exchange (voir lib/oidcExchange.ts).
+    const code = createExchangeCode(userId);
+    const redirectUrl = new URL('/oauth/callback', config.appUrl);
+    redirectUrl.searchParams.set('code', code);
+    res.redirect(redirectUrl.href);
+  } catch {
+    await recordAuthEvent(prisma, { userId: null, provider: 'google', type: 'LOGIN_FAILED', req });
+    loginUrl.searchParams.set('googleError', '1');
+    res.redirect(loginUrl.href);
+  }
 }
 
 export const oidcController = {
@@ -142,6 +228,7 @@ export const oidcController = {
     }
 
     await prisma.oAuthAccount.deleteMany({ where: { provider: 'google', userId: req.userId } });
+    await recordAuthEvent(prisma, { userId: req.userId!, provider: 'google', type: 'UNLINKED', req });
     res.json({ message: req.t('auth.googleAccountUnlinked') });
   },
 
@@ -162,68 +249,20 @@ export const oidcController = {
 
     const raw = req.cookies?.[OIDC_COOKIE];
     res.clearCookie(OIDC_COOKIE, { path: '/api/auth/oidc/google' });
-    if (!raw) throw new ValidationError(req.t('errors.oidcFlowExpired'));
+    await handleGoogleLoginCallback(req, res, raw);
+  },
 
-    let flow: OidcFlowState;
-    try {
-      flow = JSON.parse(raw);
-    } catch {
-      throw new ValidationError(req.t('errors.oidcFlowExpired'));
-    }
+  // POST /api/auth/oidc/exchange — échange un code d'usage unique (émis par
+  // handleGoogleLoginCallback) contre le JWT de session applicatif. Évite
+  // que le JWT lui-même ne transite dans l'URL de redirection (voir
+  // lib/oidcExchange.ts).
+  googleExchange: async (req: AuthRequest, res: Response): Promise<void> => {
+    const code = typeof req.body?.code === 'string' ? req.body.code : undefined;
+    if (!code) throw new ValidationError(req.t('errors.oidcFlowExpired'));
 
-    // openid-client compare `req.query.state` à `flow.state` (et valide
-    // signature/iss/aud/exp/nonce de l'id_token) à l'intérieur de cet appel.
-    const callbackUrl = new URL(req.originalUrl, config.googleRedirectUri);
-    const identity = await handleGoogleCallback(callbackUrl, flow);
+    const userId = consumeExchangeCode(code);
+    if (!userId) throw new ValidationError(req.t('errors.oidcFlowExpired'));
 
-    if (!identity.email) {
-      throw new ValidationError(req.t('errors.oidcNoEmail'));
-    }
-
-    const existingLink = await prisma.oAuthAccount.findUnique({
-      where: { provider_providerAccountId: { provider: 'google', providerAccountId: identity.providerAccountId } },
-      include: { user: true },
-    });
-
-    let userId: string;
-
-    if (existingLink) {
-      userId = existingLink.userId;
-    } else {
-      // Pas encore de compte lié à ce `sub` Google. Si un compte existe déjà
-      // avec cet email, on le lie (federated identity linking) — mais
-      // seulement si Google certifie l'email vérifié, sinon un attaquant
-      // pourrait créer un compte Google sur l'email de quelqu'un d'autre
-      // pour prendre le contrôle de son compte ThyroTrack.
-      const existingUser = identity.emailVerified
-        ? await prisma.user.findUnique({ where: { email: identity.email } })
-        : null;
-
-      if (existingUser) {
-        await prisma.oAuthAccount.create({
-          data: { provider: 'google', providerAccountId: identity.providerAccountId, userId: existingUser.id },
-        });
-        userId = existingUser.id;
-      } else {
-        const created = await prisma.user.create({
-          data: {
-            email: identity.email,
-            password: null,
-            name: identity.name,
-            emailVerified: identity.emailVerified,
-            profile: { create: {} },
-            notifications: { create: {} },
-            oauthAccounts: { create: { provider: 'google', providerAccountId: identity.providerAccountId } },
-          },
-          select: { id: true },
-        });
-        userId = created.id;
-      }
-    }
-
-    const token = signSessionToken(userId);
-    const redirectUrl = new URL('/oauth/callback', config.appUrl);
-    redirectUrl.searchParams.set('token', token);
-    res.redirect(redirectUrl.href);
+    res.json({ token: signSessionToken(userId) });
   },
 };
