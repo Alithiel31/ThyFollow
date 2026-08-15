@@ -37,6 +37,22 @@ cp backend/.env.example backend/.env
 # Éditer backend/.env avec votre DATABASE_URL et JWT_SECRET
 ```
 
+#### (Optionnel) Activer "Se connecter avec Google"
+
+Sans `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`, `GET /api/auth/oidc/google` répond simplement `501` et le bouton Google reste inutile — le reste de l'app fonctionne normalement. Pour l'activer :
+
+1. Sur [Google Cloud Console](https://console.cloud.google.com/), créez (ou sélectionnez) un projet.
+2. **APIs & Services → OAuth consent screen** : type *External*, renseignez le nom de l'app et un email de support, ajoutez les scopes `openid`, `email`, `profile`.
+3. **APIs & Services → Credentials → Create Credentials → OAuth client ID**, type *Web application*.
+4. **Authorized JavaScript origins** : `http://localhost:5173` (URL du frontend).
+5. **Authorized redirect URIs** : `http://localhost:3001/api/auth/oidc/google/callback` (doit correspondre exactement à `GOOGLE_REDIRECT_URI`, c'est l'URL du **backend**, pas du frontend).
+6. Copiez le *Client ID* et le *Client Secret* générés dans `backend/.env` :
+   ```bash
+   GOOGLE_CLIENT_ID="xxxxxxxx.apps.googleusercontent.com"
+   GOOGLE_CLIENT_SECRET="xxxxxxxx"
+   ```
+En production, mettez à jour les origines/redirect URIs avec le domaine réel et ajustez `GOOGLE_REDIRECT_URI` (+ `APP_URL`) en conséquence.
+
 ### 3. Initialiser la base de données
 ```bash
 cd backend
@@ -167,6 +183,8 @@ User ──┬── UserProfile         (diagnostic, plages cibles)
 POST   /api/auth/register
 POST   /api/auth/login
 GET    /api/auth/me
+GET    /api/auth/oidc/google            (redirige vers Google — OAuth2 + OpenID Connect)
+GET    /api/auth/oidc/google/callback
 
 GET    /api/entries?from=&to=
 GET    /api/entries/:date
@@ -213,7 +231,7 @@ GET    /api/analytics/symptoms?days=30
 | API | Express 4 + TypeScript |
 | ORM | Prisma 5 |
 | BDD | PostgreSQL |
-| Auth | JWT (jsonwebtoken) + bcryptjs |
+| Auth | JWT (jsonwebtoken) + bcryptjs, OAuth2 + OpenID Connect (Google, via `openid-client`) |
 | Validation | Zod |
 | Frontend | React 18 + Vite |
 | État | Zustand + TanStack Query |

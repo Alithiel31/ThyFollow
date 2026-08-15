@@ -22,6 +22,14 @@ export const config = {
   appUrl: process.env.APP_URL || (process.env.FRONTEND_URL || 'http://caesura:8082').split(',')[0].trim(),
   jwtSecret: process.env.JWT_SECRET || 'dev-secret-key-min-32-characters-long',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '30d',
+  // OpenID Connect / OAuth2 — connexion via Google. Absents en dev tant que
+  // l'utilisateur n'a pas créé de credentials dans Google Cloud Console :
+  // la route /api/auth/oidc/google répond alors 501 plutôt que de planter.
+  googleClientId: process.env.GOOGLE_CLIENT_ID || '',
+  googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+  // Doit correspondre exactement à une "Authorized redirect URI" déclarée
+  // côté Google (l'URL publique du backend, pas du frontend).
+  googleRedirectUri: process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3001/api/auth/oidc/google/callback',
   // Resend (email d'activation de compte) : sans clé, l'envoi est simplement
   // sauté (log en warn) pour ne pas bloquer le dev local sans compte Resend.
   resendApiKey: process.env.RESEND_API_KEY || '',

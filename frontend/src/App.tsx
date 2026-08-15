@@ -10,6 +10,7 @@ import { RegisterPage } from './pages/RegisterPage';
 import { VerifyEmailPage } from './pages/VerifyEmailPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
+import { OAuthCallbackPage } from './pages/OAuthCallbackPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { LogPage } from './pages/LogPage';
 import { LabResultsPage } from './pages/LabResultsPage';
@@ -59,6 +60,7 @@ export default function App() {
         <Route path="/verify-email" element={<VerifyEmailPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
 
         {/* Protected */}
         <Route element={<RequireAuth><AppShell /></RequireAuth>}>

@@ -49,7 +49,14 @@
       "resendVerification": "Resend confirmation email",
       "resending": "Sending…",
       "resendSuccess": "Confirmation email resent",
-      "forgotPassword": "Forgot password?"
+      "forgotPassword": "Forgot password?",
+      "orDivider": "or",
+      "continueWithGoogle": "Continue with Google"
+    },
+    "oauthCallback": {
+      "loading": "Signing in…",
+      "error": "Sign-in with Google failed",
+      "backToLogin": "Back to sign in"
     },
     "register": {
       "title": "Create an account",
