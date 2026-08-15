@@ -21,12 +21,14 @@
     "invalidOrExpiredResetToken": "Lien de réinitialisation invalide ou expiré",
     "oidcNotConfigured": "La connexion avec Google n'est pas configurée sur ce serveur",
     "oidcFlowExpired": "La tentative de connexion a expiré, veuillez réessayer",
-    "oidcNoEmail": "Google n'a pas fourni d'adresse email pour ce compte"
+    "oidcNoEmail": "Google n'a pas fourni d'adresse email pour ce compte",
+    "oidcLinkCannotUnlinkNoPassword": "Définissez d'abord un mot de passe (via « Mot de passe oublié ») avant de délier Google, sinon vous perdriez l'accès à votre compte"
   },
   "auth": {
     "verificationEmailSent": "Un email de confirmation a été envoyé",
     "passwordResetEmailSent": "Si un compte existe avec cet email, un lien de réinitialisation a été envoyé",
-    "passwordResetSuccess": "Mot de passe mis à jour. Vous pouvez vous connecter."
+    "passwordResetSuccess": "Mot de passe mis à jour. Vous pouvez vous connecter.",
+    "googleAccountUnlinked": "Compte Google délié"
   },
   "resources": {
     "appointment": "Rendez-vous",

@@ -209,6 +209,9 @@ export const authController = {
         birthDate: true,
         createdAt: true,
         profile: true,
+        // Comptes fédérés liés (ex: Google) — le frontend s'en sert pour
+        // afficher l'état "connecté/non connecté" dans le Profil.
+        oauthAccounts: { select: { provider: true } },
       },
     });
 

@@ -10,6 +10,9 @@ export interface User {
   birthDate?: string;
   createdAt: string;
   profile?: UserProfile;
+  // Comptes fédérés liés (ex: Google) — sert à afficher l'état "lié/non lié"
+  // dans le Profil (voir ProfilePage.tsx, section "Comptes liés").
+  oauthAccounts?: { provider: string }[];
 }
 
 export interface UserProfile {

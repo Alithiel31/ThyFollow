@@ -21,12 +21,14 @@
     "invalidOrExpiredResetToken": "Invalid or expired reset link",
     "oidcNotConfigured": "Sign in with Google is not configured on this server",
     "oidcFlowExpired": "The sign-in attempt expired, please try again",
-    "oidcNoEmail": "Google did not provide an email address for this account"
+    "oidcNoEmail": "Google did not provide an email address for this account",
+    "oidcLinkCannotUnlinkNoPassword": "Set a password first (via \"Forgot password\") before unlinking Google, otherwise you would lose access to your account"
   },
   "auth": {
     "verificationEmailSent": "A confirmation email has been sent",
     "passwordResetEmailSent": "If an account exists for this email, a reset link has been sent",
-    "passwordResetSuccess": "Password updated. You can now sign in."
+    "passwordResetSuccess": "Password updated. You can now sign in.",
+    "googleAccountUnlinked": "Google account unlinked"
   },
   "resources": {
     "appointment": "Appointment",

@@ -1,20 +1,81 @@
 // src/pages/ProfilePage.tsx
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { Save, LogOut } from 'lucide-react';
-import { profileApi } from '../lib/api';
+import { authApi, profileApi } from '../lib/api';
 import { useAuthStore } from '../lib/store';
+import { GoogleIcon } from '../components/GoogleIcon';
 import { DIAGNOSIS_LABEL_KEYS, THYROID_STATUS_LABEL_KEYS, type UserProfile } from '../types';
 import styles from './ProfilePage.module.css';
 
 export function ProfilePage() {
   const { t } = useTranslation();
-  const { user, logout } = useAuthStore();
+  const { user, token, logout, setAuth } = useAuthStore();
   const qc = useQueryClient();
   const [form, setForm] = useState<Partial<UserProfile>>({});
   const [dirty, setDirty] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [linking, setLinking] = useState(false);
+  const [unlinking, setUnlinking] = useState(false);
+  const isGoogleLinked = user?.oauthAccounts?.some((a) => a.provider === 'google') ?? false;
+
+  // ── Retour du flux de liaison Google : oidc.controller.ts redirige ici
+  // avec ?googleLinked=1 ou ?googleLinkError=(conflict|1) après le passage
+  // par l'écran de consentement Google (voir handleGoogleLinkCallback).
+  useEffect(() => {
+    const linked = searchParams.get('googleLinked');
+    const error = searchParams.get('googleLinkError');
+    if (!linked && !error) return;
+
+    if (linked) {
+      toast.success(t('profile.linkedAccounts.linkedSuccess'));
+      // Le JWT ne change pas ici : on rafraîchit juste `user` pour que
+      // `oauthAccounts` reflète le nouveau lien.
+      if (token) authApi.me().then(({ data }) => setAuth(data, token));
+    } else if (error === 'conflict') {
+      toast.error(t('profile.linkedAccounts.linkConflict'));
+    } else {
+      toast.error(t('profile.linkedAccounts.linkError'));
+    }
+
+    searchParams.delete('googleLinked');
+    searchParams.delete('googleLinkError');
+    setSearchParams(searchParams, { replace: true });
+  }, []); // eslint-disable-line
+
+  const handleLinkGoogle = async () => {
+    setLinking(true);
+    try {
+      const { data } = await authApi.linkGoogle();
+      // Navigation plein-page volontaire : le backend a déjà posé le cookie
+      // de flux OIDC via cet appel XHR, il ne reste qu'à envoyer le
+      // navigateur vers Google (voir api.ts / oidc.controller.ts).
+      window.location.href = data.url;
+    } catch {
+      toast.error(t('profile.linkedAccounts.linkError'));
+      setLinking(false);
+    }
+  };
+
+  const handleUnlinkGoogle = async () => {
+    setUnlinking(true);
+    try {
+      await authApi.unlinkGoogle();
+      toast.success(t('profile.linkedAccounts.unlinkedSuccess'));
+      if (token) {
+        const { data } = await authApi.me();
+        setAuth(data, token);
+      }
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? t('profile.linkedAccounts.unlinkError');
+      toast.error(msg);
+    } finally {
+      setUnlinking(false);
+    }
+  };
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['profile'],
@@ -165,6 +226,36 @@ export function ProfilePage() {
           {updateMut.isPending ? t('profile.saveButton.saving') : dirty ? t('profile.saveButton.dirty') : t('profile.saveButton.saved')}
         </button>
       </form>
+
+      {/* ── Comptes liés (hors <form> : n'a rien à voir avec l'enregistrement
+          du profil ci-dessus, et ne doit pas déclencher son onSubmit). */}
+      <Section title={t('profile.linkedAccounts.title')}>
+        <div className={styles.linkedAccountRow}>
+          <div className={styles.linkedAccountInfo}>
+            <GoogleIcon size={22} />
+            <div>
+              <div>{t('profile.linkedAccounts.google')}</div>
+              <div className={`${styles.linkedAccountStatus} ${isGoogleLinked ? styles.linked : ''}`}>
+                {isGoogleLinked ? t('profile.linkedAccounts.linked') : t('profile.linkedAccounts.notLinked')}
+              </div>
+            </div>
+          </div>
+          {isGoogleLinked ? (
+            <button
+              type="button"
+              className={`${styles.smallBtn} ${styles.smallBtnDanger}`}
+              onClick={handleUnlinkGoogle}
+              disabled={unlinking}
+            >
+              {unlinking ? t('profile.linkedAccounts.unlinking') : t('profile.linkedAccounts.unlink')}
+            </button>
+          ) : (
+            <button type="button" className={styles.smallBtn} onClick={handleLinkGoogle} disabled={linking}>
+              {linking ? t('profile.linkedAccounts.linking') : t('profile.linkedAccounts.link')}
+            </button>
+          )}
+        </div>
+      </Section>
 
       <button type="button" className={styles.logoutBtn} onClick={logout}>
         <LogOut size={16} />

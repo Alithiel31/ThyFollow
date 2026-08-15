@@ -39,6 +39,13 @@ export const authApi = {
   resetPassword: (token: string, password: string) =>
     api.post<{ message: string }>('/auth/reset-password', { token, password }),
   me: () => api.get<import('../types').User>('/auth/me'),
+  // Liaison/déliaison de Google à un compte déjà connecté (voir
+  // oidc.controller.ts). `linkGoogle` est un POST (pas un simple <a href>)
+  // pour que l'intercepteur axios attache le header Authorization — requis
+  // par la route, protégée par `authenticate`. Le frontend fait ensuite
+  // lui-même la navigation plein-page vers l'URL Google renvoyée.
+  linkGoogle: () => api.post<{ url: string }>('/auth/oidc/google/link'),
+  unlinkGoogle: () => api.delete<{ message: string }>('/auth/oidc/google/link'),
 };
 
 // ── Daily entries

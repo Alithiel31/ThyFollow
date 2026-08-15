@@ -1,5 +1,7 @@
 {
-  "app": { "name": "ThyroTrack" },
+  "app": {
+    "name": "ThyroTrack"
+  },
   "nav": {
     "dashboard": "Tableau de bord",
     "log": "Journal",
@@ -74,7 +76,9 @@
       "signIn": "Se connecter",
       "genericError": "Erreur lors de la création",
       "checkEmailTitle": "Vérifiez votre boîte mail",
-      "checkEmailSubtitle": "Un email de confirmation a été envoyé à {{email}}. Cliquez sur le lien qu'il contient pour activer votre compte."
+      "checkEmailSubtitle": "Un email de confirmation a été envoyé à {{email}}. Cliquez sur le lien qu'il contient pour activer votre compte.",
+      "orDivider": "ou",
+      "continueWithGoogle": "Continuer avec Google"
     },
     "verify": {
       "pendingTitle": "Vérification en cours…",
@@ -360,6 +364,21 @@
       "saving": "Enregistrement…",
       "dirty": "Enregistrer les modifications",
       "saved": "Profil à jour"
+    },
+    "linkedAccounts": {
+      "title": "Comptes liés",
+      "google": "Google",
+      "linked": "Connecté",
+      "notLinked": "Non connecté",
+      "link": "Lier",
+      "unlink": "Délier",
+      "linking": "Redirection…",
+      "unlinking": "Déliaison…",
+      "linkedSuccess": "Compte Google lié avec succès",
+      "linkError": "Erreur lors de la liaison avec Google",
+      "linkConflict": "Ce compte Google est déjà lié à un autre utilisateur",
+      "unlinkedSuccess": "Compte Google délié",
+      "unlinkError": "Erreur lors de la déliaison du compte Google"
     }
   },
   "diagnosis": {

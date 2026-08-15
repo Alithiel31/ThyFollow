@@ -1,5 +1,7 @@
 {
-  "app": { "name": "ThyroTrack" },
+  "app": {
+    "name": "ThyroTrack"
+  },
   "nav": {
     "dashboard": "Dashboard",
     "log": "Log",
@@ -74,7 +76,9 @@
       "signIn": "Sign in",
       "genericError": "Error while creating account",
       "checkEmailTitle": "Check your inbox",
-      "checkEmailSubtitle": "A confirmation email has been sent to {{email}}. Click the link inside to activate your account."
+      "checkEmailSubtitle": "A confirmation email has been sent to {{email}}. Click the link inside to activate your account.",
+      "orDivider": "or",
+      "continueWithGoogle": "Continue with Google"
     },
     "verify": {
       "pendingTitle": "Verifying…",
@@ -360,6 +364,21 @@
       "saving": "Saving…",
       "dirty": "Save changes",
       "saved": "Profile up to date"
+    },
+    "linkedAccounts": {
+      "title": "Linked accounts",
+      "google": "Google",
+      "linked": "Connected",
+      "notLinked": "Not connected",
+      "link": "Link",
+      "unlink": "Unlink",
+      "linking": "Redirecting…",
+      "unlinking": "Unlinking…",
+      "linkedSuccess": "Google account linked successfully",
+      "linkError": "Error linking Google account",
+      "linkConflict": "This Google account is already linked to another user",
+      "unlinkedSuccess": "Google account unlinked",
+      "unlinkError": "Error unlinking Google account"
     }
   },
   "diagnosis": {
