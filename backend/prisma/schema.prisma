@@ -43,6 +43,7 @@ model User {
   symptoms      SymptomLibrary[]
   notifications NotificationSetting?
   oauthAccounts OAuthAccount[]
+  authEvents    AuthEvent[]
 
   @@map("users")
 }
@@ -65,6 +66,35 @@ model OAuthAccount {
 
   @@unique([provider, providerAccountId])
   @@map("oauth_accounts")
+}
+
+// ─────────────────────────────────────────────
+// AUTH EVENT (traçabilité des connexions/liaisons OIDC, ex: Google)
+// ─────────────────────────────────────────────
+model AuthEvent {
+  id     String @id @default(cuid())
+  // Nullable : un échec de login peut survenir avant qu'un utilisateur ne
+  // soit résolu (ex: state/nonce invalide, flow expiré).
+  userId String?
+  provider  String // ex: "google"
+  type      AuthEventType
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@map("auth_events")
+}
+
+enum AuthEventType {
+  LOGIN_SUCCESS
+  LOGIN_FAILED
+  LINKED
+  LINK_CONFLICT
+  LINK_FAILED
+  UNLINKED
 }
 
 // ─────────────────────────────────────────────

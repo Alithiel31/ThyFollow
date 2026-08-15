@@ -50,4 +50,17 @@ export const profileController = {
 
     res.json(profile);
   },
+
+  // GET /api/profile/security/events — historique récent des connexions/
+  // liaisons Google (voir lib/authEvents.ts), pour informer l'utilisateur
+  // d'une activité inattendue sur son compte.
+  securityEvents: async (req: AuthRequest, res: Response): Promise<void> => {
+    const events = await prisma.authEvent.findMany({
+      where: { userId: req.userId },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+      select: { id: true, provider: true, type: true, userAgent: true, createdAt: true },
+    });
+    res.json(events);
+  },
 };
