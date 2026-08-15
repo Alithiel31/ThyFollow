@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Activity, MailCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { authApi } from '../lib/api';
+import { GoogleIcon } from '../components/GoogleIcon';
 import styles from './AuthPage.module.css';
 
 export function RegisterPage() {
@@ -95,6 +96,17 @@ export function RegisterPage() {
             {loading ? t('auth.register.submitting') : t('auth.register.submit')}
           </button>
         </form>
+
+        <div className={styles.divider}>{t('auth.register.orDivider')}</div>
+
+        {/* Navigation plein-page volontaire (pas un appel axios) : ce lien
+            démarre une redirection OAuth2/OIDC vers Google. Le backend crée
+            automatiquement le compte si aucun n'existe encore pour cet email
+            (voir oidc.controller.ts) — inutile de dupliquer le formulaire. */}
+        <a className={styles.googleBtn} href="/api/auth/oidc/google">
+          <GoogleIcon />
+          {t('auth.register.continueWithGoogle')}
+        </a>
 
         <p className={styles.switchText}>
           {t('auth.register.alreadyAccount')}{' '}

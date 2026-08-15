@@ -93,6 +93,28 @@
 }
 .logoutBtn:hover { background: var(--danger-soft); border-color: var(--danger); }
 
+/* ── Comptes liés (OAuth) */
+.linkedAccountRow {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+
+.linkedAccountInfo { display: flex; align-items: center; gap: 12px; font-size: 0.9rem; color: var(--text); }
+
+.linkedAccountStatus { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+.linked { color: var(--accent); font-weight: 500; }
+
+.smallBtn {
+  background: var(--bg-raised); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 8px 16px;
+  color: var(--text); font-family: var(--font-body); font-size: 0.85rem; font-weight: 500;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.smallBtn:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-soft); }
+.smallBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.smallBtnDanger { color: var(--danger); }
+.smallBtnDanger:hover:not(:disabled) { border-color: var(--danger); background: var(--danger-soft); }
+
 @media (max-width: 600px) {
   .grid2, .grid3 { grid-template-columns: 1fr 1fr; }
   .header { flex-direction: column; align-items: flex-start; }

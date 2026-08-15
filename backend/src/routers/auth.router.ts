@@ -18,5 +18,9 @@ router.get('/me', authenticate, asyncHandler(authController.me));
 // OpenID Connect / OAuth2 — "Se connecter avec Google"
 router.get('/oidc/google', asyncHandler(oidcController.googleAuthorize));
 router.get('/oidc/google/callback', asyncHandler(oidcController.googleCallback));
+// Liaison/déliaison de Google à un compte déjà connecté (ex: compte créé par
+// email/mot de passe qui veut ajouter "Se connecter avec Google").
+router.post('/oidc/google/link', authenticate, asyncHandler(oidcController.googleLinkStart));
+router.delete('/oidc/google/link', authenticate, asyncHandler(oidcController.googleUnlink));
 
 export default router;
