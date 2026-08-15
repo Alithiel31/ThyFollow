@@ -10,28 +10,33 @@ import {
 } from 'lucide-react';
 import styles from './AppShell.module.css';
 
-/* Logo « papillon » de la maquette : deux lobes bleu / orange */
+/* Logo « papillon » de la maquette (version icône) : ellipses bleu / orange */
 function LogoMark() {
   return (
     <div className={styles.logoIcon} aria-hidden="true">
-      <div className={styles.wings}>
-        <span className={styles.wingLeft} />
-        <span className={styles.wingRight} />
-      </div>
+      <svg width="24" height="18" viewBox="0 0 64 48" style={{ display: 'block' }}>
+        <ellipse cx="34" cy="20" rx="4.4" ry="16" fill="#3b7bf6" transform="rotate(-45 34 36)" />
+        <ellipse cx="34" cy="22" rx="3.9" ry="14" fill="#2159d1" transform="rotate(-30 34 36)" />
+        <ellipse cx="34" cy="26" rx="3.1" ry="10" fill="#3b7bf6" transform="rotate(-15 34 36)" />
+        <ellipse cx="34" cy="20" rx="4.4" ry="16" fill="#f2761f" transform="rotate(45 34 36)" />
+        <ellipse cx="34" cy="22" rx="3.9" ry="14" fill="#c85b0f" transform="rotate(30 34 36)" />
+        <ellipse cx="34" cy="26" rx="3.1" ry="10" fill="#f2761f" transform="rotate(15 34 36)" />
+      </svg>
     </div>
   );
 }
 
+/* shape : glyphe géométrique de la nav basse mobile (maquette Mobile) */
 function useNavItems() {
   const { t } = useTranslation();
   return [
-    { to: '/dashboard', icon: LayoutDashboard, label: t('nav.dashboard') },
-    { to: '/log', icon: ClipboardEdit, label: t('nav.log') },
-    { to: '/lab-results', icon: FlaskConical, label: t('nav.labResults') },
-    { to: '/medications', icon: Pill, label: t('nav.medications') },
-    { to: '/appointments', icon: Calendar, label: t('nav.appointments') },
-    { to: '/learn', icon: BookOpen, label: t('nav.learn') },
-    { to: '/profile', icon: User, label: t('nav.profile') },
+    { to: '/dashboard', icon: LayoutDashboard, label: t('nav.dashboard'), shape: 'circle' },
+    { to: '/log', icon: ClipboardEdit, label: t('nav.log'), shape: 'square' },
+    { to: '/lab-results', icon: FlaskConical, label: t('nav.labResults'), shape: 'circle' },
+    { to: '/medications', icon: Pill, label: t('nav.medications'), shape: 'diamond' },
+    { to: '/appointments', icon: Calendar, label: t('nav.appointments'), shape: 'square' },
+    { to: '/learn', icon: BookOpen, label: t('nav.learn'), shape: 'circle' },
+    { to: '/profile', icon: User, label: t('nav.profile'), shape: 'circle' },
   ];
 }
 
@@ -109,19 +114,25 @@ export function AppShell() {
           )}
         </nav>
 
-        <div className={styles.sidebarFooter}>
-          <div className={styles.userInfo} title={user ? `${user.name}\n${user.email}` : undefined}>
-            <div className={styles.avatar}>
-              <span className={styles.avatarInner}>
-                {user?.name?.charAt(0).toUpperCase()}
-              </span>
-            </div>
-          </div>
+        <div className={styles.footerRow}>
           <LanguageToggle className={styles.footerBtn} />
           <ThemeToggle className={styles.footerBtn} />
           <button className={styles.footerBtn} onClick={logout} title={t('common.logout')} aria-label={t('common.logout')}>
             <LogOut size={16} />
           </button>
+        </div>
+
+        {/* Fiche utilisateur de la maquette : avatar cerclé + nom + email */}
+        <div className={styles.sidebarFooter} title={user ? `${user.name}\n${user.email}` : undefined}>
+          <div className={styles.avatar}>
+            <span className={styles.avatarInner}>
+              {user?.name?.charAt(0).toUpperCase()}
+            </span>
+          </div>
+          <div className={styles.userMeta}>
+            <span className={styles.userName}>{user?.name?.split(' ')[0]}</span>
+            <span className={styles.userEmail}>{user?.email}</span>
+          </div>
         </div>
       </aside>
 
@@ -154,7 +165,7 @@ export function AppShell() {
       {/* ── Nav basse (mobile) */}
       {/* Nav à points de la maquette : point plein = actif, cerclé = inactif */}
       <nav className={styles.mobileNav}>
-        {NAV.slice(0, 5).map(({ to, label }) => (
+        {NAV.slice(0, 5).map(({ to, label, shape }) => (
           <NavLink
             key={to}
             to={to}
@@ -162,7 +173,13 @@ export function AppShell() {
               `${styles.mobileNavItem} ${isActive ? styles.mobileNavItemActive : ''}`
             }
           >
-            <span className={styles.navDot} aria-hidden="true" />
+            <span
+              className={`${styles.navDot} ${
+                shape === 'square' ? styles.navDotSquare
+                : shape === 'diamond' ? styles.navDotDiamond : ''
+              }`}
+              aria-hidden="true"
+            />
             <span className={styles.navLabel}>{label.split(' ')[0]}</span>
           </NavLink>
         ))}

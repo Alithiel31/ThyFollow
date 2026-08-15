@@ -10,7 +10,7 @@ import { LAB_RANGES, type LabResult } from '../types';
 import { useAuthStore } from '../lib/store';
 import {
   LineChart, Line, XAxis, YAxis, Tooltip,
-  ResponsiveContainer, ReferenceLine, CartesianGrid
+  ResponsiveContainer, ReferenceLine, ReferenceArea, CartesianGrid
 } from 'recharts';
 import { parseISO, format } from 'date-fns';
 import { fr, enUS } from 'date-fns/locale';
@@ -117,8 +117,14 @@ export function LabResultsPage() {
               <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} tickLine={false} axisLine={false} />
               <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} tickLine={false} axisLine={false} />
               <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, fontSize: 12, color: 'var(--text)', boxShadow: 'var(--shadow)' }} />
-              <ReferenceLine y={profile?.targetTSH_min ?? LAB_RANGES.tsh.min} stroke="var(--success)" strokeOpacity={0.35} strokeDasharray="4 4" />
-              <ReferenceLine y={profile?.targetTSH_max ?? LAB_RANGES.tsh.max} stroke="var(--success)" strokeOpacity={0.35} strokeDasharray="4 4" label={{ value: t('labResults.targetZone'), position: 'right', fontSize: 10, fill: 'var(--success)' }} />
+              {/* Zone cible de la maquette : bande bleutée + pointillés accent */}
+              <ReferenceArea
+                y1={profile?.targetTSH_min ?? LAB_RANGES.tsh.min}
+                y2={profile?.targetTSH_max ?? LAB_RANGES.tsh.max}
+                fill="var(--accent)" fillOpacity={0.08} stroke="none"
+              />
+              <ReferenceLine y={profile?.targetTSH_min ?? LAB_RANGES.tsh.min} stroke="var(--accent)" strokeOpacity={0.35} strokeDasharray="4 4" />
+              <ReferenceLine y={profile?.targetTSH_max ?? LAB_RANGES.tsh.max} stroke="var(--accent)" strokeOpacity={0.35} strokeDasharray="4 4" label={{ value: t('labResults.targetZone'), position: 'right', fontSize: 10, fill: 'var(--accent)' }} />
               <Line type="monotone" dataKey="tsh" stroke="var(--chart-1)" strokeWidth={2.5} dot={{ r: 4, fill: 'var(--chart-1)', strokeWidth: 0 }} connectNulls />
             </LineChart>
           </ResponsiveContainer>
@@ -197,7 +203,14 @@ export function LabResultsPage() {
           {results.map((r) => {
             const tshInfo = r.tsh != null ? tshStatus(r.tsh, profile?.targetTSH_min, profile?.targetTSH_max) : null;
             return (
-              <div key={r.id} className={styles.resultCard} onClick={() => openEdit(r)}>
+              <div
+                key={r.id}
+                className={`${styles.resultCard} ${
+                  tshInfo?.status === 'high' ? styles.resultCardHigh
+                  : tshInfo?.status === 'low' ? styles.resultCardLow : ''
+                }`}
+                onClick={() => openEdit(r)}
+              >
                 <div className={styles.resultDate}>{formatDate(r.date)}</div>
                 {r.lab && <div className={styles.resultLab}>{r.lab}</div>}
                 <div className={styles.markers}>

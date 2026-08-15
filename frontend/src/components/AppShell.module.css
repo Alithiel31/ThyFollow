@@ -27,40 +27,29 @@
   cursor: pointer;
 }
 
+/* Écrin du logo : cadre clair le jour, halo bleuté la nuit (maquette) */
 .logoIcon {
-  width: 30px; height: 30px;
+  width: 34px; height: 34px;
   background: var(--bg-card);
-  border: 1px solid var(--accent-soft);
-  border-radius: 9px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(20, 30, 50, 0.08);
 }
 
-/* Papillon : deux lobes bleu / orange (maquette) */
-.wings {
-  position: relative;
-  width: 16px; height: 12px;
+:global([data-theme='dark']) .logoIcon {
+  background: linear-gradient(150deg, #111c33, #0a0d14);
+  border-color: rgba(59, 123, 246, 0.24);
+  box-shadow: 0 0 18px rgba(59, 123, 246, 0.2);
 }
 
-.wingLeft, .wingRight {
-  position: absolute;
-  top: 1px;
-  width: 8px; height: 10px;
-  display: block;
-}
-
-.wingLeft {
-  left: 0;
-  border-radius: 7px 7px 7px 1px;
-  background: linear-gradient(140deg, #8fb8ff, #3b7bf6);
-  transform: rotate(-9deg);
-}
-
-.wingRight {
-  right: 0;
-  border-radius: 7px 7px 1px 7px;
-  background: linear-gradient(220deg, #ff9d4d, #e8650f);
-  transform: rotate(9deg);
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme='light'])) .logoIcon {
+    background: linear-gradient(150deg, #111c33, #0a0d14);
+    border-color: rgba(59, 123, 246, 0.24);
+    box-shadow: 0 0 18px rgba(59, 123, 246, 0.2);
+  }
 }
 
 .logoText {
@@ -98,10 +87,14 @@
   color: var(--text);
 }
 
+/* Item actif : fond bleuté + bordure gauche accent (maquette) */
 .navItemActive {
   background: var(--accent-soft);
   color: var(--accent);
-  font-weight: 500;
+  font-weight: 600;
+  border-left: 2px solid var(--accent);
+  margin-left: -2px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
 .navItemActive:hover {
@@ -110,20 +103,44 @@
 }
 
 /* ── Pied de sidebar ───────────────────────── */
-.sidebarFooter {
+/* Rangée d'actions (langue / thème / déconnexion) */
+.footerRow {
   display: flex;
-  align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 10px;
-  background: var(--bg-raised);
-  border-radius: var(--radius);
   margin-top: 16px;
 }
 
-.userInfo {
+/* Fiche utilisateur de la maquette : avatar + nom + email */
+.sidebarFooter {
   display: flex;
   align-items: center;
-  flex: 1;
+  gap: 10px;
+  padding: 12px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-top: 10px;
+}
+
+.userMeta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.userName {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.userEmail {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Avatar cerclé d'un dégradé bleu → orange (maquette) */
@@ -241,13 +258,23 @@
   white-space: nowrap;
 }
 
-/* Point cerclé (inactif) → plein bleu (actif), comme la maquette */
+/* Glyphe cerclé (inactif) → plein bleu (actif), comme la maquette.
+   Trois formes : rond, carré arrondi, losange (maquette Mobile). */
 .navDot {
-  width: 9px; height: 9px;
+  width: 10px; height: 10px;
   border-radius: 50%;
   border: 1.5px solid var(--border-hover);
   background: transparent;
   transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.navDotSquare { border-radius: 3px; }
+
+.navDotDiamond {
+  border-radius: 2px;
+  transform: rotate(45deg);
+  width: 8px; height: 8px;
+  margin: 1px;
 }
 
 .mobileNavItemActive {
@@ -261,6 +288,50 @@
 }
 
 /* ── Responsive ────────────────────────────── */
+
+/* Tablette (769–1024px) : sidebar réduite en icônes.
+   Le layout desktop est conservé, mais on gagne ~170px de largeur utile. */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .sidebar {
+    width: 72px;
+    padding: 24px 10px;
+    align-items: center;
+  }
+
+  .logo { padding: 0; justify-content: center; }
+  .logoText { display: none; }
+
+  .nav { width: 100%; }
+
+  .navItem {
+    justify-content: center;
+    padding: 11px 0;
+  }
+  .navItem span { display: none; }   /* on ne garde que l'icône */
+
+  .navItemActive {
+    border-left: none;
+    margin-left: 0;
+    border-radius: var(--radius-sm);
+  }
+
+  .footerRow { flex-direction: column; align-items: center; }
+
+  .sidebarFooter {
+    padding: 6px;
+    background: transparent;
+    border: none;
+    justify-content: center;
+  }
+  .userMeta { display: none; }       /* avatar seul en mode icônes */
+
+  .main {
+    margin-left: 72px;
+    padding: 32px 28px 40px;
+  }
+}
+
+/* Téléphone (≤768px) : topbar compacte + nav basse (maquette Mobile) */
 @media (max-width: 768px) {
   .sidebar { display: none; }
   .mobileHeader { display: flex; }

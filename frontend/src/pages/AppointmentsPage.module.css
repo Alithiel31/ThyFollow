@@ -2,17 +2,19 @@
 
 .page { max-width: 760px; }
 .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
-.title { font-family: var(--font-display); font-style: italic; font-weight: 500; font-size: 1.5rem; color: var(--text); letter-spacing: -0.02em; }
-.sub { font-size: 0.875rem; color: var(--text-muted); margin-top: 4px; }
+.title { font-family: var(--font-display); font-style: italic; font-weight: 500; font-size: 1.9rem; color: var(--text); letter-spacing: -0.02em; }
+.sub { font-size: 0.875rem; color: var(--text-muted); margin-top: 6px; }
 
+/* Bouton primaire de la maquette : dégradé bleu + ombre accent */
 .addBtn {
   display: flex; align-items: center; gap: 8px;
-  background: var(--accent); color: var(--on-accent); border: none;
-  border-radius: var(--radius-sm); padding: 10px 18px;
-  font-family: var(--font-body); font-size: 0.875rem; font-weight: 500;
-  cursor: pointer; transition: opacity 0.15s;
+  background: var(--accent-grad); color: var(--on-accent); border: none;
+  border-radius: 11px; padding: 11px 18px;
+  font-family: var(--font-body); font-size: 0.82rem; font-weight: 600;
+  cursor: pointer; box-shadow: var(--shadow-accent);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.addBtn:hover { opacity: 0.85; }
+.addBtn:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(59, 123, 246, 0.4); }
 
 .filters {
   display: flex; gap: 8px; margin-bottom: 24px;
@@ -20,28 +22,38 @@
 
 .filterBtn {
   background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 100px; padding: 7px 16px;
-  color: var(--text-muted); font-family: var(--font-body); font-size: 0.82rem;
+  border-radius: 100px; padding: 8px 16px;
+  color: var(--text-muted); font-family: var(--font-body); font-size: 0.8rem;
   cursor: pointer; transition: all 0.15s;
 }
 .filterBtn:hover { color: var(--text); border-color: var(--border-hover); }
-.filterActive { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 
-.list { display: flex; flex-direction: column; gap: 12px; }
+/* Maquette : le filtre actif est une pilule bleu plein */
+.filterActive {
+  background: var(--accent); border-color: var(--accent);
+  color: var(--on-accent); font-weight: 600;
+}
+.filterActive:hover { color: var(--on-accent); }
+
+.list { display: flex; flex-direction: column; gap: 14px; }
 
 .apptCard {
   display: flex; align-items: flex-start; gap: 16px;
   background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 18px 20px;
+  border-radius: 16px; padding: 18px 22px;
+  box-shadow: var(--shadow);
   cursor: pointer; transition: border-color 0.15s;
 }
-.apptCard:hover { border-color: var(--border-hover); }
+.apptCard:hover { border-color: var(--accent-soft); }
 .apptDone { opacity: 0.6; }
 .apptCancelled { opacity: 0.4; }
 
+/* Maquette : l'emoji est posé dans une pastille arrondie bleutée */
 .apptEmoji {
-  font-size: 1.5rem; line-height: 1; flex-shrink: 0;
-  margin-top: 2px;
+  width: 42px; height: 42px; flex-shrink: 0;
+  background: var(--accent-soft); border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; line-height: 1;
 }
 
 .apptInfo { flex: 1; min-width: 0; }
@@ -65,7 +77,7 @@
 }
 
 .statusBadge {
-  font-size: 0.7rem; font-weight: 500; padding: 3px 10px;
+  font-size: 0.68rem; font-weight: 700; padding: 4px 11px;
   border-radius: 100px; white-space: nowrap;
 }
 .status_UPCOMING { background: var(--accent-soft); color: var(--accent); }

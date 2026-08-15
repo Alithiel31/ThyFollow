@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import {
   ChevronLeft, ChevronRight, Check, Save, Pill,
-  Sparkles, Activity, Dumbbell, Moon, Ruler, FileText, FileDown,
+  Sparkles, Activity, Dumbbell, Moon, FileDown,
 } from 'lucide-react';
 import { entriesApi } from '../lib/api';
 import { toISODate, formatDate, symptomLabel } from '../lib/utils';
@@ -21,29 +21,49 @@ type ScoreField = keyof Pick<DailyEntry,
   'neckPain' | 'swelling' | 'tremors' | 'sleepQuality'
 >;
 
+/* marker : pastille géométrique colorée du titre de section (maquette Journal) */
 function useSections(t: (k: string) => string) {
   return [
     {
       title: t('log.sections.wellbeing'),
       icon: Sparkles,
+      marker: { shape: 'square', color: 'var(--accent)' },
       fields: ['energyLevel', 'moodScore', 'anxietyLevel', 'brainFogLevel'] as ScoreField[],
     },
     {
       title: t('log.sections.thyroidSymptoms'),
       icon: Activity,
+      marker: { shape: 'circle', color: 'var(--lav)' },
       fields: ['coldSensitivity', 'heatSensitivity', 'hairLoss', 'drySkin', 'neckPain', 'swelling', 'tremors'] as ScoreField[],
     },
     {
       title: t('log.sections.digestiveMuscular'),
       icon: Dumbbell,
+      marker: { shape: 'diamond', color: 'var(--text)' },
       fields: ['constipation', 'bloating', 'muscleWeakness', 'jointPain'] as ScoreField[],
     },
     {
       title: t('log.sections.sleep'),
       icon: Moon,
+      marker: { shape: 'circle', color: 'var(--accent)' },
       fields: ['sleepQuality'] as ScoreField[],
     },
   ];
+}
+
+/* Pastille de section : carré, rond ou losange, comme la maquette */
+function SectionMarker({ shape, color }: { shape: string; color: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      style={{
+        width: 8, height: 8, display: 'inline-block', flexShrink: 0,
+        background: color,
+        borderRadius: shape === 'circle' ? '50%' : 2,
+        transform: shape === 'diamond' ? 'rotate(45deg)' : undefined,
+      }}
+    />
+  );
 }
 
 export function LogPage() {
@@ -193,7 +213,8 @@ export function LogPage() {
           {SECTIONS.map((section) => (
             <div key={section.title} className={styles.section}>
               <h2 className={styles.sectionTitle}>
-                <section.icon size={16} strokeWidth={1.8} /> {section.title}
+                <SectionMarker shape={section.marker.shape} color={section.marker.color} />
+                {section.title}
               </h2>
               <div className={styles.scoreGrid}>
                 {section.fields.map((field) => (
@@ -210,7 +231,10 @@ export function LogPage() {
 
           {/* ── Physical metrics */}
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}><Ruler size={16} strokeWidth={1.8} /> {t('log.measures')}</h2>
+            <h2 className={styles.sectionTitle}>
+              <SectionMarker shape="diamond" color="var(--text)" />
+              {t('log.measures')}
+            </h2>
             <div className={styles.metricsGrid}>
               <MetricInput label={t('log.weight')} value={form.weight ?? ''}
                 onChange={(v) => setField('weight', v ? parseFloat(v) : null)}
@@ -229,7 +253,7 @@ export function LogPage() {
 
           {/* ── Notes */}
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}><FileText size={16} strokeWidth={1.8} /> {t('log.notes')}</h2>
+            <h2 className={styles.sectionTitle}>{t('log.notes')}</h2>
             <textarea
               className={styles.textarea}
               value={form.notes ?? ''}
