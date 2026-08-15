@@ -1,5 +1,6 @@
 // src/index.ts
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -60,6 +61,12 @@ const authLimiter = rateLimit({
 });
 
 app.use(express.json());
+
+// ── Nécessaire pour lire le cookie httpOnly qui porte le state/nonce/PKCE
+// durant le flux OIDC (voir controllers/oidc.controller.ts). L'app n'a pas
+// de session serveur par ailleurs : ce cookie est le seul, et il ne
+// contient rien de sensible côté utilisateur (pas de secret partagé).
+app.use(cookieParser());
 
 // ── Nettoyage des payloads contre les injections XSS
 app.use(xss());

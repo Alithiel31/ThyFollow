@@ -16,7 +16,9 @@ datasource db {
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
-  password  String
+  // Nullable : un compte créé via un fournisseur OIDC (Google...) n'a pas de
+  // mot de passe local tant qu'il n'en définit pas un explicitement.
+  password  String?
   name      String
   role      Role     @default(USER)
   birthDate DateTime?
@@ -33,15 +35,36 @@ model User {
   resetTokenExpiresAt DateTime?
 
   // Relations
-  profile      UserProfile?
-  entries      DailyEntry[]
-  medications  Medication[]
-  labResults   LabResult[]
-  appointments Appointment[]
-  symptoms     SymptomLibrary[]
+  profile       UserProfile?
+  entries       DailyEntry[]
+  medications   Medication[]
+  labResults    LabResult[]
+  appointments  Appointment[]
+  symptoms      SymptomLibrary[]
   notifications NotificationSetting?
+  oauthAccounts OAuthAccount[]
 
   @@map("users")
+}
+
+// ─────────────────────────────────────────────
+// OAUTH ACCOUNT (identités fédérées liées à un compte, ex: Google via OIDC)
+// ─────────────────────────────────────────────
+model OAuthAccount {
+  id     String @id @default(cuid())
+  // Nom du fournisseur OIDC (ex: "google"). Un même provider ne peut pas
+  // être lié deux fois au même sub → @@unique ci-dessous.
+  provider          String
+  // Claim `sub` de l'id_token : identifiant stable et unique chez le
+  // fournisseur, à ne jamais confondre avec l'email (qui peut changer).
+  providerAccountId String
+  userId            String
+  createdAt         DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("oauth_accounts")
 }
 
 // ─────────────────────────────────────────────

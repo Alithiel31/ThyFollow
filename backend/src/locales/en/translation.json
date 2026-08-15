@@ -18,7 +18,10 @@
     "tooManyLoginAttempts": "Too many login attempts, please try again later",
     "emailNotVerified": "Please confirm your email before signing in",
     "invalidOrExpiredToken": "Invalid or expired verification link",
-    "invalidOrExpiredResetToken": "Invalid or expired reset link"
+    "invalidOrExpiredResetToken": "Invalid or expired reset link",
+    "oidcNotConfigured": "Sign in with Google is not configured on this server",
+    "oidcFlowExpired": "The sign-in attempt expired, please try again",
+    "oidcNoEmail": "Google did not provide an email address for this account"
   },
   "auth": {
     "verificationEmailSent": "A confirmation email has been sent",
