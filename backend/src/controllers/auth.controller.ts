@@ -101,7 +101,10 @@ export const authController = {
     const { email, password } = loginSchema.parse(req.body);
 
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) throw new AuthenticationError(req.t('errors.invalidCredentials'));
+    // `password` est null pour un compte créé via Google (OIDC) qui n'a
+    // jamais défini de mot de passe local : même erreur générique que des
+    // identifiants incorrects, pour ne pas révéler comment le compte a été créé.
+    if (!user || !user.password) throw new AuthenticationError(req.t('errors.invalidCredentials'));
 
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) throw new AuthenticationError(req.t('errors.invalidCredentials'));
