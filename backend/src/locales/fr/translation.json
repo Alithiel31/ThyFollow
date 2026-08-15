@@ -18,7 +18,10 @@
     "tooManyLoginAttempts": "Trop de tentatives de connexion, réessayez plus tard",
     "emailNotVerified": "Veuillez confirmer votre email avant de vous connecter",
     "invalidOrExpiredToken": "Lien de vérification invalide ou expiré",
-    "invalidOrExpiredResetToken": "Lien de réinitialisation invalide ou expiré"
+    "invalidOrExpiredResetToken": "Lien de réinitialisation invalide ou expiré",
+    "oidcNotConfigured": "La connexion avec Google n'est pas configurée sur ce serveur",
+    "oidcFlowExpired": "La tentative de connexion a expiré, veuillez réessayer",
+    "oidcNoEmail": "Google n'a pas fourni d'adresse email pour ce compte"
   },
   "auth": {
     "verificationEmailSent": "Un email de confirmation a été envoyé",
