@@ -17,6 +17,11 @@
   --accent-strong: #2159d1;
   --accent-soft: rgba(59, 123, 246, 0.12);
   --on-accent: #ffffff;
+  /* Dégradé des boutons primaires (maquette) */
+  --accent-grad: linear-gradient(135deg, #3b7bf6, #2159d1);
+
+  /* ── Motif pointillé du fond de page (maquette) */
+  --dot: rgba(0, 0, 0, 0.035);
 
   /* ── Secondaire : orange */
   --lav: #e8650f;
@@ -86,6 +91,8 @@
   --accent-soft: rgba(59, 123, 246, 0.16);
   --on-accent: #ffffff;
 
+  --dot: rgba(255, 255, 255, 0.035);
+
   --lav: #f2761f;
   --lav-soft: rgba(242, 118, 31, 0.15);
 
@@ -135,6 +142,8 @@
     --warn: #f2a71f;
     --warn-soft: rgba(242, 167, 31, 0.14);
 
+    --dot: rgba(255, 255, 255, 0.035);
+
     --chart-1: #3b7bf6;
     --chart-2: #f2761f;
     --chart-grid: rgba(255, 255, 255, 0.06);
@@ -158,6 +167,9 @@ html { font-size: 16px; scroll-behavior: smooth; }
 body {
   font-family: var(--font-body);
   background: var(--bg);
+  /* Motif pointillé discret, comme sur toutes les maquettes */
+  background-image: radial-gradient(circle, var(--dot) 1px, transparent 1px);
+  background-size: 20px 20px;
   color: var(--text);
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
@@ -201,6 +213,7 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 }
 
 /* Utilitaires */
+
 .sr-only {
   position: absolute; width: 1px; height: 1px;
   padding: 0; margin: -1px; overflow: hidden;

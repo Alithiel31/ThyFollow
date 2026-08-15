@@ -11,7 +11,7 @@
 
 .greeting {
   font-family: var(--font-display); font-style: italic; font-weight: 500;
-  font-size: 1.6rem;
+  font-size: 2.1rem;
   color: var(--text);
   letter-spacing: -0.02em;
 }
@@ -23,23 +23,28 @@
   text-transform: capitalize;
 }
 
+/* Bouton primaire de la maquette : dégradé bleu + ombre portée accent */
 .logBtn {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--accent);
+  background: var(--accent-grad);
   color: var(--on-accent);
   border: none;
-  border-radius: var(--radius-sm);
-  padding: 10px 18px;
+  border-radius: 11px;
+  padding: 12px 20px;
   font-family: var(--font-body);
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.15s;
+  box-shadow: var(--shadow-accent);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
   white-space: nowrap;
 }
-.logBtn:hover { opacity: 0.85; }
+.logBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 30px rgba(59, 123, 246, 0.4);
+}
 
 /* ── KPI Strip */
 .kpiRow {
@@ -49,43 +54,66 @@
   margin-bottom: 24px;
 }
 
+/* Carte KPI (maquette) : verticale, valeur serif colorée, élévation au survol */
 .kpiCard {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px 20px;
+  border-radius: var(--radius-lg);
+  padding: 20px;
   display: flex;
-  align-items: center;
-  gap: 14px;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.kpiCard:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-soft);
+  box-shadow: 0 14px 28px rgba(59, 123, 246, 0.16);
 }
 
 .kpiIcon {
-  width: 40px; height: 40px;
-  border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
+  margin-bottom: 10px;
 }
 
 .kpiLabel {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
-  margin-bottom: 2px;
+  margin-bottom: 6px;
 }
 
 .kpiValue {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  font-weight: 500;
+  line-height: 1.1;
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 8px;
 }
 
+.kpiUnit {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
 .kpiBadge {
-  font-size: 0.7rem;
-  font-weight: 500;
-  padding: 2px 8px;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 3px 9px;
   border-radius: 100px;
+}
+
+.kpiExtra {
+  width: 100%;
+  margin-top: 10px;
 }
 
 /* ── Main grid */
@@ -106,8 +134,9 @@
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   padding: 20px 22px;
+  box-shadow: var(--shadow);
 }
 
 .cardHeader {

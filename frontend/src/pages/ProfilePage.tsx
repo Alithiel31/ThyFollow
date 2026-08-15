@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
-import { User, Save, Target, Settings, LogOut } from 'lucide-react';
+import { Save, LogOut } from 'lucide-react';
 import { profileApi } from '../lib/api';
 import { useAuthStore } from '../lib/store';
 import { DIAGNOSIS_LABEL_KEYS, THYROID_STATUS_LABEL_KEYS, type UserProfile } from '../types';
@@ -51,7 +51,10 @@ export function ProfilePage() {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <div className={styles.avatar}>{user?.name?.charAt(0).toUpperCase()}</div>
+        {/* Avatar cerclé d'un dégradé bleu → orange (maquette) */}
+        <div className={styles.avatar}>
+          <span className={styles.avatarInner}>{user?.name?.charAt(0).toUpperCase()}</span>
+        </div>
         <div>
           <h1 className={styles.title}>{user?.name}</h1>
           <p className={styles.email}>{user?.email}</p>
@@ -60,7 +63,7 @@ export function ProfilePage() {
 
       <form onSubmit={handleSubmit}>
         {/* ── Diagnosis */}
-        <Section title={t('profile.diagnosisSection')} icon={<User size={16} strokeWidth={1.8} />}>
+        <Section title={t('profile.diagnosisSection')} marker={{ shape: 'square', color: 'var(--accent)' }}>
           <div className={styles.grid2}>
             <div className={styles.field}>
               <label className={styles.label}>{t('profile.diagnosisType')}</label>
@@ -94,7 +97,7 @@ export function ProfilePage() {
         </Section>
 
         {/* ── Target ranges */}
-        <Section title={t('profile.targetsSection')} icon={<Target size={16} strokeWidth={1.8} />}>
+        <Section title={t('profile.targetsSection')} marker={{ shape: 'circle', color: 'var(--lav)' }}>
           <p className={styles.hint}>{t('profile.targetsHint')}</p>
           <div className={styles.grid3}>
             <div className={styles.field}>
@@ -133,7 +136,7 @@ export function ProfilePage() {
         </Section>
 
         {/* ── Preferences */}
-        <Section title={t('profile.preferencesSection')} icon={<Settings size={16} strokeWidth={1.8} />}>
+        <Section title={t('profile.preferencesSection')}>
           <div className={styles.grid2}>
             <div className={styles.field}>
               <label className={styles.label}>{t('profile.weightUnit')}</label>
@@ -171,10 +174,26 @@ export function ProfilePage() {
   );
 }
 
-function Section({ title, children, icon }: { title: string; children: React.ReactNode; icon?: React.ReactNode }) {
+/* Pastille géométrique colorée du titre de section (maquette Profil) */
+function Section({ title, children, marker }: {
+  title: string; children: React.ReactNode;
+  marker?: { shape: 'square' | 'circle'; color: string };
+}) {
   return (
     <div className={styles.section}>
-      <h2 className={styles.sectionTitle}>{icon}{title}</h2>
+      <h2 className={styles.sectionTitle}>
+        {marker && (
+          <span
+            aria-hidden="true"
+            style={{
+              width: 8, height: 8, display: 'inline-block', flexShrink: 0,
+              background: marker.color,
+              borderRadius: marker.shape === 'circle' ? '50%' : 2,
+            }}
+          />
+        )}
+        {title}
+      </h2>
       <div className={styles.sectionBody}>{children}</div>
     </div>
   );

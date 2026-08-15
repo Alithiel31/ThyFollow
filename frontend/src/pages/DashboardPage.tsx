@@ -84,32 +84,36 @@ export function DashboardPage() {
           icon={<Flame size={18} />}
           label={t('dashboard.kpi.streak')}
           value={t('dashboard.kpi.streakUnit', { count: overview?.streak ?? 0 })}
-          color="var(--amber)"
-          bg="var(--amber-soft)"
+          color="var(--lav)"
+          bg="var(--lav-soft)"
         />
         <KpiCard
           icon={<Pill size={18} />}
           label={t('dashboard.kpi.medicationAdherence')}
           value={overview?.medicationAdherence != null
             ? `${Math.round(overview.medicationAdherence)}%` : '—'}
-          color="var(--teal)"
-          bg="var(--teal-soft)"
+          color="var(--accent-strong)"
+          bg="var(--accent-soft)"
         />
         <KpiCard
           icon={<TrendingUp size={18} />}
           label={t('dashboard.kpi.avgEnergy')}
           value={overview?.averages.energy != null
             ? `${overview.averages.energy.toFixed(1)} / 5` : '—'}
-          color="var(--accent)"
+          color="var(--accent-strong)"
           bg="var(--accent-soft)"
         />
         <KpiCard
           icon={<FlaskConical size={18} />}
           label={t('dashboard.kpi.lastTsh')}
-          value={tsh != null ? `${tsh} mUI/L` : '—'}
+          value={tsh != null ? `${tsh}` : '—'}
+          unit={tsh != null ? 'mUI/L' : undefined}
           color={tshInfo?.color ?? 'var(--text-muted)'}
           bg={tshInfo?.bg ?? 'var(--bg-raised)'}
           badge={tshInfo?.label}
+          extra={tsh != null && (
+            <TshBar value={tsh} min={LAB_RANGES.tsh.min} max={LAB_RANGES.tsh.max} />
+          )}
         />
       </div>
 
@@ -259,19 +263,22 @@ export function DashboardPage() {
 
 // ── Sub-components
 
-function KpiCard({ icon, label, value, color, bg, badge }: {
-  icon: React.ReactNode; label: string; value: string;
-  color: string; bg: string; badge?: string;
+/* Carte KPI de la maquette : glyphe coloré en haut, libellé discret,
+   valeur en Newsreader (serif) colorée, élévation au survol. */
+function KpiCard({ icon, label, value, unit, color, bg, badge, extra }: {
+  icon: React.ReactNode; label: string; value: string; unit?: string;
+  color: string; bg: string; badge?: string; extra?: React.ReactNode;
 }) {
   return (
     <div className={styles.kpiCard}>
-      <div className={styles.kpiIcon} style={{ color, background: bg }}>{icon}</div>
-      <div>
-        <p className={styles.kpiLabel}>{label}</p>
-        <p className={styles.kpiValue}>{value}
-          {badge && <span className={styles.kpiBadge} style={{ color, background: bg }}>{badge}</span>}
-        </p>
-      </div>
+      <div className={styles.kpiIcon} style={{ color }}>{icon}</div>
+      <p className={styles.kpiLabel}>{label}</p>
+      <p className={styles.kpiValue} style={{ color }}>
+        {value}
+        {unit && <span className={styles.kpiUnit}>{unit}</span>}
+        {badge && <span className={styles.kpiBadge} style={{ color, background: bg }}>{badge}</span>}
+      </p>
+      {extra && <div className={styles.kpiExtra}>{extra}</div>}
     </div>
   );
 }
