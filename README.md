@@ -26,7 +26,7 @@ Application web de suivi thyroïdien, inspirée de l'app Clue.
 
 | Module | Détail |
 |---|---|
-| **Journal quotidien** | Énergie, humeur, anxiété, brouillard mental, 11 symptômes thyroïdiens, médicament pris, mesures physiques |
+| **Journal quotidien** | Énergie, humeur, anxiété, brouillard mental, 11 symptômes thyroïdiens, médicament pris, mesures physiques (poids/FC/sommeil synchronisables via Google Health, ex: Pixel Watch) |
 | **Analyses sanguines** | TSH, FT4, FT3, Anti-TPO, Anti-TG, carences (Ferritine, Vit D, B12…) avec graphiques d'évolution |
 | **Médicaments** | Gestion du traitement (Levothyrox, etc.), dosage, fréquence, observance |
 | **Rendez-vous** | Agenda médical avec rappels, statuts, types spécialisés |
@@ -98,6 +98,42 @@ Sans `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`, `GET /api/auth/oidc/google` rép
    GOOGLE_CLIENT_SECRET="xxxxxxxx"
    ```
 En production, mettez à jour les origines/redirect URIs avec le domaine réel et ajustez `GOOGLE_REDIRECT_URI` (+ `APP_URL`) en conséquence.
+
+#### (Optionnel) Synchroniser Google Health (poids / rythme cardiaque / sommeil)
+
+Fonctionnalité distincte de "Se connecter avec Google" ci-dessus : elle relie un appareil
+connecté (ex: **Pixel Watch**) via la [Google Health API](https://developers.google.com/health)
+pour pré-remplir automatiquement Poids, Rythme cardiaque et Heures de sommeil dans le Journal
+(un badge <kbd>⌚</kbd> indique une valeur synchronisée). Sans `GOOGLE_HEALTH_CLIENT_ID`, la carte
+"Google Health" du Profil répond `501` et reste inactive.
+
+> ⚠️ **Le format exact des notifications webhook et les chemins REST de la Google Health API
+> n'ont pas pu être vérifiés au moment d'écrire cette intégration** (accès à
+> `developers.google.com` bloqué depuis l'environnement de développement utilisé). Le flux
+> OAuth (connexion/déconnexion) est fiable et testé ; `backend/src/lib/googleHealth.ts` et le
+> webhook (`backend/src/controllers/googleHealthWebhook.controller.ts`) sont écrits sur la
+> meilleure hypothèse disponible mais **doivent être vérifiés/ajustés face à la doc officielle
+> et à la console Google Cloud** avant un usage en production.
+
+1. Sur [Google Cloud Console](https://console.cloud.google.com/), activez la **Google Health
+   API** sur le projet (le même que "Se connecter avec Google" ou un projet dédié).
+2. **APIs & Services → Credentials → Create Credentials → OAuth client ID**, type *Web
+   application* — des credentials séparés de ceux du login, car les scopes santé sont
+   sensibles et peuvent nécessiter leur propre écran de consentement.
+3. **Authorized redirect URIs** : `http://localhost:3001/api/integrations/google-health/callback`
+   (doit correspondre à `GOOGLE_HEALTH_REDIRECT_URI`).
+4. Copiez le *Client ID*/*Client Secret* dans `backend/.env` (`GOOGLE_HEALTH_CLIENT_ID`,
+   `GOOGLE_HEALTH_CLIENT_SECRET`), et générez une clé de chiffrement pour les tokens stockés :
+   ```bash
+   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+   ```
+   à mettre dans `TOKEN_ENCRYPTION_KEY` (requise dès que `GOOGLE_HEALTH_CLIENT_ID` est renseigné,
+   le serveur refuse de démarrer en production sinon).
+5. **Important** : `POST /api/webhooks/google-health` doit être joignable par Google en HTTPS
+   public — ça ne fonctionnera pas avec `localhost`, il faut un vrai domaine déployé pour tester
+   la synchro automatique en conditions réelles.
+
+En production, mettez à jour `GOOGLE_HEALTH_REDIRECT_URI` avec le domaine réel.
 
 ### 3. Initialiser la base de données
 ```bash
@@ -198,12 +234,13 @@ thyro-track/
 ## 🗃️ Schéma de la base de données
 
 ```
-User ──┬── UserProfile         (diagnostic, plages cibles)
-       ├── DailyEntry[]        (journal quotidien)
-       │     └── SymptomLog[]  (symptômes personnalisés)
-       ├── LabResult[]         (TSH, FT4, FT3, anticorps, carences)
-       ├── Medication[]        (traitements)
-       ├── Appointment[]       (rendez-vous médicaux)
+User ──┬── UserProfile             (diagnostic, plages cibles)
+       ├── DailyEntry[]            (journal quotidien — poids/FC/sommeil avec provenance MANUAL|GOOGLE_HEALTH)
+       │     └── SymptomLog[]      (symptômes personnalisés)
+       ├── LabResult[]             (TSH, FT4, FT3, anticorps, carences)
+       ├── Medication[]            (traitements)
+       ├── Appointment[]           (rendez-vous médicaux)
+       ├── GoogleHealthConnection  (tokens chiffrés, synchro Pixel Watch...)
        └── NotificationSetting
 ```
 
@@ -243,6 +280,12 @@ PUT    /api/profile
 
 GET    /api/analytics/overview?days=90
 GET    /api/analytics/symptoms?days=30
+
+POST   /api/integrations/google-health/link      (démarre la connexion Pixel Watch/Google Health)
+GET    /api/integrations/google-health/callback
+DELETE /api/integrations/google-health/link
+GET    /api/webhooks/google-health                (vérification d'abonnement Google)
+POST   /api/webhooks/google-health                (notification de changement → synchro DailyEntry)
 ```
 
 ---
