@@ -30,6 +30,19 @@ export const config = {
   // Doit correspondre exactement à une "Authorized redirect URI" déclarée
   // côté Google (l'URL publique du backend, pas du frontend).
   googleRedirectUri: process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3001/api/auth/oidc/google/callback',
+  // Google Health API — synchronisation santé (poids, rythme cardiaque,
+  // sommeil) depuis un appareil connecté (Pixel Watch...). Distinct de
+  // GOOGLE_CLIENT_ID/SECRET (identité) : ce sont des scopes sensibles, avec
+  // leur propre projet/écran de consentement Google Cloud recommandé.
+  // Absent => la fonctionnalité répond 501, comme pour le login Google.
+  googleHealthClientId: process.env.GOOGLE_HEALTH_CLIENT_ID || '',
+  googleHealthClientSecret: process.env.GOOGLE_HEALTH_CLIENT_SECRET || '',
+  googleHealthRedirectUri:
+    process.env.GOOGLE_HEALTH_REDIRECT_URI || 'http://localhost:3001/api/integrations/google-health/callback',
+  // Clé de chiffrement (hex, 32 octets) des tokens Google Health stockés en
+  // base — voir lib/crypto.ts. Générée comme JWT_SECRET :
+  // node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+  tokenEncryptionKey: process.env.TOKEN_ENCRYPTION_KEY || '',
   // Resend (email d'activation de compte) : sans clé, l'envoi est simplement
   // sauté (log en warn) pour ne pas bloquer le dev local sans compte Resend.
   resendApiKey: process.env.RESEND_API_KEY || '',
@@ -59,4 +72,19 @@ if (!config.isProd && (!process.env.JWT_SECRET || process.env.JWT_SECRET.length 
   console.warn(
     '⚠️  JWT_SECRET manquant ou trop court (< 32 caractères). Secret de développement utilisé.'
   );
+}
+
+// La clé de chiffrement n'est requise que si Google Health est activé
+// (GOOGLE_HEALTH_CLIENT_ID défini) : sans elle, les tokens d'accès aux
+// données de santé ne pourraient pas être stockés de façon sûre.
+if (config.googleHealthClientId && !/^[0-9a-f]{64}$/i.test(config.tokenEncryptionKey)) {
+  const message =
+    'TOKEN_ENCRYPTION_KEY manquante ou invalide (attendu : 64 caractères hexadécimaux / 32 octets) ' +
+    'alors que GOOGLE_HEALTH_CLIENT_ID est configuré.';
+  if (config.isProd) {
+    console.error(`❌ ${message}`);
+    process.exit(1);
+  } else {
+    console.warn(`⚠️  ${message}`);
+  }
 }

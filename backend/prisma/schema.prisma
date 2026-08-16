@@ -14,16 +14,16 @@ datasource db {
 // USER
 // ─────────────────────────────────────────────
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id        String    @id @default(cuid())
+  email     String    @unique
   // Nullable : un compte créé via un fournisseur OIDC (Google...) n'a pas de
   // mot de passe local tant qu'il n'en définit pas un explicitement.
   password  String?
   name      String
-  role      Role     @default(USER)
+  role      Role      @default(USER)
   birthDate DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   // ── Vérification d'email (activation de compte via Resend)
   emailVerified              Boolean   @default(false)
@@ -35,15 +35,16 @@ model User {
   resetTokenExpiresAt DateTime?
 
   // Relations
-  profile       UserProfile?
-  entries       DailyEntry[]
-  medications   Medication[]
-  labResults    LabResult[]
-  appointments  Appointment[]
-  symptoms      SymptomLibrary[]
-  notifications NotificationSetting?
-  oauthAccounts OAuthAccount[]
-  authEvents    AuthEvent[]
+  profile                UserProfile?
+  entries                DailyEntry[]
+  medications            Medication[]
+  labResults             LabResult[]
+  appointments           Appointment[]
+  symptoms               SymptomLibrary[]
+  notifications          NotificationSetting?
+  oauthAccounts          OAuthAccount[]
+  authEvents             AuthEvent[]
+  googleHealthConnection GoogleHealthConnection?
 
   @@map("users")
 }
@@ -52,7 +53,7 @@ model User {
 // OAUTH ACCOUNT (identités fédérées liées à un compte, ex: Google via OIDC)
 // ─────────────────────────────────────────────
 model OAuthAccount {
-  id     String @id @default(cuid())
+  id                String   @id @default(cuid())
   // Nom du fournisseur OIDC (ex: "google"). Un même provider ne peut pas
   // être lié deux fois au même sub → @@unique ci-dessous.
   provider          String
@@ -72,15 +73,15 @@ model OAuthAccount {
 // AUTH EVENT (traçabilité des connexions/liaisons OIDC, ex: Google)
 // ─────────────────────────────────────────────
 model AuthEvent {
-  id     String @id @default(cuid())
+  id        String        @id @default(cuid())
   // Nullable : un échec de login peut survenir avant qu'un utilisateur ne
   // soit résolu (ex: state/nonce invalide, flow expiré).
-  userId String?
+  userId    String?
   provider  String // ex: "google"
   type      AuthEventType
   ip        String?
   userAgent String?
-  createdAt DateTime @default(now())
+  createdAt DateTime      @default(now())
 
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
@@ -98,24 +99,54 @@ enum AuthEventType {
 }
 
 // ─────────────────────────────────────────────
+// GOOGLE HEALTH CONNECTION (accès API santé, distinct de OAuthAccount qui
+// ne porte qu'une identité — ici on stocke des secrets d'accès à des
+// données de santé, chiffrés au repos, voir lib/crypto.ts)
+// ─────────────────────────────────────────────
+model GoogleHealthConnection {
+  id                    String    @id @default(cuid())
+  userId                String    @unique
+  // Tokens chiffrés (AES-256-GCM) — jamais stockés en clair.
+  accessTokenEnc        String
+  refreshTokenEnc       String
+  tokenExpiresAt        DateTime
+  // Scopes accordés lors du consentement, ex: "sleep.read body.read heart_rate.read"
+  scope                 String
+  connectedAt           DateTime  @default(now())
+  lastSyncedAt          DateTime?
+  // Id d'abonnement aux notifications retourné par Google (si applicable).
+  webhookSubscriptionId String?
+  // Secret partagé généré par nous et transmis à Google lors de l'abonnement
+  // (mécanisme "channel token" des notifications push Google, réutilisé
+  // pour les autres APIs Google comme Calendar/Drive). Renvoyé tel quel dans
+  // chaque notification entrante : permet de vérifier qu'elle vient bien de
+  // Google pour CET abonnement, avant de faire confiance à son contenu.
+  webhookChannelToken   String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("google_health_connections")
+}
+
+// ─────────────────────────────────────────────
 // USER PROFILE (thyroid context)
 // ─────────────────────────────────────────────
 model UserProfile {
-  id                String          @id @default(cuid())
-  userId            String          @unique
-  diagnosisType     DiagnosisType?  // hypothyroidism, hyperthyroidism, hashimoto, graves, etc.
-  diagnosisDate     DateTime?
-  thyroidStatus     ThyroidStatus?  // intact, partial, total, radioiodine
+  id                  String         @id @default(cuid())
+  userId              String         @unique
+  diagnosisType       DiagnosisType? // hypothyroidism, hyperthyroidism, hashimoto, graves, etc.
+  diagnosisDate       DateTime?
+  thyroidStatus       ThyroidStatus? // intact, partial, total, radioiodine
   endocrinologistName String?
-  targetTSH_min     Float?          // personalized TSH target range
-  targetTSH_max     Float?
-  targetFT4_min     Float?
-  targetFT4_max     Float?
-  targetFT3_min     Float?
-  targetFT3_max     Float?
-  timezone          String          @default("Europe/Paris")
-  weightUnit        WeightUnit      @default(KG)
-  temperatureUnit   TempUnit        @default(CELSIUS)
+  targetTSH_min       Float? // personalized TSH target range
+  targetTSH_max       Float?
+  targetFT4_min       Float?
+  targetFT4_max       Float?
+  targetFT3_min       Float?
+  targetFT3_max       Float?
+  timezone            String         @default("Europe/Paris")
+  weightUnit          WeightUnit     @default(KG)
+  temperatureUnit     TempUnit       @default(CELSIUS)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -133,47 +164,55 @@ model DailyEntry {
   updatedAt DateTime @updatedAt
 
   // ── Energy & Mood
-  energyLevel     Int?   // 1-5
-  moodScore       Int?   // 1-5
-  anxietyLevel    Int?   // 1-5
-  brainFogLevel   Int?   // 1-5
+  energyLevel   Int? // 1-5
+  moodScore     Int? // 1-5
+  anxietyLevel  Int? // 1-5
+  brainFogLevel Int? // 1-5
 
   // ── Physical
-  weight          Float?
-  bodyTemperature Float?
-  heartRate       Int?
+  weight           Float?
+  // Provenance de weight/heartRate/sleepHours : MANUAL tant que l'utilisateur
+  // n'a pas connecté Google Health, ou GOOGLE_HEALTH si la valeur vient d'une
+  // synchro automatique (Pixel Watch...). Repasse à MANUAL dès que
+  // l'utilisateur modifie le champ lui-même, pour ne plus jamais l'écraser
+  // ensuite (voir controllers/googleHealth.controller.ts).
+  weightSource     DataSource @default(MANUAL)
+  bodyTemperature  Float?
+  heartRate        Int?
+  heartRateSource  DataSource @default(MANUAL)
   bloodPressureSys Int?
   bloodPressureDia Int?
 
   // ── Thyroid-specific symptoms
-  coldSensitivity  Int?   // 1-5
-  heatSensitivity  Int?   // 1-5
-  hairLoss         Int?   // 1-5
-  drySkin          Int?   // 1-5
-  constipation     Int?   // 1-5
-  bloating         Int?   // 1-5
-  muscleWeakness   Int?   // 1-5
-  jointPain        Int?   // 1-5
-  neckPain         Int?   // 1-5 (goiter / throat discomfort)
-  swelling         Int?   // 1-5 (face, eyes, legs)
-  tremors          Int?   // 1-5
+  coldSensitivity Int? // 1-5
+  heatSensitivity Int? // 1-5
+  hairLoss        Int? // 1-5
+  drySkin         Int? // 1-5
+  constipation    Int? // 1-5
+  bloating        Int? // 1-5
+  muscleWeakness  Int? // 1-5
+  jointPain       Int? // 1-5
+  neckPain        Int? // 1-5 (goiter / throat discomfort)
+  swelling        Int? // 1-5 (face, eyes, legs)
+  tremors         Int? // 1-5
 
   // ── Sleep
-  sleepHours      Float?
-  sleepQuality    Int?   // 1-5
+  sleepHours       Float?
+  sleepHoursSource DataSource @default(MANUAL)
+  sleepQuality     Int? // 1-5
 
   // ── Medication
-  medicationTaken      Boolean @default(false)
-  medicationTime       DateTime?
-  medicationNotes      String?
+  medicationTaken Boolean   @default(false)
+  medicationTime  DateTime?
+  medicationNotes String?
 
   // ── Notes
-  notes           String?
-  tags            String[]   // free tags
+  notes String?
+  tags  String[] // free tags
 
   // Relations
-  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  symptomLogs     SymptomLog[]
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  symptomLogs SymptomLog[]
 
   @@unique([userId, date])
   @@map("daily_entries")
@@ -183,13 +222,13 @@ model DailyEntry {
 // CUSTOM SYMPTOMS (user-defined, like Clue)
 // ─────────────────────────────────────────────
 model SymptomLibrary {
-  id        String   @id @default(cuid())
+  id        String          @id @default(cuid())
   userId    String
   name      String
-  icon      String?  // emoji or icon name
+  icon      String? // emoji or icon name
   color     String?
   category  SymptomCategory @default(OTHER)
-  createdAt DateTime @default(now())
+  createdAt DateTime        @default(now())
 
   user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   logs SymptomLog[]
@@ -198,11 +237,11 @@ model SymptomLibrary {
 }
 
 model SymptomLog {
-  id         String   @id @default(cuid())
-  entryId    String
-  symptomId  String
-  severity   Int      // 1-5
-  note       String?
+  id        String  @id @default(cuid())
+  entryId   String
+  symptomId String
+  severity  Int // 1-5
+  note      String?
 
   entry   DailyEntry     @relation(fields: [entryId], references: [id], onDelete: Cascade)
   symptom SymptomLibrary @relation(fields: [symptomId], references: [id], onDelete: Cascade)
@@ -216,16 +255,16 @@ model SymptomLog {
 model Medication {
   id           String       @id @default(cuid())
   userId       String
-  name         String       // Levothyrox, Euthyrox, L-Thyroxine, Vitamine D...
+  name         String // Levothyrox, Euthyrox, L-Thyroxine, Vitamine D...
   brand        String?
-  dosage       Float        // valeur numérique ; l'unité est donnée par dosageUnit
+  dosage       Float // valeur numérique ; l'unité est donnée par dosageUnit
   dosageUnit   DosageUnit   @default(MCG)
   frequency    MedFrequency @default(DAILY) // cadence (tous les jours / un jour sur deux...), indépendante de intakeTimes
-  intakeTimes  String[]     @default([])    // une entrée par prise quotidienne, ex: ["08:00","14:00","20:00"]
+  intakeTimes  String[]     @default([]) // une entrée par prise quotidienne, ex: ["08:00","14:00","20:00"]
   startDate    DateTime
   endDate      DateTime?
   active       Boolean      @default(true)
-  instructions String?      // "à jeun 30 min avant le repas"
+  instructions String? // "à jeun 30 min avant le repas"
   notes        String?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
@@ -243,7 +282,7 @@ model MedicationIntake {
   id           String   @id @default(cuid())
   medicationId String
   date         DateTime @db.Date // jour concerné
-  time         String            // reprend une des valeurs de Medication.intakeTimes, ex: "08:00"
+  time         String // reprend une des valeurs de Medication.intakeTimes, ex: "08:00"
   takenAt      DateTime @default(now())
 
   medication Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
@@ -256,37 +295,37 @@ model MedicationIntake {
 // LAB RESULTS (TSH, FT4, FT3, etc.)
 // ─────────────────────────────────────────────
 model LabResult {
-  id          String   @id @default(cuid())
-  userId      String
-  date        DateTime @db.Date
-  lab         String?  // nom du laboratoire
-  orderedBy   String?  // médecin prescripteur
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime @db.Date
+  lab       String? // nom du laboratoire
+  orderedBy String? // médecin prescripteur
 
   // Core thyroid markers
-  tsh         Float?   // mUI/L
-  ft4         Float?   // pmol/L
-  ft3         Float?   // pmol/L
-  t4          Float?   // nmol/L (total T4)
-  t3          Float?   // nmol/L (total T3)
+  tsh Float? // mUI/L
+  ft4 Float? // pmol/L
+  ft3 Float? // pmol/L
+  t4  Float? // nmol/L (total T4)
+  t3  Float? // nmol/L (total T3)
 
   // Autoimmune markers
-  antiTPO     Float?   // Anti-TPO (UI/mL)
-  antiTG      Float?   // Anti-Thyroglobulin
-  antiTSHR    Float?   // Anti-récepteurs TSH (Graves)
+  antiTPO       Float? // Anti-TPO (UI/mL)
+  antiTG        Float? // Anti-Thyroglobulin
+  antiTSHR      Float? // Anti-récepteurs TSH (Graves)
   thyroglobulin Float? // Thyroglobuline (suivi cancer)
 
   // Associated markers
-  ferritin    Float?   // µg/L
-  vitaminD    Float?   // nmol/L
-  vitaminB12  Float?   // pmol/L
-  magnesium   Float?   // mmol/L
-  selenium    Float?   // µg/L
-  cholesterol Float?   // mmol/L
-  glucose     Float?   // mmol/L
-  hemoglobin  Float?   // g/dL
+  ferritin    Float? // µg/L
+  vitaminD    Float? // nmol/L
+  vitaminB12  Float? // pmol/L
+  magnesium   Float? // mmol/L
+  selenium    Float? // µg/L
+  cholesterol Float? // mmol/L
+  glucose     Float? // mmol/L
+  hemoglobin  Float? // g/dL
 
   notes       String?
-  documentUrl String?  // PDF upload link
+  documentUrl String? // PDF upload link
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -299,19 +338,19 @@ model LabResult {
 // APPOINTMENTS
 // ─────────────────────────────────────────────
 model Appointment {
-  id          String          @id @default(cuid())
-  userId      String
-  date        DateTime
-  type        AppointmentType
-  doctorName  String?
-  specialty   String?
-  location    String?
-  notes       String?
-  reminder    Boolean         @default(true)
-  reminderDays Int            @default(2)
-  status      AppointmentStatus @default(UPCOMING)
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  id           String            @id @default(cuid())
+  userId       String
+  date         DateTime
+  type         AppointmentType
+  doctorName   String?
+  specialty    String?
+  location     String?
+  notes        String?
+  reminder     Boolean           @default(true)
+  reminderDays Int               @default(2)
+  status       AppointmentStatus @default(UPCOMING)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -385,6 +424,11 @@ enum TempUnit {
   FAHRENHEIT
 }
 
+enum DataSource {
+  MANUAL
+  GOOGLE_HEALTH
+}
+
 enum SymptomCategory {
   ENERGY
   MOOD
@@ -420,8 +464,8 @@ model Article {
   id          String      @id @default(cuid())
   slug        String      @unique
   title       String
-  excerpt     String?     // résumé affiché dans les listes / encarts
-  content     String      // markdown
+  excerpt     String? // résumé affiché dans les listes / encarts
+  content     String // markdown
   kind        ArticleKind @default(ARTICLE)
   published   Boolean     @default(false)
   publishedAt DateTime?
@@ -433,7 +477,7 @@ model Article {
 
 enum ArticleKind {
   ARTICLE // article long pour la section "Comprendre"
-  TIP     // encart court affiché sur le dashboard
+  TIP // encart court affiché sur le dashboard
 }
 
 enum Role {

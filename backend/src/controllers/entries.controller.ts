@@ -49,6 +49,32 @@ function parseIntOr(value: string | undefined, fallback: number): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
+// Champs synchronisables depuis Google Health (voir lib/googleHealthSync.ts).
+// `LogPage` renvoie systématiquement tout le formulaire à chaque sauvegarde
+// (voir frontend/src/pages/LogPage.tsx#handleSave), donc la simple présence
+// d'un champ dans le payload ne veut pas dire que l'utilisateur l'a modifié.
+// On ne repasse une source en MANUAL que si la valeur envoyée diffère
+// réellement de celle déjà stockée — sinon un enregistrement du journal qui
+// ne concerne pas ce champ effacerait silencieusement la provenance Google
+// Health et bloquerait sa resynchro automatique.
+const SYNCABLE_FIELDS = ['weight', 'heartRate', 'sleepHours'] as const;
+
+function buildManualSourceOverrides(
+  existing: { weight: number | null; heartRate: number | null; sleepHours: number | null } | null,
+  data: Record<string, unknown>
+): Record<string, 'MANUAL'> {
+  const overrides: Record<string, 'MANUAL'> = {};
+  for (const field of SYNCABLE_FIELDS) {
+    if (!(field in data)) continue;
+    const incoming = data[field] as number | null | undefined;
+    const current = existing?.[field] ?? null;
+    if (incoming !== undefined && incoming !== current) {
+      overrides[`${field}Source`] = 'MANUAL';
+    }
+  }
+  return overrides;
+}
+
 export const entriesController = {
   // GET /api/entries - liste paginée
   list: async (req: AuthRequest, res: Response): Promise<void> => {
@@ -97,6 +123,12 @@ export const entriesController = {
   upsert: async (req: AuthRequest, res: Response): Promise<void> => {
     const { date, tags, medicationTime, ...data } = entrySchema(req.t).parse(req.body);
 
+    const existing = await prisma.dailyEntry.findUnique({
+      where: { userId_date: { userId: req.userId!, date: new Date(date) } },
+      select: { weight: true, heartRate: true, sleepHours: true },
+    });
+    const sourceOverrides = buildManualSourceOverrides(existing, data);
+
     const entry = await prisma.dailyEntry.upsert({
       where: {
         userId_date: { userId: req.userId!, date: new Date(date) },
@@ -107,11 +139,13 @@ export const entriesController = {
         tags: tags ?? [],
         medicationTime: medicationTime ? new Date(medicationTime) : null,
         ...data,
+        ...sourceOverrides,
       },
       update: {
         tags: tags ?? [],
         medicationTime: medicationTime ? new Date(medicationTime) : null,
         ...data,
+        ...sourceOverrides,
       },
       include: { symptomLogs: { include: { symptom: true } } },
     });
