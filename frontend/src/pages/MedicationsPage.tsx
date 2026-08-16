@@ -150,58 +150,58 @@ export function MedicationsPage() {
             <form onSubmit={handleSubmit} className={styles.form}>
               <div className={styles.grid2}>
                 <div className={styles.field}>
-                  <label className={styles.label}>{t('medications.name')}</label>
-                  <input className={styles.input} placeholder={t('medications.namePlaceholder')} value={form.name ?? ''} onChange={set('name')} required />
+                  <label className={styles.label} htmlFor="med-name">{t('medications.name')}</label>
+                  <input id="med-name" className={styles.input} placeholder={t('medications.namePlaceholder')} value={form.name ?? ''} onChange={set('name')} required />
                 </div>
                 <div className={styles.field}>
-                  <label className={styles.label}>{t('medications.brand')}</label>
-                  <input className={styles.input} placeholder={t('medications.brandPlaceholder')} value={form.brand ?? ''} onChange={set('brand')} />
+                  <label className={styles.label} htmlFor="med-brand">{t('medications.brand')}</label>
+                  <input id="med-brand" className={styles.input} placeholder={t('medications.brandPlaceholder')} value={form.brand ?? ''} onChange={set('brand')} />
                 </div>
               </div>
 
               <div className={styles.grid2}>
                 <div className={styles.field}>
-                  <label className={styles.label}>{t('medications.dosage')}</label>
+                  <label className={styles.label} htmlFor="med-dosage">{t('medications.dosage')}</label>
                   <div className={styles.dosageRow}>
-                    <input className={styles.input} type="number" step="0.1" placeholder="75" value={form.dosage ?? ''} onChange={set('dosage')} required />
-                    <select className={styles.input} value={form.dosageUnit ?? 'MCG'} onChange={set('dosageUnit') as (e: React.ChangeEvent<HTMLSelectElement>) => void}>
+                    <input id="med-dosage" className={styles.input} type="number" step="0.1" placeholder="75" value={form.dosage ?? ''} onChange={set('dosage')} required />
+                    <select aria-label={t('medications.dosage')} className={styles.input} value={form.dosageUnit ?? 'MCG'} onChange={set('dosageUnit') as (e: React.ChangeEvent<HTMLSelectElement>) => void}>
                       {Object.entries(UNIT_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                     </select>
                   </div>
                 </div>
                 <div className={styles.field}>
-                  <label className={styles.label}>{t('medications.frequencyLabel')}</label>
-                  <select className={styles.input} value={form.frequency ?? 'DAILY'} onChange={set('frequency') as (e: React.ChangeEvent<HTMLSelectElement>) => void}>
+                  <label className={styles.label} htmlFor="med-frequency">{t('medications.frequencyLabel')}</label>
+                  <select id="med-frequency" className={styles.input} value={form.frequency ?? 'DAILY'} onChange={set('frequency') as (e: React.ChangeEvent<HTMLSelectElement>) => void}>
                     {Object.entries(FREQ_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                   </select>
                 </div>
               </div>
 
               <div className={styles.field}>
-                <label className={styles.label}>{t('medications.timesPerDay')}</label>
-                <select className={styles.input} value={timesPerDay} onChange={(e) => setTimesPerDay(parseInt(e.target.value, 10))}>
+                <label className={styles.label} htmlFor="med-times-per-day">{t('medications.timesPerDay')}</label>
+                <select id="med-times-per-day" className={styles.input} value={timesPerDay} onChange={(e) => setTimesPerDay(parseInt(e.target.value, 10))}>
                   {[1, 2, 3, 4].map((n) => <option key={n} value={n}>{t('medications.timesPerDayOption', { count: n })}</option>)}
                 </select>
                 <div className={styles.timeSlotsRow}>
                   {(form.intakeTimes ?? ['07:00']).map((time, i) => (
-                    <input key={i} className={styles.input} type="time" value={time} onChange={(e) => setTimeSlot(i, e.target.value)} />
+                    <input key={i} aria-label={t('medications.timesPerDayOption', { count: i + 1 })} className={styles.input} type="time" value={time} onChange={(e) => setTimeSlot(i, e.target.value)} />
                   ))}
                 </div>
               </div>
 
               <div className={styles.field}>
-                <label className={styles.label}>{t('medications.startDate')}</label>
-                <input className={styles.input} type="date" value={form.startDate ?? ''} onChange={set('startDate')} required />
+                <label className={styles.label} htmlFor="med-start-date">{t('medications.startDate')}</label>
+                <input id="med-start-date" className={styles.input} type="date" value={form.startDate ?? ''} onChange={set('startDate')} required />
               </div>
 
               <div className={styles.field}>
-                <label className={styles.label}>{t('medications.instructions')}</label>
-                <input className={styles.input} placeholder={t('medications.instructionsPlaceholder')} value={form.instructions ?? ''} onChange={set('instructions')} />
+                <label className={styles.label} htmlFor="med-instructions">{t('medications.instructions')}</label>
+                <input id="med-instructions" className={styles.input} placeholder={t('medications.instructionsPlaceholder')} value={form.instructions ?? ''} onChange={set('instructions')} />
               </div>
 
               <div className={styles.field}>
-                <label className={styles.label}>{t('medications.notes')}</label>
-                <textarea className={styles.textarea} rows={2} value={form.notes ?? ''} onChange={set('notes')} placeholder={t('medications.notesPlaceholder')} />
+                <label className={styles.label} htmlFor="med-notes">{t('medications.notes')}</label>
+                <textarea id="med-notes" className={styles.textarea} rows={2} value={form.notes ?? ''} onChange={set('notes')} placeholder={t('medications.notesPlaceholder')} />
               </div>
 
               <div className={styles.formActions}>

@@ -129,36 +129,36 @@ export function AppointmentsPage() {
             <h2 className={styles.modalTitle}><Calendar size={18} /> {editItem ? t('appointments.editTitle') : t('appointments.newTitle')}</h2>
             <form onSubmit={handleSubmit} className={styles.form}>
               <div className={styles.field}>
-                <label className={styles.label}>{t('appointments.typeLabel')}</label>
-                <select className={styles.input} value={form.type ?? 'ENDOCRINOLOGIST'} onChange={set('type') as (e: React.ChangeEvent<HTMLSelectElement>) => void}>
+                <label className={styles.label} htmlFor="appt-type">{t('appointments.typeLabel')}</label>
+                <select id="appt-type" className={styles.input} value={form.type ?? 'ENDOCRINOLOGIST'} onChange={set('type') as (e: React.ChangeEvent<HTMLSelectElement>) => void}>
                   {Object.entries(TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
               </div>
               <div className={styles.field}>
-                <label className={styles.label}>{t('appointments.dateTime')}</label>
-                <input className={styles.input} type="datetime-local" value={form.date as string ?? ''} onChange={set('date')} required />
+                <label className={styles.label} htmlFor="appt-datetime">{t('appointments.dateTime')}</label>
+                <input id="appt-datetime" className={styles.input} type="datetime-local" value={form.date as string ?? ''} onChange={set('date')} required />
               </div>
               <div className={styles.grid2}>
                 <div className={styles.field}>
-                  <label className={styles.label}>{t('appointments.doctor')}</label>
-                  <input className={styles.input} placeholder={t('appointments.doctorPlaceholder')} value={form.doctorName ?? ''} onChange={set('doctorName')} />
+                  <label className={styles.label} htmlFor="appt-doctor">{t('appointments.doctor')}</label>
+                  <input id="appt-doctor" className={styles.input} placeholder={t('appointments.doctorPlaceholder')} value={form.doctorName ?? ''} onChange={set('doctorName')} />
                 </div>
                 <div className={styles.field}>
-                  <label className={styles.label}>{t('appointments.location')}</label>
-                  <input className={styles.input} placeholder={t('appointments.locationPlaceholder')} value={form.location ?? ''} onChange={set('location')} />
+                  <label className={styles.label} htmlFor="appt-location">{t('appointments.location')}</label>
+                  <input id="appt-location" className={styles.input} placeholder={t('appointments.locationPlaceholder')} value={form.location ?? ''} onChange={set('location')} />
                 </div>
               </div>
               {editItem && (
                 <div className={styles.field}>
-                  <label className={styles.label}>{t('appointments.statusLabel')}</label>
-                  <select className={styles.input} value={form.status ?? 'UPCOMING'} onChange={set('status') as (e: React.ChangeEvent<HTMLSelectElement>) => void}>
+                  <label className={styles.label} htmlFor="appt-status">{t('appointments.statusLabel')}</label>
+                  <select id="appt-status" className={styles.input} value={form.status ?? 'UPCOMING'} onChange={set('status') as (e: React.ChangeEvent<HTMLSelectElement>) => void}>
                     {Object.entries(STATUS_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                   </select>
                 </div>
               )}
               <div className={styles.field}>
-                <label className={styles.label}>{t('appointments.notes')}</label>
-                <textarea className={styles.textarea} rows={3} value={form.notes ?? ''} onChange={set('notes')} placeholder={t('appointments.notesPlaceholder')} />
+                <label className={styles.label} htmlFor="appt-notes">{t('appointments.notes')}</label>
+                <textarea id="appt-notes" className={styles.textarea} rows={3} value={form.notes ?? ''} onChange={set('notes')} placeholder={t('appointments.notesPlaceholder')} />
               </div>
               <div className={styles.formActions}>
                 <button type="button" className={styles.cancelBtn} onClick={resetForm}>{t('common.cancel')}</button>

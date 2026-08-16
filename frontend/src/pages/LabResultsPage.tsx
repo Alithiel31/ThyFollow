@@ -1,5 +1,5 @@
 // src/pages/LabResultsPage.tsx
-import { useState } from 'react';
+import { useState, useId, cloneElement, isValidElement, type ReactElement } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
@@ -239,10 +239,17 @@ export function LabResultsPage() {
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  // Un seul id généré ici et injecté dans le contrôle enfant (input/select/
+  // textarea) : associe programmatiquement le <label> à son champ pour les
+  // lecteurs d'écran, sans avoir à répéter un id à chaque site d'appel.
+  const id = useId();
+  const control = isValidElement(children)
+    ? cloneElement(children as ReactElement<{ id?: string }>, { id })
+    : children;
   return (
     <div className={styles.field}>
-      <label className={styles.label}>{label}</label>
-      {children}
+      <label className={styles.label} htmlFor={id}>{label}</label>
+      {control}
     </div>
   );
 }

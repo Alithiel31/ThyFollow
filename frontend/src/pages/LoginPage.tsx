@@ -72,8 +72,9 @@ export function LoginPage() {
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
-            <label className={styles.label}>{t('auth.login.email')}</label>
+            <label className={styles.label} htmlFor="login-email">{t('auth.login.email')}</label>
             <input
+              id="login-email"
               className={styles.input}
               type="email"
               value={email}
@@ -86,12 +87,13 @@ export function LoginPage() {
 
           <div className={styles.field}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <label className={styles.label}>{t('auth.login.password')}</label>
+              <label className={styles.label} htmlFor="login-password">{t('auth.login.password')}</label>
               <Link to="/forgot-password" className={styles.switchLink} style={{ fontSize: '0.8rem' }}>
                 {t('auth.login.forgotPassword')}
               </Link>
             </div>
             <input
+              id="login-password"
               className={styles.input}
               type="password"
               value={password}
