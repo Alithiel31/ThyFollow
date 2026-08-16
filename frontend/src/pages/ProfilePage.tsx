@@ -135,30 +135,30 @@ export function ProfilePage() {
         <Section title={t('profile.diagnosisSection')} marker={{ shape: 'square', color: 'var(--accent)' }}>
           <div className={styles.grid2}>
             <div className={styles.field}>
-              <label className={styles.label}>{t('profile.diagnosisType')}</label>
-              <select className={styles.input} value={form.diagnosisType ?? ''} onChange={set('diagnosisType') as (e: React.ChangeEvent<HTMLSelectElement>) => void}>
+              <label className={styles.label} htmlFor="profile-diagnosis-type">{t('profile.diagnosisType')}</label>
+              <select id="profile-diagnosis-type" className={styles.input} value={form.diagnosisType ?? ''} onChange={set('diagnosisType') as (e: React.ChangeEvent<HTMLSelectElement>) => void}>
                 <option value="">{t('common.notSpecified')}</option>
                 {DIAGNOSIS_LABEL_KEYS.map((k) => <option key={k} value={k}>{t(`diagnosis.${k}`)}</option>)}
               </select>
             </div>
             <div className={styles.field}>
-              <label className={styles.label}>{t('profile.diagnosisDate')}</label>
-              <input className={styles.input} type="date"
+              <label className={styles.label} htmlFor="profile-diagnosis-date">{t('profile.diagnosisDate')}</label>
+              <input id="profile-diagnosis-date" className={styles.input} type="date"
                 value={form.diagnosisDate ? (form.diagnosisDate as string).split('T')[0] : ''}
                 onChange={set('diagnosisDate')} />
             </div>
           </div>
           <div className={styles.grid2}>
             <div className={styles.field}>
-              <label className={styles.label}>{t('profile.thyroidStatus')}</label>
-              <select className={styles.input} value={form.thyroidStatus ?? ''} onChange={set('thyroidStatus') as (e: React.ChangeEvent<HTMLSelectElement>) => void}>
+              <label className={styles.label} htmlFor="profile-thyroid-status">{t('profile.thyroidStatus')}</label>
+              <select id="profile-thyroid-status" className={styles.input} value={form.thyroidStatus ?? ''} onChange={set('thyroidStatus') as (e: React.ChangeEvent<HTMLSelectElement>) => void}>
                 <option value="">{t('common.notSpecified')}</option>
                 {THYROID_STATUS_LABEL_KEYS.map((k) => <option key={k} value={k}>{t(`thyroidStatus.${k}`)}</option>)}
               </select>
             </div>
             <div className={styles.field}>
-              <label className={styles.label}>{t('profile.endocrinologistName')}</label>
-              <input className={styles.input} placeholder={t('profile.endocrinologistPlaceholder')}
+              <label className={styles.label} htmlFor="profile-endocrinologist">{t('profile.endocrinologistName')}</label>
+              <input id="profile-endocrinologist" className={styles.input} placeholder={t('profile.endocrinologistPlaceholder')}
                 value={form.endocrinologistName ?? ''}
                 onChange={set('endocrinologistName')} />
             </div>
@@ -170,35 +170,35 @@ export function ProfilePage() {
           <p className={styles.hint}>{t('profile.targetsHint')}</p>
           <div className={styles.grid3}>
             <div className={styles.field}>
-              <label className={styles.label}>{t('profile.tshMin')}</label>
-              <input className={styles.input} type="number" step="0.01" placeholder="0.40"
+              <label className={styles.label} htmlFor="profile-tsh-min">{t('profile.tshMin')}</label>
+              <input id="profile-tsh-min" className={styles.input} type="number" step="0.01" placeholder="0.40"
                 value={form.targetTSH_min ?? ''} onChange={set('targetTSH_min')} />
             </div>
             <div className={styles.field}>
-              <label className={styles.label}>{t('profile.tshMax')}</label>
-              <input className={styles.input} type="number" step="0.01" placeholder="4.00"
+              <label className={styles.label} htmlFor="profile-tsh-max">{t('profile.tshMax')}</label>
+              <input id="profile-tsh-max" className={styles.input} type="number" step="0.01" placeholder="4.00"
                 value={form.targetTSH_max ?? ''} onChange={set('targetTSH_max')} />
             </div>
             <div></div>
             <div className={styles.field}>
-              <label className={styles.label}>{t('profile.ft4Min')}</label>
-              <input className={styles.input} type="number" step="0.1" placeholder="12.0"
+              <label className={styles.label} htmlFor="profile-ft4-min">{t('profile.ft4Min')}</label>
+              <input id="profile-ft4-min" className={styles.input} type="number" step="0.1" placeholder="12.0"
                 value={form.targetFT4_min ?? ''} onChange={set('targetFT4_min')} />
             </div>
             <div className={styles.field}>
-              <label className={styles.label}>{t('profile.ft4Max')}</label>
-              <input className={styles.input} type="number" step="0.1" placeholder="22.0"
+              <label className={styles.label} htmlFor="profile-ft4-max">{t('profile.ft4Max')}</label>
+              <input id="profile-ft4-max" className={styles.input} type="number" step="0.1" placeholder="22.0"
                 value={form.targetFT4_max ?? ''} onChange={set('targetFT4_max')} />
             </div>
             <div></div>
             <div className={styles.field}>
-              <label className={styles.label}>{t('profile.ft3Min')}</label>
-              <input className={styles.input} type="number" step="0.1" placeholder="3.5"
+              <label className={styles.label} htmlFor="profile-ft3-min">{t('profile.ft3Min')}</label>
+              <input id="profile-ft3-min" className={styles.input} type="number" step="0.1" placeholder="3.5"
                 value={form.targetFT3_min ?? ''} onChange={set('targetFT3_min')} />
             </div>
             <div className={styles.field}>
-              <label className={styles.label}>{t('profile.ft3Max')}</label>
-              <input className={styles.input} type="number" step="0.1" placeholder="6.5"
+              <label className={styles.label} htmlFor="profile-ft3-max">{t('profile.ft3Max')}</label>
+              <input id="profile-ft3-max" className={styles.input} type="number" step="0.1" placeholder="6.5"
                 value={form.targetFT3_max ?? ''} onChange={set('targetFT3_max')} />
             </div>
           </div>
@@ -208,15 +208,15 @@ export function ProfilePage() {
         <Section title={t('profile.preferencesSection')}>
           <div className={styles.grid2}>
             <div className={styles.field}>
-              <label className={styles.label}>{t('profile.weightUnit')}</label>
-              <select className={styles.input} value={form.weightUnit ?? 'KG'} onChange={set('weightUnit') as (e: React.ChangeEvent<HTMLSelectElement>) => void}>
+              <label className={styles.label} htmlFor="profile-weight-unit">{t('profile.weightUnit')}</label>
+              <select id="profile-weight-unit" className={styles.input} value={form.weightUnit ?? 'KG'} onChange={set('weightUnit') as (e: React.ChangeEvent<HTMLSelectElement>) => void}>
                 <option value="KG">{t('profile.weightUnitKg')}</option>
                 <option value="LBS">{t('profile.weightUnitLbs')}</option>
               </select>
             </div>
             <div className={styles.field}>
-              <label className={styles.label}>{t('profile.temperatureUnit')}</label>
-              <select className={styles.input} value={form.temperatureUnit ?? 'CELSIUS'} onChange={set('temperatureUnit') as (e: React.ChangeEvent<HTMLSelectElement>) => void}>
+              <label className={styles.label} htmlFor="profile-temperature-unit">{t('profile.temperatureUnit')}</label>
+              <select id="profile-temperature-unit" className={styles.input} value={form.temperatureUnit ?? 'CELSIUS'} onChange={set('temperatureUnit') as (e: React.ChangeEvent<HTMLSelectElement>) => void}>
                 <option value="CELSIUS">{t('profile.temperatureUnitCelsius')}</option>
                 <option value="FAHRENHEIT">{t('profile.temperatureUnitFahrenheit')}</option>
               </select>

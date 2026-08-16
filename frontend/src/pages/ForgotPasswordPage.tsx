@@ -62,8 +62,9 @@ export function ForgotPasswordPage() {
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
-            <label className={styles.label}>{t('auth.forgotPassword.email')}</label>
+            <label className={styles.label} htmlFor="forgot-password-email">{t('auth.forgotPassword.email')}</label>
             <input
+              id="forgot-password-email"
               className={styles.input}
               type="email"
               value={email}
