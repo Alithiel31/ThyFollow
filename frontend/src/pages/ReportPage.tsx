@@ -172,9 +172,10 @@ export function ReportPage() {
                   {t('report.medicationLine', {
                     name: m.name,
                     brand: m.brand ? ` (${m.brand})` : '',
-                    dose: m.dosageMcg,
+                    dose: m.dosage,
+                    unit: t(`medications.dosageUnits.${m.dosageUnit}`),
                     freq: freqLabel(t, m.frequency),
-                    intakeTime: m.intakeTime ? t('report.intakeTimeSuffix', { time: m.intakeTime }) : '',
+                    intakeTime: m.intakeTimes.length > 0 ? t('report.intakeTimeSuffix', { time: m.intakeTimes.join(', ') }) : '',
                   })}
                 </li>
               ))}

@@ -32,9 +32,10 @@ async function main() {
       medications: {
         create: {
           name: 'Levothyrox',
-          dosageMcg: 75,
+          dosage: 75,
+          dosageUnit: 'MCG',
           frequency: 'DAILY',
-          intakeTime: '07:00',
+          intakeTimes: ['07:00'],
           startDate: new Date('2018-07-01'),
           instructions: 'À jeun, 30 minutes avant le repas',
           active: true,

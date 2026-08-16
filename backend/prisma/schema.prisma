@@ -214,24 +214,42 @@ model SymptomLog {
 // MEDICATIONS
 // ─────────────────────────────────────────────
 model Medication {
-  id           String   @id @default(cuid())
+  id           String       @id @default(cuid())
   userId       String
-  name         String   // Levothyrox, Euthyrox, L-Thyroxine...
+  name         String       // Levothyrox, Euthyrox, L-Thyroxine, Vitamine D...
   brand        String?
-  dosageMcg    Float    // micrograms
-  frequency    MedFrequency @default(DAILY)
-  intakeTime   String?  // "07:00" - time of day
+  dosage       Float        // valeur numérique ; l'unité est donnée par dosageUnit
+  dosageUnit   DosageUnit   @default(MCG)
+  frequency    MedFrequency @default(DAILY) // cadence (tous les jours / un jour sur deux...), indépendante de intakeTimes
+  intakeTimes  String[]     @default([])    // une entrée par prise quotidienne, ex: ["08:00","14:00","20:00"]
   startDate    DateTime
   endDate      DateTime?
-  active       Boolean  @default(true)
-  instructions String?  // "à jeun 30 min avant le repas"
+  active       Boolean      @default(true)
+  instructions String?      // "à jeun 30 min avant le repas"
   notes        String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  intakes MedicationIntake[]
 
   @@map("medications")
+}
+
+// ─────────────────────────────────────────────
+// MEDICATION INTAKES (prises quotidiennes validées, une par créneau)
+// ─────────────────────────────────────────────
+model MedicationIntake {
+  id           String   @id @default(cuid())
+  medicationId String
+  date         DateTime @db.Date // jour concerné
+  time         String            // reprend une des valeurs de Medication.intakeTimes, ex: "08:00"
+  takenAt      DateTime @default(now())
+
+  medication Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+
+  @@unique([medicationId, date, time])
+  @@map("medication_intakes")
 }
 
 // ─────────────────────────────────────────────
@@ -345,6 +363,16 @@ enum MedFrequency {
   EVERY_OTHER_DAY
   WEEKLY
   AS_NEEDED
+}
+
+enum DosageUnit {
+  MCG
+  MG
+  IU
+  TABLET
+  DROP
+  ML
+  OTHER
 }
 
 enum WeightUnit {
