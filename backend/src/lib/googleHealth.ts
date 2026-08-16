@@ -209,7 +209,13 @@ export async function subscribeToWebhook(
       token: channelToken,
     }),
   });
-  if (!res.ok) return null;
+  if (!res.ok) {
+    // `fetch` ne rejette que sur une erreur réseau, jamais sur un simple
+    // statut HTTP d'erreur (404, 400...) — sans ce log explicite, un
+    // endpoint incorrect échouerait silencieusement (retour `null`) et le
+    // diagnostic serait impossible depuis les logs.
+    throw new Error(`Échec abonnement webhook Google Health : ${res.status} ${await res.text()}`);
+  }
   const body = (await res.json()) as { subscriptionId?: string };
   return body.subscriptionId ?? null;
 }

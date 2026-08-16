@@ -3,7 +3,7 @@
 // avec `openid-client` mocké — même approche que lib/oidc.test.ts : on
 // vérifie le protocole (scopes santé, PKCE/state, access_type=offline +
 // prompt=consent), pas un vrai appel réseau à Google.
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const discoveryMock = vi.fn();
 const buildAuthorizationUrlMock = vi.fn();
@@ -36,6 +36,10 @@ describe('lib/googleHealth', () => {
     buildAuthorizationUrlMock.mockReturnValue(new URL('https://accounts.google.com/o/oauth2/auth?mock=1'));
 
     googleHealth = await import('./googleHealth.js');
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   describe('buildGoogleHealthAuthorizationUrl', () => {
@@ -128,6 +132,33 @@ describe('lib/googleHealth', () => {
       expect(result.accessToken).toBe('new-access-token');
       expect(result.expiresAt.getTime()).toBeGreaterThan(Date.now());
       expect(refreshTokenGrantMock).toHaveBeenCalledWith({ __fakeConfig: true }, 'refresh-token');
+    });
+  });
+
+  describe('subscribeToWebhook', () => {
+    it('returns the subscriptionId on a successful response', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({ ok: true, json: async () => ({ subscriptionId: 'sub-1' }) })
+      );
+
+      const id = await googleHealth.subscribeToWebhook('access-token', 'https://app.example.com/webhook', 'token-1');
+
+      expect(id).toBe('sub-1');
+    });
+
+    it('throws (rather than silently returning null) when Google responds with an HTTP error', async () => {
+      // fetch() only rejects on a network failure, never on a plain HTTP
+      // error status — this must be checked and surfaced explicitly, or a
+      // wrong/unavailable endpoint fails invisibly with no log trace at all.
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({ ok: false, status: 404, text: async () => 'Not Found' })
+      );
+
+      await expect(
+        googleHealth.subscribeToWebhook('access-token', 'https://app.example.com/webhook', 'token-1')
+      ).rejects.toThrow(/404/);
     });
   });
 });
