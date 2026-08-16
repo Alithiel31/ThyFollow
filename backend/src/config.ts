@@ -10,7 +10,7 @@ export const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
   // Liste d'origines autorisées en CORS (séparées par des virgules) :
   // permet d'accepter à la fois un accès local et l'URL de déploiement.
-  frontendUrls: (process.env.FRONTEND_URL || 'http://caesura:8082')
+  frontendUrls: (process.env.FRONTEND_URL || 'http://localhost:5173')
     .split(',')
     .map((url) => url.trim()),
   // URL publique canonique du frontend, utilisée pour construire les liens
@@ -19,7 +19,7 @@ export const config = {
   // entrées (dev + prod) dans un ordre quelconque, alors qu'un lien d'email
   // doit toujours pointer vers UNE seule adresse, la bonne. Si APP_URL n'est
   // pas définie, on retombe sur la première entrée de FRONTEND_URL.
-  appUrl: process.env.APP_URL || (process.env.FRONTEND_URL || 'http://caesura:8082').split(',')[0].trim(),
+  appUrl: process.env.APP_URL || (process.env.FRONTEND_URL || 'http://localhost:5173').split(',')[0].trim(),
   jwtSecret: process.env.JWT_SECRET || 'dev-secret-key-min-32-characters-long',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '30d',
   // OpenID Connect / OAuth2 — connexion via Google. Absents en dev tant que
