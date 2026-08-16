@@ -187,8 +187,13 @@ const DATA_TYPES = {
 } as const;
 
 export async function fetchDailyMetrics(accessToken: string, date: string): Promise<DailyHealthMetrics> {
+  // Intervalle semi-ouvert [début du jour, début du lendemain[ — confirmé
+  // nécessaire en usage réel : certains champs (ex: heart_rate.sample_time)
+  // rejettent LESS_THAN_EQUALS avec "only supports comparators
+  // GREATER_THAN_EQUALS and LESS_THAN". Univoque de toute façon (pas de
+  // double-comptage d'une mesure pile à minuit).
   const startTime = new Date(`${date}T00:00:00.000Z`).toISOString();
-  const endTime = new Date(`${date}T23:59:59.999Z`).toISOString();
+  const endTime = new Date(new Date(`${date}T00:00:00.000Z`).getTime() + 24 * 60 * 60 * 1000).toISOString();
 
   async function fetchDataType(dataType: { path: string; filterField: string }): Promise<unknown[]> {
     const url = new URL(`${GOOGLE_HEALTH_API_BASE}/users/me/dataTypes/${dataType.path}/dataPoints`);
@@ -198,7 +203,7 @@ export async function fetchDailyMetrics(accessToken: string, date: string): Prom
     // "Cannot bind query parameter" : confirmé en usage réel.
     url.searchParams.set(
       'filter',
-      `${dataType.filterField} >= "${startTime}" AND ${dataType.filterField} <= "${endTime}"`
+      `${dataType.filterField} >= "${startTime}" AND ${dataType.filterField} < "${endTime}"`
     );
 
     const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' } });
