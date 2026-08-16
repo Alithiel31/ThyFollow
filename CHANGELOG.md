@@ -11,8 +11,6 @@ numérotées.
 
 - Documentation API structurée (OpenAPI/Swagger) — la liste d'endpoints du README est tenue à
   la main et devient difficile à maintenir à mesure que l'API grossit.
-- Étendre la couverture de tests frontend au-delà des formulaires d'auth/médicaments (LogPage,
-  LabResultsPage, AppointmentsPage, ProfilePage).
 - Migrer vers react-router-dom 7.x pour corriger l'avertissement de sécurité modéré sur les
   versions 6.x/7.x antérieures (open redirect via backslash dans `Link`/`useNavigate`) — non
   exploitable en l'état (aucune destination `navigate()`/`Link` construite à partir d'une entrée
@@ -38,7 +36,8 @@ numérotées.
   (`auth.controller.ts` : register, login, verify-email, resend-verification,
   forgot/reset-password, `/me`) — seul le flow Google OIDC était couvert jusque-là.
 - Vitest + React Testing Library côté frontend (aucun framework de test n'y existait), avec des
-  tests sur les pages de login/register et le formulaire d'ajout de médicament.
+  tests sur les pages de login/register, le journal quotidien, les analyses, les rendez-vous,
+  le profil, et les formulaires d'ajout de médicament.
 - `LICENSE` (propriétaire, tous droits réservés), `.nvmrc` + `engines` (Node 20) dans les deux
   `package.json`, `.editorconfig`.
 - `CONTRIBUTING.md`, `TROUBLESHOOTING.md`, ce `CHANGELOG.md`.
