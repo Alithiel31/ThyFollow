@@ -43,6 +43,25 @@ export const config = {
   // base — voir lib/crypto.ts. Générée comme JWT_SECRET :
   // node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
   tokenEncryptionKey: process.env.TOKEN_ENCRYPTION_KEY || '',
+  // Gestion de l'abonné webhook au niveau du projet (voir
+  // lib/googleHealthSubscriber.ts) : distincte du flux OAuth utilisateur,
+  // authentifiée via un compte de service IAM Google Cloud (recommandation
+  // officielle de la Google Health API pour gérer `projects.subscribers`).
+  //
+  // Numéro (pas ID) du projet Google Cloud — voir la doc officielle qui
+  // signale explicitement cette confusion comme source d'erreur 400/403.
+  googleHealthProjectNumber: process.env.GOOGLE_HEALTH_PROJECT_NUMBER || '',
+  // Clé JSON du compte de service (contenu brut du fichier téléchargé
+  // depuis Google Cloud Console, pas un chemin de fichier), avec le rôle
+  // "Éditeur de l'API Google Health" a minima.
+  googleHealthServiceAccountKey: process.env.GOOGLE_HEALTH_SERVICE_ACCOUNT_KEY || '',
+  // Secret statique que nous choisissons, déclaré à Google lors de la
+  // création de l'abonné (`endpointAuthorization.secret`) et renvoyé tel
+  // quel par Google dans l'en-tête Authorization de chaque notification —
+  // c'est ce qui permet de vérifier qu'une requête entrante vient bien de
+  // Google avant de lui faire confiance. Format libre côté Google (ex:
+  // "Bearer <valeur>"), on stocke la chaîne complète telle qu'à envoyer.
+  googleHealthWebhookSecret: process.env.GOOGLE_HEALTH_WEBHOOK_SECRET || '',
   // Resend (email d'activation de compte) : sans clé, l'envoi est simplement
   // sauté (log en warn) pour ne pas bloquer le dev local sans compte Resend.
   resendApiKey: process.env.RESEND_API_KEY || '',

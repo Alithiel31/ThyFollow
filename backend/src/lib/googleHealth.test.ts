@@ -135,30 +135,33 @@ describe('lib/googleHealth', () => {
     });
   });
 
-  describe('subscribeToWebhook', () => {
-    it('returns the subscriptionId on a successful response', async () => {
-      vi.stubGlobal(
-        'fetch',
-        vi.fn().mockResolvedValue({ ok: true, json: async () => ({ subscriptionId: 'sub-1' }) })
-      );
+  describe('getHealthUserId', () => {
+    it('returns healthUserId when present in the response', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ healthUserId: 'hu-1' }) }));
 
-      const id = await googleHealth.subscribeToWebhook('access-token', 'https://app.example.com/webhook', 'token-1');
+      const id = await googleHealth.getHealthUserId('access-token');
 
-      expect(id).toBe('sub-1');
+      expect(id).toBe('hu-1');
     });
 
-    it('throws (rather than silently returning null) when Google responds with an HTTP error', async () => {
-      // fetch() only rejects on a network failure, never on a plain HTTP
-      // error status — this must be checked and surfaced explicitly, or a
-      // wrong/unavailable endpoint fails invisibly with no log trace at all.
-      vi.stubGlobal(
-        'fetch',
-        vi.fn().mockResolvedValue({ ok: false, status: 404, text: async () => 'Not Found' })
-      );
+    it('falls back to other plausible field names when healthUserId is absent', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ userId: 'hu-2' }) }));
 
-      await expect(
-        googleHealth.subscribeToWebhook('access-token', 'https://app.example.com/webhook', 'token-1')
-      ).rejects.toThrow(/404/);
+      const id = await googleHealth.getHealthUserId('access-token');
+
+      expect(id).toBe('hu-2');
+    });
+
+    it('throws with the raw body when no recognized id field is found', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ somethingElse: 'x' }) }));
+
+      await expect(googleHealth.getHealthUserId('access-token')).rejects.toThrow(/healthUserId/);
+    });
+
+    it('throws (rather than silently swallowing) on an HTTP error', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 401, text: async () => 'Unauthorized' }));
+
+      await expect(googleHealth.getHealthUserId('access-token')).rejects.toThrow(/401/);
     });
   });
 });

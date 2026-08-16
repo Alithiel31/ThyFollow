@@ -6,7 +6,6 @@
 // le Profil), mais toujours en mode "liaison" — il n'existe pas de "login
 // avec Google Health", cette connexion n'a de sens que pour un compte
 // ThyroTrack déjà authentifié.
-import crypto from 'crypto';
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth.js';
 import { config } from '../config.js';
@@ -14,7 +13,7 @@ import { prisma } from '../lib/prisma.js';
 import {
   buildGoogleHealthAuthorizationUrl,
   handleGoogleHealthCallback,
-  subscribeToWebhook,
+  getHealthUserId,
   type GoogleHealthFlowState,
 } from '../lib/googleHealth.js';
 import { encrypt } from '../lib/crypto.js';
@@ -74,19 +73,12 @@ export const googleHealthController = {
       const callbackUrl = new URL(req.originalUrl, config.googleHealthRedirectUri);
       const tokens = await handleGoogleHealthCallback(callbackUrl, flow!);
 
-      // Abonnement aux notifications webhook pour la synchro en arrière-plan
-      // (voir controllers/googleHealthWebhook.controller.ts). Best-effort :
-      // un échec ici ne doit pas faire échouer la connexion elle-même —
-      // l'utilisateur reste connecté, seule la synchro automatique est absente
-      // jusqu'à un futur réessai.
-      const webhookUrl = new URL('/api/webhooks/google-health', config.googleHealthRedirectUri).href;
-      const webhookChannelToken = crypto.randomBytes(24).toString('hex');
-      const webhookSubscriptionId = await subscribeToWebhook(tokens.accessToken, webhookUrl, webhookChannelToken).catch(
-        (err) => {
-          logger.error('Échec abonnement webhook Google Health', err);
-          return null;
-        }
-      );
+      // Mappe cette identité OAuth vers le healthUserId opaque que Google
+      // utilisera dans les notifications webhook (voir lib/googleHealthSync.ts)
+      // — l'abonnement webhook lui-même est au niveau du projet, créé une
+      // fois pour toutes au démarrage (voir lib/googleHealthSubscriber.ts),
+      // pas ici par connexion.
+      const healthUserId = await getHealthUserId(tokens.accessToken);
 
       await prisma.googleHealthConnection.upsert({
         where: { userId: flow!.userId },
@@ -96,16 +88,14 @@ export const googleHealthController = {
           refreshTokenEnc: encrypt(tokens.refreshToken),
           tokenExpiresAt: tokens.expiresAt,
           scope: tokens.scope,
-          webhookSubscriptionId,
-          webhookChannelToken: webhookSubscriptionId ? webhookChannelToken : null,
+          healthUserId,
         },
         update: {
           accessTokenEnc: encrypt(tokens.accessToken),
           refreshTokenEnc: encrypt(tokens.refreshToken),
           tokenExpiresAt: tokens.expiresAt,
           scope: tokens.scope,
-          webhookSubscriptionId,
-          webhookChannelToken: webhookSubscriptionId ? webhookChannelToken : null,
+          healthUserId,
         },
       });
 

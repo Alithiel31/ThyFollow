@@ -9,16 +9,19 @@
 // - un client OAuth dédié (GOOGLE_HEALTH_CLIENT_ID/SECRET), pas forcément
 //   le même projet Google Cloud que le login.
 //
-// ⚠️ Le flux OAuth2 (construction de l'URL, échange du code, refresh) est
-// standard et repose sur les mêmes endpoints Google que lib/oidc.ts — cette
-// partie est fiable, et les scopes ci-dessous ont été validés en usage réel
-// (voir GOOGLE_HEALTH_SCOPES). En revanche, `fetchDailyMetrics` et
-// `subscribeToWebhook` ciblent des endpoints REST de la Google Health API
-// dont le détail exact (chemins, format des réponses, mécanisme de
-// vérification webhook) n'a toujours pas pu être vérifié (accès réseau à
-// developers.google.com bloqué depuis l'environnement de développement). À
-// confirmer avec la doc officielle et la console Google Cloud avant mise en
-// production — voir le plan d'implémentation.
+// Le flux OAuth2 (construction de l'URL, échange du code, refresh) est
+// standard et repose sur les mêmes endpoints Google que lib/oidc.ts. Les
+// scopes (GOOGLE_HEALTH_SCOPES), le host/version de l'API
+// (health.googleapis.com/v4) et getHealthUserId ont été confirmés contre la
+// documentation officielle (developers.google.com/health). La gestion de
+// l'abonnement webhook (au niveau du projet, pas par utilisateur) vit dans
+// lib/googleHealthSubscriber.ts — voir ce fichier pour le détail du modèle.
+//
+// ⚠️ `fetchDailyMetrics` reste partiellement une best-effort : le chemin et
+// les en-têtes sont corrects (confirmés), mais la forme exacte du corps de
+// réponse des endpoints `dataPoints` n'a pas pu être vérifiée (les exemples
+// de la doc n'affichent que la requête, pas la réponse JSON). À ajuster si
+// le parsing s'avère incorrect en usage réel.
 import * as client from 'openid-client';
 import { config } from '../config.js';
 
@@ -134,16 +137,43 @@ export async function refreshAccessToken(refreshToken: string): Promise<{ access
   };
 }
 
+// Host/version confirmés (developers.google.com/health/endpoints) : toute
+// l'API Google Health, données comme abonnements, vit sous ce préfixe.
+export const GOOGLE_HEALTH_API_BASE = 'https://health.googleapis.com/v4';
+
+// Mappe l'identité OAuth de l'utilisateur (le token qu'on vient d'obtenir)
+// vers son `healthUserId` — l'identifiant opaque que Google utilise dans
+// les notifications webhook (voir googleHealthSync.ts). Appelé une seule
+// fois à la connexion, le mapping ne change jamais (recommandation officielle :
+// "peut être mis en cache indéfiniment").
+//
+// ⚠️ La forme exacte du corps de réponse n'était pas visible dans la doc
+// consultée (seule la requête était montrée) — plusieurs noms de champ
+// plausibles sont essayés, avec un log explicite si aucun ne correspond.
+export async function getHealthUserId(accessToken: string): Promise<string> {
+  const res = await fetch(`${GOOGLE_HEALTH_API_BASE}/users/me/identity`, {
+    headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' },
+  });
+  if (!res.ok) {
+    throw new Error(`Échec récupération identité Google Health : ${res.status} ${await res.text()}`);
+  }
+  const body = (await res.json()) as Record<string, unknown>;
+  const healthUserId = body.healthUserId ?? body.userId ?? body.googleUserId ?? body.id;
+  if (typeof healthUserId !== 'string' || !healthUserId) {
+    throw new Error(`Réponse getIdentity sans healthUserId reconnu : ${JSON.stringify(body)}`);
+  }
+  return healthUserId;
+}
+
 export interface DailyHealthMetrics {
   weightKg: number | null;
   heartRateBpm: number | null;
   sleepHours: number | null;
 }
 
-// ⚠️ Chemin/forme de réponse non vérifiés (voir en-tête de fichier) — à
-// ajuster une fois la Google Health API accessible dans Google Cloud
-// Console. Structuré pour que ce soit le seul endroit à corriger.
-const GOOGLE_HEALTH_API_BASE = 'https://healthapi.googleapis.com/v1';
+// Types de données au format kebab-case attendu dans le chemin de l'URL
+// (voir developers.google.com/health/endpoints, ex: "body-fat").
+const DATA_TYPES = { weight: 'weight', heartRate: 'heart-rate', sleep: 'sleep' } as const;
 
 export async function fetchDailyMetrics(accessToken: string, date: string): Promise<DailyHealthMetrics> {
   const startTime = new Date(`${date}T00:00:00.000Z`).toISOString();
@@ -154,7 +184,7 @@ export async function fetchDailyMetrics(accessToken: string, date: string): Prom
     url.searchParams.set('startTime', startTime);
     url.searchParams.set('endTime', endTime);
 
-    const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' } });
     if (!res.ok) {
       throw new Error(`Google Health API ${dataTypeId} : ${res.status} ${await res.text()}`);
     }
@@ -163,9 +193,9 @@ export async function fetchDailyMetrics(accessToken: string, date: string): Prom
   }
 
   const [weightPoints, heartRatePoints, sleepPoints] = await Promise.all([
-    fetchDataType('weight').catch(() => []),
-    fetchDataType('heart_rate').catch(() => []),
-    fetchDataType('sleep').catch(() => []),
+    fetchDataType(DATA_TYPES.weight).catch(() => []),
+    fetchDataType(DATA_TYPES.heartRate).catch(() => []),
+    fetchDataType(DATA_TYPES.sleep).catch(() => []),
   ]);
 
   return {
@@ -187,35 +217,4 @@ function sumSleepDurationHours(points: unknown[]): number | null {
     return sum + (new Date(p.endTime).getTime() - new Date(p.startTime).getTime());
   }, 0);
   return totalMs > 0 ? totalMs / (1000 * 60 * 60) : null;
-}
-
-// Abonnement aux notifications webhook pour ne pas avoir à poller — voir
-// controllers/googleHealthWebhook.controller.ts. Best-effort : un échec ne
-// doit pas empêcher la connexion elle-même (voir appelant). `channelToken`
-// est un secret que nous générons (voir GoogleHealthConnection.webhookChannelToken)
-// et que Google est censé renvoyer tel quel dans chaque notification, pour
-// que le webhook puisse en vérifier l'authenticité.
-export async function subscribeToWebhook(
-  accessToken: string,
-  webhookUrl: string,
-  channelToken: string
-): Promise<string | null> {
-  const res = await fetch(`${GOOGLE_HEALTH_API_BASE}/users/me/dataTypes:subscribe`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      dataTypeIds: ['weight', 'heart_rate', 'sleep'],
-      notificationUrl: webhookUrl,
-      token: channelToken,
-    }),
-  });
-  if (!res.ok) {
-    // `fetch` ne rejette que sur une erreur réseau, jamais sur un simple
-    // statut HTTP d'erreur (404, 400...) — sans ce log explicite, un
-    // endpoint incorrect échouerait silencieusement (retour `null`) et le
-    // diagnostic serait impossible depuis les logs.
-    throw new Error(`Échec abonnement webhook Google Health : ${res.status} ${await res.text()}`);
-  }
-  const body = (await res.json()) as { subscriptionId?: string };
-  return body.subscriptionId ?? null;
 }
