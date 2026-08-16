@@ -44,6 +44,10 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        # Figé dans le bundle statique au build, pas lu au démarrage du
+        # conteneur — lu depuis le .env à la racine (voir .env.example).
+        VITE_SENTRY_DSN: ${VITE_SENTRY_DSN:-}
     container_name: thyrotrack-frontend
     restart: unless-stopped
     ports:

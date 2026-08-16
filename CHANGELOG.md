@@ -13,12 +13,23 @@ numérotées.
   la main et devient difficile à maintenir à mesure que l'API grossit.
 - Étendre la couverture de tests frontend au-delà des formulaires d'auth/médicaments (LogPage,
   LabResultsPage, AppointmentsPage, ProfilePage).
-- Suivi d'erreurs en production (Sentry ou équivalent) — aujourd'hui, un crash en prod ne
-  remonte que via le logger applicatif, aucune alerte externe.
+- Migrer vers react-router-dom 7.x pour corriger l'avertissement de sécurité modéré sur les
+  versions 6.x/7.x antérieures (open redirect via backslash dans `Link`/`useNavigate`) — non
+  exploitable en l'état (aucune destination `navigate()`/`Link` construite à partir d'une entrée
+  utilisateur dans ce code), mais à traiter en migration délibérée plutôt qu'en `--force`.
 - Évaluer la montée de version Prisma 5 → 6 et Express 4 → 5 (aucune faille connue identifiée,
   mais l'écart grandit).
 
 ### Added
+
+- Suivi d'erreurs en production (Sentry, `@sentry/node` + `@sentry/react`) : intégration
+  optionnelle, no-op complet tant que `SENTRY_DSN`/`VITE_SENTRY_DSN` ne sont pas renseignées
+  (même principe que l'intégration Resend existante). Ne capture que les erreurs réellement
+  inattendues côté backend (`errorHandler.ts`), pas les 4xx métier ; côté frontend, un
+  `Sentry.ErrorBoundary` affiche un écran de secours bilingue si un rendu plante. En déploiement
+  Docker, `VITE_SENTRY_DSN` passe par un build arg (`frontend/Dockerfile` /
+  `docker-compose.yml`), pas par une variable d'environnement du conteneur — les variables
+  `VITE_*` sont figées dans le bundle statique au build.
 
 - Pipeline CI (GitHub Actions, `.github/workflows/ci.yml`) : lint + typecheck/build + tests pour
   backend et frontend, sur chaque push/PR vers `main`. Jusqu'ici aucune vérification automatique
@@ -61,6 +72,13 @@ numérotées.
 - `jsdom@30`/`@testing-library/jest-dom@7` (installés depuis un poste en Node 22) faisaient
   planter Vitest en CI (Node 20). Voir
   [`TROUBLESHOOTING.md#3`](./TROUBLESHOOTING.md#3-vitest-run-plante-en-ci-après-lajout-des-tests-frontend-node-20-vs-node-22).
+- Vulnérabilités `npm audit` : `body-parser` (déni de service, backend) et `react-router-dom`
+  (open redirect, frontend) corrigées par bump de patch/mineure. `sanitize-html` (bypass XSS,
+  backend, via `express-xss-sanitizer`) était bloquée par un range figé (`~2.13.0`) dans
+  `express-xss-sanitizer@2.0.2` qui n'a jamais reçu le correctif — forcée à `^2.17.5` via un
+  `overrides` npm plutôt que de suivre la suggestion de `npm audit fix --force` (rétrograder
+  `express-xss-sanitizer` vers sa 1.x, plus fragile qu'un simple override de la dépendance
+  transitive concernée).
 
 ### Removed
 

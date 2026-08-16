@@ -9,6 +9,11 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
+# Les variables VITE_* sont figées dans le bundle statique au build (pas
+# lues au démarrage du conteneur, contrairement aux env vars du backend) —
+# doit donc passer par un build arg plutôt qu'un `environment:` docker-compose.
+ARG VITE_SENTRY_DSN
+ENV VITE_SENTRY_DSN=$VITE_SENTRY_DSN
 RUN npm run build
 
 # ── Runtime ──────────────────────────────────────────────────

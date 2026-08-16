@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 import { AppError } from '../lib/errors.js';
 import { logger } from '../lib/logger.js';
+import { captureException } from '../lib/sentry.js';
 
 // Note: on garde volontairement le format de réponse `{ error: string }`
 // pour rester compatible avec le frontend actuel (lib/api.ts / interceptor
@@ -32,11 +33,14 @@ export const errorHandler = (
       return;
     }
     logger.error(`Erreur Prisma ${err.code}`, err.message);
+    captureException(err);
     res.status(400).json({ error: req.t('errors.invalidDbOperation') });
     return;
   }
 
-  // Erreurs applicatives typées (NotFoundError, ConflictError, etc.)
+  // Erreurs applicatives typées (NotFoundError, ConflictError, etc.) : un
+  // fonctionnement normal de l'API (mauvais identifiants, ressource
+  // manquante...), pas remonté à Sentry pour ne pas noyer les vraies alertes.
   if (err instanceof AppError) {
     res.status(err.statusCode).json({ error: err.message, ...(err.code ? { code: err.code } : {}) });
     return;
@@ -44,5 +48,6 @@ export const errorHandler = (
 
   // Tout le reste : erreur inattendue, on ne fuite pas le détail au client
   logger.error('Erreur non gérée', err);
+  captureException(err);
   res.status(500).json({ error: req.t('errors.internalError') });
 };

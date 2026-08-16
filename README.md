@@ -99,6 +99,10 @@ Sans `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`, `GET /api/auth/oidc/google` rép
    ```
 En production, mettez à jour les origines/redirect URIs avec le domaine réel et ajustez `GOOGLE_REDIRECT_URI` (+ `APP_URL`) en conséquence.
 
+#### (Optionnel) Suivi d'erreurs (Sentry)
+
+Sans `SENTRY_DSN` (backend) / `VITE_SENTRY_DSN` (frontend), l'intégration est un no-op complet — aucun appel réseau, rien à configurer pour développer en local. Pour l'activer, renseignez `SENTRY_DSN` dans `backend/.env` et `VITE_SENTRY_DSN` dans `frontend/.env` (voir `frontend/.env.example`). Côté frontend, cette variable est figée dans le bundle **au build** (Vite) : en déploiement Docker Compose, elle passe par un build arg (voir [Déploiement](#déploiement-docker-compose-self-hosted)), pas par une variable d'environnement du conteneur.
+
 ### 3. Initialiser la base de données
 ```bash
 cd backend
@@ -126,10 +130,12 @@ Le déploiement réel de ce projet passe par `docker-compose.yml` à la racine :
 ### 1. Configurer l'environnement
 ```bash
 cp .env.example .env
-# Renseigner un POSTGRES_PASSWORD fort (ex: openssl rand -hex 24)
+# Renseigner un POSTGRES_PASSWORD fort (ex: openssl rand -hex 24), et
+# VITE_SENTRY_DSN si le suivi d'erreurs frontend est utilisé (lu au build
+# de l'image frontend, voir docker-compose.yml).
 
 cp backend/.env.example backend/.env
-# Renseigner JWT_SECRET (32+ caractères), RESEND_API_KEY, et
+# Renseigner JWT_SECRET (32+ caractères), RESEND_API_KEY, SENTRY_DSN, et
 # GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET si "Se connecter avec Google" est utilisé.
 # DATABASE_URL et FRONTEND_URL sont déjà fixés dans docker-compose.yml —
 # adaptez-y votre propre domaine avant de déployer.
@@ -269,6 +275,7 @@ GET    /api/analytics/symptoms?days=30
 | État | Zustand + TanStack Query |
 | Graphiques | Recharts |
 | Routing | React Router 6 |
+| Suivi d'erreurs | Sentry (optionnel, `@sentry/node` + `@sentry/react`) |
 | Déploiement | Docker Compose (self-hosted) |
 
 ---

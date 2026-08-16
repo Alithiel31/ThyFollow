@@ -34,6 +34,9 @@ export const config = {
   // sauté (log en warn) pour ne pas bloquer le dev local sans compte Resend.
   resendApiKey: process.env.RESEND_API_KEY || '',
   resendFromEmail: process.env.RESEND_FROM_EMAIL || 'ThyroTrack <onboarding@resend.dev>',
+  // Suivi d'erreurs (Sentry) : sans DSN, lib/sentry.ts est un no-op complet
+  // (même logique que Resend ci-dessus) — aucun overhead en dev.
+  sentryDsn: process.env.SENTRY_DSN || '',
   // Rate limiting global : 100 requêtes / 15 min par IP par défaut
   rateLimitWindowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || String(15 * 60 * 1000), 10),
   rateLimitMax: parseInt(process.env.RATE_LIMIT_MAX || '100', 10),

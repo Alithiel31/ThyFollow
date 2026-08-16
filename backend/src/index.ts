@@ -1,4 +1,8 @@
 // src/index.ts
+// Doit être importé en tout premier : Sentry.init() doit tourner avant le
+// reste du graphe de modules pour capter les erreurs qui surviendraient dès
+// leur chargement.
+import './lib/sentry.js';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
