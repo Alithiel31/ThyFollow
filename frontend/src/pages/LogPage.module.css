@@ -189,6 +189,16 @@
   font-size: 0.8rem;
   color: var(--text-dim);
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Indique qu'une mesure vient d'une synchro Google Health (Pixel Watch...)
+   plutôt que d'une saisie manuelle — voir DailyEntry.*Source côté backend. */
+.metricSyncBadge {
+  display: inline-flex;
+  color: var(--teal);
 }
 
 .metricInput {

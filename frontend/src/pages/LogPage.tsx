@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import {
   ChevronLeft, ChevronRight, Check, Save, Pill,
-  Sparkles, Activity, Dumbbell, Moon, FileDown,
+  Sparkles, Activity, Dumbbell, Moon, FileDown, Watch,
 } from 'lucide-react';
 import { entriesApi } from '../lib/api';
 import { toISODate, formatDate, symptomLabel } from '../lib/utils';
@@ -238,16 +238,19 @@ export function LogPage() {
             <div className={styles.metricsGrid}>
               <MetricInput label={t('log.weight')} value={form.weight ?? ''}
                 onChange={(v) => setField('weight', v ? parseFloat(v) : null)}
-                placeholder="62.5" step="0.1" />
+                placeholder="62.5" step="0.1"
+                synced={form.weightSource === 'GOOGLE_HEALTH'} />
               <MetricInput label={t('log.temperature')} value={form.bodyTemperature ?? ''}
                 onChange={(v) => setField('bodyTemperature', v ? parseFloat(v) : null)}
                 placeholder="36.6" step="0.1" />
               <MetricInput label={t('log.heartRate')} value={form.heartRate ?? ''}
                 onChange={(v) => setField('heartRate', v ? parseInt(v) : null)}
-                placeholder="72" step="1" />
+                placeholder="72" step="1"
+                synced={form.heartRateSource === 'GOOGLE_HEALTH'} />
               <MetricInput label={t('log.sleepHours')} value={form.sleepHours ?? ''}
                 onChange={(v) => setField('sleepHours', v ? parseFloat(v) : null)}
-                placeholder="7.5" step="0.5" />
+                placeholder="7.5" step="0.5"
+                synced={form.sleepHoursSource === 'GOOGLE_HEALTH'} />
             </div>
           </div>
 
@@ -305,15 +308,24 @@ function ScoreRow({ label, value, onChange }: {
   );
 }
 
-function MetricInput({ label, value, onChange, placeholder, step }: {
+function MetricInput({ label, value, onChange, placeholder, step, synced }: {
   label: string; value: number | string;
   onChange: (v: string) => void;
   placeholder: string; step: string;
+  synced?: boolean;
 }) {
+  const { t } = useTranslation();
   const id = useId();
   return (
     <div className={styles.metricField}>
-      <label className={styles.metricLabel} htmlFor={id}>{label}</label>
+      <label className={styles.metricLabel} htmlFor={id}>
+        {label}
+        {synced && (
+          <span className={styles.metricSyncBadge} title={t('log.syncedFromGoogleHealth')}>
+            <Watch size={13} aria-hidden="true" />
+          </span>
+        )}
+      </label>
       <input
         id={id}
         className={styles.metricInput}
