@@ -1,7 +1,24 @@
 # 🦋 ThyroTrack
 
+[![CI](https://github.com/Alithiel31/ThyFollow/actions/workflows/ci.yml/badge.svg)](https://github.com/Alithiel31/ThyFollow/actions/workflows/ci.yml)
+
 Application web de suivi thyroïdien, inspirée de l'app Clue.  
 **Stack** : TypeScript · Express · Prisma · PostgreSQL · React · Recharts · Docker
+
+## Table des matières
+
+- [Fonctionnalités](#fonctionnalités)
+- [Architecture](#architecture)
+- [Démarrage rapide (local)](#démarrage-rapide-local)
+- [Déploiement](#déploiement-docker-compose-self-hosted)
+- [Structure du projet](#structure-du-projet)
+- [Schéma de la base de données](#schéma-de-la-base-de-données)
+- [API Endpoints](#api-endpoints)
+- [Design System](#design-system)
+- [Stack technique](#stack-technique)
+- [Contribuer](#contribuer)
+- [Changelog](#changelog)
+- [Licence](#licence)
 
 ---
 
@@ -15,6 +32,34 @@ Application web de suivi thyroïdien, inspirée de l'app Clue.
 | **Rendez-vous** | Agenda médical avec rappels, statuts, types spécialisés |
 | **Tableau de bord** | Streak médicament, observance, moyennes, prochain RDV, historique TSH |
 | **Profil** | Diagnostic, état thyroïde, plages TSH/FT4/FT3 personnalisées par votre médecin |
+
+---
+
+## 🏗️ Architecture
+
+```mermaid
+flowchart LR
+    UI["Navigateur"]
+
+    subgraph Host["Hôte Docker (docker-compose.yml)"]
+        FE["frontend<br/>nginx + build React/Vite<br/>:8082 → :80"]
+        BE["backend<br/>Express + TypeScript<br/>:3001"]
+        DB[("postgres<br/>PostgreSQL 16")]
+        FE -- "proxy /api/*" --> BE
+        BE --> DB
+    end
+
+    EXT["Google OAuth · Resend"]
+
+    UI -- "HTTPS :8082" --> FE
+    BE -. "OIDC (connexion Google) / envoi d'email" .-> EXT
+```
+
+Le conteneur `frontend` ne sert que des fichiers statiques (nginx) ; toutes les requêtes
+`/api/*` sont proxyfiées vers `backend` (voir `frontend/nginx.conf`), qui est seul à parler à
+PostgreSQL via Prisma. Le navigateur ne voit donc qu'une seule origine (`:8082`), ce qui évite
+toute configuration CORS côté client en production — `CORS_ORIGIN`/`FRONTEND_URL` restent un
+garde-fou si le backend est appelé directement.
 
 ---
 
@@ -225,3 +270,19 @@ GET    /api/analytics/symptoms?days=30
 | Graphiques | Recharts |
 | Routing | React Router 6 |
 | Déploiement | Docker Compose (self-hosted) |
+
+---
+
+## 🤝 Contribuer
+
+Voir [`CONTRIBUTING.md`](./CONTRIBUTING.md) pour l'environnement de développement, comment
+reproduire la CI en local, et le format des PR. En cas de problème, [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md)
+documente les incidents déjà rencontrés (et leur diagnostic) sur ce projet.
+
+## 📝 Changelog
+
+Les changements notables sont documentés dans [`CHANGELOG.md`](./CHANGELOG.md).
+
+## 📄 Licence
+
+Projet privé — voir [`LICENSE`](./LICENSE).
