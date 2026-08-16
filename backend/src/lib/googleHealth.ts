@@ -24,6 +24,7 @@
 // le parsing s'avère incorrect en usage réel.
 import * as client from 'openid-client';
 import { config } from '../config.js';
+import { logger } from './logger.js';
 
 let discoveredConfig: client.Configuration | null = null;
 
@@ -192,10 +193,23 @@ export async function fetchDailyMetrics(accessToken: string, date: string): Prom
     return body.dataPoints ?? [];
   }
 
+  // Un échec sur un type de donnée ne doit pas empêcher les autres de
+  // remonter, mais doit rester visible — un `.catch(() => [])` muet ferait
+  // "réussir" silencieusement une synchro qui n'a en fait rien récupéré
+  // (déjà vécu avec l'abonnement webhook, voir lib/googleHealthSubscriber.ts).
+  async function fetchDataTypeLogged(dataTypeId: string): Promise<unknown[]> {
+    try {
+      return await fetchDataType(dataTypeId);
+    } catch (err) {
+      logger.error(`Échec lecture Google Health API pour "${dataTypeId}"`, err);
+      return [];
+    }
+  }
+
   const [weightPoints, heartRatePoints, sleepPoints] = await Promise.all([
-    fetchDataType(DATA_TYPES.weight).catch(() => []),
-    fetchDataType(DATA_TYPES.heartRate).catch(() => []),
-    fetchDataType(DATA_TYPES.sleep).catch(() => []),
+    fetchDataTypeLogged(DATA_TYPES.weight),
+    fetchDataTypeLogged(DATA_TYPES.heartRate),
+    fetchDataTypeLogged(DATA_TYPES.sleep),
   ]);
 
   return {
