@@ -9,10 +9,11 @@ numérotées.
 
 ### À faire
 
-- Vérifier le format exact des notifications webhook et les chemins REST de la Google Health
-  API (`lib/googleHealth.ts`, `controllers/googleHealthWebhook.controller.ts`) face à la doc
-  officielle et à la console Google Cloud — non vérifiable depuis l'environnement de
-  développement utilisé pour écrire cette intégration (accès réseau bloqué), voir README.
+- Vérifier la forme exacte du corps JSON renvoyé par `dataTypes/{type}/dataPoints`
+  (`lib/googleHealth.ts#fetchDailyMetrics`) une fois des données réelles observées — le reste
+  du modèle Google Health (scopes, host/version, abonnement webhook au niveau projet,
+  authentification, négociation de validation) a été confirmé par lecture directe de la doc
+  officielle, voir README.
 - Documentation API structurée (OpenAPI/Swagger) — la liste d'endpoints du README est tenue à
   la main et devient difficile à maintenir à mesure que l'API grossit.
 - Étendre la couverture de tests frontend au-delà des formulaires d'auth/médicaments (LogPage,
