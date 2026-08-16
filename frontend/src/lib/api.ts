@@ -49,6 +49,12 @@ export const authApi = {
   // Échange le code opaque à usage unique reçu sur /oauth/callback?code=...
   // contre le JWT de session (voir backend oidc.controller.ts#googleExchange).
   exchangeOidcCode: (code: string) => api.post<{ token: string }>('/auth/oidc/exchange', { code }),
+  // Connexion/déconnexion Google Health (poids/FC/sommeil, ex: Pixel Watch)
+  // — voir backend googleHealth.controller.ts. Même logique que
+  // linkGoogle/unlinkGoogle : POST pour transporter le header Authorization,
+  // navigation plein-page ensuite faite par le frontend.
+  linkGoogleHealth: () => api.post<{ url: string }>('/integrations/google-health/link'),
+  unlinkGoogleHealth: () => api.delete<{ message: string }>('/integrations/google-health/link'),
 };
 
 // ── Sécurité du compte

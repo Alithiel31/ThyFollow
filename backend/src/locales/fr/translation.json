@@ -22,13 +22,15 @@
     "oidcNotConfigured": "La connexion avec Google n'est pas configurée sur ce serveur",
     "oidcFlowExpired": "La tentative de connexion a expiré, veuillez réessayer",
     "oidcNoEmail": "Google n'a pas fourni d'adresse email pour ce compte",
-    "oidcLinkCannotUnlinkNoPassword": "Définissez d'abord un mot de passe (via « Mot de passe oublié ») avant de délier Google, sinon vous perdriez l'accès à votre compte"
+    "oidcLinkCannotUnlinkNoPassword": "Définissez d'abord un mot de passe (via « Mot de passe oublié ») avant de délier Google, sinon vous perdriez l'accès à votre compte",
+    "googleHealthNotConfigured": "La synchronisation Google Health n'est pas configurée sur ce serveur"
   },
   "auth": {
     "verificationEmailSent": "Un email de confirmation a été envoyé",
     "passwordResetEmailSent": "Si un compte existe avec cet email, un lien de réinitialisation a été envoyé",
     "passwordResetSuccess": "Mot de passe mis à jour. Vous pouvez vous connecter.",
-    "googleAccountUnlinked": "Compte Google délié"
+    "googleAccountUnlinked": "Compte Google délié",
+    "googleHealthAccountUnlinked": "Google Health déconnecté"
   },
   "resources": {
     "appointment": "Rendez-vous",
