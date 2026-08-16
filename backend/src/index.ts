@@ -18,6 +18,7 @@ import analyticsRouter from './routers/analytics.router.js';
 import articlesRouter from './routers/articles.router.js';
 import googleHealthRouter from './routers/googleHealth.router.js';
 import googleHealthWebhookRouter from './routers/googleHealthWebhook.router.js';
+import { ensureProjectSubscriber } from './lib/googleHealthSubscriber.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -96,6 +97,16 @@ app.use(errorHandler);
 app.listen(config.port, () => {
   logger.success(`🦋 ThyroTrack API running on port ${config.port}`);
   logger.info(`Environnement: ${config.nodeEnv}`);
+
+  // Abonné webhook Google Health : au niveau du projet, pas par utilisateur
+  // (voir lib/googleHealthSubscriber.ts) — créé une fois si absent, sans
+  // bloquer le démarrage ni faire planter le serveur si Google Health n'est
+  // pas configuré ou momentanément indisponible.
+  if (config.googleHealthClientId && config.googleHealthServiceAccountKey && config.googleHealthProjectNumber) {
+    ensureProjectSubscriber().catch((err) => {
+      logger.error('Échec initialisation de l’abonné webhook Google Health', err);
+    });
+  }
 });
 
 export default app;

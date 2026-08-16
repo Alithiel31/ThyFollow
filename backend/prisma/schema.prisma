@@ -104,25 +104,23 @@ enum AuthEventType {
 // données de santé, chiffrés au repos, voir lib/crypto.ts)
 // ─────────────────────────────────────────────
 model GoogleHealthConnection {
-  id                    String    @id @default(cuid())
-  userId                String    @unique
+  id              String    @id @default(cuid())
+  userId          String    @unique
   // Tokens chiffrés (AES-256-GCM) — jamais stockés en clair.
-  accessTokenEnc        String
-  refreshTokenEnc       String
-  tokenExpiresAt        DateTime
+  accessTokenEnc  String
+  refreshTokenEnc String
+  tokenExpiresAt  DateTime
   // Scopes accordés lors du consentement, ex: "googlehealth.sleep.readonly
   // googlehealth.health_metrics_and_measurements.readonly googlehealth.activity_and_fitness.readonly"
-  scope                 String
-  connectedAt           DateTime  @default(now())
-  lastSyncedAt          DateTime?
-  // Id d'abonnement aux notifications retourné par Google (si applicable).
-  webhookSubscriptionId String?
-  // Secret partagé généré par nous et transmis à Google lors de l'abonnement
-  // (mécanisme "channel token" des notifications push Google, réutilisé
-  // pour les autres APIs Google comme Calendar/Drive). Renvoyé tel quel dans
-  // chaque notification entrante : permet de vérifier qu'elle vient bien de
-  // Google pour CET abonnement, avant de faire confiance à son contenu.
-  webhookChannelToken   String?
+  scope           String
+  connectedAt     DateTime  @default(now())
+  lastSyncedAt    DateTime?
+  // Identifiant opaque Google Health pour cet utilisateur (voir
+  // lib/googleHealth.ts#getHealthUserId), différent du `sub` OIDC. Les
+  // notifications webhook du projet (voir lib/googleHealthSubscriber.ts)
+  // portent ce healthUserId, pas d'identifiant par connexion : c'est ce
+  // champ qui permet de retrouver quel utilisateur ThyroTrack est concerné.
+  healthUserId    String?   @unique
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
