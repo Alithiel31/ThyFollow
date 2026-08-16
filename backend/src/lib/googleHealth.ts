@@ -11,13 +11,14 @@
 //
 // ⚠️ Le flux OAuth2 (construction de l'URL, échange du code, refresh) est
 // standard et repose sur les mêmes endpoints Google que lib/oidc.ts — cette
-// partie est fiable. En revanche, `fetchDailyMetrics` et
+// partie est fiable, et les scopes ci-dessous ont été validés en usage réel
+// (voir GOOGLE_HEALTH_SCOPES). En revanche, `fetchDailyMetrics` et
 // `subscribeToWebhook` ciblent des endpoints REST de la Google Health API
 // dont le détail exact (chemins, format des réponses, mécanisme de
-// vérification webhook) n'a pas pu être vérifié depuis cet environnement
-// (accès réseau à developers.google.com bloqué). À confirmer avec la doc
-// officielle et la console Google Cloud avant mise en production — voir
-// le plan d'implémentation.
+// vérification webhook) n'a toujours pas pu être vérifié (accès réseau à
+// developers.google.com bloqué depuis l'environnement de développement). À
+// confirmer avec la doc officielle et la console Google Cloud avant mise en
+// production — voir le plan d'implémentation.
 import * as client from 'openid-client';
 import { config } from '../config.js';
 
@@ -40,14 +41,20 @@ async function getGoogleHealthConfig(): Promise<client.Configuration> {
   return discoveredConfig;
 }
 
-// Scopes de la Google Health API. ⚠️ Noms exacts à confirmer dans Google
-// Cloud Console (APIs & Services > Google Health API > Scopes) au moment
-// de créer les credentials — ceux-ci suivent la convention observée sur
-// les autres APIs Google (Fitness/Fit) et sont notre meilleure estimation.
+// Scopes de la Google Health API. Format confirmé en usage réel (une
+// première tentative avec des noms de type "health.sleep.read" a été
+// rejetée par Google avec `invalid_scope`) : le préfixe est `googlehealth.`
+// et les scopes sont des catégories, pas un scope par métrique — il n'existe
+// pas de scope "heart_rate" dédié, la fréquence cardiaque est couverte par
+// le scope activité/fitness.
 export const GOOGLE_HEALTH_SCOPES = [
-  'https://www.googleapis.com/auth/health.sleep.read',
-  'https://www.googleapis.com/auth/health.body.read',
-  'https://www.googleapis.com/auth/health.heart_rate.read',
+  // Sommeil
+  'https://www.googleapis.com/auth/googlehealth.sleep.readonly',
+  // Poids
+  'https://www.googleapis.com/auth/googlehealth.health_metrics_and_measurements.readonly',
+  // Rythme cardiaque (regroupé avec l'activité/fitness côté Google, pas de
+  // scope "heart_rate" séparé)
+  'https://www.googleapis.com/auth/googlehealth.activity_and_fitness.readonly',
 ];
 
 export interface GoogleHealthFlowState {

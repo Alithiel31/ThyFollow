@@ -109,11 +109,13 @@ pour pré-remplir automatiquement Poids, Rythme cardiaque et Heures de sommeil d
 
 > ⚠️ **Le format exact des notifications webhook et les chemins REST de la Google Health API
 > n'ont pas pu être vérifiés au moment d'écrire cette intégration** (accès à
-> `developers.google.com` bloqué depuis l'environnement de développement utilisé). Le flux
-> OAuth (connexion/déconnexion) est fiable et testé ; `backend/src/lib/googleHealth.ts` et le
-> webhook (`backend/src/controllers/googleHealthWebhook.controller.ts`) sont écrits sur la
-> meilleure hypothèse disponible mais **doivent être vérifiés/ajustés face à la doc officielle
-> et à la console Google Cloud** avant un usage en production.
+> `developers.google.com` bloqué depuis l'environnement de développement utilisé). Le flux OAuth
+> (connexion/déconnexion) est fiable et testé, et les scopes ci-dessous ont été confirmés en
+> usage réel (une première version utilisait des noms de scope incorrects, rejetés par Google
+> avec `invalid_scope` — corrigé). En revanche, `backend/src/lib/googleHealth.ts#fetchDailyMetrics`
+> et le webhook (`backend/src/controllers/googleHealthWebhook.controller.ts`) ciblent des
+> endpoints REST écrits sur la meilleure hypothèse disponible et **doivent être vérifiés/ajustés
+> face à la doc officielle** avant un usage en production.
 
 1. Sur [Google Cloud Console](https://console.cloud.google.com/), activez la **Google Health
    API** sur le projet (le même que "Se connecter avec Google" ou un projet dédié).
