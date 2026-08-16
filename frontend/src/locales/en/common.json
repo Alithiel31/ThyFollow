@@ -10,7 +10,9 @@
     "appointments": "Appointments",
     "learn": "Learn",
     "profile": "My profile",
-    "writing": "Writing"
+    "writing": "Writing",
+    "mainLabel": "Main navigation",
+    "mobileLabel": "Mobile navigation"
   },
   "theme": {
     "auto": "Theme: automatic",

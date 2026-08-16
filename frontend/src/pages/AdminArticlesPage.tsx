@@ -92,15 +92,18 @@ export function AdminArticlesPage() {
             <form onSubmit={handleSubmit} className={styles.form}>
               <div className={styles.grid2}>
                 <div className={styles.field}>
-                  <label className={styles.label}>{t('adminArticles.type')}</label>
-                  <select className={styles.input} value={form.kind ?? 'ARTICLE'}
+                  <label className={styles.label} htmlFor="admin-article-kind">{t('adminArticles.type')}</label>
+                  <select id="admin-article-kind" className={styles.input} value={form.kind ?? 'ARTICLE'}
                     onChange={(e) => setForm((f) => ({ ...f, kind: e.target.value as ArticleKind }))}>
                     <option value="ARTICLE">{t('adminArticles.typeArticle')}</option>
                     <option value="TIP">{t('adminArticles.typeTip')}</option>
                   </select>
                 </div>
                 <div className={styles.field}>
-                  <label className={styles.label}>{t('adminArticles.status')}</label>
+                  {/* Titre du groupe, pas un label associé à un contrôle : la
+                      case à cocher ci-dessous est déjà nativement associée à
+                      son texte via le <label> qui l'enveloppe. */}
+                  <span className={styles.label}>{t('adminArticles.status')}</span>
                   <label className={styles.checkRow}>
                     <input type="checkbox" checked={form.published ?? false}
                       onChange={(e) => setForm((f) => ({ ...f, published: e.target.checked }))} />
@@ -110,26 +113,26 @@ export function AdminArticlesPage() {
               </div>
 
               <div className={styles.field}>
-                <label className={styles.label}>{t('adminArticles.titleField')}</label>
-                <input className={styles.input} value={form.title ?? ''}
+                <label className={styles.label} htmlFor="admin-article-title">{t('adminArticles.titleField')}</label>
+                <input id="admin-article-title" className={styles.input} value={form.title ?? ''}
                   onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
                   placeholder={t('adminArticles.titlePlaceholder')} required />
               </div>
 
               {form.kind !== 'TIP' && (
                 <div className={styles.field}>
-                  <label className={styles.label}>{t('adminArticles.excerpt')}</label>
-                  <input className={styles.input} value={form.excerpt ?? ''}
+                  <label className={styles.label} htmlFor="admin-article-excerpt">{t('adminArticles.excerpt')}</label>
+                  <input id="admin-article-excerpt" className={styles.input} value={form.excerpt ?? ''}
                     onChange={(e) => setForm((f) => ({ ...f, excerpt: e.target.value }))}
                     placeholder={t('adminArticles.excerptPlaceholder')} />
                 </div>
               )}
 
               <div className={styles.field}>
-                <label className={styles.label}>
+                <label className={styles.label} htmlFor="admin-article-content">
                   {form.kind === 'TIP' ? t('adminArticles.tipContent') : t('adminArticles.articleContent')}
                 </label>
-                <textarea className={styles.textarea}
+                <textarea id="admin-article-content" className={styles.textarea}
                   rows={form.kind === 'TIP' ? 4 : 14}
                   value={form.content ?? ''}
                   onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}

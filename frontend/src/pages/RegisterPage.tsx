@@ -70,26 +70,26 @@ export function RegisterPage() {
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
-            <label className={styles.label}>{t('auth.register.fullName')}</label>
-            <input className={styles.input} value={form.name} onChange={set('name')}
+            <label className={styles.label} htmlFor="register-name">{t('auth.register.fullName')}</label>
+            <input id="register-name" className={styles.input} value={form.name} onChange={set('name')}
               placeholder={t('auth.register.fullNamePlaceholder')} required minLength={2} />
           </div>
 
           <div className={styles.field}>
-            <label className={styles.label}>{t('auth.register.email')}</label>
-            <input className={styles.input} type="email" value={form.email} onChange={set('email')}
+            <label className={styles.label} htmlFor="register-email">{t('auth.register.email')}</label>
+            <input id="register-email" className={styles.input} type="email" value={form.email} onChange={set('email')}
               placeholder="vous@exemple.com" required />
           </div>
 
           <div className={styles.field}>
-            <label className={styles.label}>{t('auth.register.password')}</label>
-            <input className={styles.input} type="password" value={form.password} onChange={set('password')}
+            <label className={styles.label} htmlFor="register-password">{t('auth.register.password')}</label>
+            <input id="register-password" className={styles.input} type="password" value={form.password} onChange={set('password')}
               placeholder={t('auth.register.passwordPlaceholder')} required minLength={8} />
           </div>
 
           <div className={styles.field}>
-            <label className={styles.label}>{t('auth.register.birthDate')} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>{t('auth.register.optional')}</span></label>
-            <input className={styles.input} type="date" value={form.birthDate} onChange={set('birthDate')} />
+            <label className={styles.label} htmlFor="register-birthDate">{t('auth.register.birthDate')} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>{t('auth.register.optional')}</span></label>
+            <input id="register-birthDate" className={styles.input} type="date" value={form.birthDate} onChange={set('birthDate')} />
           </div>
 
           <button className={styles.btn} type="submit" disabled={loading}>
