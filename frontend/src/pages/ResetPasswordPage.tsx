@@ -102,8 +102,9 @@ export function ResetPasswordPage() {
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
-            <label className={styles.label}>{t('auth.resetPassword.newPassword')}</label>
+            <label className={styles.label} htmlFor="reset-password-new">{t('auth.resetPassword.newPassword')}</label>
             <input
+              id="reset-password-new"
               className={styles.input}
               type="password"
               value={password}
@@ -116,8 +117,9 @@ export function ResetPasswordPage() {
           </div>
 
           <div className={styles.field}>
-            <label className={styles.label}>{t('auth.resetPassword.confirmPassword')}</label>
+            <label className={styles.label} htmlFor="reset-password-confirm">{t('auth.resetPassword.confirmPassword')}</label>
             <input
+              id="reset-password-confirm"
               className={styles.input}
               type="password"
               value={confirm}

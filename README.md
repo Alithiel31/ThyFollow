@@ -1,7 +1,7 @@
 # 🦋 ThyroTrack
 
 Application web de suivi thyroïdien, inspirée de l'app Clue.  
-**Stack** : TypeScript · Express · Prisma · PostgreSQL · React · Recharts · Railway
+**Stack** : TypeScript · Express · Prisma · PostgreSQL · React · Recharts · Docker
 
 ---
 
@@ -28,7 +28,8 @@ Application web de suivi thyroïdien, inspirée de l'app Clue.
 ```bash
 git clone <url>
 cd thyro-track
-npm install
+cd backend && npm install && cd ..
+cd frontend && npm install && cd ..
 ```
 
 ### 2. Configurer l'environnement backend
@@ -62,57 +63,45 @@ npm run db:seed   # Crée un compte démo: demo@thyrotrack.com / demo1234
 ```
 
 ### 4. Lancer en développement
+
+Dans deux terminaux séparés :
 ```bash
-# Depuis la racine
-npm run dev
-# Backend: http://localhost:3001
-# Frontend: http://localhost:5173
+cd backend && npm run dev   # http://localhost:3001
+```
+```bash
+cd frontend && npm run dev  # http://localhost:5173
 ```
 
 ---
 
-## 🚂 Déploiement sur Railway
+## 🐳 Déploiement (Docker Compose, self-hosted)
 
-### 1. Préparer le projet Railway
+Le déploiement réel de ce projet passe par `docker-compose.yml` à la racine : trois services (PostgreSQL, backend Express, frontend servi par nginx) construits depuis `backend/Dockerfile` et `frontend/Dockerfile`.
 
+### 1. Configurer l'environnement
 ```bash
-# Installer Railway CLI
-npm install -g @railway/cli
-railway login
+cp .env.example .env
+# Renseigner un POSTGRES_PASSWORD fort (ex: openssl rand -hex 24)
+
+cp backend/.env.example backend/.env
+# Renseigner JWT_SECRET (32+ caractères), RESEND_API_KEY, et
+# GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET si "Se connecter avec Google" est utilisé.
+# DATABASE_URL et FRONTEND_URL sont déjà fixés dans docker-compose.yml —
+# adaptez-y votre propre domaine avant de déployer.
 ```
 
-### 2. Créer le projet
+### 2. Lancer
 ```bash
-railway init
-# Choisir "Empty project"
+docker compose up -d --build
 ```
+Le conteneur backend exécute automatiquement `prisma migrate deploy` au démarrage (voir `backend/Dockerfile`). Le frontend est disponible sur le port `8082` (voir `docker-compose.yml`), le backend en interne sur `3001`.
 
-### 3. Ajouter PostgreSQL
-Dans le dashboard Railway :
-- **New** → **Database** → **Add PostgreSQL**
-- Railway injecte automatiquement `DATABASE_URL`
-
-### 4. Variables d'environnement (Railway Dashboard → Variables)
-
-| Variable | Valeur |
-|---|---|
-| `NODE_ENV` | `production` |
-| `JWT_SECRET` | une chaîne aléatoire sécurisée (32+ caractères) |
-| `DATABASE_URL` | injecté automatiquement par Railway PostgreSQL |
+### 3. Seeder les données de démo (optionnel)
+```bash
+docker compose exec backend npm run db:seed
+```
 
 > **Générer un JWT_SECRET :** `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
-
-### 5. Déployer
-```bash
-railway up
-```
-
-Railway détecte `nixpacks.toml`, construit le backend et le frontend, migre la BDD et démarre le serveur.
-
-### 6. Seeder les données de démo (optionnel)
-```bash
-railway run npm run db:seed --workspace=backend
-```
 
 ---
 
@@ -122,43 +111,41 @@ railway run npm run db:seed --workspace=backend
 thyro-track/
 ├── backend/
 │   ├── prisma/
-│   │   ├── schema.prisma       # Modèles de données complets
-│   │   └── seed.ts             # Données de démonstration
+│   │   ├── schema.prisma        # Modèles de données complets
+│   │   └── seed.ts              # Données de démonstration
 │   ├── src/
-│   │   ├── index.ts            # Entrée Express
-│   │   ├── lib/
-│   │   │   └── prisma.ts       # Client Prisma singleton
+│   │   ├── index.ts             # Entrée Express
+│   │   ├── lib/                 # Prisma client, i18n, logger, email (Resend), OIDC
 │   │   ├── middleware/
-│   │   │   ├── auth.ts         # JWT middleware
+│   │   │   ├── auth.ts          # JWT middleware
+│   │   │   ├── admin.ts
+│   │   │   ├── asyncHandler.ts
 │   │   │   └── errorHandler.ts
-│   │   └── routes/
-│   │       ├── auth.ts         # POST /register, /login, /me
-│   │       ├── entries.ts      # Journal quotidien (upsert par date)
-│   │       ├── labResults.ts   # CRUD analyses sanguines
-│   │       ├── medications.ts  # CRUD médicaments
-│   │       ├── appointments.ts # CRUD rendez-vous
-│   │       ├── profile.ts      # Profil thyroïdien
-│   │       └── analytics.ts    # Agrégations, tendances
+│   │   ├── routers/             # Déclaration des routes Express (*.router.ts)
+│   │   └── controllers/         # Logique métier + validation Zod (*.controller.ts)
+│   ├── Dockerfile
 │   └── package.json
 │
 ├── frontend/
-│   └── src/
-│       ├── pages/
-│       │   ├── DashboardPage   # Vue d'ensemble
-│       │   ├── LogPage         # Journal quotidien (style Clue)
-│       │   ├── LabResultsPage  # Analyses + graphiques
-│       │   ├── MedicationsPage # Traitements
-│       │   ├── AppointmentsPage
-│       │   └── ProfilePage
-│       ├── lib/
-│       │   ├── api.ts          # Client axios typé
-│       │   ├── store.ts        # Auth state (Zustand)
-│       │   └── utils.ts        # Helpers date, couleurs
-│       └── types/index.ts      # Types partagés + constantes
+│   ├── src/
+│   │   ├── pages/
+│   │   │   ├── DashboardPage    # Vue d'ensemble
+│   │   │   ├── LogPage          # Journal quotidien (style Clue)
+│   │   │   ├── LabResultsPage   # Analyses + graphiques
+│   │   │   ├── MedicationsPage  # Traitements
+│   │   │   ├── AppointmentsPage
+│   │   │   └── ProfilePage
+│   │   ├── lib/
+│   │   │   ├── api.ts           # Client axios typé
+│   │   │   ├── store.ts         # Auth state (Zustand)
+│   │   │   └── utils.ts         # Helpers date, couleurs
+│   │   └── types/index.ts       # Types partagés + constantes
+│   ├── Dockerfile
+│   └── package.json
 │
-├── railway.toml                # Config Railway
-├── nixpacks.toml               # Build pipeline
-└── package.json                # Monorepo workspaces
+├── docker-compose.yml            # Backend + Frontend (nginx) + PostgreSQL
+├── .env.example                  # Variables lues par docker-compose.yml
+└── LICENSE
 ```
 
 ---
@@ -237,4 +224,4 @@ GET    /api/analytics/symptoms?days=30
 | État | Zustand + TanStack Query |
 | Graphiques | Recharts |
 | Routing | React Router 6 |
-| Déploiement | Railway (monorepo) |
+| Déploiement | Docker Compose (self-hosted) |

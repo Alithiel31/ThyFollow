@@ -81,13 +81,13 @@ export function AppShell() {
   return (
     <div className={styles.shell}>
       {/* ── Sidebar (desktop) */}
-      <aside className={styles.sidebar}>
+      <aside className={styles.sidebar} aria-label={t('nav.mainLabel')}>
         <div className={styles.logo} onClick={() => navigate('/dashboard')}>
           <LogoMark />
           <span className={styles.logoText}>{t('app.name')}</span>
         </div>
 
-        <nav className={styles.nav}>
+        <nav className={styles.nav} aria-label={t('nav.mainLabel')}>
           {NAV.map(({ to, icon: Icon, label }) => (
             <NavLink
               key={to}
@@ -164,7 +164,7 @@ export function AppShell() {
 
       {/* ── Nav basse (mobile) */}
       {/* Nav à points de la maquette : point plein = actif, cerclé = inactif */}
-      <nav className={styles.mobileNav}>
+      <nav className={styles.mobileNav} aria-label={t('nav.mobileLabel')}>
         {NAV.slice(0, 5).map(({ to, label, shape }) => (
           <NavLink
             key={to}

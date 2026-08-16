@@ -10,7 +10,9 @@
     "appointments": "Rendez-vous",
     "learn": "Comprendre",
     "profile": "Mon profil",
-    "writing": "Rédaction"
+    "writing": "Rédaction",
+    "mainLabel": "Navigation principale",
+    "mobileLabel": "Navigation mobile"
   },
   "theme": {
     "auto": "Thème : automatique",

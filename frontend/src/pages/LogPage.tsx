@@ -1,5 +1,5 @@
 // src/pages/LogPage.tsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useId } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -310,10 +310,12 @@ function MetricInput({ label, value, onChange, placeholder, step }: {
   onChange: (v: string) => void;
   placeholder: string; step: string;
 }) {
+  const id = useId();
   return (
     <div className={styles.metricField}>
-      <label className={styles.metricLabel}>{label}</label>
+      <label className={styles.metricLabel} htmlFor={id}>{label}</label>
       <input
+        id={id}
         className={styles.metricInput}
         type="number"
         value={value}
