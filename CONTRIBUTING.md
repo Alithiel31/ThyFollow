@@ -43,7 +43,9 @@ cd frontend && npm run dev  # http://localhost:5173
 ```
 
 Voir le [`README.md`](./README.md) pour le détail (Google OAuth optionnel, déploiement Docker
-Compose).
+Compose). La doc interactive de l'API (Swagger UI) est servie sur `http://localhost:3001/api/docs`
+une fois le backend lancé — si vous ajoutez, modifiez ou supprimez une route, mettez à jour
+[`backend/openapi.yaml`](./backend/openapi.yaml) dans la même PR.
 
 ## Reproduire la CI en local
 

@@ -9,8 +9,6 @@ numérotées.
 
 ### À faire
 
-- Documentation API structurée (OpenAPI/Swagger) — la liste d'endpoints du README est tenue à
-  la main et devient difficile à maintenir à mesure que l'API grossit.
 - Migrer vers react-router-dom 7.x pour corriger l'avertissement de sécurité modéré sur les
   versions 6.x/7.x antérieures (open redirect via backslash dans `Link`/`useNavigate`) — non
   exploitable en l'état (aucune destination `navigate()`/`Link` construite à partir d'une entrée
@@ -28,6 +26,11 @@ numérotées.
   Docker, `VITE_SENTRY_DSN` passe par un build arg (`frontend/Dockerfile` /
   `docker-compose.yml`), pas par une variable d'environnement du conteneur — les variables
   `VITE_*` sont figées dans le bundle statique au build.
+- Documentation API structurée : spec OpenAPI 3 complète (`backend/openapi.yaml`, 31 routes,
+  17 schémas) servie en interactif via Swagger UI sur `GET /api/docs` hors production
+  (`docs.router.ts`), remplaçant la liste d'endpoints tenue à la main dans le README —
+  incomplète (il manquait verify-email, forgot/reset-password, les routes OIDC détaillées,
+  les articles admin...) et vouée à dériver.
 
 - Pipeline CI (GitHub Actions, `.github/workflows/ci.yml`) : lint + typecheck/build + tests pour
   backend et frontend, sur chaque push/PR vers `main`. Jusqu'ici aucune vérification automatique

@@ -1,0 +1,856 @@
+openapi: 3.0.3
+info:
+  title: ThyroTrack API
+  version: "1.0.0"
+  description: >
+    API du backend ThyroTrack (suivi de santé thyroïdienne). Toutes les routes
+    listées ici sont préfixées par `/api`. Sauf mention contraire, une route
+    nécessite un JWT (`Authorization: Bearer <token>`), obtenu via
+    `/auth/login`, `/auth/register` + `/auth/verify-email`, ou le flow Google.
+    Voir le [README](../README.md) pour le détail du flow d'auth et le schéma
+    de la base de données.
+servers:
+  - url: http://localhost:3001/api
+    description: Développement local
+  - url: /api
+    description: Même origine (nginx en production, voir docker-compose.yml)
+
+tags:
+  - name: Auth
+    description: Inscription, connexion, vérification d'email, mot de passe oublié
+  - name: Google OAuth
+    description: "Connexion via Google (OAuth2 + OpenID Connect)"
+  - name: Entries
+    description: Journal quotidien (symptômes, mesures)
+  - name: LabResults
+    description: Résultats d'analyses sanguines
+  - name: Medications
+    description: Médicaments et suivi des prises
+  - name: Appointments
+    description: Rendez-vous médicaux
+  - name: Profile
+    description: Profil thyroïdien et sécurité du compte
+  - name: Analytics
+    description: Agrégations et tendances
+  - name: Articles
+    description: Contenu éducatif (public + administration)
+
+security:
+  - bearerAuth: []
+
+paths:
+  # ── Auth ──────────────────────────────────────────────
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Créer un compte
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, name]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+                name: { type: string, minLength: 2 }
+                birthDate: { type: string, format: date, nullable: true }
+      responses:
+        "201":
+          description: Compte créé, email de vérification envoyé (compte non actif tant que non vérifié)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { message: { type: string } }
+        "409": { description: "Email déjà utilisé", content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        "400": { $ref: '#/components/responses/ValidationError' }
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Se connecter par email/mot de passe
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        "200":
+          description: Connecté
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user: { $ref: '#/components/schemas/User' }
+                  token: { type: string, description: JWT de session }
+        "401":
+          description: "Identifiants invalides, ou email non vérifié (`code: EMAIL_NOT_VERIFIED`)"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Error'
+                  - type: object
+                    properties: { code: { type: string, example: EMAIL_NOT_VERIFIED } }
+
+  /auth/verify-email:
+    post:
+      tags: [Auth]
+      summary: Confirmer l'email via le token reçu par email
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties: { token: { type: string } }
+      responses:
+        "200":
+          description: Compte activé, connecté directement
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user: { $ref: '#/components/schemas/User' }
+                  token: { type: string }
+        "400": { description: "Token invalide ou expiré", content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+
+  /auth/resend-verification:
+    post:
+      tags: [Auth]
+      summary: Renvoyer l'email de vérification
+      description: Réponse identique que le compte existe ou non (anti-énumération).
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties: { email: { type: string, format: email } }
+      responses:
+        "200": { description: "Email renvoyé si applicable" }
+
+  /auth/forgot-password:
+    post:
+      tags: [Auth]
+      summary: Demander un lien de réinitialisation de mot de passe
+      description: Réponse identique que le compte existe ou non (anti-énumération).
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties: { email: { type: string, format: email } }
+      responses:
+        "200": { description: "Email envoyé si applicable" }
+
+  /auth/reset-password:
+    post:
+      tags: [Auth]
+      summary: Réinitialiser le mot de passe via le token reçu par email
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, password]
+              properties:
+                token: { type: string }
+                password: { type: string, minLength: 8 }
+      responses:
+        "200": { description: "Mot de passe changé (pas de connexion automatique)" }
+        "400": { description: "Token invalide ou expiré", content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Utilisateur courant
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "404": { description: "Compte supprimé entre l'émission du JWT et cet appel" }
+
+  # ── Google OAuth ──────────────────────────────────────
+  /auth/oidc/google:
+    get:
+      tags: [Google OAuth]
+      summary: Démarre le flow de connexion Google (redirection)
+      security: []
+      responses:
+        "302": { description: "Redirige vers l'écran de consentement Google" }
+        "501": { description: "GOOGLE_CLIENT_ID/SECRET non configurés" }
+
+  /auth/oidc/google/callback:
+    get:
+      tags: [Google OAuth]
+      summary: Callback OAuth2/OIDC (appelé par Google, jamais directement)
+      security: []
+      parameters:
+        - { name: code, in: query, schema: { type: string } }
+        - { name: state, in: query, schema: { type: string } }
+      responses:
+        "302":
+          description: >
+            Redirige vers `/oauth/callback?code=...` (login, avec un code
+            d'échange opaque à usage unique — voir /auth/oidc/exchange) ou
+            vers `/profile?googleLinked=1` (liaison de compte). En cas
+            d'erreur, redirige vers `/login?googleError=1` ou
+            `/profile?googleLinkError=...` plutôt que d'exposer du JSON brut.
+
+  /auth/oidc/exchange:
+    post:
+      tags: [Google OAuth]
+      summary: Échange le code opaque à usage unique contre le JWT de session
+      description: >
+        Le JWT ne transite jamais dans l'URL de redirection Google (voir
+        TROUBLESHOOTING/historique CHANGELOG) : le frontend récupère ce code
+        depuis `/oauth/callback?code=...` puis l'échange ici. Usage unique,
+        expire après 60s.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties: { code: { type: string } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { token: { type: string } }
+        "400": { description: "Code invalide, déjà utilisé, ou expiré" }
+
+  /auth/oidc/google/link:
+    post:
+      tags: [Google OAuth]
+      summary: Démarre la liaison de Google à un compte déjà connecté
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { url: { type: string, description: "URL de consentement Google à ouvrir" } }
+    delete:
+      tags: [Google OAuth]
+      summary: Délier Google du compte
+      description: >
+        Refusé (409) si le compte n'a pas de mot de passe local — garde-fou
+        anti-verrouillage (il faut au moins une méthode de connexion restante).
+      responses:
+        "200": { description: "Délié" }
+        "409": { description: "Aucun mot de passe local : liaison Google impossible à retirer" }
+
+  # ── Entries ───────────────────────────────────────────
+  /entries:
+    get:
+      tags: [Entries]
+      summary: Lister le journal (paginé)
+      parameters:
+        - { name: from, in: query, schema: { type: string, format: date } }
+        - { name: to, in: query, schema: { type: string, format: date } }
+        - { name: limit, in: query, schema: { type: integer, default: 30, maximum: 365 } }
+        - { name: offset, in: query, schema: { type: integer, default: 0 } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entries: { type: array, items: { $ref: '#/components/schemas/DailyEntry' } }
+                  total: { type: integer }
+    post:
+      tags: [Entries]
+      summary: "Créer ou mettre à jour l'entrée d'une date (upsert par date)"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DailyEntryInput' }
+      responses:
+        "201": { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/DailyEntry' } } } }
+        "400": { $ref: '#/components/responses/ValidationError' }
+
+  /entries/{date}:
+    parameters:
+      - { name: date, in: path, required: true, schema: { type: string, format: date, example: "2026-08-16" } }
+    get:
+      tags: [Entries]
+      summary: "Entrée d'une date donnée (null si aucune)"
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { nullable: true, allOf: [{ $ref: '#/components/schemas/DailyEntry' }] } } } }
+    delete:
+      tags: [Entries]
+      summary: Supprimer l'entrée d'une date
+      responses:
+        "200": { $ref: '#/components/responses/Success' }
+        "404": { $ref: '#/components/responses/NotFound' }
+
+  # ── LabResults ────────────────────────────────────────
+  /lab-results:
+    get:
+      tags: [LabResults]
+      summary: Lister les analyses
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/LabResult' } } } } }
+    post:
+      tags: [LabResults]
+      summary: Ajouter une analyse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LabResultInput' }
+      responses:
+        "201": { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/LabResult' } } } }
+        "400": { $ref: '#/components/responses/ValidationError' }
+
+  /lab-results/{id}:
+    parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+    get:
+      tags: [LabResults]
+      summary: Détail d'une analyse
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/LabResult' } } } }
+        "404": { $ref: '#/components/responses/NotFound' }
+    put:
+      tags: [LabResults]
+      summary: Modifier une analyse (champs partiels)
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LabResultInput' }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/LabResult' } } } }
+        "404": { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [LabResults]
+      summary: Supprimer une analyse
+      responses:
+        "200": { $ref: '#/components/responses/Success' }
+        "404": { $ref: '#/components/responses/NotFound' }
+
+  # ── Medications ───────────────────────────────────────
+  /medications:
+    get:
+      tags: [Medications]
+      summary: Lister les médicaments
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Medication' } } } } }
+    post:
+      tags: [Medications]
+      summary: Ajouter un médicament
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MedicationInput' }
+      responses:
+        "201": { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Medication' } } } }
+        "400": { $ref: '#/components/responses/ValidationError' }
+
+  /medications/{id}:
+    parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+    put:
+      tags: [Medications]
+      summary: Modifier un médicament (champs partiels)
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MedicationInput' }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Medication' } } } }
+        "404": { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [Medications]
+      summary: Supprimer un médicament
+      responses:
+        "200": { $ref: '#/components/responses/Success' }
+        "404": { $ref: '#/components/responses/NotFound' }
+
+  /medications/intakes:
+    get:
+      tags: [Medications]
+      summary: "Prises validées pour une date (tous médicaments confondus)"
+      parameters:
+        - { name: date, in: query, schema: { type: string, format: date }, description: "Défaut : aujourd'hui" }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/MedicationIntake' } } } } }
+
+  /medications/{id}/intake:
+    parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+    post:
+      tags: [Medications]
+      summary: "Valider une prise (créneau horaire) pour une date"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [date, time]
+              properties:
+                date: { type: string, format: date }
+                time: { type: string, pattern: '^([01]\d|2[0-3]):[0-5]\d$', example: "08:00" }
+      responses:
+        "201": { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MedicationIntake' } } } }
+        "404": { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [Medications]
+      summary: "Annuler la validation d'une prise"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [date, time]
+              properties:
+                date: { type: string, format: date }
+                time: { type: string }
+      responses:
+        "200": { $ref: '#/components/responses/Success' }
+        "404": { $ref: '#/components/responses/NotFound' }
+
+  # ── Appointments ──────────────────────────────────────
+  /appointments:
+    get:
+      tags: [Appointments]
+      summary: Lister les rendez-vous
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Appointment' } } } } }
+    post:
+      tags: [Appointments]
+      summary: Créer un rendez-vous
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AppointmentInput' }
+      responses:
+        "201": { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Appointment' } } } }
+        "400": { $ref: '#/components/responses/ValidationError' }
+
+  /appointments/{id}:
+    parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+    put:
+      tags: [Appointments]
+      summary: Modifier un rendez-vous (champs partiels)
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AppointmentInput' }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Appointment' } } } }
+        "404": { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [Appointments]
+      summary: Supprimer un rendez-vous
+      responses:
+        "200": { $ref: '#/components/responses/Success' }
+        "404": { $ref: '#/components/responses/NotFound' }
+
+  # ── Profile ───────────────────────────────────────────
+  /profile:
+    get:
+      tags: [Profile]
+      summary: "Profil thyroïdien (diagnostic, plages cibles, préférences)"
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { nullable: true, allOf: [{ $ref: '#/components/schemas/UserProfile' }] } } } }
+    put:
+      tags: [Profile]
+      summary: "Créer ou mettre à jour le profil (upsert)"
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UserProfileInput' }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/UserProfile' } } } }
+
+  /profile/security/events:
+    get:
+      tags: [Profile]
+      summary: "Historique récent des connexions/liaisons Google (10 derniers événements)"
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AuthEvent' } } } } }
+
+  # ── Analytics ─────────────────────────────────────────
+  /analytics/overview:
+    get:
+      tags: [Analytics]
+      summary: "Vue d'ensemble du tableau de bord"
+      parameters:
+        - { name: days, in: query, schema: { type: integer, default: 90 } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  period: { type: object, properties: { from: { type: string, format: date-time }, days: { type: integer } } }
+                  totalEntries: { type: integer }
+                  streak: { type: integer, description: "Jours consécutifs avec médicament pris" }
+                  averages: { type: object, properties: { energy: { type: number, nullable: true }, mood: { type: number, nullable: true } } }
+                  medicationAdherence: { type: number, nullable: true, description: "Pourcentage sur la période" }
+                  activeMedications: { type: array, items: { $ref: '#/components/schemas/Medication' } }
+                  latestLabResult: { nullable: true, allOf: [{ $ref: '#/components/schemas/LabResult' }] }
+                  labHistory: { type: array, items: { $ref: '#/components/schemas/LabResult' } }
+                  nextAppointment: { nullable: true, allOf: [{ $ref: '#/components/schemas/Appointment' }] }
+                  timeSeries: { type: array, items: { $ref: '#/components/schemas/DailyEntry' } }
+
+  /analytics/symptoms:
+    get:
+      tags: [Analytics]
+      summary: "Fréquence et sévérité moyenne des symptômes sur la période"
+      parameters:
+        - { name: days, in: query, schema: { type: integer, default: 30 } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  period: { type: object }
+                  frequency:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      properties: { count: { type: integer }, avgSeverity: { type: number } }
+
+  /analytics/report:
+    get:
+      tags: [Analytics]
+      summary: "Rapport de synthèse sur une période libre (sert l'export)"
+      parameters:
+        - { name: from, in: query, required: true, schema: { type: string, format: date } }
+        - { name: to, in: query, required: true, schema: { type: string, format: date } }
+      responses:
+        "200": { description: OK }
+        "400": { description: "Période invalide (dates non parsables, ou from > to)" }
+
+  # ── Articles ──────────────────────────────────────────
+  /articles:
+    get:
+      tags: [Articles]
+      summary: "Articles/encarts publiés (contenu public une fois authentifié)"
+      parameters:
+        - { name: kind, in: query, schema: { type: string, enum: [ARTICLE, TIP] } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/ArticleSummary' } } } } }
+
+  /articles/{slug}:
+    get:
+      tags: [Articles]
+      summary: "Lire un article publié"
+      parameters: [{ name: slug, in: path, required: true, schema: { type: string } }]
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Article' } } } }
+        "404": { $ref: '#/components/responses/NotFound' }
+
+  /articles/admin/all:
+    get:
+      tags: [Articles]
+      summary: "Tous les articles, y compris brouillons (rôle ADMIN)"
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Article' } } } } }
+        "403": { description: "Rôle ADMIN requis" }
+
+  /articles/admin:
+    post:
+      tags: [Articles]
+      summary: "Créer un article/encart (rôle ADMIN)"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ArticleInput' }
+      responses:
+        "201": { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Article' } } } }
+        "403": { description: "Rôle ADMIN requis" }
+
+  /articles/admin/{id}:
+    parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+    put:
+      tags: [Articles]
+      summary: "Modifier un article (rôle ADMIN, champs partiels)"
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ArticleInput' }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Article' } } } }
+        "403": { description: "Rôle ADMIN requis" }
+        "404": { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [Articles]
+      summary: "Supprimer un article (rôle ADMIN)"
+      responses:
+        "204": { description: "Supprimé" }
+        "403": { description: "Rôle ADMIN requis" }
+        "404": { $ref: '#/components/responses/NotFound' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    Success:
+      description: OK
+      content:
+        application/json:
+          schema: { type: object, properties: { success: { type: boolean, example: true } } }
+    NotFound:
+      description: Ressource introuvable
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    Unauthorized:
+      description: "Token manquant ou invalide"
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    ValidationError:
+      description: "Corps de requête invalide (Zod)"
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error: { type: string }
+        code: { type: string, description: "Code machine-lisible optionnel (ex: EMAIL_NOT_VERIFIED)" }
+
+    User:
+      type: object
+      properties:
+        id: { type: string }
+        email: { type: string, format: email }
+        name: { type: string }
+        role: { type: string, enum: [USER, ADMIN] }
+        birthDate: { type: string, format: date, nullable: true }
+        createdAt: { type: string, format: date-time }
+        profile: { nullable: true, allOf: [{ $ref: '#/components/schemas/UserProfile' }] }
+        oauthAccounts:
+          type: array
+          items: { type: object, properties: { provider: { type: string, example: google } } }
+
+    DailyEntryInput:
+      type: object
+      required: [date]
+      description: "Tous les scores sont 1-5 (nullable pour effacer). `date` sert de clé d'upsert."
+      properties:
+        date: { type: string, format: date }
+        energyLevel: { type: integer, minimum: 1, maximum: 5, nullable: true }
+        moodScore: { type: integer, minimum: 1, maximum: 5, nullable: true }
+        anxietyLevel: { type: integer, minimum: 1, maximum: 5, nullable: true }
+        brainFogLevel: { type: integer, minimum: 1, maximum: 5, nullable: true }
+        weight: { type: number, nullable: true }
+        bodyTemperature: { type: number, nullable: true }
+        heartRate: { type: integer, nullable: true }
+        bloodPressureSys: { type: integer, nullable: true }
+        bloodPressureDia: { type: integer, nullable: true }
+        coldSensitivity: { type: integer, minimum: 1, maximum: 5, nullable: true }
+        heatSensitivity: { type: integer, minimum: 1, maximum: 5, nullable: true }
+        hairLoss: { type: integer, minimum: 1, maximum: 5, nullable: true }
+        drySkin: { type: integer, minimum: 1, maximum: 5, nullable: true }
+        constipation: { type: integer, minimum: 1, maximum: 5, nullable: true }
+        bloating: { type: integer, minimum: 1, maximum: 5, nullable: true }
+        muscleWeakness: { type: integer, minimum: 1, maximum: 5, nullable: true }
+        jointPain: { type: integer, minimum: 1, maximum: 5, nullable: true }
+        neckPain: { type: integer, minimum: 1, maximum: 5, nullable: true }
+        swelling: { type: integer, minimum: 1, maximum: 5, nullable: true }
+        tremors: { type: integer, minimum: 1, maximum: 5, nullable: true }
+        sleepHours: { type: number, minimum: 0, maximum: 24, nullable: true }
+        sleepQuality: { type: integer, minimum: 1, maximum: 5, nullable: true }
+        medicationTaken: { type: boolean }
+        medicationTime: { type: string, format: date-time, nullable: true }
+        medicationNotes: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+        tags: { type: array, items: { type: string } }
+    DailyEntry:
+      allOf:
+        - $ref: '#/components/schemas/DailyEntryInput'
+        - type: object
+          properties:
+            id: { type: string }
+            userId: { type: string }
+
+    LabResultInput:
+      type: object
+      required: [date]
+      properties:
+        date: { type: string, format: date }
+        lab: { type: string, nullable: true }
+        orderedBy: { type: string, nullable: true }
+        tsh: { type: number, nullable: true }
+        ft4: { type: number, nullable: true }
+        ft3: { type: number, nullable: true }
+        t4: { type: number, nullable: true }
+        t3: { type: number, nullable: true }
+        antiTPO: { type: number, nullable: true }
+        antiTG: { type: number, nullable: true }
+        antiTSHR: { type: number, nullable: true }
+        thyroglobulin: { type: number, nullable: true }
+        ferritin: { type: number, nullable: true }
+        vitaminD: { type: number, nullable: true }
+        vitaminB12: { type: number, nullable: true }
+        magnesium: { type: number, nullable: true }
+        selenium: { type: number, nullable: true }
+        cholesterol: { type: number, nullable: true }
+        glucose: { type: number, nullable: true }
+        hemoglobin: { type: number, nullable: true }
+        notes: { type: string, nullable: true }
+        documentUrl: { type: string, format: uri, nullable: true }
+    LabResult:
+      allOf:
+        - $ref: '#/components/schemas/LabResultInput'
+        - type: object
+          properties: { id: { type: string }, userId: { type: string } }
+
+    MedicationInput:
+      type: object
+      required: [name, dosage, startDate]
+      properties:
+        name: { type: string, minLength: 1 }
+        brand: { type: string, nullable: true }
+        dosage: { type: number, exclusiveMinimum: 0 }
+        dosageUnit: { type: string, enum: [MCG, MG, IU, TABLET, DROP, ML, OTHER], default: MCG }
+        frequency: { type: string, enum: [DAILY, EVERY_OTHER_DAY, WEEKLY, AS_NEEDED], default: DAILY }
+        intakeTimes:
+          type: array
+          maxItems: 8
+          items: { type: string, pattern: '^([01]\d|2[0-3]):[0-5]\d$' }
+          description: "Un créneau horaire par prise quotidienne (1 à 4×/jour)"
+        startDate: { type: string, format: date }
+        endDate: { type: string, format: date, nullable: true }
+        active: { type: boolean, default: true }
+        instructions: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+    Medication:
+      allOf:
+        - $ref: '#/components/schemas/MedicationInput'
+        - type: object
+          properties: { id: { type: string }, userId: { type: string } }
+    MedicationIntake:
+      type: object
+      properties:
+        id: { type: string }
+        medicationId: { type: string }
+        date: { type: string, format: date }
+        time: { type: string, example: "08:00" }
+
+    AppointmentInput:
+      type: object
+      required: [date, type]
+      properties:
+        date: { type: string, format: date-time }
+        type: { type: string, enum: [ENDOCRINOLOGIST, GENERAL_PRACTITIONER, ULTRASOUND, BLOOD_TEST, SCINTIGRAPHY, BIOPSY, OTHER] }
+        doctorName: { type: string, nullable: true }
+        specialty: { type: string, nullable: true }
+        location: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+        reminder: { type: boolean, default: true }
+        reminderDays: { type: integer, default: 2 }
+        status: { type: string, enum: [UPCOMING, COMPLETED, CANCELLED], default: UPCOMING }
+    Appointment:
+      allOf:
+        - $ref: '#/components/schemas/AppointmentInput'
+        - type: object
+          properties: { id: { type: string }, userId: { type: string } }
+
+    UserProfileInput:
+      type: object
+      properties:
+        diagnosisType: { type: string, nullable: true, enum: [HYPOTHYROIDISM, HYPERTHYROIDISM, HASHIMOTO, GRAVES, THYROID_CANCER, NODULES, GOITER, OTHER] }
+        diagnosisDate: { type: string, format: date, nullable: true }
+        thyroidStatus: { type: string, nullable: true, enum: [INTACT, PARTIAL_REMOVAL, TOTAL_REMOVAL, RADIOIODINE_ABLATION, RADIOIODINE_PARTIAL] }
+        endocrinologistName: { type: string, nullable: true }
+        targetTSH_min: { type: number, nullable: true }
+        targetTSH_max: { type: number, nullable: true }
+        targetFT4_min: { type: number, nullable: true }
+        targetFT4_max: { type: number, nullable: true }
+        targetFT3_min: { type: number, nullable: true }
+        targetFT3_max: { type: number, nullable: true }
+        timezone: { type: string }
+        weightUnit: { type: string, enum: [KG, LBS] }
+        temperatureUnit: { type: string, enum: [CELSIUS, FAHRENHEIT] }
+    UserProfile:
+      allOf:
+        - $ref: '#/components/schemas/UserProfileInput'
+        - type: object
+          properties: { id: { type: string }, userId: { type: string } }
+
+    AuthEvent:
+      type: object
+      properties:
+        id: { type: string }
+        provider: { type: string, example: google }
+        type: { type: string, enum: [LOGIN_SUCCESS, LOGIN_FAILED, UNLINKED, LINK_CONFLICT] }
+        userAgent: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    ArticleInput:
+      type: object
+      required: [title, content]
+      properties:
+        title: { type: string, minLength: 3 }
+        excerpt: { type: string, nullable: true }
+        content: { type: string, minLength: 1 }
+        kind: { type: string, enum: [ARTICLE, TIP], default: ARTICLE }
+        published: { type: boolean, default: false }
+    Article:
+      allOf:
+        - $ref: '#/components/schemas/ArticleInput'
+        - type: object
+          properties:
+            id: { type: string }
+            slug: { type: string }
+            publishedAt: { type: string, format: date-time, nullable: true }
+            updatedAt: { type: string, format: date-time }
+    ArticleSummary:
+      type: object
+      description: "Forme renvoyée par GET /articles (contenu inclus uniquement pour les encarts TIP)"
+      properties:
+        id: { type: string }
+        slug: { type: string }
+        title: { type: string }
+        excerpt: { type: string, nullable: true }
+        kind: { type: string, enum: [ARTICLE, TIP] }
+        published: { type: boolean }
+        publishedAt: { type: string, format: date-time, nullable: true }
+        updatedAt: { type: string, format: date-time }
+        content: { type: string, description: "Présent uniquement quand kind=TIP" }

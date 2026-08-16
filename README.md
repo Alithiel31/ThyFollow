@@ -217,39 +217,24 @@ User ──┬── UserProfile         (diagnostic, plages cibles)
 
 ## 🔌 API Endpoints
 
-```
-POST   /api/auth/register
-POST   /api/auth/login
-GET    /api/auth/me
-GET    /api/auth/oidc/google            (redirige vers Google — OAuth2 + OpenID Connect)
-GET    /api/auth/oidc/google/callback
+La référence complète est [`backend/openapi.yaml`](./backend/openapi.yaml) (spec OpenAPI 3),
+servie en interactif via Swagger UI sur `GET /api/docs` (hors production —
+voir [`docs.router.ts`](./backend/src/routers/docs.router.ts)) une fois le backend lancé en local
+(`http://localhost:3001/api/docs`).
 
-GET    /api/entries?from=&to=
-GET    /api/entries/:date
-POST   /api/entries              (upsert par date)
-DELETE /api/entries/:date
+Aperçu des ressources exposées, toutes préfixées par `/api` et protégées par JWT sauf mention
+contraire (voir la spec pour le détail des routes et des schémas) :
 
-GET    /api/lab-results
-POST   /api/lab-results
-PUT    /api/lab-results/:id
-DELETE /api/lab-results/:id
-
-GET    /api/medications
-POST   /api/medications
-PUT    /api/medications/:id
-DELETE /api/medications/:id
-
-GET    /api/appointments
-POST   /api/appointments
-PUT    /api/appointments/:id
-DELETE /api/appointments/:id
-
-GET    /api/profile
-PUT    /api/profile
-
-GET    /api/analytics/overview?days=90
-GET    /api/analytics/symptoms?days=30
-```
+| Ressource | Routes |
+|---|---|
+| `/auth` | register, login, verify-email, resend-verification, forgot/reset-password, me, oidc/google (+ callback/exchange/link) |
+| `/entries` | journal quotidien (upsert par date) |
+| `/lab-results` | analyses sanguines |
+| `/medications` | traitements + suivi des prises (`/medications/:id/intake`) |
+| `/appointments` | rendez-vous médicaux |
+| `/profile` | profil thyroïdien, historique de sécurité du compte |
+| `/analytics` | vue d'ensemble, tendances de symptômes, rapport sur période |
+| `/articles` | contenu éducatif (public + `/articles/admin/*`, rôle ADMIN) |
 
 ---
 
@@ -276,6 +261,7 @@ GET    /api/analytics/symptoms?days=30
 | Graphiques | Recharts |
 | Routing | React Router 6 |
 | Suivi d'erreurs | Sentry (optionnel, `@sentry/node` + `@sentry/react`) |
+| Doc API | OpenAPI 3 + Swagger UI (`backend/openapi.yaml`, `/api/docs` hors production) |
 | Déploiement | Docker Compose (self-hosted) |
 
 ---

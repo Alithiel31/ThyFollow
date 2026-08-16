@@ -20,6 +20,7 @@ import appointmentsRouter from './routers/appointments.router.js';
 import profileRouter from './routers/profile.router.js';
 import analyticsRouter from './routers/analytics.router.js';
 import articlesRouter from './routers/articles.router.js';
+import docsRouter from './routers/docs.router.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -79,6 +80,9 @@ app.use(xss());
 app.get('/health', (_, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// ── Documentation API (Swagger UI), hors production — voir docs.router.ts
+app.use('/api/docs', docsRouter);
 
 // ── Routes
 app.use('/api/auth', authLimiter, authRouter);
