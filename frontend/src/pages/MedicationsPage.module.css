@@ -134,6 +134,28 @@
 .submitBtn:hover:not(:disabled) { opacity: 0.85; }
 .submitBtn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+.dosageRow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.timeSlotsRow { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.timeSlotsRow .input { width: auto; flex: 1 1 100px; }
+
+.doseChecklist { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+
+.doseBtn {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--bg-raised); border: 1px solid var(--border);
+  border-radius: 999px; padding: 5px 10px;
+  font-family: var(--font-body); font-size: 0.75rem; color: var(--text-dim);
+  cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.doseBtn:hover { border-color: var(--accent-soft); }
+
+.doseBtnTaken {
+  background: var(--teal-soft);
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
 .loader { display: flex; justify-content: center; padding: 60px; }
 
 .empty {
