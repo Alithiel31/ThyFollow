@@ -172,22 +172,38 @@ export interface DailyHealthMetrics {
   sleepHours: number | null;
 }
 
-// Types de données au format kebab-case attendu dans le chemin de l'URL
-// (voir developers.google.com/health/endpoints, ex: "body-fat").
-const DATA_TYPES = { weight: 'weight', heartRate: 'heart-rate', sleep: 'sleep' } as const;
+// Types de données : identifiant kebab-case pour le chemin de l'URL (ex:
+// "body-fat"), nom snake_case pour le paramètre `filter` (confirmé par la
+// doc : "dans un paramètre de filtre, le nom du type de données doit être
+// au format snake_case"), et le champ temporel à filtrer — `sample_time`
+// pour une mesure ponctuelle (comme "body-fat" dans la doc), `interval`
+// pour une plage (comme "steps"). Le rythme cardiaque est traité comme
+// ponctuel par analogie avec le poids — non confirmé explicitement par la
+// doc consultée.
+const DATA_TYPES = {
+  weight: { path: 'weight', filterField: 'weight.sample_time.physical_time' },
+  heartRate: { path: 'heart-rate', filterField: 'heart_rate.sample_time.physical_time' },
+  sleep: { path: 'sleep', filterField: 'sleep.interval.start_time' },
+} as const;
 
 export async function fetchDailyMetrics(accessToken: string, date: string): Promise<DailyHealthMetrics> {
   const startTime = new Date(`${date}T00:00:00.000Z`).toISOString();
   const endTime = new Date(`${date}T23:59:59.999Z`).toISOString();
 
-  async function fetchDataType(dataTypeId: string): Promise<unknown[]> {
-    const url = new URL(`${GOOGLE_HEALTH_API_BASE}/users/me/dataTypes/${dataTypeId}/dataPoints`);
-    url.searchParams.set('startTime', startTime);
-    url.searchParams.set('endTime', endTime);
+  async function fetchDataType(dataType: { path: string; filterField: string }): Promise<unknown[]> {
+    const url = new URL(`${GOOGLE_HEALTH_API_BASE}/users/me/dataTypes/${dataType.path}/dataPoints`);
+    // Syntaxe de filtrage AIP-160 (l'API suit ce standard, voir
+    // developers.google.com/health/endpoints) — `startTime`/`endTime` en
+    // paramètres séparés, essayé initialement, est rejeté par Google avec
+    // "Cannot bind query parameter" : confirmé en usage réel.
+    url.searchParams.set(
+      'filter',
+      `${dataType.filterField} >= "${startTime}" AND ${dataType.filterField} <= "${endTime}"`
+    );
 
     const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' } });
     if (!res.ok) {
-      throw new Error(`Google Health API ${dataTypeId} : ${res.status} ${await res.text()}`);
+      throw new Error(`Google Health API ${dataType.path} : ${res.status} ${await res.text()}`);
     }
     const body = (await res.json()) as { dataPoints?: unknown[] };
     return body.dataPoints ?? [];
@@ -197,11 +213,11 @@ export async function fetchDailyMetrics(accessToken: string, date: string): Prom
   // remonter, mais doit rester visible — un `.catch(() => [])` muet ferait
   // "réussir" silencieusement une synchro qui n'a en fait rien récupéré
   // (déjà vécu avec l'abonnement webhook, voir lib/googleHealthSubscriber.ts).
-  async function fetchDataTypeLogged(dataTypeId: string): Promise<unknown[]> {
+  async function fetchDataTypeLogged(dataType: { path: string; filterField: string }): Promise<unknown[]> {
     try {
-      return await fetchDataType(dataTypeId);
+      return await fetchDataType(dataType);
     } catch (err) {
-      logger.error(`Échec lecture Google Health API pour "${dataTypeId}"`, err);
+      logger.error(`Échec lecture Google Health API pour "${dataType.path}"`, err);
       return [];
     }
   }
