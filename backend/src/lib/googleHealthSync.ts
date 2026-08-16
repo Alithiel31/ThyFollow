@@ -89,10 +89,15 @@ export async function syncDailyMetricsForUser(userId: string, date: string): Pro
   });
 }
 
-export async function syncDailyMetricsBySubscription(subscriptionId: string, dates: string[]): Promise<void> {
-  const connection = await prisma.googleHealthConnection.findFirst({ where: { webhookSubscriptionId: subscriptionId } });
+// L'abonnement webhook est au niveau du projet (voir
+// lib/googleHealthSubscriber.ts) : une notification ne porte donc pas d'id
+// de connexion, mais le `healthUserId` opaque de l'utilisateur concerné
+// (voir GoogleHealthConnection.healthUserId, rempli au moment du getIdentity
+// post-connexion).
+export async function syncDailyMetricsByHealthUserId(healthUserId: string, dates: string[]): Promise<void> {
+  const connection = await prisma.googleHealthConnection.findUnique({ where: { healthUserId } });
   if (!connection) {
-    logger.warn(`Notification Google Health reçue pour un abonnement inconnu: ${subscriptionId}`);
+    logger.warn(`Notification Google Health reçue pour un healthUserId inconnu: ${healthUserId}`);
     return;
   }
 
