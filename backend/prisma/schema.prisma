@@ -110,7 +110,8 @@ model GoogleHealthConnection {
   accessTokenEnc        String
   refreshTokenEnc       String
   tokenExpiresAt        DateTime
-  // Scopes accordés lors du consentement, ex: "sleep.read body.read heart_rate.read"
+  // Scopes accordés lors du consentement, ex: "googlehealth.sleep.readonly
+  // googlehealth.health_metrics_and_measurements.readonly googlehealth.activity_and_fitness.readonly"
   scope                 String
   connectedAt           DateTime  @default(now())
   lastSyncedAt          DateTime?
