@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
-import { Save, LogOut } from 'lucide-react';
+import { Save, LogOut, Watch } from 'lucide-react';
 import { authApi, profileApi, securityApi } from '../lib/api';
 import { useAuthStore } from '../lib/store';
 import { GoogleIcon } from '../components/GoogleIcon';
@@ -20,7 +20,10 @@ export function ProfilePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [linking, setLinking] = useState(false);
   const [unlinking, setUnlinking] = useState(false);
+  const [linkingHealth, setLinkingHealth] = useState(false);
+  const [unlinkingHealth, setUnlinkingHealth] = useState(false);
   const isGoogleLinked = user?.oauthAccounts?.some((a) => a.provider === 'google') ?? false;
+  const isGoogleHealthLinked = !!user?.googleHealthConnection;
 
   // ── Retour du flux de liaison Google : oidc.controller.ts redirige ici
   // avec ?googleLinked=1 ou ?googleLinkError=(conflict|1) après le passage
@@ -45,6 +48,52 @@ export function ProfilePage() {
     searchParams.delete('googleLinkError');
     setSearchParams(searchParams, { replace: true });
   }, []); // eslint-disable-line
+
+  // ── Retour du flux de liaison Google Health (voir
+  // backend googleHealth.controller.ts#callback).
+  useEffect(() => {
+    const linked = searchParams.get('googleHealthLinked');
+    const error = searchParams.get('googleHealthLinkError');
+    if (!linked && !error) return;
+
+    if (linked) {
+      toast.success(t('profile.linkedAccounts.googleHealthLinkedSuccess'));
+      if (token) authApi.me().then(({ data }) => setAuth(data, token));
+    } else {
+      toast.error(t('profile.linkedAccounts.googleHealthLinkError'));
+    }
+
+    searchParams.delete('googleHealthLinked');
+    searchParams.delete('googleHealthLinkError');
+    setSearchParams(searchParams, { replace: true });
+  }, []); // eslint-disable-line
+
+  const handleLinkGoogleHealth = async () => {
+    setLinkingHealth(true);
+    try {
+      const { data } = await authApi.linkGoogleHealth();
+      window.location.href = data.url;
+    } catch {
+      toast.error(t('profile.linkedAccounts.googleHealthLinkError'));
+      setLinkingHealth(false);
+    }
+  };
+
+  const handleUnlinkGoogleHealth = async () => {
+    setUnlinkingHealth(true);
+    try {
+      await authApi.unlinkGoogleHealth();
+      toast.success(t('profile.linkedAccounts.googleHealthUnlinkedSuccess'));
+      if (token) {
+        const { data } = await authApi.me();
+        setAuth(data, token);
+      }
+    } catch {
+      toast.error(t('profile.linkedAccounts.googleHealthUnlinkError'));
+    } finally {
+      setUnlinkingHealth(false);
+    }
+  };
 
   const handleLinkGoogle = async () => {
     setLinking(true);
@@ -260,6 +309,36 @@ export function ProfilePage() {
           ) : (
             <button type="button" className={styles.smallBtn} onClick={handleLinkGoogle} disabled={linking}>
               {linking ? t('profile.linkedAccounts.linking') : t('profile.linkedAccounts.link')}
+            </button>
+          )}
+        </div>
+
+        <div className={styles.linkedAccountRow}>
+          <div className={styles.linkedAccountInfo}>
+            <Watch size={22} />
+            <div>
+              <div>{t('profile.linkedAccounts.googleHealth')}</div>
+              <div className={`${styles.linkedAccountStatus} ${isGoogleHealthLinked ? styles.linked : ''}`}>
+                {isGoogleHealthLinked
+                  ? user?.googleHealthConnection?.lastSyncedAt
+                    ? t('profile.linkedAccounts.lastSynced', { date: new Date(user.googleHealthConnection.lastSyncedAt).toLocaleString() })
+                    : t('profile.linkedAccounts.linkedNoSyncYet')
+                  : t('profile.linkedAccounts.notLinked')}
+              </div>
+            </div>
+          </div>
+          {isGoogleHealthLinked ? (
+            <button
+              type="button"
+              className={`${styles.smallBtn} ${styles.smallBtnDanger}`}
+              onClick={handleUnlinkGoogleHealth}
+              disabled={unlinkingHealth}
+            >
+              {unlinkingHealth ? t('profile.linkedAccounts.unlinking') : t('profile.linkedAccounts.unlink')}
+            </button>
+          ) : (
+            <button type="button" className={styles.smallBtn} onClick={handleLinkGoogleHealth} disabled={linkingHealth}>
+              {linkingHealth ? t('profile.linkedAccounts.linking') : t('profile.linkedAccounts.link')}
             </button>
           )}
         </div>

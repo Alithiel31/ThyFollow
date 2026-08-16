@@ -212,6 +212,9 @@ export const authController = {
         // Comptes fédérés liés (ex: Google) — le frontend s'en sert pour
         // afficher l'état "connecté/non connecté" dans le Profil.
         oauthAccounts: { select: { provider: true } },
+        // Connexion Google Health (poids/FC/sommeil) — jamais les tokens
+        // eux-mêmes, seulement de quoi afficher l'état de la synchro.
+        googleHealthConnection: { select: { connectedAt: true, lastSyncedAt: true } },
       },
     });
 

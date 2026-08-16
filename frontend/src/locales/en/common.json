@@ -208,6 +208,7 @@
     "temperature": "Temperature (°C)",
     "heartRate": "Heart rate",
     "sleepHours": "Hours of sleep",
+    "syncedFromGoogleHealth": "Synced from Google Health",
     "notes": "Notes",
     "notesPlaceholder": "How are you feeling today? Anything in particular to note?",
     "saveButton": {
@@ -395,7 +396,14 @@
       "linkError": "Error linking Google account",
       "linkConflict": "This Google account is already linked to another user",
       "unlinkedSuccess": "Google account unlinked",
-      "unlinkError": "Error unlinking Google account"
+      "unlinkError": "Error unlinking Google account",
+      "googleHealth": "Google Health (Pixel Watch)",
+      "linkedNoSyncYet": "Connected — first sync pending",
+      "lastSynced": "Last synced: {{date}}",
+      "googleHealthLinkedSuccess": "Google Health connected successfully",
+      "googleHealthLinkError": "Error connecting to Google Health",
+      "googleHealthUnlinkedSuccess": "Google Health disconnected",
+      "googleHealthUnlinkError": "Error disconnecting Google Health"
     },
     "securityEvents": {
       "title": "Recent activity",
