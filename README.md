@@ -107,33 +107,74 @@ pour pré-remplir automatiquement Poids, Rythme cardiaque et Heures de sommeil d
 (un badge <kbd>⌚</kbd> indique une valeur synchronisée). Sans `GOOGLE_HEALTH_CLIENT_ID`, la carte
 "Google Health" du Profil répond `501` et reste inactive.
 
-> ⚠️ **Le format exact des notifications webhook et les chemins REST de la Google Health API
-> n'ont pas pu être vérifiés au moment d'écrire cette intégration** (accès à
-> `developers.google.com` bloqué depuis l'environnement de développement utilisé). Le flux OAuth
-> (connexion/déconnexion) est fiable et testé, et les scopes ci-dessous ont été confirmés en
-> usage réel (une première version utilisait des noms de scope incorrects, rejetés par Google
-> avec `invalid_scope` — corrigé). En revanche, `backend/src/lib/googleHealth.ts#fetchDailyMetrics`
-> et le webhook (`backend/src/controllers/googleHealthWebhook.controller.ts`) ciblent des
-> endpoints REST écrits sur la meilleure hypothèse disponible et **doivent être vérifiés/ajustés
-> face à la doc officielle** avant un usage en production.
+Deux flux d'authentification distincts sont en jeu :
+- **OAuth utilisateur** (`GOOGLE_HEALTH_CLIENT_ID`/`SECRET`) : chaque utilisateur autorise
+  ThyroTrack à lire ses données santé — c'est le bouton "Lier" du Profil.
+- **Compte de service IAM Google Cloud** (`GOOGLE_HEALTH_SERVICE_ACCOUNT_KEY`) : gère un
+  **unique abonné webhook au niveau du projet** (pas par utilisateur), créé une fois au démarrage
+  du backend. Avec une politique `AUTOMATIC`, Google route ensuite automatiquement les
+  notifications de tout utilisateur consentant vers cet abonné — aucun abonnement individuel
+  n'est nécessaire.
 
-1. Sur [Google Cloud Console](https://console.cloud.google.com/), activez la **Google Health
-   API** sur le projet (le même que "Se connecter avec Google" ou un projet dédié).
-2. **APIs & Services → Credentials → Create Credentials → OAuth client ID**, type *Web
-   application* — des credentials séparés de ceux du login, car les scopes santé sont
-   sensibles et peuvent nécessiter leur propre écran de consentement.
-3. **Authorized redirect URIs** : `http://localhost:3001/api/integrations/google-health/callback`
+> ⚠️ **`fetchDailyMetrics` (lecture des mesures) reste partiellement une best-effort.** Le host,
+> la version (`health.googleapis.com/v4`), les scopes OAuth et tout le modèle d'abonnement webhook
+> ont été confirmés par lecture directe de la documentation officielle. En revanche, la forme
+> exacte du corps JSON renvoyé par les endpoints `dataTypes/{type}/dataPoints` (utilisés pour
+> lire les valeurs) n'a pas pu être vérifiée — le parsing dans
+> `backend/src/lib/googleHealth.ts#fetchDailyMetrics` est une meilleure hypothèse, à ajuster si
+> besoin une fois des données réelles observées.
+
+**1. Projet et API**
+
+Sur [Google Cloud Console](https://console.cloud.google.com/), activez la **Google Health API**
+sur le projet (le même que "Se connecter avec Google" ou un projet dédié). Notez le **numéro**
+du projet (visible sur la page d'accueil du projet — pas son ID textuel, Google renvoie une
+erreur 400/403 sinon) pour `GOOGLE_HEALTH_PROJECT_NUMBER`.
+
+**2. Client OAuth (connexion utilisateur)**
+
+1. **APIs & Services → Credentials → Create Credentials → OAuth client ID**, type *Web
+   application* — des credentials séparées de celles du login, car les scopes santé sont
+   sensibles.
+2. **Authorized redirect URIs** : `http://localhost:3001/api/integrations/google-health/callback`
    (doit correspondre à `GOOGLE_HEALTH_REDIRECT_URI`).
-4. Copiez le *Client ID*/*Client Secret* dans `backend/.env` (`GOOGLE_HEALTH_CLIENT_ID`,
+3. Copiez le *Client ID*/*Client Secret* dans `backend/.env` (`GOOGLE_HEALTH_CLIENT_ID`,
    `GOOGLE_HEALTH_CLIENT_SECRET`), et générez une clé de chiffrement pour les tokens stockés :
    ```bash
    node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
    ```
    à mettre dans `TOKEN_ENCRYPTION_KEY` (requise dès que `GOOGLE_HEALTH_CLIENT_ID` est renseigné,
    le serveur refuse de démarrer en production sinon).
-5. **Important** : `POST /api/webhooks/google-health` doit être joignable par Google en HTTPS
-   public — ça ne fonctionnera pas avec `localhost`, il faut un vrai domaine déployé pour tester
-   la synchro automatique en conditions réelles.
+4. Ajoutez votre compte Google comme **testeur** : **Google Auth Platform → Audience → Utilisateurs
+   tests → Add users** (nécessaire tant que l'app n'est pas publiée/vérifiée par Google — largement
+   suffisant pour un usage personnel).
+
+**3. Compte de service (abonné webhook au niveau du projet)**
+
+1. **IAM et administration → Comptes de service → Créer un compte de service.**
+2. Attribuez-lui le rôle **"Éditeur de l'API Google Health"** (ou Administrateur, selon vos
+   besoins).
+3. Générez une clé JSON pour ce compte de service (onglet **Clés → Ajouter une clé → JSON**) et
+   collez **le contenu complet du fichier téléchargé** dans `GOOGLE_HEALTH_SERVICE_ACCOUNT_KEY`
+   (pas un chemin de fichier — la variable d'env porte le JSON lui-même).
+4. Choisissez un secret et mettez-le dans `GOOGLE_HEALTH_WEBHOOK_SECRET` :
+   ```bash
+   node -e "console.log('Bearer ' + require('crypto').randomBytes(24).toString('hex'))"
+   ```
+   Ce secret est envoyé à Google à la création de l'abonné et renvoyé tel quel par Google dans
+   chaque notification — c'est ce qui permet au backend de vérifier leur authenticité.
+5. Renseignez `GOOGLE_HEALTH_PROJECT_NUMBER` (voir étape 1).
+
+**4. Important : HTTPS public**
+
+`POST /api/webhooks/google-health` doit être joignable par Google en HTTPS public — ça ne
+fonctionnera pas avec `localhost`. Un vrai domaine déployé est nécessaire pour que l'abonné
+se crée avec succès : Google effectue une double vérification synchrone de l'endpoint (une
+requête authentifiée qui doit répondre 200/201, une non authentifiée qui doit répondre
+401/403) au moment de la création, et **la création de l'abonné échoue si l'une des deux rate.**
+
+Une fois tout renseigné, redémarrez le backend : il crée l'abonné automatiquement au démarrage
+(voir les logs pour confirmer `Abonné webhook Google Health "thyrotrack-webhook" créé.`).
 
 En production, mettez à jour `GOOGLE_HEALTH_REDIRECT_URI` avec le domaine réel.
 
@@ -286,8 +327,7 @@ GET    /api/analytics/symptoms?days=30
 POST   /api/integrations/google-health/link      (démarre la connexion Pixel Watch/Google Health)
 GET    /api/integrations/google-health/callback
 DELETE /api/integrations/google-health/link
-GET    /api/webhooks/google-health                (vérification d'abonnement Google)
-POST   /api/webhooks/google-health                (notification de changement → synchro DailyEntry)
+POST   /api/webhooks/google-health                (notifications Google + négociation de validation de l'abonné)
 ```
 
 ---
