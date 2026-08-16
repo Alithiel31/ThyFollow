@@ -13,6 +13,9 @@ export interface User {
   // Comptes fédérés liés (ex: Google) — sert à afficher l'état "lié/non lié"
   // dans le Profil (voir ProfilePage.tsx, section "Comptes liés").
   oauthAccounts?: { provider: string }[];
+  // Connexion Google Health (poids/FC/sommeil, ex: Pixel Watch) — absente si
+  // jamais connectée. Ne contient jamais de token, juste l'état de la synchro.
+  googleHealthConnection?: { connectedAt: string; lastSyncedAt: string | null } | null;
 }
 
 // Historique des connexions/liaisons Google (voir backend authEvents.ts),
@@ -51,6 +54,11 @@ export type ThyroidStatus =
   | 'INTACT' | 'PARTIAL_REMOVAL' | 'TOTAL_REMOVAL'
   | 'RADIOIODINE_ABLATION' | 'RADIOIODINE_PARTIAL';
 
+// Provenance d'une mesure synchronisable (poids/FC/sommeil) : MANUAL tant
+// que l'utilisateur n'a pas connecté Google Health, ou GOOGLE_HEALTH si la
+// valeur vient d'une synchro automatique (voir LogPage.tsx, badge montre).
+export type DataSource = 'MANUAL' | 'GOOGLE_HEALTH';
+
 export interface DailyEntry {
   id: string;
   date: string;
@@ -59,8 +67,10 @@ export interface DailyEntry {
   anxietyLevel?: number | null;
   brainFogLevel?: number | null;
   weight?: number | null;
+  weightSource?: DataSource;
   bodyTemperature?: number | null;
   heartRate?: number | null;
+  heartRateSource?: DataSource;
   bloodPressureSys?: number | null;
   bloodPressureDia?: number | null;
   coldSensitivity?: number | null;
@@ -75,6 +85,7 @@ export interface DailyEntry {
   swelling?: number | null;
   tremors?: number | null;
   sleepHours?: number | null;
+  sleepHoursSource?: DataSource;
   sleepQuality?: number | null;
   medicationTaken: boolean;
   medicationTime?: string | null;

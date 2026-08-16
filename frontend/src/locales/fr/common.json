@@ -208,6 +208,7 @@
     "temperature": "Température (°C)",
     "heartRate": "Rythme cardiaque",
     "sleepHours": "Heures de sommeil",
+    "syncedFromGoogleHealth": "Synchronisé depuis Google Health",
     "notes": "Notes",
     "notesPlaceholder": "Comment vous sentez-vous aujourd'hui ? Quelque chose de particulier à noter ?",
     "saveButton": {
@@ -395,7 +396,14 @@
       "linkError": "Erreur lors de la liaison avec Google",
       "linkConflict": "Ce compte Google est déjà lié à un autre utilisateur",
       "unlinkedSuccess": "Compte Google délié",
-      "unlinkError": "Erreur lors de la déliaison du compte Google"
+      "unlinkError": "Erreur lors de la déliaison du compte Google",
+      "googleHealth": "Google Health (Pixel Watch)",
+      "linkedNoSyncYet": "Connecté — première synchro à venir",
+      "lastSynced": "Dernière synchro : {{date}}",
+      "googleHealthLinkedSuccess": "Google Health connecté avec succès",
+      "googleHealthLinkError": "Erreur lors de la connexion à Google Health",
+      "googleHealthUnlinkedSuccess": "Google Health déconnecté",
+      "googleHealthUnlinkError": "Erreur lors de la déconnexion de Google Health"
     },
     "securityEvents": {
       "title": "Activité récente",

@@ -9,6 +9,10 @@ numérotées.
 
 ### À faire
 
+- Vérifier le format exact des notifications webhook et les chemins REST de la Google Health
+  API (`lib/googleHealth.ts`, `controllers/googleHealthWebhook.controller.ts`) face à la doc
+  officielle et à la console Google Cloud — non vérifiable depuis l'environnement de
+  développement utilisé pour écrire cette intégration (accès réseau bloqué), voir README.
 - Documentation API structurée (OpenAPI/Swagger) — la liste d'endpoints du README est tenue à
   la main et devient difficile à maintenir à mesure que l'API grossit.
 - Étendre la couverture de tests frontend au-delà des formulaires d'auth/médicaments (LogPage,
@@ -20,6 +24,12 @@ numérotées.
 
 ### Added
 
+- Synchronisation Google Health (poids, rythme cardiaque, heures de sommeil) depuis un appareil
+  connecté (ex: Pixel Watch) : connexion/déconnexion dédiée dans le Profil (distincte de "Se
+  connecter avec Google"), tokens chiffrés au repos (AES-256-GCM), synchro en arrière-plan par
+  webhook, avec une règle stricte de non-écrasement des saisies manuelles dans `LogPage`
+  (badge ⌚ affiché quand une valeur vient de la synchro). Voir le README pour la configuration
+  et les points restant à vérifier face à la doc officielle Google.
 - Pipeline CI (GitHub Actions, `.github/workflows/ci.yml`) : lint + typecheck/build + tests pour
   backend et frontend, sur chaque push/PR vers `main`. Jusqu'ici aucune vérification automatique
   n'existait avant qu'un changement n'atteigne la prod.
