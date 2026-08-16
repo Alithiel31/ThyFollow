@@ -40,7 +40,7 @@ export const analyticsController = {
       }),
       prisma.medication.findMany({
         where: { userId: req.userId, active: true },
-        select: { name: true, dosageMcg: true, intakeTime: true },
+        select: { name: true, dosage: true, dosageUnit: true, intakeTimes: true },
       }),
       prisma.appointment.findFirst({
         where: {
@@ -112,7 +112,7 @@ export const analyticsController = {
       }),
       prisma.medication.findMany({
         where: { userId: req.userId, active: true },
-        select: { name: true, brand: true, dosageMcg: true, frequency: true, intakeTime: true },
+        select: { name: true, brand: true, dosage: true, dosageUnit: true, frequency: true, intakeTimes: true },
       }),
     ]);
 

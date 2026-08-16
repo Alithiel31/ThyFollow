@@ -108,18 +108,29 @@ export interface LabResult {
   notes?: string | null;
 }
 
+export type DosageUnit = 'MCG' | 'MG' | 'IU' | 'TABLET' | 'DROP' | 'ML' | 'OTHER';
+
 export interface Medication {
   id: string;
   name: string;
   brand?: string | null;
-  dosageMcg: number;
+  dosage: number;
+  dosageUnit: DosageUnit;
   frequency: 'DAILY' | 'EVERY_OTHER_DAY' | 'WEEKLY' | 'AS_NEEDED';
-  intakeTime?: string | null;
+  intakeTimes: string[];
   startDate: string;
   endDate?: string | null;
   active: boolean;
   instructions?: string | null;
   notes?: string | null;
+}
+
+// Une prise validée (checklist) pour un médicament donné, un jour et un créneau donnés.
+export interface MedicationIntake {
+  id: string;
+  medicationId: string;
+  date: string;
+  time: string;
 }
 
 export interface Appointment {
@@ -144,7 +155,7 @@ export interface AnalyticsOverview {
   streak: number;
   averages: { energy: number | null; mood: number | null };
   medicationAdherence: number | null;
-  activeMedications: Pick<Medication, 'name' | 'dosageMcg' | 'intakeTime'>[];
+  activeMedications: Pick<Medication, 'name' | 'dosage' | 'dosageUnit' | 'intakeTimes'>[];
   latestLabResult: Pick<LabResult, 'date' | 'tsh' | 'ft4' | 'ft3'> | null;
   labHistory: Pick<LabResult, 'date' | 'tsh' | 'ft4' | 'ft3'>[];
   nextAppointment: Appointment | null;
@@ -201,6 +212,6 @@ export interface ReportData {
     sleepHours: number | null;
   };
   medicationAdherence: number | null;
-  activeMedications: Pick<Medication, 'name' | 'brand' | 'dosageMcg' | 'frequency' | 'intakeTime'>[];
+  activeMedications: Pick<Medication, 'name' | 'brand' | 'dosage' | 'dosageUnit' | 'frequency' | 'intakeTimes'>[];
   labResults: LabResult[];
 }

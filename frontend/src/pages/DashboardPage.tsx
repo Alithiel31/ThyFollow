@@ -226,8 +226,8 @@ export function DashboardPage() {
                   <div className={styles.medIcon}><Pill size={14} /></div>
                   <div>
                     <p className={styles.medName}>{m.name}</p>
-                    <p className={styles.medDose}>{m.dosageMcg} µg
-                      {m.intakeTime && ` · ${m.intakeTime}`}
+                    <p className={styles.medDose}>{m.dosage} {t(`medications.dosageUnits.${m.dosageUnit}`)}
+                      {m.intakeTimes.length > 0 && ` · ${m.intakeTimes.join(', ')}`}
                     </p>
                   </div>
                 </div>
