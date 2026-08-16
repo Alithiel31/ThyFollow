@@ -173,29 +173,23 @@ export interface DailyHealthMetrics {
 }
 
 // Types de données : identifiant kebab-case pour le chemin de l'URL (ex:
-// "body-fat"), nom snake_case pour le paramètre `filter` (confirmé par la
-// doc : "dans un paramètre de filtre, le nom du type de données doit être
-// au format snake_case"), et le champ temporel à filtrer. Deux familles de
-// champs, confirmées par des erreurs réelles distinctes :
+// "body-fat"), et le champ temporel à filtrer côté serveur — `null` quand
+// aucun filtre serveur ne fonctionne, auquel cas on filtre nous-mêmes sur
+// la réponse (voir `sleep` ci-dessous).
 // - `sample_time.physical_time` pour une mesure ponctuelle (poids, rythme
-//   cardiaque) — fonctionne avec un timestamp UTC ("...Z").
-// - `interval.civil_start_time` pour une plage (sommeil) — `interval.start_time`
-//   est rejeté ("not supported for filtering"), seule la variante "civil"
-//   (heure locale, sans suffixe "Z", comme dans l'exemple `steps` de la doc)
-//   l'est. ⚠️ Simplification actuelle : on réutilise les mêmes chiffres que
-//   l'heure UTC en ôtant juste le "Z", sans conversion vers le vrai fuseau
-//   de l'utilisateur (UserProfile.timezone) — à affiner si ça décale les
-//   résultats d'un utilisateur hors UTC.
+//   cardiaque) — fonctionne avec un timestamp UTC ("...Z"), confirmé.
+// - Pour `sleep` : ni `interval.start_time` ni `interval.civil_start_time`
+//   ne sont acceptés ("not supported for filtering", confirmé deux fois en
+//   usage réel) — semble ne supporter aucun filtre temporel côté serveur
+//   sur `dataPoints`. On récupère donc sans filtre et on ne garde que les
+//   points qui recoupent la journée demandée (voir `filterPointsForDate`).
+//   ⚠️ Suppose que la réponse expose des champs `startTime`/`endTime" —
+//   toujours pas confirmé contre un vrai payload.
 const DATA_TYPES = {
-  weight: { path: 'weight', filterField: 'weight.sample_time.physical_time', civil: false },
-  heartRate: { path: 'heart-rate', filterField: 'heart_rate.sample_time.physical_time', civil: false },
-  sleep: { path: 'sleep', filterField: 'sleep.interval.civil_start_time', civil: true },
+  weight: { path: 'weight', filterField: 'weight.sample_time.physical_time' as string | null },
+  heartRate: { path: 'heart-rate', filterField: 'heart_rate.sample_time.physical_time' as string | null },
+  sleep: { path: 'sleep', filterField: null as string | null },
 } as const;
-
-// Un champ "civil" attend une heure locale sans suffixe de fuseau ("Z").
-function toFilterTimestamp(isoUtc: string, civil: boolean): string {
-  return civil ? isoUtc.replace(/Z$/, '') : isoUtc;
-}
 
 export async function fetchDailyMetrics(accessToken: string, date: string): Promise<DailyHealthMetrics> {
   // Intervalle semi-ouvert [début du jour, début du lendemain[ — confirmé
@@ -206,15 +200,15 @@ export async function fetchDailyMetrics(accessToken: string, date: string): Prom
   const startTime = new Date(`${date}T00:00:00.000Z`).toISOString();
   const endTime = new Date(new Date(`${date}T00:00:00.000Z`).getTime() + 24 * 60 * 60 * 1000).toISOString();
 
-  async function fetchDataType(dataType: { path: string; filterField: string; civil: boolean }): Promise<unknown[]> {
+  async function fetchDataType(dataType: { path: string; filterField: string | null }): Promise<unknown[]> {
     const url = new URL(`${GOOGLE_HEALTH_API_BASE}/users/me/dataTypes/${dataType.path}/dataPoints`);
-    const from = toFilterTimestamp(startTime, dataType.civil);
-    const to = toFilterTimestamp(endTime, dataType.civil);
     // Syntaxe de filtrage AIP-160 (l'API suit ce standard, voir
     // developers.google.com/health/endpoints) — `startTime`/`endTime` en
     // paramètres séparés, essayé initialement, est rejeté par Google avec
     // "Cannot bind query parameter" : confirmé en usage réel.
-    url.searchParams.set('filter', `${dataType.filterField} >= "${from}" AND ${dataType.filterField} < "${to}"`);
+    if (dataType.filterField) {
+      url.searchParams.set('filter', `${dataType.filterField} >= "${startTime}" AND ${dataType.filterField} < "${endTime}"`);
+    }
 
     const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' } });
     if (!res.ok) {
@@ -228,7 +222,7 @@ export async function fetchDailyMetrics(accessToken: string, date: string): Prom
   // remonter, mais doit rester visible — un `.catch(() => [])` muet ferait
   // "réussir" silencieusement une synchro qui n'a en fait rien récupéré
   // (déjà vécu avec l'abonnement webhook, voir lib/googleHealthSubscriber.ts).
-  async function fetchDataTypeLogged(dataType: { path: string; filterField: string; civil: boolean }): Promise<unknown[]> {
+  async function fetchDataTypeLogged(dataType: { path: string; filterField: string | null }): Promise<unknown[]> {
     try {
       return await fetchDataType(dataType);
     } catch (err) {
@@ -246,13 +240,27 @@ export async function fetchDailyMetrics(accessToken: string, date: string): Prom
   return {
     weightKg: extractLatestNumericValue(weightPoints),
     heartRateBpm: extractLatestNumericValue(heartRatePoints),
-    sleepHours: sumSleepDurationHours(sleepPoints),
+    sleepHours: sumSleepDurationHours(filterPointsForDate(sleepPoints, startTime, endTime)),
   };
 }
 
 function extractLatestNumericValue(points: unknown[]): number | null {
   const last = points[points.length - 1] as { value?: number } | undefined;
   return typeof last?.value === 'number' ? last.value : null;
+}
+
+// Filtrage côté code, pour les types sans filtre serveur fonctionnel (voir
+// `sleep` dans DATA_TYPES) : ne garde qu'un point dont l'intervalle recoupe
+// [startTimeIso, endTimeIso[.
+function filterPointsForDate(points: unknown[], startTimeIso: string, endTimeIso: string): unknown[] {
+  const from = new Date(startTimeIso).getTime();
+  const to = new Date(endTimeIso).getTime();
+  return (points as { startTime?: string; endTime?: string }[]).filter((p) => {
+    if (!p.startTime || !p.endTime) return false;
+    const pointStart = new Date(p.startTime).getTime();
+    const pointEnd = new Date(p.endTime).getTime();
+    return pointStart < to && pointEnd > from;
+  });
 }
 
 function sumSleepDurationHours(points: unknown[]): number | null {
