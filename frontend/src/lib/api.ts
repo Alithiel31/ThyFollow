@@ -80,11 +80,18 @@ export const labApi = {
 // ── Medications
 export const medApi = {
   list: () => api.get<import('../types').Medication[]>('/medications'),
-  create: (data: Partial<import('../types').Medication> & { name: string; dosageMcg: number; startDate: string }) =>
+  create: (data: Partial<import('../types').Medication> & { name: string; dosage: number; startDate: string }) =>
     api.post<import('../types').Medication>('/medications', data),
   update: (id: string, data: Partial<import('../types').Medication>) =>
     api.put<import('../types').Medication>(`/medications/${id}`, data),
   delete: (id: string) => api.delete(`/medications/${id}`),
+  // ── Checklist des prises quotidiennes
+  listIntakes: (date: string) =>
+    api.get<import('../types').MedicationIntake[]>('/medications/intakes', { params: { date } }),
+  markTaken: (id: string, date: string, time: string) =>
+    api.post<import('../types').MedicationIntake>(`/medications/${id}/intake`, { date, time }),
+  markUntaken: (id: string, date: string, time: string) =>
+    api.delete(`/medications/${id}/intake`, { data: { date, time } }),
 };
 
 // ── Appointments
