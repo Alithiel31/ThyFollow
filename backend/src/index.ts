@@ -20,6 +20,7 @@ import googleHealthRouter from './routers/googleHealth.router.js';
 import googleHealthWebhookRouter from './routers/googleHealthWebhook.router.js';
 import { ensureProjectSubscriber } from './lib/googleHealthSubscriber.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { mountGraphQL } from './graphql/index.js';
 
 const app = express();
 
@@ -90,6 +91,12 @@ app.use('/api/analytics', analyticsRouter);
 app.use('/api/articles', articlesRouter);
 app.use('/api/integrations/google-health', googleHealthRouter);
 app.use('/api/webhooks/google-health', googleHealthWebhookRouter);
+
+// ── GraphQL (additif, en plus de la REST API ci-dessus — voir
+// backend/docs/graphql.md). Monté après le parsing du body / avant le error
+// handler REST : Apollo formate ses propres erreurs et n'appelle jamais
+// next(err), donc errorHandler ne le concerne pas.
+await mountGraphQL(app);
 
 // ── Error handler
 app.use(errorHandler);
