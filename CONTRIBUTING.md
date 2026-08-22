@@ -1,18 +1,19 @@
-# Contribuer
+# Contributing
 
-Merci de l'intérêt porté à ce projet. ThyroTrack est une app de suivi de santé thyroïdienne
-(journal de symptômes, analyses, médicaments, rendez-vous) — toute contribution qui corrige un
-bug, améliore la fiabilité ou clarifie la documentation est bienvenue.
+🇫🇷 [Version française](./CONTRIBUTING.fr.md)
 
-## Avant de commencer
+Thanks for your interest in this project. ThyroTrack is a thyroid health tracking app (symptom
+log, lab results, medications, appointments) — any contribution that fixes a bug, improves
+reliability, or clarifies the documentation is welcome.
 
-- Pour un changement non trivial (nouvelle fonctionnalité, refonte), ouvrez une issue pour en
-  discuter avant de coder.
-- Pour un correctif évident (typo, lien mort, faute de traduction), une PR directe suffit.
-- Vérifiez que le point n'est pas déjà listé dans la section `[Unreleased] > À faire` du
+## Before you start
+
+- For a non-trivial change (new feature, redesign), open an issue to discuss it before coding.
+- For an obvious fix (typo, dead link, translation mistake), a direct PR is fine.
+- Check that the item isn't already listed in the `[Unreleased] > To do` section of
   [`CHANGELOG.md`](./CHANGELOG.md).
 
-## Environnement de développement
+## Development environment
 
 ```bash
 git clone git@github.com:Alithiel31/ThyFollow.git
@@ -22,17 +23,17 @@ cd backend && npm install && cd ..
 cd frontend && npm install && cd ..
 
 cp backend/.env.example backend/.env
-# Renseigner DATABASE_URL (Postgres local ou via Docker) et JWT_SECRET
+# Fill in DATABASE_URL (local Postgres or via Docker) and JWT_SECRET
 ```
 
 ```bash
 cd backend
 npx prisma migrate dev
 npx prisma generate
-npm run db:seed   # Compte de démo : demo@thyrotrack.com / demo1234
+npm run db:seed   # Demo account: demo@thyrotrack.com / demo1234
 ```
 
-Puis, dans deux terminaux séparés :
+Then, in two separate terminals:
 
 ```bash
 cd backend && npm run dev   # http://localhost:3001
@@ -42,13 +43,13 @@ cd backend && npm run dev   # http://localhost:3001
 cd frontend && npm run dev  # http://localhost:5173
 ```
 
-Voir le [`README.md`](./README.md) pour le détail (Google OAuth optionnel, déploiement Docker
-Compose).
+See [`README.md`](./README.md) for the details (optional Google OAuth, Docker Compose
+deployment).
 
-## Reproduire la CI en local
+## Reproducing CI locally
 
-Le workflow [`ci.yml`](./.github/workflows/ci.yml) lance, sur chaque PR vers `main`, lint +
-typecheck/build + tests pour le backend et pour le frontend. Reproduction locale :
+The [`ci.yml`](./.github/workflows/ci.yml) workflow runs, on every PR to `main`, lint +
+typecheck/build + tests for both backend and frontend. To reproduce locally:
 
 ```bash
 # Backend
@@ -64,40 +65,39 @@ npm run build   # tsc && vite build — typecheck + build
 npm test        # vitest run
 ```
 
-Node 20 est requis (`.nvmrc` à la racine) : les deux `package.json` pinnent volontairement
-`jsdom`/`@testing-library/jest-dom` sur des versions compatibles Node 20 (les dernières majeures
-de ces deux paquets exigent Node ≥22) — ne les mettez pas à jour sans revérifier cette
-contrainte, voir [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md).
+Node 20 is required (`.nvmrc` at the root): both `package.json` files deliberately pin
+`jsdom`/`@testing-library/jest-dom` to versions compatible with Node 20 (the latest majors of
+these two packages require Node ≥22) — don't bump them without re-checking this constraint, see
+[`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md).
 
-## Ouvrir une Pull Request
+## Opening a Pull Request
 
-1. Créez une branche depuis `main` (`git checkout -b fix/mon-correctif`).
-2. Committez avec un message clair — ce repo mélange `type(scope): description`
-   (`fix(backend): ...`) et des messages en anglais plus descriptifs pour les changements plus
-   larges ; les deux sont acceptés, mais le message doit expliquer le **pourquoi**, pas
-   seulement le quoi.
-3. Si le changement est notable pour un utilisateur ou un contributeur, ajoutez une entrée dans
-   la section `[Unreleased]` de [`CHANGELOG.md`](./CHANGELOG.md).
-4. Vérifiez que la CI passe (voir ci-dessus pour la reproduire en local avant de pousser).
-5. Ouvrez la PR contre `main`.
+1. Create a branch from `main` (`git checkout -b fix/my-fix`).
+2. Commit with a clear message — this repo mixes `type(scope): description`
+   (`fix(backend): ...`) and more descriptive English messages for larger changes; both are
+   accepted, but the message should explain the **why**, not just the what.
+3. If the change is notable for a user or a contributor, add an entry to the `[Unreleased]`
+   section of [`CHANGELOG.md`](./CHANGELOG.md).
+4. Make sure CI passes (see above to reproduce it locally before pushing).
+5. Open the PR against `main`.
 
-## Signaler un problème
+## Reporting an issue
 
-Pour un bug, précisez :
+For a bug, include:
 
-- Ce qui était attendu vs. ce qui s'est produit.
-- Les étapes pour reproduire.
-- `backend` ou `frontend` (ou les deux), et l'environnement (local, Docker Compose).
-- Les logs pertinents (`docker compose logs backend`, console navigateur) — **en retirant tout
-  token, email réel, ou donnée de santé.**
+- What was expected vs. what happened.
+- Steps to reproduce.
+- `backend` or `frontend` (or both), and the environment (local, Docker Compose).
+- Relevant logs (`docker compose logs backend`, browser console) — **with any token, real
+  email, or health data stripped out.**
 
-Avant d'ouvrir l'issue, jetez un œil à [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md) : les
-incidents déjà rencontrés et leur diagnostic y sont documentés.
+Before opening the issue, take a look at [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md): incidents
+already encountered and their diagnosis are documented there.
 
-## Secrets et données de santé
+## Secrets and health data
 
-- Ne committez jamais de fichier `.env` réel, ni de `JWT_SECRET`, `GOOGLE_CLIENT_SECRET`,
-  `RESEND_API_KEY` ou mot de passe Postgres — seuls les `.env.example` sont versionnés.
-- Cette app manipule des données de santé (symptômes, résultats de labo). N'utilisez jamais de
-  données personnelles réelles dans un exemple, un test, une issue ou une capture d'écran ; le
-  compte de démo créé par `npm run db:seed` suffit pour illustrer un problème.
+- Never commit a real `.env` file, nor `JWT_SECRET`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`,
+  or a Postgres password — only `.env.example` files are versioned.
+- This app handles health data (symptoms, lab results). Never use real personal data in an
+  example, a test, an issue, or a screenshot; the demo account created by `npm run db:seed` is
+  enough to illustrate a problem.
