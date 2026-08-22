@@ -1,37 +1,52 @@
 # 🦋 ThyroTrack
 
+🇫🇷 [Version française](./README.fr.md)
+
 [![CI](https://github.com/Alithiel31/ThyFollow/actions/workflows/ci.yml/badge.svg)](https://github.com/Alithiel31/ThyFollow/actions/workflows/ci.yml)
 
-Application web de suivi thyroïdien, inspirée de l'app Clue.  
-**Stack** : TypeScript · Express · Prisma · PostgreSQL · React · Recharts · Docker
+![Node.js](https://img.shields.io/badge/Node.js-20-339933?logo=node.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
+![Express](https://img.shields.io/badge/Express-4-000000?logo=express&logoColor=white)
+![GraphQL](https://img.shields.io/badge/GraphQL-Apollo%20Server%205-E10098?logo=graphql&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-5-2D3748?logo=prisma&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
 
-## Table des matières
+![Docker Compose](https://img.shields.io/badge/Docker%20Compose-self--hosted-2496ED?logo=docker&logoColor=white)
+![Traefik](https://img.shields.io/badge/Traefik-reverse%20proxy-24A1C1?logo=traefikproxy&logoColor=white)
+![Cloudflare](https://img.shields.io/badge/cloudflared-tunnel-F38020?logo=cloudflare&logoColor=white)
+![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-self--hosted%20host-A22846?logo=raspberrypi&logoColor=white)
 
-- [Fonctionnalités](#fonctionnalités)
+A web app for tracking thyroid health, inspired by the Clue app.  
+**Stack**: TypeScript · Express · GraphQL (additive) · Prisma · PostgreSQL · React · Recharts · Docker
+
+## Table of contents
+
+- [Features](#features)
 - [Architecture](#architecture)
-- [Démarrage rapide (local)](#démarrage-rapide-local)
-- [Déploiement](#déploiement-docker-compose-self-hosted)
-- [Structure du projet](#structure-du-projet)
-- [Schéma de la base de données](#schéma-de-la-base-de-données)
+- [Quick start (local)](#quick-start-local)
+- [Deployment](#deployment-docker-compose-self-hosted)
+- [Project structure](#project-structure)
+- [Database schema](#database-schema)
 - [API Endpoints](#api-endpoints)
 - [Design System](#design-system)
-- [Stack technique](#stack-technique)
-- [Contribuer](#contribuer)
+- [Tech stack](#tech-stack)
+- [Contributing](#contributing)
 - [Changelog](#changelog)
-- [Licence](#licence)
+- [License](#license)
 
 ---
 
-## ✨ Fonctionnalités
+## ✨ Features
 
-| Module | Détail |
+| Module | Detail |
 |---|---|
-| **Journal quotidien** | Énergie, humeur, anxiété, brouillard mental, 11 symptômes thyroïdiens, médicament pris, mesures physiques (poids/FC/sommeil synchronisables via Google Health, ex: Pixel Watch) |
-| **Analyses sanguines** | TSH, FT4, FT3, Anti-TPO, Anti-TG, carences (Ferritine, Vit D, B12…) avec graphiques d'évolution |
-| **Médicaments** | Gestion du traitement (Levothyrox, etc.), dosage, fréquence, observance |
-| **Rendez-vous** | Agenda médical avec rappels, statuts, types spécialisés |
-| **Tableau de bord** | Streak médicament, observance, moyennes, prochain RDV, historique TSH |
-| **Profil** | Diagnostic, état thyroïde, plages TSH/FT4/FT3 personnalisées par votre médecin |
+| **Daily log** | Energy, mood, anxiety, brain fog, 11 thyroid symptoms, medication taken, physical measurements (weight/heart rate/sleep, syncable via Google Health, e.g. Pixel Watch) |
+| **Lab results** | TSH, FT4, FT3, Anti-TPO, Anti-TG, deficiencies (Ferritin, Vit D, B12…) with trend charts |
+| **Medications** | Treatment management (Levothyroxine, etc.), dosage, frequency, adherence |
+| **Appointments** | Medical calendar with reminders, statuses, specialized types |
+| **Dashboard** | Medication streak, adherence, averages, next appointment, TSH history |
+| **Profile** | Diagnosis, thyroid status, TSH/FT4/FT3 target ranges set by your doctor |
 
 ---
 
@@ -39,47 +54,47 @@ Application web de suivi thyroïdien, inspirée de l'app Clue.
 
 ```mermaid
 flowchart LR
-    UI["Navigateur"]
+    UI["Browser"]
     TR["Traefik<br/>reverse proxy (:8000)"]
 
-    subgraph Host["Hôte Docker (docker-compose.yml)"]
-        FE["frontend<br/>nginx + build React/Vite<br/>:80"]
+    subgraph Host["Docker host (docker-compose.yml)"]
+        FE["frontend<br/>nginx + React/Vite build<br/>:80"]
         BE["backend<br/>Express + TypeScript<br/>:3001"]
         FE -- "proxy /api/*" --> BE
     end
 
-    DB[("PostgreSQL 17<br/>instance partagée native (hors Docker)")]
+    DB[("PostgreSQL 17<br/>shared native instance (outside Docker)")]
     EXT["Google OAuth · Resend"]
 
     UI -- "HTTPS · cloudflared" --> TR
     TR -- "Host: thyrotrack.alithiel31.dev" --> FE
     BE -- "host.docker.internal:5432" --> DB
-    BE -. "OIDC (connexion Google) / envoi d'email" .-> EXT
+    BE -. "OIDC (Google login) / email sending" .-> EXT
 ```
 
-Le conteneur `frontend` ne sert que des fichiers statiques (nginx) ; toutes les requêtes
-`/api/*` sont proxyfiées vers `backend` (voir `frontend/nginx.conf`), qui est seul à parler à
-PostgreSQL via Prisma. Le navigateur ne voit donc qu'une seule origine, ce qui évite toute
-configuration CORS côté client en production — `CORS_ORIGIN`/`FRONTEND_URL` restent un garde-fou
-si le backend est appelé directement.
+The `frontend` container only serves static files (nginx); all `/api/*` requests are proxied
+to `backend` (see `frontend/nginx.conf`), which is the only service that talks to PostgreSQL
+via Prisma. The browser therefore only ever sees a single origin, which avoids any client-side
+CORS configuration in production — `CORS_ORIGIN`/`FRONTEND_URL` remain a safety net in case the
+backend is called directly.
 
-Aucun port n'est publié sur l'hôte : `frontend` est joint au réseau `traefik-net` (créé par
-Traefik, déclaré `external: true` dans `docker-compose.yml`) et porte des labels
-`traefik.*` qui routent `thyrotrack.alithiel31.dev` vers son port interne `80`. Traefik est un
-service partagé entre plusieurs projets sur cet hôte, pas géré par ce repo. PostgreSQL n'est pas
-non plus un service de ce `docker-compose.yml` : c'est une instance partagée, elle aussi commune
-à plusieurs projets sur cet hôte, jointe depuis le conteneur `backend` via
-`host.docker.internal` (voir `extra_hosts` dans `docker-compose.yml`).
+No port is published on the host: `frontend` joins the `traefik-net` network (created by
+Traefik, declared `external: true` in `docker-compose.yml`) and carries `traefik.*` labels that
+route `thyrotrack.alithiel31.dev` to its internal port `80`. Traefik is a service shared across
+several projects on this host, not managed by this repo. PostgreSQL isn't a service of this
+`docker-compose.yml` either: it's a shared instance, also common to several projects on this
+host, reached from the `backend` container via `host.docker.internal` (see `extra_hosts` in
+`docker-compose.yml`).
 
 ---
 
-## 🚀 Démarrage rapide (local)
+## 🚀 Quick start (local)
 
-### Prérequis
+### Prerequisites
 - Node.js 20+
-- PostgreSQL (ou Docker)
+- PostgreSQL (or Docker)
 
-### 1. Cloner et installer
+### 1. Clone and install
 ```bash
 git clone <url>
 cd thyro-track
@@ -87,118 +102,118 @@ cd backend && npm install && cd ..
 cd frontend && npm install && cd ..
 ```
 
-### 2. Configurer l'environnement backend
+### 2. Configure the backend environment
 ```bash
 cp backend/.env.example backend/.env
-# Éditer backend/.env avec votre DATABASE_URL et JWT_SECRET
+# Edit backend/.env with your DATABASE_URL and JWT_SECRET
 ```
 
-#### (Optionnel) Activer "Se connecter avec Google"
+#### (Optional) Enable "Sign in with Google"
 
-Sans `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`, `GET /api/auth/oidc/google` répond simplement `501` et le bouton Google reste inutile — le reste de l'app fonctionne normalement. Pour l'activer :
+Without `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`, `GET /api/auth/oidc/google` simply responds
+`501` and the Google button stays inert — the rest of the app works normally. To enable it:
 
-1. Sur [Google Cloud Console](https://console.cloud.google.com/), créez (ou sélectionnez) un projet.
-2. **APIs & Services → OAuth consent screen** : type *External*, renseignez le nom de l'app et un email de support, ajoutez les scopes `openid`, `email`, `profile`.
+1. On the [Google Cloud Console](https://console.cloud.google.com/), create (or select) a project.
+2. **APIs & Services → OAuth consent screen**: type *External*, fill in the app name and a support email, add the `openid`, `email`, `profile` scopes.
 3. **APIs & Services → Credentials → Create Credentials → OAuth client ID**, type *Web application*.
-4. **Authorized JavaScript origins** : `http://localhost:5173` (URL du frontend).
-5. **Authorized redirect URIs** : `http://localhost:3001/api/auth/oidc/google/callback` (doit correspondre exactement à `GOOGLE_REDIRECT_URI`, c'est l'URL du **backend**, pas du frontend).
-6. Copiez le *Client ID* et le *Client Secret* générés dans `backend/.env` :
+4. **Authorized JavaScript origins**: `http://localhost:5173` (the frontend URL).
+5. **Authorized redirect URIs**: `http://localhost:3001/api/auth/oidc/google/callback` (must exactly match `GOOGLE_REDIRECT_URI` — this is the **backend**'s URL, not the frontend's).
+6. Copy the generated *Client ID* and *Client Secret* into `backend/.env`:
    ```bash
    GOOGLE_CLIENT_ID="xxxxxxxx.apps.googleusercontent.com"
    GOOGLE_CLIENT_SECRET="xxxxxxxx"
    ```
-En production, mettez à jour les origines/redirect URIs avec le domaine réel et ajustez `GOOGLE_REDIRECT_URI` (+ `APP_URL`) en conséquence.
+In production, update the origins/redirect URIs with the real domain and adjust
+`GOOGLE_REDIRECT_URI` (+ `APP_URL`) accordingly.
 
-#### (Optionnel) Synchroniser Google Health (poids / rythme cardiaque / sommeil)
+#### (Optional) Sync Google Health (weight / heart rate / sleep)
 
-Fonctionnalité distincte de "Se connecter avec Google" ci-dessus : elle relie un appareil
-connecté (ex: **Pixel Watch**) via la [Google Health API](https://developers.google.com/health)
-pour pré-remplir automatiquement Poids, Rythme cardiaque et Heures de sommeil dans le Journal
-(un badge <kbd>⌚</kbd> indique une valeur synchronisée). Sans `GOOGLE_HEALTH_CLIENT_ID`, la carte
-"Google Health" du Profil répond `501` et reste inactive.
+A feature distinct from "Sign in with Google" above: it links a connected device (e.g. a
+**Pixel Watch**) via the [Google Health API](https://developers.google.com/health) to
+automatically pre-fill Weight, Heart rate and Sleep hours in the daily log (a <kbd>⌚</kbd>
+badge marks a synced value). Without `GOOGLE_HEALTH_CLIENT_ID`, the "Google Health" card in the
+Profile page responds `501` and stays inactive.
 
-Deux flux d'authentification distincts sont en jeu :
-- **OAuth utilisateur** (`GOOGLE_HEALTH_CLIENT_ID`/`SECRET`) : chaque utilisateur autorise
-  ThyroTrack à lire ses données santé — c'est le bouton "Lier" du Profil.
-- **Compte de service IAM Google Cloud** (`GOOGLE_HEALTH_SERVICE_ACCOUNT_KEY`) : gère un
-  **unique abonné webhook au niveau du projet** (pas par utilisateur), créé une fois au démarrage
-  du backend. Avec une politique `AUTOMATIC`, Google route ensuite automatiquement les
-  notifications de tout utilisateur consentant vers cet abonné — aucun abonnement individuel
-  n'est nécessaire.
+Two distinct authentication flows are involved:
+- **User OAuth** (`GOOGLE_HEALTH_CLIENT_ID`/`SECRET`): each user authorizes ThyroTrack to read
+  their health data — this is the "Link" button in the Profile page.
+- **Google Cloud IAM service account** (`GOOGLE_HEALTH_SERVICE_ACCOUNT_KEY`): manages a
+  **single project-wide webhook subscriber** (not per user), created once at backend startup.
+  With an `AUTOMATIC` policy, Google then automatically routes notifications for every
+  consenting user to this one subscriber — no individual subscription is needed.
 
-> ⚠️ **`fetchDailyMetrics` (lecture des mesures) reste partiellement une best-effort.** Le host,
-> la version (`health.googleapis.com/v4`), les scopes OAuth et tout le modèle d'abonnement webhook
-> ont été confirmés par lecture directe de la documentation officielle. En revanche, la forme
-> exacte du corps JSON renvoyé par les endpoints `dataTypes/{type}/dataPoints` (utilisés pour
-> lire les valeurs) n'a pas pu être vérifiée — le parsing dans
-> `backend/src/lib/googleHealth.ts#fetchDailyMetrics` est une meilleure hypothèse, à ajuster si
-> besoin une fois des données réelles observées.
+> ⚠️ **`fetchDailyMetrics` (reading measurements) is still partly best-effort.** The host, the
+> version (`health.googleapis.com/v4`), the OAuth scopes and the whole webhook subscription
+> model were confirmed by reading the official documentation directly. The exact shape of the
+> JSON body returned by the `dataTypes/{type}/dataPoints` endpoints (used to read values),
+> however, could not be verified — the parsing in
+> `backend/src/lib/googleHealth.ts#fetchDailyMetrics` is a best guess, to be adjusted if needed
+> once real data has been observed.
 
-**1. Projet et API**
+**1. Project and API**
 
-Sur [Google Cloud Console](https://console.cloud.google.com/), activez la **Google Health API**
-sur le projet (le même que "Se connecter avec Google" ou un projet dédié). Notez le **numéro**
-du projet (visible sur la page d'accueil du projet — pas son ID textuel, Google renvoie une
-erreur 400/403 sinon) pour `GOOGLE_HEALTH_PROJECT_NUMBER`.
+On the [Google Cloud Console](https://console.cloud.google.com/), enable the **Google Health
+API** on the project (the same one as "Sign in with Google", or a dedicated one). Note the
+project's **number** (visible on the project's home page — not its text ID, Google returns a
+400/403 error otherwise) for `GOOGLE_HEALTH_PROJECT_NUMBER`.
 
-**2. Client OAuth (connexion utilisateur)**
+**2. OAuth client (user login)**
 
 1. **APIs & Services → Credentials → Create Credentials → OAuth client ID**, type *Web
-   application* — des credentials séparées de celles du login, car les scopes santé sont
-   sensibles.
-2. **Authorized redirect URIs** : `http://localhost:3001/api/integrations/google-health/callback`
-   (doit correspondre à `GOOGLE_HEALTH_REDIRECT_URI`).
-3. Copiez le *Client ID*/*Client Secret* dans `backend/.env` (`GOOGLE_HEALTH_CLIENT_ID`,
-   `GOOGLE_HEALTH_CLIENT_SECRET`), et générez une clé de chiffrement pour les tokens stockés :
+   application* — separate credentials from the login ones, since health scopes are sensitive.
+2. **Authorized redirect URIs**: `http://localhost:3001/api/integrations/google-health/callback`
+   (must match `GOOGLE_HEALTH_REDIRECT_URI`).
+3. Copy the *Client ID*/*Client Secret* into `backend/.env` (`GOOGLE_HEALTH_CLIENT_ID`,
+   `GOOGLE_HEALTH_CLIENT_SECRET`), and generate an encryption key for the stored tokens:
    ```bash
    node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
    ```
-   à mettre dans `TOKEN_ENCRYPTION_KEY` (requise dès que `GOOGLE_HEALTH_CLIENT_ID` est renseigné,
-   le serveur refuse de démarrer en production sinon).
-4. Ajoutez votre compte Google comme **testeur** : **Google Auth Platform → Audience → Utilisateurs
-   tests → Add users** (nécessaire tant que l'app n'est pas publiée/vérifiée par Google — largement
-   suffisant pour un usage personnel).
+   to put in `TOKEN_ENCRYPTION_KEY` (required as soon as `GOOGLE_HEALTH_CLIENT_ID` is set, the
+   server refuses to start in production otherwise).
+4. Add your Google account as a **test user**: **Google Auth Platform → Audience → Test users →
+   Add users** (necessary as long as the app isn't published/verified by Google — plenty for
+   personal use).
 
-**3. Compte de service (abonné webhook au niveau du projet)**
+**3. Service account (project-wide webhook subscriber)**
 
-1. **IAM et administration → Comptes de service → Créer un compte de service.**
-2. Attribuez-lui le rôle **"Éditeur de l'API Google Health"** (ou Administrateur, selon vos
-   besoins).
-3. Générez une clé JSON pour ce compte de service (onglet **Clés → Ajouter une clé → JSON**) et
-   collez **le contenu complet du fichier téléchargé** dans `GOOGLE_HEALTH_SERVICE_ACCOUNT_KEY`
-   (pas un chemin de fichier — la variable d'env porte le JSON lui-même).
-4. Choisissez un secret et mettez-le dans `GOOGLE_HEALTH_WEBHOOK_SECRET` :
+1. **IAM & Admin → Service Accounts → Create Service Account.**
+2. Grant it the **"Google Health API Editor"** role (or Admin, depending on your needs).
+3. Generate a JSON key for this service account (**Keys → Add Key → JSON** tab) and paste
+   **the full content of the downloaded file** into `GOOGLE_HEALTH_SERVICE_ACCOUNT_KEY` (not a
+   file path — the env var holds the JSON itself).
+4. Pick a secret and put it in `GOOGLE_HEALTH_WEBHOOK_SECRET`:
    ```bash
    node -e "console.log('Bearer ' + require('crypto').randomBytes(24).toString('hex'))"
    ```
-   Ce secret est envoyé à Google à la création de l'abonné et renvoyé tel quel par Google dans
-   chaque notification — c'est ce qui permet au backend de vérifier leur authenticité.
-5. Renseignez `GOOGLE_HEALTH_PROJECT_NUMBER` (voir étape 1).
+   This secret is sent to Google when the subscriber is created and echoed back by Google in
+   every notification — that's what lets the backend verify their authenticity.
+5. Fill in `GOOGLE_HEALTH_PROJECT_NUMBER` (see step 1).
 
-**4. Important : HTTPS public**
+**4. Important: public HTTPS**
 
-`POST /api/webhooks/google-health` doit être joignable par Google en HTTPS public — ça ne
-fonctionnera pas avec `localhost`. Un vrai domaine déployé est nécessaire pour que l'abonné
-se crée avec succès : Google effectue une double vérification synchrone de l'endpoint (une
-requête authentifiée qui doit répondre 200/201, une non authentifiée qui doit répondre
-401/403) au moment de la création, et **la création de l'abonné échoue si l'une des deux rate.**
+`POST /api/webhooks/google-health` must be reachable by Google over public HTTPS — this won't
+work with `localhost`. A real, deployed domain is required for the subscriber to be created
+successfully: Google performs a synchronous double-check of the endpoint at creation time (an
+authenticated request that must respond 200/201, and an unauthenticated one that must respond
+401/403), and **subscriber creation fails if either one fails.**
 
-Une fois tout renseigné, redémarrez le backend : il crée l'abonné automatiquement au démarrage
-(voir les logs pour confirmer `Abonné webhook Google Health "thyrotrack-webhook" créé.`).
+Once everything is filled in, restart the backend: it creates the subscriber automatically at
+startup (check the logs to confirm `Google Health webhook subscriber "thyrotrack-webhook"
+created.`).
 
-En production, mettez à jour `GOOGLE_HEALTH_REDIRECT_URI` avec le domaine réel.
+In production, update `GOOGLE_HEALTH_REDIRECT_URI` with the real domain.
 
-### 3. Initialiser la base de données
+### 3. Initialize the database
 ```bash
 cd backend
 npx prisma migrate dev --name init
 npx prisma generate
-npm run db:seed   # Crée un compte démo: demo@thyrotrack.com / demo1234
+npm run db:seed   # Creates a demo account: demo@thyrotrack.com / demo1234
 ```
 
-### 4. Lancer en développement
+### 4. Run in development
 
-Dans deux terminaux séparés :
+In two separate terminals:
 ```bash
 cd backend && npm run dev   # http://localhost:3001
 ```
@@ -208,113 +223,116 @@ cd frontend && npm run dev  # http://localhost:5173
 
 ---
 
-## 🐳 Déploiement (Docker Compose, self-hosted)
+## 🐳 Deployment (Docker Compose, self-hosted)
 
-Le déploiement réel de ce projet passe par `docker-compose.yml` à la racine : deux services
-(backend Express, frontend servi par nginx) construits depuis `backend/Dockerfile` et
-`frontend/Dockerfile`. Depuis le 2026-08-22, PostgreSQL n'est **plus** un service de ce fichier —
-le backend se connecte à une instance PostgreSQL partagée avec d'autres projets sur le même hôte,
-et le frontend n'expose plus de port : il est routé via un reverse proxy Traefik partagé lui
-aussi (voir le diagramme d'architecture ci-dessus). Ces deux dépendances externes sont donc
-préalables à tout déploiement avec ce fichier tel quel :
+This project's real-world deployment goes through the root `docker-compose.yml`: two services
+(Express backend, frontend served by nginx) built from `backend/Dockerfile` and
+`frontend/Dockerfile`. As of 2026-08-22, PostgreSQL is **no longer** a service in this file —
+the backend connects to a PostgreSQL instance shared with other projects on the same host, and
+the frontend no longer exposes a port: it's routed through a Traefik reverse proxy, itself
+shared as well (see the architecture diagram above). These two external dependencies are
+therefore prerequisites for any deployment with this file as-is:
 
-- une instance PostgreSQL joignable en réseau, avec une base et un rôle applicatif déjà créés ;
-- une instance Traefik (provider Docker, réseau `traefik-net`) déjà en place sur l'hôte.
+- a network-reachable PostgreSQL instance, with a database and application role already created;
+- a Traefik instance (Docker provider, `traefik-net` network) already running on the host.
 
-> **Déploiement sur un hôte sans Traefik ni PostgreSQL partagé** (ex: un nouvel hôte, ou un test
-> isolé) : ce `docker-compose.yml` n'est plus autonome tel quel. Il faudrait soit réintroduire un
-> service `postgres` dédié et republier un port sur `frontend` (`ports: ["8082:80"]`, en retirant
-> les labels `traefik.*` et le réseau `traefik-net`), soit déployer sa propre instance Traefik.
-> Ce n'est pas documenté ici car ce n'est pas la configuration réellement utilisée pour ce
-> projet — demander si besoin.
+> **Deploying on a host without a shared Traefik or PostgreSQL** (e.g. a fresh host, or an
+> isolated test): this `docker-compose.yml` is no longer self-contained as-is. You'd need to
+> either reintroduce a dedicated `postgres` service and republish a port on `frontend`
+> (`ports: ["8082:80"]`, removing the `traefik.*` labels and the `traefik-net` network), or
+> deploy your own Traefik instance. This isn't documented here since it isn't the configuration
+> actually used for this project — ask if you need it.
 
-### 1. Configurer l'environnement
+### 1. Configure the environment
 ```bash
 cp .env.example .env
-# Renseigner DB_PASSWORD : le mot de passe du rôle applicatif PostgreSQL
-# (ex: openssl rand -hex 24), déjà créé sur l'instance partagée.
+# Fill in DB_PASSWORD: the password for the PostgreSQL application role
+# (e.g. openssl rand -hex 24), already created on the shared instance.
 
 cp backend/.env.example backend/.env
-# Renseigner JWT_SECRET (32+ caractères), RESEND_API_KEY, et
-# GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET si "Se connecter avec Google" est utilisé.
-# DATABASE_URL et FRONTEND_URL sont déjà fixés dans docker-compose.yml —
-# adaptez-y votre propre domaine et votre hôte PostgreSQL avant de déployer.
+# Fill in JWT_SECRET (32+ characters), RESEND_API_KEY, and
+# GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET if "Sign in with Google" is used.
+# DATABASE_URL and FRONTEND_URL are already set in docker-compose.yml —
+# adapt them to your own domain and PostgreSQL host before deploying.
 ```
 
-### 2. Lancer
+### 2. Launch
 ```bash
 docker compose up -d --build
 ```
-Le conteneur backend exécute automatiquement `prisma migrate deploy` au démarrage (voir
-`backend/Dockerfile`) et rejoint PostgreSQL via `host.docker.internal` (voir `extra_hosts` dans
-`docker-compose.yml`) — la base doit donc déjà exister avec le rôle applicatif attendu par
-`DATABASE_URL`. Le frontend est routé par Traefik d'après ses labels `traefik.*` (règle `Host`
-sur le domaine configuré), le backend reste en interne sur `3001`.
+The backend container automatically runs `prisma migrate deploy` at startup (see
+`backend/Dockerfile`) and joins PostgreSQL via `host.docker.internal` (see `extra_hosts` in
+`docker-compose.yml`) — the database must therefore already exist with the application role
+expected by `DATABASE_URL`. The frontend is routed by Traefik based on its `traefik.*` labels
+(a `Host` rule on the configured domain), the backend stays internal on `3001`.
 
-### 3. Seeder les données de démo (optionnel)
+### 3. Seed demo data (optional)
 ```bash
 docker compose exec backend npm run db:seed
 ```
 
-> **Générer un JWT_SECRET :** `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+> **Generate a JWT_SECRET:** `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
 
 ---
 
-## 📁 Structure du projet
+## 📁 Project structure
 
 ```
 thyro-track/
 ├── backend/
 │   ├── prisma/
-│   │   ├── schema.prisma        # Modèles de données complets
-│   │   └── seed.ts              # Données de démonstration
+│   │   ├── schema.prisma        # Full data models
+│   │   └── seed.ts              # Demo data
 │   ├── src/
-│   │   ├── index.ts             # Entrée Express
+│   │   ├── index.ts             # Express entry point
 │   │   ├── lib/                 # Prisma client, i18n, logger, email (Resend), OIDC
 │   │   ├── middleware/
 │   │   │   ├── auth.ts          # JWT middleware
 │   │   │   ├── admin.ts
 │   │   │   ├── asyncHandler.ts
 │   │   │   └── errorHandler.ts
-│   │   ├── routers/             # Déclaration des routes Express (*.router.ts)
-│   │   └── controllers/         # Logique métier + validation Zod (*.controller.ts)
+│   │   ├── routers/             # Express route declarations (*.router.ts)
+│   │   ├── controllers/         # Business logic + Zod validation (*.controller.ts)
+│   │   └── graphql/             # POST /graphql endpoint, additive to the REST API — see backend/docs/graphql.md
+│   ├── docs/
+│   │   └── graphql.md           # Why/how of the GraphQL layer (N+1, auth, out of scope)
 │   ├── Dockerfile
 │   └── package.json
 │
 ├── frontend/
 │   ├── src/
 │   │   ├── pages/
-│   │   │   ├── DashboardPage    # Vue d'ensemble
-│   │   │   ├── LogPage          # Journal quotidien (style Clue)
-│   │   │   ├── LabResultsPage   # Analyses + graphiques
-│   │   │   ├── MedicationsPage  # Traitements
+│   │   │   ├── DashboardPage    # Overview
+│   │   │   ├── LogPage          # Daily log (Clue-style)
+│   │   │   ├── LabResultsPage   # Lab results + charts
+│   │   │   ├── MedicationsPage  # Treatments
 │   │   │   ├── AppointmentsPage
 │   │   │   └── ProfilePage
 │   │   ├── lib/
-│   │   │   ├── api.ts           # Client axios typé
+│   │   │   ├── api.ts           # Typed axios client
 │   │   │   ├── store.ts         # Auth state (Zustand)
-│   │   │   └── utils.ts         # Helpers date, couleurs
-│   │   └── types/index.ts       # Types partagés + constantes
+│   │   │   └── utils.ts         # Date/color helpers
+│   │   └── types/index.ts       # Shared types + constants
 │   ├── Dockerfile
 │   └── package.json
 │
-├── docker-compose.yml            # Backend + Frontend (nginx) — PostgreSQL et Traefik externes
-├── .env.example                  # Variables lues par docker-compose.yml
+├── docker-compose.yml            # Backend + Frontend (nginx) — PostgreSQL and Traefik are external
+├── .env.example                  # Variables read by docker-compose.yml
 └── LICENSE
 ```
 
 ---
 
-## 🗃️ Schéma de la base de données
+## 🗃️ Database schema
 
 ```
-User ──┬── UserProfile             (diagnostic, plages cibles)
-       ├── DailyEntry[]            (journal quotidien — poids/FC/sommeil avec provenance MANUAL|GOOGLE_HEALTH)
-       │     └── SymptomLog[]      (symptômes personnalisés)
-       ├── LabResult[]             (TSH, FT4, FT3, anticorps, carences)
-       ├── Medication[]            (traitements)
-       ├── Appointment[]           (rendez-vous médicaux)
-       ├── GoogleHealthConnection  (tokens chiffrés, synchro Pixel Watch...)
+User ──┬── UserProfile             (diagnosis, target ranges)
+       ├── DailyEntry[]            (daily log — weight/HR/sleep with source MANUAL|GOOGLE_HEALTH)
+       │     └── SymptomLog[]      (custom symptoms)
+       ├── LabResult[]             (TSH, FT4, FT3, antibodies, deficiencies)
+       ├── Medication[]            (treatments)
+       ├── Appointment[]           (medical appointments)
+       ├── GoogleHealthConnection  (encrypted tokens, Pixel Watch sync...)
        └── NotificationSetting
 ```
 
@@ -326,12 +344,12 @@ User ──┬── UserProfile             (diagnostic, plages cibles)
 POST   /api/auth/register
 POST   /api/auth/login
 GET    /api/auth/me
-GET    /api/auth/oidc/google            (redirige vers Google — OAuth2 + OpenID Connect)
+GET    /api/auth/oidc/google            (redirects to Google — OAuth2 + OpenID Connect)
 GET    /api/auth/oidc/google/callback
 
 GET    /api/entries?from=&to=
 GET    /api/entries/:date
-POST   /api/entries              (upsert par date)
+POST   /api/entries              (upsert by date)
 DELETE /api/entries/:date
 
 GET    /api/lab-results
@@ -355,50 +373,56 @@ PUT    /api/profile
 GET    /api/analytics/overview?days=90
 GET    /api/analytics/symptoms?days=30
 
-POST   /api/integrations/google-health/link      (démarre la connexion Pixel Watch/Google Health)
+POST   /api/integrations/google-health/link      (starts the Pixel Watch/Google Health connection)
 GET    /api/integrations/google-health/callback
 DELETE /api/integrations/google-health/link
-POST   /api/webhooks/google-health                (notifications Google + négociation de validation de l'abonné)
+POST   /api/webhooks/google-health                (Google notifications + subscriber validation handshake)
+
+POST   /graphql                                   (additive to the REST API above, doesn't replace it — see backend/docs/graphql.md)
 ```
 
 ---
 
 ## 🎨 Design System
 
-- **Palette** : fond sombre (#0b0d14), accent violet (#7b61ff), teal (#00d4b4), rose (#ff6b8a)
-- **Typographie** : DM Serif Display (titres) + DM Sans (corps)
-- **UI** : CSS Modules, responsive mobile avec navigation bas de page
+- **Palette**: dark background (#0b0d14), purple accent (#7b61ff), teal (#00d4b4), pink (#ff6b8a)
+- **Typography**: DM Serif Display (headings) + DM Sans (body)
+- **UI**: CSS Modules, mobile-responsive with bottom navigation
 
 ---
 
-## 📦 Stack technique
+## 📦 Tech stack
 
-| Couche | Technologie |
+| Layer | Technology |
 |---|---|
 | Runtime | Node.js 20 |
 | API | Express 4 + TypeScript |
+| GraphQL API | Apollo Server 5 + DataLoader (additive to REST, technical demo — see [`backend/docs/graphql.md`](./backend/docs/graphql.md)) |
 | ORM | Prisma 5 |
-| BDD | PostgreSQL |
+| Database | PostgreSQL |
 | Auth | JWT (jsonwebtoken) + bcryptjs, OAuth2 + OpenID Connect (Google, via `openid-client`) |
 | Validation | Zod |
 | Frontend | React 18 + Vite |
-| État | Zustand + TanStack Query |
-| Graphiques | Recharts |
+| State | Zustand + TanStack Query |
+| Charts | Recharts |
 | Routing | React Router 6 |
-| Déploiement | Docker Compose (self-hosted) |
+| Deployment | Docker Compose (self-hosted, Raspberry Pi) |
+| Reverse proxy | Traefik (shared, `traefik-net`) |
+| Public access | cloudflared (tunnel) |
+| Database (infra) | PostgreSQL 17, shared native instance (outside Docker) |
 
 ---
 
-## 🤝 Contribuer
+## 🤝 Contributing
 
-Voir [`CONTRIBUTING.md`](./CONTRIBUTING.md) pour l'environnement de développement, comment
-reproduire la CI en local, et le format des PR. En cas de problème, [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md)
-documente les incidents déjà rencontrés (et leur diagnostic) sur ce projet.
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the development setup, how to reproduce CI
+locally, and the PR format. If you hit an issue, [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md)
+documents incidents already encountered on this project (and their diagnosis).
 
 ## 📝 Changelog
 
-Les changements notables sont documentés dans [`CHANGELOG.md`](./CHANGELOG.md).
+Notable changes are documented in [`CHANGELOG.md`](./CHANGELOG.md) (French only).
 
-## 📄 Licence
+## 📄 License
 
-Projet privé — voir [`LICENSE`](./LICENSE).
+Private project — see [`LICENSE`](./LICENSE).
