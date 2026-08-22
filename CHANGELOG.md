@@ -78,6 +78,31 @@ numérotées.
 - `_to_delete/tf-changes.tar.gz` : archive de 26 Ko, explicitement nommée "à supprimer",
   toujours committée depuis son ajout accidentel.
 
+## 2026-08-22 — Bascule infra Pi : PostgreSQL partagé + Traefik
+
+Consolidation du déploiement sur l'hôte self-hosted (Raspberry Pi), sur deux axes indépendants.
+
+- **Base de données** : le service `postgres` dédié (conteneur `thyrotrack-postgres`,
+  PostgreSQL 16) est retiré de `docker-compose.yml`. Le backend se connecte désormais à une
+  instance PostgreSQL 17 partagée avec d'autres projets sur le même hôte, via un rôle applicatif
+  dédié à privilèges limités (accès à la seule base `thyrotrack`, pas de droits d'administration)
+  et `host.docker.internal` (`extra_hosts`) pour joindre l'hôte depuis le conteneur. Migration des
+  données existantes vérifiée par comptage exact (`COUNT(*)`) table par table avant bascule et
+  suppression de l'ancien conteneur. Variable d'environnement renommée `POSTGRES_PASSWORD` →
+  `DB_PASSWORD` dans `.env`/`.env.example`/`docker-compose.yml`. Le réseau Docker du projet
+  (`thyrotrack-network`) a un sous-réseau désormais fixé explicitement (`172.22.0.0/24`) plutôt
+  qu'attribué dynamiquement, pour que les règles d'accès réseau côté PostgreSQL restent valables
+  dans la durée.
+- **Reverse proxy** : le port `8082` n'est plus publié sur l'hôte. `frontend` rejoint le réseau
+  `traefik-net` (partagé, géré par une instance Traefik déjà existante sur l'hôte) et porte des
+  labels `traefik.*` routant `thyrotrack.alithiel31.dev` vers son port interne `80`. Le trafic
+  public passe désormais par `cloudflared → Traefik → frontend` plutôt que directement sur un
+  port exposé. `~/.cloudflared/config.yml` (hors dépôt, sur l'hôte) mis à jour en conséquence.
+
+Voir le diagramme d'architecture et la section Déploiement du README pour le détail de la
+nouvelle configuration, ainsi que les limites de portabilité de `docker-compose.yml` désormais
+lié à cet hôte précis (instance PostgreSQL et Traefik externes au projet).
+
 ## 2026-08-16 — Vitamines et dosages flexibles
 
 Les médicaments supposaient jusque-là une hormone thyroïdienne dosée en microgrammes avec une

@@ -40,26 +40,36 @@ Application web de suivi thyroïdien, inspirée de l'app Clue.
 ```mermaid
 flowchart LR
     UI["Navigateur"]
+    TR["Traefik<br/>reverse proxy (:8000)"]
 
     subgraph Host["Hôte Docker (docker-compose.yml)"]
-        FE["frontend<br/>nginx + build React/Vite<br/>:8082 → :80"]
+        FE["frontend<br/>nginx + build React/Vite<br/>:80"]
         BE["backend<br/>Express + TypeScript<br/>:3001"]
-        DB[("postgres<br/>PostgreSQL 16")]
         FE -- "proxy /api/*" --> BE
-        BE --> DB
     end
 
+    DB[("PostgreSQL 17<br/>instance partagée native (hors Docker)")]
     EXT["Google OAuth · Resend"]
 
-    UI -- "HTTPS :8082" --> FE
+    UI -- "HTTPS · cloudflared" --> TR
+    TR -- "Host: thyrotrack.alithiel31.dev" --> FE
+    BE -- "host.docker.internal:5432" --> DB
     BE -. "OIDC (connexion Google) / envoi d'email" .-> EXT
 ```
 
 Le conteneur `frontend` ne sert que des fichiers statiques (nginx) ; toutes les requêtes
 `/api/*` sont proxyfiées vers `backend` (voir `frontend/nginx.conf`), qui est seul à parler à
-PostgreSQL via Prisma. Le navigateur ne voit donc qu'une seule origine (`:8082`), ce qui évite
-toute configuration CORS côté client en production — `CORS_ORIGIN`/`FRONTEND_URL` restent un
-garde-fou si le backend est appelé directement.
+PostgreSQL via Prisma. Le navigateur ne voit donc qu'une seule origine, ce qui évite toute
+configuration CORS côté client en production — `CORS_ORIGIN`/`FRONTEND_URL` restent un garde-fou
+si le backend est appelé directement.
+
+Aucun port n'est publié sur l'hôte : `frontend` est joint au réseau `traefik-net` (créé par
+Traefik, déclaré `external: true` dans `docker-compose.yml`) et porte des labels
+`traefik.*` qui routent `thyrotrack.alithiel31.dev` vers son port interne `80`. Traefik est un
+service partagé entre plusieurs projets sur cet hôte, pas géré par ce repo. PostgreSQL n'est pas
+non plus un service de ce `docker-compose.yml` : c'est une instance partagée, elle aussi commune
+à plusieurs projets sur cet hôte, jointe depuis le conteneur `backend` via
+`host.docker.internal` (voir `extra_hosts` dans `docker-compose.yml`).
 
 ---
 
@@ -200,25 +210,46 @@ cd frontend && npm run dev  # http://localhost:5173
 
 ## 🐳 Déploiement (Docker Compose, self-hosted)
 
-Le déploiement réel de ce projet passe par `docker-compose.yml` à la racine : trois services (PostgreSQL, backend Express, frontend servi par nginx) construits depuis `backend/Dockerfile` et `frontend/Dockerfile`.
+Le déploiement réel de ce projet passe par `docker-compose.yml` à la racine : deux services
+(backend Express, frontend servi par nginx) construits depuis `backend/Dockerfile` et
+`frontend/Dockerfile`. Depuis le 2026-08-22, PostgreSQL n'est **plus** un service de ce fichier —
+le backend se connecte à une instance PostgreSQL partagée avec d'autres projets sur le même hôte,
+et le frontend n'expose plus de port : il est routé via un reverse proxy Traefik partagé lui
+aussi (voir le diagramme d'architecture ci-dessus). Ces deux dépendances externes sont donc
+préalables à tout déploiement avec ce fichier tel quel :
+
+- une instance PostgreSQL joignable en réseau, avec une base et un rôle applicatif déjà créés ;
+- une instance Traefik (provider Docker, réseau `traefik-net`) déjà en place sur l'hôte.
+
+> **Déploiement sur un hôte sans Traefik ni PostgreSQL partagé** (ex: un nouvel hôte, ou un test
+> isolé) : ce `docker-compose.yml` n'est plus autonome tel quel. Il faudrait soit réintroduire un
+> service `postgres` dédié et republier un port sur `frontend` (`ports: ["8082:80"]`, en retirant
+> les labels `traefik.*` et le réseau `traefik-net`), soit déployer sa propre instance Traefik.
+> Ce n'est pas documenté ici car ce n'est pas la configuration réellement utilisée pour ce
+> projet — demander si besoin.
 
 ### 1. Configurer l'environnement
 ```bash
 cp .env.example .env
-# Renseigner un POSTGRES_PASSWORD fort (ex: openssl rand -hex 24)
+# Renseigner DB_PASSWORD : le mot de passe du rôle applicatif PostgreSQL
+# (ex: openssl rand -hex 24), déjà créé sur l'instance partagée.
 
 cp backend/.env.example backend/.env
 # Renseigner JWT_SECRET (32+ caractères), RESEND_API_KEY, et
 # GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET si "Se connecter avec Google" est utilisé.
 # DATABASE_URL et FRONTEND_URL sont déjà fixés dans docker-compose.yml —
-# adaptez-y votre propre domaine avant de déployer.
+# adaptez-y votre propre domaine et votre hôte PostgreSQL avant de déployer.
 ```
 
 ### 2. Lancer
 ```bash
 docker compose up -d --build
 ```
-Le conteneur backend exécute automatiquement `prisma migrate deploy` au démarrage (voir `backend/Dockerfile`). Le frontend est disponible sur le port `8082` (voir `docker-compose.yml`), le backend en interne sur `3001`.
+Le conteneur backend exécute automatiquement `prisma migrate deploy` au démarrage (voir
+`backend/Dockerfile`) et rejoint PostgreSQL via `host.docker.internal` (voir `extra_hosts` dans
+`docker-compose.yml`) — la base doit donc déjà exister avec le rôle applicatif attendu par
+`DATABASE_URL`. Le frontend est routé par Traefik d'après ses labels `traefik.*` (règle `Host`
+sur le domaine configuré), le backend reste en interne sur `3001`.
 
 ### 3. Seeder les données de démo (optionnel)
 ```bash
@@ -267,7 +298,7 @@ thyro-track/
 │   ├── Dockerfile
 │   └── package.json
 │
-├── docker-compose.yml            # Backend + Frontend (nginx) + PostgreSQL
+├── docker-compose.yml            # Backend + Frontend (nginx) — PostgreSQL et Traefik externes
 ├── .env.example                  # Variables lues par docker-compose.yml
 └── LICENSE
 ```
