@@ -1,9 +1,10 @@
 # Changelog
 
 Tous les changements notables de ce projet sont documentés ici. Format inspiré de
-[Keep a Changelog](https://keepachangelog.com/fr/1.0.0/). Le projet n'utilise pas de versions
-sémantiques taguées (`package.json` reste en `1.0.0`) : les entrées sont datées plutôt que
-numérotées.
+[Keep a Changelog](https://keepachangelog.com/fr/1.0.0/). Les entrées ci-dessous restent datées
+plutôt que rattachées à un numéro de version — seules les [releases GitHub](https://github.com/Alithiel31/ThyFollow/releases)
+(à partir de `v1.0.0`) sont taguées ; `package.json` reste volontairement fixé à `1.0.0` et n'est
+pas synchronisé avec ces tags.
 
 ## [Unreleased]
 
