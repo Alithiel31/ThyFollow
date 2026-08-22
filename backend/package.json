@@ -34,7 +34,7 @@
     "google-auth-library": "^11.0.2",
     "graphql": "^16.14.2",
     "helmet": "^8.0.0",
-    "i18next": "^26.3.4",
+    "i18next": "^26.3.6",
     "i18next-http-middleware": "^3.9.7",
     "jsonwebtoken": "^9.0.2",
     "openid-client": "^6.8.5",
