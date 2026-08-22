@@ -1,14 +1,21 @@
 node_modules/
 dist/
-.env
-*.env.local
-.DS_Store
+coverage/
+*.tsbuildinfo
+
+.env*
+!.env.example
+!*/.env.example
+
 *.log
+.DS_Store
+Thumbs.db
+desktop.ini
+
 prisma/migrations/*.sql.bak
-frontend/dist/
-backend/dist/
+
 .claude/
+
 thyro-track-conceptArt.pdf
 ThyroTrack Mobile (standalone).html
 ConceptArt
-.claude
