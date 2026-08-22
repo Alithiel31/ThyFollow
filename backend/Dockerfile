@@ -1,5 +1,5 @@
 # ── Build ────────────────────────────────────────────────────
-FROM node:20-alpine AS builder
+FROM node:26-alpine AS builder
 WORKDIR /app
 
 RUN apk add --no-cache openssl
@@ -14,7 +14,7 @@ RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" npx prisma gene
 RUN npm run build
 
 # ── Runtime ──────────────────────────────────────────────────
-FROM node:20-alpine
+FROM node:26-alpine
 WORKDIR /app
 
 RUN apk add --no-cache dumb-init openssl
