@@ -16,6 +16,4 @@ prisma/migrations/*.sql.bak
 
 .claude/
 
-thyro-track-conceptArt.pdf
-ThyroTrack Mobile (standalone).html
-ConceptArt
+Docs/

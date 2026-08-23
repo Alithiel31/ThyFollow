@@ -1,9 +1,10 @@
 # Changelog
 
 Tous les changements notables de ce projet sont documentés ici. Format inspiré de
-[Keep a Changelog](https://keepachangelog.com/fr/1.0.0/). Le projet n'utilise pas de versions
-sémantiques taguées (`package.json` reste en `1.0.0`) : les entrées sont datées plutôt que
-numérotées.
+[Keep a Changelog](https://keepachangelog.com/fr/1.0.0/). Les entrées ci-dessous restent datées
+plutôt que rattachées à un numéro de version — seules les [releases GitHub](https://github.com/Alithiel31/ThyFollow/releases)
+(à partir de `v1.0.0`) sont taguées ; `package.json` reste volontairement fixé à `1.0.0` et n'est
+pas synchronisé avec ces tags.
 
 ## [Unreleased]
 
@@ -25,6 +26,16 @@ numérotées.
 
 ### Added
 
+- Endpoint `POST /graphql` (Apollo Server 5), additif à la REST API existante — aucune route
+  REST retirée ou modifiée, le frontend continue d'utiliser exclusivement `/api/*`. Démo
+  technique de design de schéma, resolvers imbriqués, auth JWT bridgée depuis
+  `middleware/auth.ts`, et surtout du piège N+1 (résolu via `DataLoader` sur
+  `Medication.intakes`/`DailyEntry.symptomLogs`, testé par assertion `toHaveBeenCalledTimes(1)`).
+  Voir [`backend/docs/graphql.md`](./backend/docs/graphql.md) pour le détail (avant/après,
+  auth, ce qui est volontairement hors scope).
+- `.github/dependabot.yml` : mises à jour hebdomadaires groupées pour les deux `package.json`
+  (npm), les `Dockerfile` (docker) et les actions utilisées par `ci.yml` (github-actions) —
+  chaque PR ouverte passe par la CI existante avant merge.
 - Synchronisation Google Health (poids, rythme cardiaque, heures de sommeil) depuis un appareil
   connecté (ex: Pixel Watch) : connexion/déconnexion dédiée dans le Profil (distincte de "Se
   connecter avec Google"), tokens chiffrés au repos (AES-256-GCM), synchro en arrière-plan par
@@ -45,6 +56,11 @@ numérotées.
 
 ### Changed
 
+- Documents non applicatifs de la racine (`ConceptArt/`, `thyro-track-conceptArt.pdf`, la
+  maquette HTML standalone) regroupés sous un unique dossier `Docs/`, ignoré en une seule ligne
+  de `.gitignore` au lieu de trois. `thyrotrack_backup_20260822.dump` (un dump PostgreSQL commité
+  par erreur dans l'infra Pi ci-dessous) a été retiré du suivi git et déplacé dans `Docs/` — il
+  reste disponible en local, simplement plus versionné.
 - Section déploiement du `README.md` réécrite autour de Docker Compose (le déploiement réel,
   `docker-compose.yml` + Dockerfiles) — elle décrivait encore Railway et des fichiers
   (`railway.toml`, `nixpacks.toml`) qui n'existent plus dans le repo depuis l'abandon de cette
