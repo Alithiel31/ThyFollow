@@ -38,6 +38,7 @@
     "i18next-http-middleware": "^3.9.7",
     "jsonwebtoken": "^9.0.2",
     "openid-client": "^6.8.5",
+    "prisma": "^5.10.0",
     "resend": "^4.8.0",
     "zod": "^3.22.4"
   },
@@ -53,7 +54,6 @@
     "eslint-config-prettier": "^9.1.0",
     "globals": "^15.9.0",
     "prettier": "^3.3.3",
-    "prisma": "^5.10.0",
     "supertest": "^7.2.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
