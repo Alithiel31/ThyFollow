@@ -18,6 +18,12 @@ services:
       # parle uniquement à nginx sur le port public). CORS_ORIGIN reste un
       # garde-fou si jamais le backend est appelé directement.
       FRONTEND_URL: http://caesura:8082,https://thyrotrack.alithiel31.dev
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       - thyrotrack-network
 
@@ -28,7 +34,8 @@ services:
     container_name: thyrotrack-frontend
     restart: unless-stopped
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - thyrotrack-network
       - traefik-net
