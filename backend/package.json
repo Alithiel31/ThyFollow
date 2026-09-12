@@ -35,7 +35,7 @@
     "graphql": "^16.14.2",
     "helmet": "^8.0.0",
     "i18next": "^26.4.1",
-    "i18next-http-middleware": "^3.9.7",
+    "i18next-http-middleware": "^3.9.9",
     "jsonwebtoken": "^9.0.2",
     "openid-client": "^6.8.5",
     "prisma": "^5.10.0",
