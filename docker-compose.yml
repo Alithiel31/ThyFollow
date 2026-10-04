@@ -6,6 +6,8 @@ services:
       dockerfile: Dockerfile
     container_name: thyrotrack-backend
     restart: unless-stopped
+    labels:
+      - "homelab.tier=app"
     env_file:
       - ./backend/.env
     extra_hosts:
@@ -40,6 +42,7 @@ services:
       - thyrotrack-network
       - traefik-net
     labels:
+      - "homelab.tier=app"
       - "traefik.enable=true"
       - "traefik.http.routers.thyrotrack.rule=Host(`thyrotrack.alithiel31.dev`)"
       - "traefik.http.routers.thyrotrack.entrypoints=web"
