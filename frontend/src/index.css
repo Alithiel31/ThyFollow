@@ -6,34 +6,34 @@
   color-scheme: light;
 
   /* ── Surfaces */
-  --bg: #faf6f1;            /* fond de page : blanc cassé chaud (maquette jour) */
-  --bg-card: #ffffff;       /* cartes */
-  --bg-raised: #f3ede5;     /* inputs, hovers, éléments posés sur une carte */
-  --border: rgba(20, 30, 50, 0.08);
-  --border-hover: rgba(20, 30, 50, 0.18);
+  --bg: #f3f6fb;            /* fond lumineux bleu-gris */
+  --bg-card: #ffffff;
+  --bg-raised: #f5f7fc;
+  --border: rgba(25, 45, 84, 0.09);
+  --border-hover: rgba(25, 45, 84, 0.2);
 
   /* ── Couleur principale : bleu */
-  --accent: #3b7bf6;
-  --accent-strong: #2159d1;
-  --accent-soft: rgba(59, 123, 246, 0.12);
+  --accent: #285ac5;
+  --accent-strong: #1d469f;
+  --accent-soft: rgba(40, 90, 197, 0.11);
   --on-accent: #ffffff;
   /* Dégradé des boutons primaires (maquette) */
-  --accent-grad: linear-gradient(135deg, #3b7bf6, #2159d1);
+  --accent-grad: linear-gradient(135deg, #3569d1, #214da9);
 
   /* ── Motif pointillé du fond de page (maquette) */
-  --dot: rgba(0, 0, 0, 0.035);
+  --dot: rgba(31, 69, 137, 0.018);
 
   /* ── Secondaire : orange */
-  --lav: #e8650f;
-  --lav-soft: rgba(232, 101, 15, 0.12);
+  --lav: #8061cf;
+  --lav-soft: rgba(128, 97, 207, 0.11);
 
   /* ── Statuts */
-  --success: #2f8a5d;
-  --success-soft: rgba(47, 138, 93, 0.12);
-  --danger: #dc3d3d;
-  --danger-soft: rgba(220, 61, 61, 0.10);
-  --warn: #c07a1a;
-  --warn-soft: rgba(192, 122, 26, 0.14);
+  --success: #178875;
+  --success-soft: rgba(23, 136, 117, 0.12);
+  --danger: #d75067;
+  --danger-soft: rgba(215, 80, 103, 0.10);
+  --warn: #bd7c24;
+  --warn-soft: rgba(189, 124, 36, 0.13);
 
   /* ── Alias hérités (anciens noms utilisés par les modules) */
   --teal: var(--success);
@@ -45,14 +45,14 @@
   --accent-glow: var(--accent-soft);
 
   /* ── Graphiques (bleu / orange, comme la maquette) */
-  --chart-1: #3b7bf6;
-  --chart-2: #e8650f;
-  --chart-grid: rgba(20, 30, 50, 0.07);
+  --chart-1: #8061cf;
+  --chart-2: #2698aa;
+  --chart-grid: rgba(25, 45, 84, 0.09);
 
   /* ── Texte */
-  --text: #241f1a;
-  --text-dim: #5c554d;
-  --text-muted: #8a8078;
+  --text: #20283a;
+  --text-dim: #4f5c73;
+  --text-muted: #71809a;
 
   /* ── Typographie */
   --font-body: 'Manrope', system-ui, sans-serif;
@@ -65,9 +65,9 @@
   --radius-xl: 24px;
 
   /* ── Ombres */
-  --shadow-sm: 0 1px 2px rgba(60, 40, 20, 0.04);
-  --shadow: 0 4px 12px rgba(60, 40, 20, 0.04);
-  --shadow-accent: 0 8px 20px rgba(59, 123, 246, 0.25);
+  --shadow-sm: 0 1px 2px rgba(23, 42, 78, 0.04);
+  --shadow: 0 5px 18px rgba(23, 42, 78, 0.055);
+  --shadow-accent: 0 8px 20px rgba(40, 90, 197, 0.22);
 
   /* ── Overlay des modales (fonctionne sur les deux thèmes) */
   --overlay: rgba(10, 12, 18, 0.45);
@@ -76,40 +76,40 @@
   --tap: 44px;
 }
 
-/* Jeu nuit : bleu nuit profond de la maquette */
+/* Thème sombre : bleu nuit inspiré de l’identité ThyroTrack */
 [data-theme='dark'] {
   color-scheme: dark;
 
-  --bg: #0a0c12;
-  --bg-card: #14161f;
-  --bg-raised: #1e2230;
-  --border: rgba(255, 255, 255, 0.07);
-  --border-hover: rgba(255, 255, 255, 0.16);
+  --bg: #0d172b;
+  --bg-card: #15223a;
+  --bg-raised: #1d2c47;
+  --border: rgba(197, 211, 244, 0.1);
+  --border-hover: rgba(197, 211, 244, 0.2);
 
-  --accent: #3b7bf6;
-  --accent-strong: #6ea8ff;
-  --accent-soft: rgba(59, 123, 246, 0.16);
+  --accent: #78a1ff;
+  --accent-strong: #a9c1ff;
+  --accent-soft: rgba(120, 161, 255, 0.16);
   --on-accent: #ffffff;
 
   --dot: rgba(255, 255, 255, 0.035);
 
-  --lav: #f2761f;
-  --lav-soft: rgba(242, 118, 31, 0.15);
+  --lav: #b49aef;
+  --lav-soft: rgba(180, 154, 239, 0.16);
 
-  --success: #5cb87f;
-  --success-soft: rgba(92, 184, 127, 0.14);
-  --danger: #ef4444;
-  --danger-soft: rgba(239, 68, 68, 0.14);
-  --warn: #f2a71f;
-  --warn-soft: rgba(242, 167, 31, 0.14);
+  --success: #69d0ae;
+  --success-soft: rgba(105, 208, 174, 0.15);
+  --danger: #ff8498;
+  --danger-soft: rgba(255, 132, 152, 0.15);
+  --warn: #f0b760;
+  --warn-soft: rgba(240, 183, 96, 0.15);
 
-  --chart-1: #3b7bf6;
-  --chart-2: #f2761f;
-  --chart-grid: rgba(255, 255, 255, 0.06);
+  --chart-1: #ad92ef;
+  --chart-2: #51c8c2;
+  --chart-grid: rgba(197, 211, 244, 0.1);
 
-  --text: #eceefb;
-  --text-dim: #a6aac2;
-  --text-muted: #5c6180;
+  --text: #eef3ff;
+  --text-dim: #c0cce3;
+  --text-muted: #97a7c4;
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
   --shadow: 0 2px 6px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.30);
@@ -121,36 +121,36 @@
   :root:not([data-theme='light']) {
     color-scheme: dark;
 
-    --bg: #0a0c12;
-    --bg-card: #14161f;
-    --bg-raised: #1e2230;
-    --border: rgba(255, 255, 255, 0.07);
-    --border-hover: rgba(255, 255, 255, 0.16);
+    --bg: #0d172b;
+    --bg-card: #15223a;
+    --bg-raised: #1d2c47;
+    --border: rgba(197, 211, 244, 0.1);
+    --border-hover: rgba(197, 211, 244, 0.2);
 
-    --accent: #3b7bf6;
-    --accent-strong: #6ea8ff;
-    --accent-soft: rgba(59, 123, 246, 0.16);
+    --accent: #78a1ff;
+    --accent-strong: #a9c1ff;
+    --accent-soft: rgba(120, 161, 255, 0.16);
     --on-accent: #ffffff;
 
-    --lav: #f2761f;
-    --lav-soft: rgba(242, 118, 31, 0.15);
+    --lav: #b49aef;
+    --lav-soft: rgba(180, 154, 239, 0.16);
 
-    --success: #5cb87f;
-    --success-soft: rgba(92, 184, 127, 0.14);
-    --danger: #ef4444;
-    --danger-soft: rgba(239, 68, 68, 0.14);
-    --warn: #f2a71f;
-    --warn-soft: rgba(242, 167, 31, 0.14);
+    --success: #69d0ae;
+    --success-soft: rgba(105, 208, 174, 0.15);
+    --danger: #ff8498;
+    --danger-soft: rgba(255, 132, 152, 0.15);
+    --warn: #f0b760;
+    --warn-soft: rgba(240, 183, 96, 0.15);
 
     --dot: rgba(255, 255, 255, 0.035);
 
-    --chart-1: #3b7bf6;
-    --chart-2: #f2761f;
-    --chart-grid: rgba(255, 255, 255, 0.06);
+    --chart-1: #ad92ef;
+    --chart-2: #51c8c2;
+    --chart-grid: rgba(197, 211, 244, 0.1);
 
-    --text: #eceefb;
-    --text-dim: #a6aac2;
-    --text-muted: #5c6180;
+    --text: #eef3ff;
+    --text-dim: #c0cce3;
+    --text-muted: #97a7c4;
 
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
     --shadow: 0 2px 6px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.30);
@@ -167,9 +167,7 @@ html { font-size: 16px; scroll-behavior: smooth; }
 body {
   font-family: var(--font-body);
   background: var(--bg);
-  /* Motif pointillé discret, comme sur toutes les maquettes */
-  background-image: radial-gradient(circle, var(--dot) 1px, transparent 1px);
-  background-size: 20px 20px;
+  background-image: none;
   color: var(--text);
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;

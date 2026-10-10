@@ -4,12 +4,17 @@
   },
   "nav": {
     "dashboard": "Dashboard",
+    "dashboardShort": "Home",
     "log": "Log",
     "labResults": "Lab results",
+    "labResultsShort": "Labs",
     "medications": "Medications",
+    "medicationsShort": "Meds",
     "appointments": "Appointments",
+    "appointmentsShort": "Visits",
     "learn": "Learn",
     "profile": "My profile",
+    "more": "More",
     "writing": "Writing",
     "mainLabel": "Main navigation",
     "mobileLabel": "Mobile navigation"
@@ -120,6 +125,9 @@
   },
   "dashboard": {
     "greeting": "Hello, {{name}}",
+    "heroEyebrow": "Thyroid care · One day at a time",
+    "weekAtGlance": "Your week at a glance",
+    "appointmentIntro": "Your next appointment",
     "logToday": "Today's log",
     "kpi": {
       "streak": "Active streak",
