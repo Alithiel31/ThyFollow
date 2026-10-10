@@ -4,12 +4,17 @@
   },
   "nav": {
     "dashboard": "Tableau de bord",
+    "dashboardShort": "Accueil",
     "log": "Journal",
     "labResults": "Analyses",
+    "labResultsShort": "Labo",
     "medications": "Médicaments",
+    "medicationsShort": "Traitements",
     "appointments": "Rendez-vous",
+    "appointmentsShort": "RDV",
     "learn": "Comprendre",
     "profile": "Mon profil",
+    "more": "Plus",
     "writing": "Rédaction",
     "mainLabel": "Navigation principale",
     "mobileLabel": "Navigation mobile"
@@ -120,6 +125,9 @@
   },
   "dashboard": {
     "greeting": "Bonjour, {{name}}",
+    "heroEyebrow": "Suivi thyroïdien · Un jour à la fois",
+    "weekAtGlance": "Ton suivi, cette semaine",
+    "appointmentIntro": "Un prochain rendez-vous à garder en tête",
     "logToday": "Journal du jour",
     "kpi": {
       "streak": "Série active",

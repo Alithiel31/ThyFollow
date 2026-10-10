@@ -8,7 +8,7 @@ import { formatDate, formatDateShort, tshStatus, toISODate } from '../lib/utils'
 import { LAB_RANGES } from '../types';
 import {
   Flame, TrendingUp, Pill, Calendar, FlaskConical,
-  Plus, ChevronRight, Activity, BookOpen
+  Plus, ChevronRight, BookOpen
 } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, Tooltip,
@@ -67,6 +67,7 @@ export function DashboardPage() {
       {/* ── Header */}
       <div className={styles.header}>
         <div>
+          <p className={styles.heroEyebrow}>{t('dashboard.heroEyebrow')}</p>
           <h1 className={styles.greeting}>
             {t('dashboard.greeting', { name: user?.name?.split(' ')[0] })}
           </h1>
@@ -77,6 +78,30 @@ export function DashboardPage() {
           {t('dashboard.logToday')}
         </button>
       </div>
+
+      <section className={styles.appointmentBanner} aria-label={t('dashboard.nextAppointment')}>
+        <div className={styles.appointmentDateBadge}>
+          <Calendar size={19} aria-hidden="true" />
+        </div>
+        <div className={styles.appointmentCopy}>
+          <p className={styles.appointmentEyebrow}>{t('dashboard.appointmentIntro')}</p>
+          {overview?.nextAppointment ? (
+            <>
+              <p className={styles.appointmentTitle}>{APPT_LABELS[overview.nextAppointment.type]}</p>
+              <p className={styles.appointmentMeta}>
+                {formatDate(overview.nextAppointment.date, 'EEEE d MMMM')}
+                {overview.nextAppointment.doctorName && ` · ${overview.nextAppointment.doctorName}`}
+              </p>
+            </>
+          ) : (
+            <p className={styles.appointmentTitle}>{t('dashboard.noAppointment')}</p>
+          )}
+        </div>
+        <button className={styles.appointmentLink} onClick={() => navigate('/appointments')}>
+          {overview?.nextAppointment ? t('dashboard.manage') : t('common.add')}
+          <ChevronRight size={16} aria-hidden="true" />
+        </button>
+      </section>
 
       {/* ── KPI strip */}
       <div className={styles.kpiRow}>
@@ -186,30 +211,6 @@ export function DashboardPage() {
             )}
           </div>
 
-          {/* Next appointment */}
-          <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>{t('dashboard.nextAppointment')}</span>
-              <button className={styles.cardLink} onClick={() => navigate('/appointments')}>
-                {t('dashboard.manage')} <ChevronRight size={14} />
-              </button>
-            </div>
-            {overview?.nextAppointment ? (
-              <div className={styles.apptRow}>
-                <div className={styles.apptIcon}><Calendar size={18} /></div>
-                <div>
-                  <p className={styles.apptType}>{APPT_LABELS[overview.nextAppointment.type]}</p>
-                  <p className={styles.apptDate}>
-                    {formatDate(overview.nextAppointment.date, 'EEEE d MMMM')}
-                    {overview.nextAppointment.doctorName && ` — ${overview.nextAppointment.doctorName}`}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <p className={styles.empty}>{t('dashboard.noAppointment')}</p>
-            )}
-          </div>
-
           {/* Active medications */}
           <div className={styles.card}>
             <div className={styles.cardHeader}>
@@ -249,14 +250,6 @@ export function DashboardPage() {
         </div>
       )}
 
-      {/* ── Quick log CTA */}
-      <div className={styles.ctaBanner}>
-        <Activity size={20} />
-        <span>{t('dashboard.ctaQuestion')}</span>
-        <button onClick={() => navigate(`/log/${today}`)}>
-          {t('dashboard.ctaButton')}
-        </button>
-      </div>
     </div>
   );
 }
