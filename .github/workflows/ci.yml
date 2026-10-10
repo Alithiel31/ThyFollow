@@ -78,7 +78,7 @@ jobs:
       - uses: docker/setup-buildx-action@v4
 
       # Build uniquement (pas de push) : détecte une image cassée avant le merge.
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         with:
           context: ./${{ matrix.service }}
           push: false
