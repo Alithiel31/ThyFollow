@@ -13,22 +13,22 @@ export function VerifyEmailPage() {
   const { t } = useTranslation();
   const [params] = useSearchParams();
   const token = params.get('token');
-  const [status, setStatus] = useState<Status>('verifying');
+  // Sans jeton dans l'URL l'erreur est immédiate (déduite) ; sinon on attend
+  // le verdict de l'API.
+  const [result, setResult] = useState<Exclude<Status, 'verifying'> | null>(null);
+  const status: Status = !token ? 'error' : (result ?? 'verifying');
   const { setAuth } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!token) {
-      setStatus('error');
-      return;
-    }
+    if (!token) return;
     authApi.verifyEmail(token)
       .then(({ data }) => {
         setAuth(data.user, data.token);
-        setStatus('success');
+        setResult('success');
         setTimeout(() => navigate('/dashboard'), 1500);
       })
-      .catch(() => setStatus('error'));
+      .catch(() => setResult('error'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
