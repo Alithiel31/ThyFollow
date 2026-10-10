@@ -24,15 +24,23 @@ updates:
       dev-dependencies:
         dependency-type: "development"
 
+  # Node : on reste sur une version LTS (paire) ; le passage à la LTS suivante
+  # se fait à la main (Dockerfiles + .nvmrc), pas via Dependabot.
   - package-ecosystem: "docker"
     directory: "/backend"
     schedule:
       interval: "weekly"
+    ignore:
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "docker"
     directory: "/frontend"
     schedule:
       interval: "weekly"
+    ignore:
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
