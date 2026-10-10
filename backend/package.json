@@ -37,7 +37,7 @@
     "i18next": "^26.4.1",
     "i18next-http-middleware": "^3.9.7",
     "jsonwebtoken": "^9.0.2",
-    "openid-client": "^6.8.5",
+    "openid-client": "^6.8.8",
     "prisma": "^5.10.0",
     "resend": "^4.8.0",
     "zod": "^4.5.4"
