@@ -19,6 +19,11 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      // Règles « React Compiler » ajoutées par eslint-plugin-react-hooks 7.
+      // En avertissement le temps de réécrire les effets concernés
+      // (DashboardPage, LogPage, OAuthCallbackPage, ProfilePage, VerifyEmailPage).
+      'react-hooks/set-state-in-effect': 'warn',
+      'react-hooks/purity': 'warn',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     },
