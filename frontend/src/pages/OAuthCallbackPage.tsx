@@ -15,13 +15,16 @@ import styles from './AuthPage.module.css';
 export function OAuthCallbackPage() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
-  const [error, setError] = useState(false);
+  const code = searchParams.get('code');
+  // Sans code dans l'URL l'erreur est immédiate (déduite) ; sinon elle vient
+  // d'un échec de l'échange.
+  const [exchangeFailed, setExchangeFailed] = useState(false);
+  const error = !code || exchangeFailed;
   const { setAuth } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const code = searchParams.get('code');
-    if (!code) { setError(true); return; }
+    if (!code) return;
 
     authApi.exchangeOidcCode(code)
       .then(({ data: { token } }) => {
@@ -35,7 +38,7 @@ export function OAuthCallbackPage() {
       })
       .catch(() => {
         localStorage.removeItem('thyro_token');
-        setError(true);
+        setExchangeFailed(true);
       });
   }, []); // eslint-disable-line
 
