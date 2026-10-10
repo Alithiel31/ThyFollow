@@ -139,9 +139,14 @@ export function ProfilePage() {
     queryFn: () => securityApi.events().then((r) => r.data),
   });
 
-  useEffect(() => {
+  // Recopie le profil chargé dans le formulaire dès qu'il change. Ajustement
+  // d'état pendant le rendu (plutôt que dans un effet) : pas de rendu
+  // intermédiaire avec un formulaire vide.
+  const [syncedProfile, setSyncedProfile] = useState(profile);
+  if (profile !== syncedProfile) {
+    setSyncedProfile(profile);
     if (profile) setForm(profile);
-  }, [profile]);
+  }
 
   const updateMut = useMutation({
     mutationFn: (data: Partial<UserProfile>) => profileApi.update(data),
