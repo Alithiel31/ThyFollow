@@ -1,5 +1,5 @@
 // src/pages/LogPage.tsx
-import { useState, useEffect, useId } from 'react';
+import { useState, useId } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -87,10 +87,15 @@ export function LogPage() {
     queryFn: () => entriesApi.getByDate(date).then((r) => r.data),
   });
 
-  useEffect(() => {
-    if (existing) setForm(existing);
-    else setForm({ medicationTaken: false, tags: [], date });
-  }, [existing, date]);
+  // Resynchronise le formulaire quand l'entrée chargée ou la date change.
+  // Ajustement d'état pendant le rendu (plutôt que dans un effet) : React
+  // refait le rendu tout de suite, sans afficher l'ancien formulaire une
+  // fois. `synced` vaut null au premier rendu pour forcer la 1re synchro.
+  const [synced, setSynced] = useState<{ existing: DailyEntry | null | undefined; date: string } | null>(null);
+  if (!synced || synced.existing !== existing || synced.date !== date) {
+    setSynced({ existing, date });
+    setForm(existing ?? { medicationTaken: false, tags: [], date });
+  }
 
   const mutation = useMutation({
     mutationFn: (data: Partial<DailyEntry> & { date: string }) => entriesApi.upsert(data),
