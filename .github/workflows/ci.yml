@@ -125,3 +125,24 @@ jobs:
       # Échoue (code 2) si schema.prisma contient des changements sans migration.
       - name: Check schema drift
         run: npx prisma migrate diff --from-url "$DATABASE_URL" --to-schema-datamodel prisma/schema.prisma --exit-code
+
+  audit:
+    name: Audit (${{ matrix.service }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [backend, frontend]
+    defaults:
+      run:
+        working-directory: ${{ matrix.service }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      # Dépendances de production uniquement, échec à partir de "high".
+      - run: npm audit --omit=dev --audit-level=high
