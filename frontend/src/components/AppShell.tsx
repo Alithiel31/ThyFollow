@@ -166,6 +166,15 @@ export function AppShell() {
 
       {/* ── Navigation basse (mobile) */}
       {moreOpen && (
+        <button
+          type="button"
+          className={styles.mobileBackdrop}
+          aria-label={t('nav.more')}
+          tabIndex={-1}
+          onClick={() => setMoreOpen(false)}
+        />
+      )}
+      {moreOpen && (
         <div className={styles.mobileMore}>
           <NavLink to="/learn" onClick={() => setMoreOpen(false)}>
             <BookOpen size={17} /> <span>{t('nav.learn')}</span>

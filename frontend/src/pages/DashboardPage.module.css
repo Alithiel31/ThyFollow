@@ -224,35 +224,6 @@
   transition: width 0.5s ease;
 }
 
-/* ── Appointment */
-.apptRow {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.apptIcon {
-  width: 38px; height: 38px;
-  background: var(--accent-soft);
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--accent);
-  flex-shrink: 0;
-}
-
-.apptType {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text);
-}
-
-.apptDate {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  margin-top: 2px;
-  text-transform: capitalize;
-}
-
 /* ── Medications */
 .medRow {
   display: flex;
@@ -282,36 +253,6 @@
   font-size: 0.78rem;
   color: var(--text-muted);
 }
-
-/* ── CTA Banner */
-.ctaBanner {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  background: var(--accent-soft);
-  border: 1px solid var(--accent-glow);
-  border-radius: var(--radius);
-  padding: 16px 22px;
-  color: var(--accent);
-  font-size: 0.9rem;
-}
-
-.ctaBanner span { flex: 1; }
-
-.ctaBanner button {
-  background: var(--accent);
-  color: var(--on-accent);
-  border: none;
-  border-radius: var(--radius-sm);
-  padding: 8px 16px;
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: opacity 0.15s;
-}
-.ctaBanner button:hover { opacity: 0.85; }
 
 /* ── Responsive */
 @media (max-width: 1024px) {
@@ -507,7 +448,6 @@
 .chartWrap { min-height: 220px; }
 .legend { font-size: 0.72rem; }
 .labRow { gap: 8px; }
-.apptIcon { background: var(--accent-soft); }
 .medRow { padding: 10px 0; }
 
 .tipCard {

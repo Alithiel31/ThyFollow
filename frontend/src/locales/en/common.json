@@ -147,8 +147,6 @@
     "noAppointment": "No appointment scheduled",
     "activeTreatment": "Active treatment",
     "noActiveMedication": "No active medication",
-    "ctaQuestion": "Have you filled in today's log?",
-    "ctaButton": "Fill it in now",
     "apptTypes": {
       "ENDOCRINOLOGIST": "Endocrinologist",
       "GENERAL_PRACTITIONER": "General practitioner",
