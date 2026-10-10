@@ -9,7 +9,7 @@ COPY tsconfig.json ./
 COPY prisma ./prisma/
 COPY src ./src/
 
-RUN npm install
+RUN npm ci
 RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" npx prisma generate
 RUN npm run build
 
@@ -22,7 +22,7 @@ RUN apk add --no-cache dumb-init openssl
 COPY package*.json ./
 COPY prisma ./prisma/
 
-RUN npm install --omit=dev
+RUN npm ci --omit=dev
 RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" npx prisma generate
 
 COPY --from=builder /app/dist ./dist/
