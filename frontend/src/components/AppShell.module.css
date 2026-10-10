@@ -258,33 +258,9 @@
   white-space: nowrap;
 }
 
-/* Glyphe cerclé (inactif) → plein bleu (actif), comme la maquette.
-   Trois formes : rond, carré arrondi, losange (maquette Mobile). */
-.navDot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  border: 1.5px solid var(--border-hover);
-  background: transparent;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-
-.navDotSquare { border-radius: 3px; }
-
-.navDotDiamond {
-  border-radius: 2px;
-  transform: rotate(45deg);
-  width: 8px; height: 8px;
-  margin: 1px;
-}
-
 .mobileNavItemActive {
   color: var(--accent-strong);
   font-weight: 600;
-}
-
-.mobileNavItemActive .navDot {
-  background: var(--accent);
-  border-color: var(--accent);
 }
 
 /* ── Responsive ────────────────────────────── */
@@ -367,6 +343,8 @@
   border: 0;
   background: transparent;
   text-align: left;
+  font: inherit;
+  color: inherit;
   cursor: pointer;
 }
 
@@ -426,6 +404,14 @@
 .mobileNavItemActive { color: #d4deff; }
 .mobileNavItem svg { flex-shrink: 0; }
 
+.mobileBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 59;
+  border: 0;
+  background: transparent;
+}
+
 .mobileMore {
   position: fixed;
   right: 12px;
@@ -460,5 +446,6 @@
 }
 
 @media (min-width: 769px) {
-  .mobileMore { display: none; }
+  .mobileMore,
+  .mobileBackdrop { display: none; }
 }
