@@ -1,12 +1,13 @@
 // src/components/AppShell.tsx
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../lib/store';
 import { useThemeStore, type ThemeMode } from '../lib/theme';
 import {
   LayoutDashboard, FlaskConical, Pill, Calendar,
   ClipboardEdit, User, LogOut,
-  Sun, Moon, MonitorSmartphone, BookOpen, PenLine, Languages,
+  Sun, Moon, MonitorSmartphone, BookOpen, PenLine, Languages, MoreHorizontal,
 } from 'lucide-react';
 import styles from './AppShell.module.css';
 
@@ -15,12 +16,12 @@ function LogoMark() {
   return (
     <div className={styles.logoIcon} aria-hidden="true">
       <svg width="24" height="18" viewBox="0 0 64 48" style={{ display: 'block' }}>
-        <ellipse cx="34" cy="20" rx="4.4" ry="16" fill="#3b7bf6" transform="rotate(-45 34 36)" />
-        <ellipse cx="34" cy="22" rx="3.9" ry="14" fill="#2159d1" transform="rotate(-30 34 36)" />
-        <ellipse cx="34" cy="26" rx="3.1" ry="10" fill="#3b7bf6" transform="rotate(-15 34 36)" />
-        <ellipse cx="34" cy="20" rx="4.4" ry="16" fill="#f2761f" transform="rotate(45 34 36)" />
-        <ellipse cx="34" cy="22" rx="3.9" ry="14" fill="#c85b0f" transform="rotate(30 34 36)" />
-        <ellipse cx="34" cy="26" rx="3.1" ry="10" fill="#f2761f" transform="rotate(15 34 36)" />
+        <ellipse cx="34" cy="20" rx="4.4" ry="16" fill="#91adff" transform="rotate(-45 34 36)" />
+        <ellipse cx="34" cy="22" rx="3.9" ry="14" fill="#6384e6" transform="rotate(-30 34 36)" />
+        <ellipse cx="34" cy="26" rx="3.1" ry="10" fill="#91adff" transform="rotate(-15 34 36)" />
+        <ellipse cx="34" cy="20" rx="4.4" ry="16" fill="#df8b79" transform="rotate(45 34 36)" />
+        <ellipse cx="34" cy="22" rx="3.9" ry="14" fill="#c56e64" transform="rotate(30 34 36)" />
+        <ellipse cx="34" cy="26" rx="3.1" ry="10" fill="#df8b79" transform="rotate(15 34 36)" />
       </svg>
     </div>
   );
@@ -30,13 +31,13 @@ function LogoMark() {
 function useNavItems() {
   const { t } = useTranslation();
   return [
-    { to: '/dashboard', icon: LayoutDashboard, label: t('nav.dashboard'), shape: 'circle' },
-    { to: '/log', icon: ClipboardEdit, label: t('nav.log'), shape: 'square' },
-    { to: '/lab-results', icon: FlaskConical, label: t('nav.labResults'), shape: 'circle' },
-    { to: '/medications', icon: Pill, label: t('nav.medications'), shape: 'diamond' },
-    { to: '/appointments', icon: Calendar, label: t('nav.appointments'), shape: 'square' },
-    { to: '/learn', icon: BookOpen, label: t('nav.learn'), shape: 'circle' },
-    { to: '/profile', icon: User, label: t('nav.profile'), shape: 'circle' },
+    { to: '/dashboard', icon: LayoutDashboard, label: t('nav.dashboard'), shortLabel: t('nav.dashboardShort') },
+    { to: '/log', icon: ClipboardEdit, label: t('nav.log'), shortLabel: t('nav.log') },
+    { to: '/lab-results', icon: FlaskConical, label: t('nav.labResults'), shortLabel: t('nav.labResultsShort') },
+    { to: '/medications', icon: Pill, label: t('nav.medications'), shortLabel: t('nav.medicationsShort') },
+    { to: '/appointments', icon: Calendar, label: t('nav.appointments'), shortLabel: t('nav.appointmentsShort') },
+    { to: '/learn', icon: BookOpen, label: t('nav.learn'), shortLabel: t('nav.learn') },
+    { to: '/profile', icon: User, label: t('nav.profile'), shortLabel: t('nav.profile') },
   ];
 }
 
@@ -77,15 +78,16 @@ export function AppShell() {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const NAV = useNavItems();
+  const [moreOpen, setMoreOpen] = useState(false);
 
   return (
     <div className={styles.shell}>
       {/* ── Sidebar (desktop) */}
       <aside className={styles.sidebar} aria-label={t('nav.mainLabel')}>
-        <div className={styles.logo} onClick={() => navigate('/dashboard')}>
+        <button className={styles.logo} type="button" onClick={() => navigate('/dashboard')}>
           <LogoMark />
           <span className={styles.logoText}>{t('app.name')}</span>
-        </div>
+        </button>
 
         <nav className={styles.nav} aria-label={t('nav.mainLabel')}>
           {NAV.map(({ to, icon: Icon, label }) => (
@@ -138,10 +140,10 @@ export function AppShell() {
 
       {/* ── Header (mobile) : logo, thème, accès profil */}
       <header className={styles.mobileHeader}>
-        <div className={styles.logo} onClick={() => navigate('/dashboard')}>
+        <button className={styles.logo} type="button" onClick={() => navigate('/dashboard')}>
           <LogoMark />
           <span className={styles.logoText}>{t('app.name')}</span>
-        </div>
+        </button>
         <div className={styles.mobileHeaderActions}>
           <LanguageToggle className={styles.footerBtn} />
           <ThemeToggle className={styles.footerBtn} />
@@ -162,10 +164,24 @@ export function AppShell() {
         <Outlet />
       </main>
 
-      {/* ── Nav basse (mobile) */}
-      {/* Nav à points de la maquette : point plein = actif, cerclé = inactif */}
+      {/* ── Navigation basse (mobile) */}
+      {moreOpen && (
+        <div className={styles.mobileMore}>
+          <NavLink to="/learn" onClick={() => setMoreOpen(false)}>
+            <BookOpen size={17} /> <span>{t('nav.learn')}</span>
+          </NavLink>
+          <NavLink to="/profile" onClick={() => setMoreOpen(false)}>
+            <User size={17} /> <span>{t('nav.profile')}</span>
+          </NavLink>
+          {user?.role === 'ADMIN' && (
+            <NavLink to="/admin/articles" onClick={() => setMoreOpen(false)}>
+              <PenLine size={17} /> <span>{t('nav.writing')}</span>
+            </NavLink>
+          )}
+        </div>
+      )}
       <nav className={styles.mobileNav} aria-label={t('nav.mobileLabel')}>
-        {NAV.slice(0, 5).map(({ to, label, shape }) => (
+        {NAV.slice(0, 5).map(({ to, icon: Icon, shortLabel }) => (
           <NavLink
             key={to}
             to={to}
@@ -173,16 +189,20 @@ export function AppShell() {
               `${styles.mobileNavItem} ${isActive ? styles.mobileNavItemActive : ''}`
             }
           >
-            <span
-              className={`${styles.navDot} ${
-                shape === 'square' ? styles.navDotSquare
-                : shape === 'diamond' ? styles.navDotDiamond : ''
-              }`}
-              aria-hidden="true"
-            />
-            <span className={styles.navLabel}>{label.split(' ')[0]}</span>
+            <Icon size={18} strokeWidth={1.8} aria-hidden="true" />
+            <span className={styles.navLabel}>{shortLabel}</span>
           </NavLink>
         ))}
+        <button
+          type="button"
+          className={`${styles.mobileNavItem} ${moreOpen ? styles.mobileNavItemActive : ''}`}
+          onClick={() => setMoreOpen((open) => !open)}
+          aria-expanded={moreOpen}
+          aria-label={t('nav.more')}
+        >
+          <MoreHorizontal size={19} strokeWidth={1.8} aria-hidden="true" />
+          <span className={styles.navLabel}>{t('nav.more')}</span>
+        </button>
       </nav>
     </div>
   );
