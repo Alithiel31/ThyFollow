@@ -147,8 +147,6 @@
     "noAppointment": "Aucun rendez-vous prévu",
     "activeTreatment": "Traitement actif",
     "noActiveMedication": "Aucun médicament actif",
-    "ctaQuestion": "Avez-vous rempli votre journal aujourd'hui ?",
-    "ctaButton": "Remplir maintenant",
     "apptTypes": {
       "ENDOCRINOLOGIST": "Endocrinologue",
       "GENERAL_PRACTITIONER": "Médecin généraliste",
