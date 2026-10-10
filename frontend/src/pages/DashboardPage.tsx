@@ -1,4 +1,5 @@
 // src/pages/DashboardPage.tsx
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -35,9 +36,11 @@ export function DashboardPage() {
     queryKey: ['articles', 'tips'],
     queryFn: () => articlesApi.list('TIP').then((r) => r.data),
   });
-  const tip = tips?.length
-    ? tips[Math.floor(Date.now() / 86_400_000) % tips.length]
-    : null;
+  // Numéro du jour figé à l'affichage de la page (état initial paresseux) :
+  // lire l'horloge pendant le rendu le rendrait impur, et l'astuce ne doit de
+  // toute façon pas changer en cours de session.
+  const [dayNumber] = useState(() => Math.floor(Date.now() / 86_400_000));
+  const tip = tips?.length ? tips[dayNumber % tips.length] : null;
 
   const chartData = overview?.timeSeries.map((e) => ({
     date: format(parseISO(e.date as string), 'd MMM', { locale: dateLocale }),

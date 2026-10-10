@@ -4,6 +4,10 @@ updates:
     directory: "/backend"
     schedule:
       interval: "weekly"
+    # Les montées de version majeure sont traitées à la main, une par une.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       dev-dependencies:
         dependency-type: "development"
@@ -12,6 +16,10 @@ updates:
     directory: "/frontend"
     schedule:
       interval: "weekly"
+    # Les montées de version majeure sont traitées à la main, une par une.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       dev-dependencies:
         dependency-type: "development"
