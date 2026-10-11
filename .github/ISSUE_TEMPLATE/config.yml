@@ -1,0 +1,14 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Troubleshooting notes
+    url: https://github.com/Alithiel31/ThyFollow/blob/main/TROUBLESHOOTING.md
+    about: Incidents already encountered (CI, lockfile, test runner), with the diagnostic process followed.
+  - name: Contributing guide
+    url: https://github.com/Alithiel31/ThyFollow/blob/main/CONTRIBUTING.md
+    about: Development environment, reproducing the CI locally, and the pull request format.
+  - name: Report a security vulnerability
+    url: https://github.com/Alithiel31/ThyFollow/security/advisories/new
+    about: Private reporting — do not open a public issue for a security flaw.
+  - name: Service status
+    url: https://thyrotrack.alithiel31.dev/health
+    about: Check that the backend responds before reporting an outage.
