@@ -31,6 +31,7 @@ A web app for tracking thyroid health, inspired by the Clue app.
 - [API Endpoints](#api-endpoints)
 - [Design System](#design-system)
 - [Tech stack](#tech-stack)
+- [Documentation](#documentation)
 - [Contributing](#contributing)
 - [Changelog](#changelog)
 - [License](#license)
@@ -410,6 +411,22 @@ POST   /graphql                                   (additive to the REST API abov
 | Reverse proxy | Traefik (shared, `traefik-net`) |
 | Public access | cloudflared (tunnel) |
 | Database (infra) | PostgreSQL 17, shared native instance (outside Docker) |
+
+---
+
+## 📚 Documentation
+
+| Guide | Content |
+|---|---|
+| [`docs/architecture.md`](./docs/architecture.md) | Request path, authentication, Google Health sync, backend layers, data model, repository structure |
+| [`docs/environment.md`](./docs/environment.md) | Every environment variable, for Docker Compose and for the backend |
+| [`docs/development.md`](./docs/development.md) | Run it locally, database migrations, full route list, tests, CI |
+| [`backend/docs/graphql.md`](./backend/docs/graphql.md) | The additive GraphQL layer (in French) |
+| [`docs/handover-guide.md`](./docs/handover-guide.md) | What runs where, which accesses are needed, how to rebuild from scratch, known risks |
+| [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md) | Incidents already encountered, with the diagnostic process |
+| [`CONTRIBUTING.md`](./CONTRIBUTING.md) · [`SECURITY.md`](./SECURITY.md) · [`SUPPORT.md`](./SUPPORT.md) · [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md) | Community files |
+
+Each guide has a French version (`*.fr.md`).
 
 ---
 
