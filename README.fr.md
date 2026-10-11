@@ -31,6 +31,7 @@ Application web de suivi thyroïdien, inspirée de l'app Clue.
 - [API Endpoints](#api-endpoints)
 - [Design System](#design-system)
 - [Stack technique](#stack-technique)
+- [Documentation](#documentation)
 - [Contribuer](#contribuer)
 - [Changelog](#changelog)
 - [Licence](#licence)
@@ -410,6 +411,22 @@ POST   /graphql                                   (additif à la REST ci-dessus,
 | Reverse proxy | Traefik (partagé, `traefik-net`) |
 | Accès public | cloudflared (tunnel) |
 | BDD (infra) | PostgreSQL 17, instance partagée native (hors Docker) |
+
+---
+
+## 📚 Documentation
+
+| Guide | Contenu |
+|---|---|
+| [`docs/architecture.fr.md`](./docs/architecture.fr.md) | Chemin d'une requête, authentification, synchro Google Health, couches du backend, modèle de données, structure du dépôt |
+| [`docs/environment.fr.md`](./docs/environment.fr.md) | Toutes les variables d'environnement, pour Docker Compose et pour le backend |
+| [`docs/development.fr.md`](./docs/development.fr.md) | Lancer le projet en local, migrations de base, liste complète des routes, tests, CI |
+| [`backend/docs/graphql.md`](./backend/docs/graphql.md) | La couche GraphQL additive |
+| [`docs/handover-guide.fr.md`](./docs/handover-guide.fr.md) | Ce qui tourne où, accès nécessaires, remise en service à partir de zéro, risques connus |
+| [`TROUBLESHOOTING.fr.md`](./TROUBLESHOOTING.fr.md) | Incidents déjà rencontrés, avec la démarche de diagnostic |
+| [`CONTRIBUTING.fr.md`](./CONTRIBUTING.fr.md) · [`SECURITY.fr.md`](./SECURITY.fr.md) · [`SUPPORT.fr.md`](./SUPPORT.fr.md) · [`CODE_OF_CONDUCT.fr.md`](./CODE_OF_CONDUCT.fr.md) | Fichiers communautaires |
+
+Chaque guide existe aussi en anglais (sans suffixe).
 
 ---
 

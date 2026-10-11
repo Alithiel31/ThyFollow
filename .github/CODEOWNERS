@@ -1,0 +1,6 @@
+# Every PR automatically requests a review from the repository owner.
+#
+# This file only *requests* the review. It becomes mandatory only if
+# "Require review from Code Owners" is ticked in the protection rule of
+# `main` — otherwise it stays decorative.
+* @Alithiel31

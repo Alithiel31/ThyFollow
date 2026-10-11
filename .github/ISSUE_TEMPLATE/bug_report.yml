@@ -1,0 +1,70 @@
+name: Bug report
+description: Something is broken — an error in the app, a failing build, a deployment that does not start...
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this.
+
+        Some incidents are already documented in
+        [`TROUBLESHOOTING.md`](https://github.com/Alithiel31/ThyFollow/blob/main/TROUBLESHOOTING.md)
+        ([version française](https://github.com/Alithiel31/ThyFollow/blob/main/TROUBLESHOOTING.fr.md)).
+        Worth a look before filling this in.
+
+        ⚠️ **Never paste real health data, a token or a password.** Strip them from any log or
+        screenshot you attach. For a security flaw, do not use this form — see
+        [`SECURITY.md`](https://github.com/Alithiel31/ThyFollow/blob/main/SECURITY.md).
+
+        Issues in English or French are both fine.
+
+  - type: checkboxes
+    attributes:
+      label: Before reporting
+      options:
+        - label: I checked the troubleshooting notes and my problem is not already documented there
+          required: true
+        - label: I searched the existing issues
+          required: true
+        - label: I removed any secret and any real health data from the logs and screenshots below
+          required: true
+
+  - type: dropdown
+    attributes:
+      label: Where does it happen
+      options:
+        - Backend (API)
+        - Frontend (web app / PWA)
+        - Both
+        - Docker / deployment
+        - CI / build
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: What happened
+      description: What you expected, and what happened instead.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Log in with the demo account
+        2. Open the daily log
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Environment
+      description: Local or Docker Compose, Node version, browser and version.
+
+  - type: textarea
+    attributes:
+      label: Logs
+      description: Relevant output (`docker compose logs backend`, browser console), with secrets and health data removed.
+      render: shell
