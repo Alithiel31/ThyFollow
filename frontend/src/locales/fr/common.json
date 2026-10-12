@@ -123,6 +123,11 @@
       "genericError": "Erreur lors de la réinitialisation"
     }
   },
+  "notFound": {
+    "title": "Page introuvable",
+    "subtitle": "La page que vous cherchez n'existe pas ou a été déplacée.",
+    "backHome": "Retour à l'accueil"
+  },
   "dashboard": {
     "greeting": "Bonjour, {{name}}",
     "heroEyebrow": "Suivi thyroïdien · Un jour à la fois",

@@ -20,6 +20,7 @@ import { ProfilePage } from './pages/ProfilePage';
 import { ArticlesPage } from './pages/ArticlesPage';
 import { AdminArticlesPage } from './pages/AdminArticlesPage';
 import { ReportPage } from './pages/ReportPage';
+import { NotFoundPage } from './pages/NotFoundPage';
 import { AppShell } from './components/AppShell';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -81,7 +82,7 @@ export default function App() {
         <Route path="/report" element={<RequireAuth><ReportPage /></RequireAuth>} />
 
         {/* 404 */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
   );
