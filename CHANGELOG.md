@@ -26,6 +26,8 @@ pas synchronisé avec ces tags.
 
 ### Added
 
+- Page 404 dédiée (`NotFoundPage`, FR/EN) : une URL inconnue n'est plus redirigée silencieusement
+  vers `/dashboard`. Le lien de retour mène au tableau de bord, ou à `/login` si la session est fermée
 - Endpoint `POST /graphql` (Apollo Server 5), additif à la REST API existante — aucune route
   REST retirée ou modifiée, le frontend continue d'utiliser exclusivement `/api/*`. Démo
   technique de design de schéma, resolvers imbriqués, auth JWT bridgée depuis
