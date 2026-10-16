@@ -72,6 +72,24 @@ The webhook subscriber is created at startup only when `GOOGLE_HEALTH_CLIENT_ID`
 > **Rotating `TOKEN_ENCRYPTION_KEY`** makes every stored Google Health token undecryptable: users
 > would have to link their device again. Rotating `JWT_SECRET` logs everybody out.
 
+### PDF lab report import
+
+| Variable                    | Required | Default                | Description |
+| --------------------------- | -------- | ---------------------- | ----------- |
+| `PDF_ENCRYPTION_KEY`        | ❌ (the import answers `501` without it) | — | 64 hexadecimal characters (32 bytes) encrypting the stored PDFs and remembered PDF passwords with AES-256-GCM. **Distinct from `TOKEN_ENCRYPTION_KEY`.** If set, it must be valid (production refuses to start otherwise). Generate: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
+| `PDF_ENCRYPTION_KEY_VERSION`| ❌       | `1`                    | Version of the key above, stored with every document (prepares a future rotation). |
+| `ANTHROPIC_API_KEY`         | ❌       | —                      | Enables the AI fallback extraction (text only, anonymised, and only for users who opted in). Without it the rules-based extraction still works. |
+| `ANTHROPIC_MODEL`           | ❌       | `claude-haiku-5-5`    | Model used by the fallback extraction (Haiku is enough for already-extracted text; switch to a larger model if a lab is misread). |
+| `PDF_IMPORT_MAX_FILES`      | ❌       | `10`                   | Files per upload. |
+| `PDF_IMPORT_MAX_BYTES`      | ❌       | `10485760` (10 MB)     | Size limit per file (a file between the limit and twice the limit is refused on its own; beyond, the whole upload is). |
+
+The import also needs the `qpdf` binary (installed in the backend Docker image; for local
+development install it with your package manager — `apt install qpdf`, `brew install qpdf`).
+
+> **Rotating `PDF_ENCRYPTION_KEY`** makes every stored PDF and remembered PDF password undecryptable:
+> there is no re-encryption tool yet. Stored PDFs live in the database (`lab_documents.dataEnc`,
+> `bytea`), so they grow the database and its backups.
+
 ### Rate limiting
 
 | Variable                     | Default            | Description                                              |

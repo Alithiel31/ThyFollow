@@ -23,7 +23,14 @@
     "oidcFlowExpired": "La tentative de connexion a expiré, veuillez réessayer",
     "oidcNoEmail": "Google n'a pas fourni d'adresse email pour ce compte",
     "oidcLinkCannotUnlinkNoPassword": "Définissez d'abord un mot de passe (via « Mot de passe oublié ») avant de délier Google, sinon vous perdriez l'accès à votre compte",
-    "googleHealthNotConfigured": "La synchronisation Google Health n'est pas configurée sur ce serveur"
+    "googleHealthNotConfigured": "La synchronisation Google Health n'est pas configurée sur ce serveur",
+    "labImport": {
+      "fileTooLarge": "Fichier trop volumineux",
+      "badUpload": "Envoi invalide (maximum {{max}} fichiers PDF)",
+      "notConfigured": "L'import de bilans PDF n'est pas configuré sur ce serveur",
+      "noFile": "Aucun fichier PDF reçu",
+      "alreadyConfirmed": "Ce document a déjà été ajouté au carnet"
+    }
   },
   "auth": {
     "verificationEmailSent": "Un email de confirmation a été envoyé",
@@ -38,7 +45,8 @@
     "user": "Utilisateur",
     "entry": "Entrée",
     "labResult": "Résultat",
-    "medication": "Médicament"
+    "medication": "Médicament",
+    "pdfPassword": "Mot de passe"
   },
   "validation": {
     "emailInvalid": "Email invalide",

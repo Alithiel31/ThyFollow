@@ -23,7 +23,14 @@
     "oidcFlowExpired": "The sign-in attempt expired, please try again",
     "oidcNoEmail": "Google did not provide an email address for this account",
     "oidcLinkCannotUnlinkNoPassword": "Set a password first (via \"Forgot password\") before unlinking Google, otherwise you would lose access to your account",
-    "googleHealthNotConfigured": "Google Health sync is not configured on this server"
+    "googleHealthNotConfigured": "Google Health sync is not configured on this server",
+    "labImport": {
+      "fileTooLarge": "File too large",
+      "badUpload": "Invalid upload (maximum {{max}} PDF files)",
+      "notConfigured": "PDF lab report import is not configured on this server",
+      "noFile": "No PDF file received",
+      "alreadyConfirmed": "This document has already been added to the log"
+    }
   },
   "auth": {
     "verificationEmailSent": "A confirmation email has been sent",
@@ -38,7 +45,8 @@
     "user": "User",
     "entry": "Entry",
     "labResult": "Lab result",
-    "medication": "Medication"
+    "medication": "Medication",
+    "pdfPassword": "Password"
   },
   "validation": {
     "emailInvalid": "Invalid email",

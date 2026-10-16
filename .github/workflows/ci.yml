@@ -32,6 +32,9 @@ jobs:
 
       - run: npm ci
 
+      # qpdf : requis par les tests de lib/pdfDecrypt (fabrication de PDF protégés)
+      - run: sudo apt-get update && sudo apt-get install -y qpdf
+
       - run: npm run lint
 
       - name: Typecheck + build

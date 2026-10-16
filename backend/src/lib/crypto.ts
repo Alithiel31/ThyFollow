@@ -43,3 +43,58 @@ export function decrypt(payload: string): string {
   const plaintext = Buffer.concat([decipher.update(Buffer.from(ciphertextHex, 'hex')), decipher.final()]);
   return plaintext.toString('utf8');
 }
+
+// ── Fichiers (PDF de bilans) et mots de passe de PDF mémorisés ─────────────
+// Clé DISTINCTE de TOKEN_ENCRYPTION_KEY (PDF_ENCRYPTION_KEY) : compromettre
+// l'une ne compromet pas l'autre, et chaque fonctionnalité peut être activée
+// ou désactivée indépendamment. Même algorithme (AES-256-GCM), mais le
+// format est binaire : [version de clé (1 octet)][iv (12)][authTag (16)][chiffré].
+// La version de clé prépare une future rotation ; seul l'octet de version
+// courant (PDF_ENCRYPTION_KEY_VERSION) est accepté au déchiffrement pour l'instant.
+const AUTH_TAG_LENGTH = 16;
+
+export function isPdfEncryptionConfigured(): boolean {
+  return /^[0-9a-f]{64}$/i.test(config.pdfEncryptionKey);
+}
+
+function getPdfKey(): Buffer {
+  const key = Buffer.from(config.pdfEncryptionKey, 'hex');
+  if (key.length !== 32) {
+    throw new Error('PDF_ENCRYPTION_KEY doit être une valeur hexadécimale de 32 octets (64 caractères)');
+  }
+  return key;
+}
+
+export function encryptBuffer(plaintext: Buffer): Buffer {
+  const iv = crypto.randomBytes(IV_LENGTH);
+  const cipher = crypto.createCipheriv(ALGORITHM, getPdfKey(), iv);
+  const ciphertext = Buffer.concat([cipher.update(plaintext), cipher.final()]);
+  const header = Buffer.from([config.pdfEncryptionKeyVersion & 0xff]);
+  return Buffer.concat([header, iv, cipher.getAuthTag(), ciphertext]);
+}
+
+export function decryptBuffer(payload: Buffer): Buffer {
+  if (payload.length < 1 + IV_LENGTH + AUTH_TAG_LENGTH) {
+    throw new Error('Format de payload chiffré invalide');
+  }
+  const version = payload[0];
+  if (version !== (config.pdfEncryptionKeyVersion & 0xff)) {
+    throw new Error(`Version de clé de chiffrement inconnue : ${version}`);
+  }
+  const iv = payload.subarray(1, 1 + IV_LENGTH);
+  const authTag = payload.subarray(1 + IV_LENGTH, 1 + IV_LENGTH + AUTH_TAG_LENGTH);
+  const ciphertext = payload.subarray(1 + IV_LENGTH + AUTH_TAG_LENGTH);
+  const decipher = crypto.createDecipheriv(ALGORITHM, getPdfKey(), iv);
+  decipher.setAuthTag(authTag);
+  return Buffer.concat([decipher.update(ciphertext), decipher.final()]);
+}
+
+// Variante chaîne (mots de passe de PDF) : même clé, sortie en base64 pour
+// rester un simple champ texte (PdfPassword.passwordEnc).
+export function encryptPdfSecret(plaintext: string): string {
+  return encryptBuffer(Buffer.from(plaintext, 'utf8')).toString('base64');
+}
+
+export function decryptPdfSecret(payload: string): string {
+  return decryptBuffer(Buffer.from(payload, 'base64')).toString('utf8');
+}

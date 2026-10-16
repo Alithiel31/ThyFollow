@@ -9,6 +9,7 @@ router.use(authenticate);
 
 router.get('/', asyncHandler(profileController.get));
 router.put('/', asyncHandler(profileController.update));
+router.put('/ai-extraction-consent', asyncHandler(profileController.setAiExtractionConsent));
 router.get('/security/events', asyncHandler(profileController.securityEvents));
 
 export default router;
