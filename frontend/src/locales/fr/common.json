@@ -426,6 +426,29 @@
         "LINK_FAILED": "Tentative de liaison Google échouée",
         "UNLINKED": "Compte Google délié"
       }
+    },
+    "documents": {
+      "title": "Documents et IA",
+      "aiConsentLabel": "Extraction des bilans par IA (en repli)",
+      "aiConsentSince": "Autorisée depuis le {{date}}",
+      "aiConsentOff": "Désactivée",
+      "aiConsentText": "Quand la lecture automatique d'un bilan PDF échoue, vous pouvez autoriser l'envoi du texte du document à {{provider}} pour l'extraire. Seul le texte est envoyé (jamais le PDF), après suppression de votre nom, date de naissance, coordonnées et n° de sécurité sociale ; cette anonymisation n'est pas infaillible. Vous pouvez révoquer cette autorisation à tout moment.",
+      "passwordsTitle": "Mots de passe de PDF mémorisés",
+      "passwordsEmpty": "Aucun mot de passe mémorisé.",
+      "passwordsNote": "Les mots de passe mémorisés sont chiffrés, mais le serveur peut les déchiffrer pour ouvrir vos PDF : supprimez-les si vous ne voulez plus qu'il le puisse.",
+      "lastUsed": "Utilisé le {{date}}",
+      "neverUsed": "Jamais utilisé",
+      "delete": "Supprimer",
+      "revokeAll": "Tout révoquer",
+      "revokeAllConfirm": "Supprimer tous les mots de passe mémorisés ?",
+      "labelField": "Libellé",
+      "labelPlaceholder": "Ex. Biogroup",
+      "passwordField": "Mot de passe du PDF",
+      "add": "Ajouter",
+      "added": "Mot de passe mémorisé",
+      "deleted": "Mot de passe supprimé",
+      "revoked": "Tous les mots de passe ont été supprimés",
+      "error": "Une erreur est survenue"
     }
   },
   "diagnosis": {

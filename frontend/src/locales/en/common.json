@@ -426,6 +426,29 @@
         "LINK_FAILED": "Failed Google linking attempt",
         "UNLINKED": "Google account unlinked"
       }
+    },
+    "documents": {
+      "title": "Documents and AI",
+      "aiConsentLabel": "AI extraction of lab reports (fallback)",
+      "aiConsentSince": "Allowed since {{date}}",
+      "aiConsentOff": "Off",
+      "aiConsentText": "When automatic reading of a PDF lab report fails, you can allow sending the document's text to {{provider}} to extract it. Only the text is sent (never the PDF), after removing your name, date of birth, contact details and social-security number; this anonymisation is not foolproof. You can withdraw this permission at any time.",
+      "passwordsTitle": "Remembered PDF passwords",
+      "passwordsEmpty": "No remembered password.",
+      "passwordsNote": "Remembered passwords are encrypted, but the server can decrypt them to open your PDFs: delete them if you no longer want it to.",
+      "lastUsed": "Used on {{date}}",
+      "neverUsed": "Never used",
+      "delete": "Delete",
+      "revokeAll": "Revoke all",
+      "revokeAllConfirm": "Delete all remembered passwords?",
+      "labelField": "Label",
+      "labelPlaceholder": "E.g. Biogroup",
+      "passwordField": "PDF password",
+      "add": "Add",
+      "added": "Password remembered",
+      "deleted": "Password deleted",
+      "revoked": "All passwords were deleted",
+      "error": "Something went wrong"
     }
   },
   "diagnosis": {
