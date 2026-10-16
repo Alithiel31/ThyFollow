@@ -68,6 +68,14 @@ Avant de signaler un problème déjà couvert, quelques mécanismes existants (d
 - **Secrets au repos** — les jetons d'accès et de rafraîchissement Google Health sont chiffrés en
   AES-256-GCM (`TOKEN_ENCRYPTION_KEY`) ; en production, le serveur refuse de démarrer sans clé valide
   quand la fonctionnalité est activée. L'endpoint webhook vérifie un secret partagé avant toute action.
+- **PDF de bilans** — les PDF importés sont déchiffrés avec `qpdf` (le mot de passe transite par un
+  fichier temporaire, jamais en argument de ligne de commande), puis stockés **chiffrés** (AES-256-GCM,
+  `PDF_ENCRYPTION_KEY`, distincte de `TOKEN_ENCRYPTION_KEY`) et servis uniquement à leur propriétaire.
+  Les mots de passe de PDF mémorisés sont chiffrés de la même façon et révocables depuis le profil,
+  mais **le serveur peut les déchiffrer** (pas de zero-knowledge) : une fuite simultanée de la base et
+  de la clé les exposerait. L'extraction optionnelle par IA envoie **uniquement du texte anonymisé**
+  (jamais le PDF) à **Anthropic**, et seulement pour les utilisateurs qui y ont consenti ;
+  l'anonymisation est faite au mieux, sans garantie.
 - **Entrées** — les corps de requête sont validés avec Zod et assainis contre le XSS
   (`express-xss-sanitizer`) ; l'analyseur JSON garde sa limite de taille par défaut.
 - **En-têtes** — `helmet` côté API ; CSP, HSTS, `X-Frame-Options`, `X-Content-Type-Options`,

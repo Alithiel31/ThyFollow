@@ -138,6 +138,52 @@ sequenceDiagram
 
 ---
 
+## Import de bilans PDF
+
+Les PDF de prises de sang déposés sur la page des analyses sont lus automatiquement et ajoutés au
+carnet **après relecture des valeurs extraites par l'utilisateur**.
+
+```mermaid
+sequenceDiagram
+    participant U as Utilisateur
+    participant A as Backend
+    participant Q as qpdf
+    participant L as API Anthropic (optionnelle)
+
+    U->>A: POST /api/lab-results/import (jusqu'à 10 PDF, mot de passe optionnel)
+    A->>Q: déchiffrement (fichier de mot de passe, jamais en argument de ligne de commande)
+    Note over A,Q: essais : aucun, fourni, mémorisés, date de naissance
+    A->>A: extraction du texte (pdfjs) et analyse par règles
+    opt règles insuffisantes ET consentement de l'utilisateur
+        A->>L: texte anonymisé uniquement
+        L-->>A: marqueurs en JSON contraint par schéma
+    end
+    A->>A: stocke le PDF déchiffré, rechiffré (AES-256-GCM)
+    A-->>U: un brouillon par fichier (ready, password_required, duplicate…)
+    U->>A: POST /api/lab-results/import/:docId/confirm (valeurs relues)
+    A->>A: crée le LabResult et rattache le PDF (une transaction)
+```
+
+- **Brouillons** — un PDF importé est un `LabDocument` sans `labResultId` jusqu'à confirmation ; les
+  brouillons non confirmés de plus de 24 h sont purgés à l'import suivant. Renvoyer le même PDF
+  réutilise son brouillon ; s'il est déjà rattaché au carnet, il est signalé comme doublon (`sha256`
+  par utilisateur).
+- **Extraction** — les règles d'abord (`lib/labExtract/rules.ts` : synonymes des 17 marqueurs de
+  `LabResult`, conversion des unités vers celles du modèle, valeurs `<`/`>` laissées à l'utilisateur).
+  Le LLM (`lib/labExtract/llm.ts`) n'est qu'un **repli**, utilisé seulement si l'utilisateur y a
+  consenti (`UserProfile.aiExtractionConsentAt`) ; il reçoit un texte anonymisé par
+  `lib/labExtract/scrub.ts` (nom, date de naissance, coordonnées, n° de sécurité sociale, lignes de
+  prescripteur et d'adresse supprimés) — jamais le PDF. L'anonymisation est faite au mieux, sans garantie.
+- **Chiffrement au repos** — PDF et mots de passe mémorisés utilisent `PDF_ENCRYPTION_KEY` (distincte
+  de `TOKEN_ENCRYPTION_KEY`), format `[version de clé][iv][tag][chiffré]`. Les mots de passe mémorisés
+  (`pdf_passwords`) sont **déchiffrables par le serveur**, par construction (il doit ouvrir les PDF de
+  l'utilisateur) : ce n'est pas du zero-knowledge. Ils se révoquent un par un ou tous d'un coup depuis
+  le profil ; le PDF stocké est une copie déchiffrée, donc révoquer un mot de passe n'empêche pas
+  l'utilisateur de consulter ses documents.
+- **Non géré** — PDF scannés (pas de couche texte, pas d'OCR), images, marqueurs hors `LabResult`.
+
+---
+
 ## Couches du backend
 
 Une requête traverse toujours la même pile, dans `src/index.ts` :
@@ -189,6 +235,8 @@ User ─┬─ UserProfile            diagnostic, statut thyroïdien, plages cib
       ├─ DailyEntry[]           journal quotidien : énergie/humeur/anxiété/brouillard, 11 symptômes, constantes
       │    └─ SymptomLog[]      symptômes personnalisés (issus de SymptomLibrary)
       ├─ LabResult[]            TSH, FT4, FT3, anticorps, carences
+      │    └─ LabDocument[]     PDF chiffré du bilan (bytea), brouillon tant que non confirmé
+      ├─ PdfPassword[]          mots de passe de PDF mémorisés (chiffrés, révocables)
       ├─ Medication[]           traitements (dosage, fréquence, créneaux de prise)
       │    └─ MedicationIntake[]  prises enregistrées
       ├─ Appointment[]          rendez-vous médicaux (type, statut)

@@ -138,6 +138,50 @@ sequenceDiagram
 
 ---
 
+## PDF lab report import
+
+Blood-test PDFs dropped on the lab results page are read automatically and added to the log **after
+the user reviews the extracted values**.
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant A as Backend
+    participant Q as qpdf
+    participant L as Anthropic API (optional)
+
+    U->>A: POST /api/lab-results/import (up to 10 PDFs, optional password)
+    A->>Q: decrypt (password file, never a command-line argument)
+    Note over A,Q: tries: none, provided, remembered, date of birth
+    A->>A: extract text (pdfjs) and parse by rules
+    opt rules insufficient AND user opted in
+        A->>L: anonymised text only
+        L-->>A: markers as schema-constrained JSON
+    end
+    A->>A: store the decrypted PDF, re-encrypted (AES-256-GCM)
+    A-->>U: one draft per file (ready, password_required, duplicate…)
+    U->>A: POST /api/lab-results/import/:docId/confirm (reviewed values)
+    A->>A: create the LabResult and attach the PDF (one transaction)
+```
+
+- **Drafts** — an imported PDF is a `LabDocument` with no `labResultId` until confirmed; unconfirmed
+  drafts older than 24 h are purged at the next import. Re-uploading the same PDF reuses its draft;
+  one already attached to the log is reported as a duplicate (`sha256` per user).
+- **Extraction** — rules first (`lib/labExtract/rules.ts`: synonyms for the 17 markers of `LabResult`,
+  unit conversion to the model's units, `<`/`>` values left for the user). The LLM
+  (`lib/labExtract/llm.ts`) is a **fallback** used only when the user opted in
+  (`UserProfile.aiExtractionConsentAt`); it receives text anonymised by `lib/labExtract/scrub.ts`
+  (name, date of birth, contact details, social-security number, prescriber and address lines
+  removed) — never the PDF. The anonymisation is best-effort, not a guarantee.
+- **Encryption at rest** — PDFs and remembered passwords use `PDF_ENCRYPTION_KEY` (distinct from
+  `TOKEN_ENCRYPTION_KEY`), format `[key version][iv][tag][ciphertext]`. Remembered passwords
+  (`pdf_passwords`) are **decryptable by the server**, by design (it must open the user's PDFs): this
+  is not zero-knowledge. They can be revoked one by one or all at once from the profile; the stored
+  PDF is a decrypted copy, so revoking a password does not lock the user out of their documents.
+- **Not handled** — scanned PDFs (no text layer, no OCR), images, markers outside `LabResult`.
+
+---
+
 ## Backend layers
 
 A request goes through the same stack in `src/index.ts`:
@@ -187,6 +231,8 @@ User ─┬─ UserProfile            diagnosis, thyroid status, target ranges
       ├─ DailyEntry[]           daily log: energy/mood/anxiety/brain fog, 11 symptoms, sleep, vitals,
       │    └─ SymptomLog[]      custom symptoms (from SymptomLibrary)
       ├─ LabResult[]            TSH, FT4, FT3, antibodies, deficiencies
+      │    └─ LabDocument[]     encrypted PDF of the report (bytea), draft until confirmed
+      ├─ PdfPassword[]          remembered PDF passwords (encrypted, revocable)
       ├─ Medication[]           treatments (dosage, frequency, intake slots)
       │    └─ MedicationIntake[]  recorded doses
       ├─ Appointment[]          medical appointments (type, status)
