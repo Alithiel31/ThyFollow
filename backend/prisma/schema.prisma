@@ -39,6 +39,8 @@ model User {
   entries                DailyEntry[]
   medications            Medication[]
   labResults             LabResult[]
+  labDocuments           LabDocument[]
+  pdfPasswords           PdfPassword[]
   appointments           Appointment[]
   symptoms               SymptomLibrary[]
   notifications          NotificationSetting?
@@ -131,21 +133,24 @@ model GoogleHealthConnection {
 // USER PROFILE (thyroid context)
 // ─────────────────────────────────────────────
 model UserProfile {
-  id                  String         @id @default(cuid())
-  userId              String         @unique
-  diagnosisType       DiagnosisType? // hypothyroidism, hyperthyroidism, hashimoto, graves, etc.
-  diagnosisDate       DateTime?
-  thyroidStatus       ThyroidStatus? // intact, partial, total, radioiodine
-  endocrinologistName String?
-  targetTSH_min       Float? // personalized TSH target range
-  targetTSH_max       Float?
-  targetFT4_min       Float?
-  targetFT4_max       Float?
-  targetFT3_min       Float?
-  targetFT3_max       Float?
-  timezone            String         @default("Europe/Paris")
-  weightUnit          WeightUnit     @default(KG)
-  temperatureUnit     TempUnit       @default(CELSIUS)
+  id                    String         @id @default(cuid())
+  userId                String         @unique
+  diagnosisType         DiagnosisType? // hypothyroidism, hyperthyroidism, hashimoto, graves, etc.
+  diagnosisDate         DateTime?
+  thyroidStatus         ThyroidStatus? // intact, partial, total, radioiodine
+  endocrinologistName   String?
+  targetTSH_min         Float? // personalized TSH target range
+  targetTSH_max         Float?
+  targetFT4_min         Float?
+  targetFT4_max         Float?
+  targetFT3_min         Float?
+  targetFT3_max         Float?
+  timezone              String         @default("Europe/Paris")
+  weightUnit            WeightUnit     @default(KG)
+  temperatureUnit       TempUnit       @default(CELSIUS)
+  // Consentement (opt-in) à l'envoi du texte anonymisé d'un bilan à l'API
+  // Anthropic en repli de l'extraction par règles. null = pas de consentement.
+  aiExtractionConsentAt DateTime?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -328,9 +333,53 @@ model LabResult {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents LabDocument[]
 
   @@map("lab_results")
+}
+
+// ─────────────────────────────────────────────
+// LAB DOCUMENT (PDF de bilan, déchiffré du mot de passe du labo puis
+// rechiffré au repos en AES-256-GCM — voir lib/crypto.ts)
+// ─────────────────────────────────────────────
+model LabDocument {
+  id          String   @id @default(cuid())
+  userId      String
+  // null tant que l'utilisateur n'a pas confirmé le brouillon d'import
+  labResultId String?
+  filename    String // nom d'origine nettoyé (jamais utilisé comme chemin)
+  sizeBytes   Int
+  // SHA-256 (hex) du PDF déchiffré : détection de doublons
+  sha256      String
+  dataEnc     Bytes // [version de clé][iv][tag][chiffré]
+  keyVersion  Int
+  createdAt   DateTime @default(now())
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  labResult LabResult? @relation(fields: [labResultId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, sha256])
+  @@index([labResultId])
+  @@map("lab_documents")
+}
+
+// ─────────────────────────────────────────────
+// PDF PASSWORD (mots de passe de PDF mémorisés, chiffrés, révocables)
+// ─────────────────────────────────────────────
+model PdfPassword {
+  id          String    @id @default(cuid())
+  userId      String
+  label       String
+  passwordEnc String
+  keyVersion  Int
+  createdAt   DateTime  @default(now())
+  lastUsedAt  DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("pdf_passwords")
 }
 
 // ─────────────────────────────────────────────
