@@ -35,6 +35,8 @@ export interface UserProfile {
   diagnosisDate?: string;
   thyroidStatus?: ThyroidStatus;
   endocrinologistName?: string;
+  // Consentement (opt-in) à l'extraction de bilans par IA en repli ; null/absent = non consenti
+  aiExtractionConsentAt?: string | null;
   targetTSH_min?: number;
   targetTSH_max?: number;
   targetFT4_min?: number;
@@ -117,6 +119,47 @@ export interface LabResult {
   glucose?: number | null;
   hemoglobin?: number | null;
   notes?: string | null;
+  // PDF rattachés (import de bilans) — ids seulement, le contenu se télécharge
+  // via labApi.downloadDocument
+  documents?: { id: string }[];
+}
+
+// ── Import de bilans PDF (voir backend labImport.controller.ts)
+export const LAB_MARKER_KEYS = [
+  'tsh', 'ft4', 'ft3', 't4', 't3', 'antiTPO', 'antiTG', 'antiTSHR', 'thyroglobulin',
+  'ferritin', 'vitaminD', 'vitaminB12', 'magnesium', 'selenium', 'cholesterol', 'glucose', 'hemoglobin',
+] as const;
+export type LabMarkerKey = (typeof LAB_MARKER_KEYS)[number];
+
+export type ImportStatus =
+  | 'ready' | 'password_required' | 'wrong_password' | 'invalid' | 'too_large' | 'duplicate' | 'failed';
+
+export interface ImportDraft {
+  date: string | null;
+  dateConfidence: 'high' | 'low' | null;
+  lab: string | null;
+  orderedBy: string | null;
+  values: Partial<Record<LabMarkerKey, number>>;
+  flags: { marker: LabMarkerKey; reason: 'comparator' | 'unknown_unit' | 'no_unit' | 'converted' }[];
+  insufficient: boolean;
+  method: 'rules' | 'llm';
+}
+
+export interface ImportFileResult {
+  filename: string;
+  status: ImportStatus;
+  documentId?: string;
+  duplicateOf?: { labResultId: string };
+  draft?: ImportDraft;
+  possibleDuplicateOf?: { labResultId: string };
+  reason?: string;
+}
+
+export interface PdfPasswordEntry {
+  id: string;
+  label: string;
+  createdAt: string;
+  lastUsedAt: string | null;
 }
 
 export type DosageUnit = 'MCG' | 'MG' | 'IU' | 'TABLET' | 'DROP' | 'ML' | 'OTHER';

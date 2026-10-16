@@ -14,6 +14,7 @@ import labResultsRouter from './routers/labResults.router.js';
 import medicationsRouter from './routers/medications.router.js';
 import appointmentsRouter from './routers/appointments.router.js';
 import profileRouter from './routers/profile.router.js';
+import pdfPasswordsRouter from './routers/pdfPasswords.router.js';
 import analyticsRouter from './routers/analytics.router.js';
 import articlesRouter from './routers/articles.router.js';
 import googleHealthRouter from './routers/googleHealth.router.js';
@@ -64,6 +65,17 @@ const authLimiter = rateLimit({
   skipSuccessfulRequests: true,
 });
 
+// ── Rate limiting dédié à l'import de bilans PDF (chaque envoi déclenche
+// qpdf, pdfjs et, si l'utilisateur y a consenti, un appel LLM payant).
+app.post(
+  '/api/lab-results/import',
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    message: (req: express.Request) => ({ error: req.t('errors.tooManyRequests') }),
+  })
+);
+
 app.use(express.json());
 
 // ── Nécessaire pour lire le cookie httpOnly qui porte le state/nonce/PKCE
@@ -87,6 +99,7 @@ app.use('/api/lab-results', labResultsRouter);
 app.use('/api/medications', medicationsRouter);
 app.use('/api/appointments', appointmentsRouter);
 app.use('/api/profile', profileRouter);
+app.use('/api/pdf-passwords', pdfPasswordsRouter);
 app.use('/api/analytics', analyticsRouter);
 app.use('/api/articles', articlesRouter);
 app.use('/api/integrations/google-health', googleHealthRouter);

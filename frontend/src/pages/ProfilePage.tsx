@@ -4,8 +4,8 @@ import { useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
-import { Save, LogOut, Watch } from 'lucide-react';
-import { authApi, profileApi, securityApi } from '../lib/api';
+import { Save, LogOut, Watch, FileText } from 'lucide-react';
+import { aiConsentApi, authApi, pdfPasswordsApi, profileApi, securityApi } from '../lib/api';
 import { useAuthStore } from '../lib/store';
 import { GoogleIcon } from '../components/GoogleIcon';
 import { DIAGNOSIS_LABEL_KEYS, THYROID_STATUS_LABEL_KEYS, type AuthEventType, type UserProfile } from '../types';
@@ -138,6 +138,55 @@ export function ProfilePage() {
     queryKey: ['securityEvents'],
     queryFn: () => securityApi.events().then((r) => r.data),
   });
+
+  // ── Documents et IA (import de bilans PDF) : mots de passe de PDF
+  // mémorisés + consentement à l'extraction par IA en repli.
+  const { data: pdfPasswords = [] } = useQuery({
+    queryKey: ['pdfPasswords'],
+    queryFn: () => pdfPasswordsApi.list().then((r) => r.data),
+  });
+  const [newPwLabel, setNewPwLabel] = useState('');
+  const [newPwValue, setNewPwValue] = useState('');
+
+  const addPasswordMut = useMutation({
+    mutationFn: () => pdfPasswordsApi.create({ label: newPwLabel.trim(), password: newPwValue }),
+    onSuccess: () => {
+      toast.success(t('profile.documents.added'));
+      setNewPwLabel('');
+      setNewPwValue('');
+      qc.invalidateQueries({ queryKey: ['pdfPasswords'] });
+    },
+    onError: () => toast.error(t('profile.documents.error')),
+  });
+  const removePasswordMut = useMutation({
+    mutationFn: (id: string) => pdfPasswordsApi.remove(id),
+    onSuccess: () => {
+      toast.success(t('profile.documents.deleted'));
+      qc.invalidateQueries({ queryKey: ['pdfPasswords'] });
+    },
+    onError: () => toast.error(t('profile.documents.error')),
+  });
+  const revokeAllMut = useMutation({
+    mutationFn: () => pdfPasswordsApi.removeAll(),
+    onSuccess: () => {
+      toast.success(t('profile.documents.revoked'));
+      qc.invalidateQueries({ queryKey: ['pdfPasswords'] });
+    },
+    onError: () => toast.error(t('profile.documents.error')),
+  });
+  const consentMut = useMutation({
+    mutationFn: (consent: boolean) => aiConsentApi.set(consent).then((r) => r.data),
+    onSuccess: ({ aiExtractionConsentAt }) => {
+      qc.invalidateQueries({ queryKey: ['profile'] });
+      // L'import de bilans (LabImport) lit le consentement dans le store
+      // d'authentification : on le tient à jour sans attendre un rechargement.
+      if (user && token) {
+        setAuth({ ...user, profile: { ...(user.profile as UserProfile), aiExtractionConsentAt } }, token);
+      }
+    },
+    onError: () => toast.error(t('profile.documents.error')),
+  });
+  const aiConsentAt = profile?.aiExtractionConsentAt ?? null;
 
   // Recopie le profil chargé dans le formulaire dès qu'il change. Ajustement
   // d'état pendant le rendu (plutôt que dans un effet) : pas de rendu
@@ -347,6 +396,83 @@ export function ProfilePage() {
             </button>
           )}
         </div>
+      </Section>
+
+      {/* ── Documents et IA : hors <form> (même raison que « Comptes liés »). */}
+      <Section title={t('profile.documents.title')}>
+        <label className={styles.linkedAccountRow}>
+          <div className={styles.linkedAccountInfo}>
+            <FileText size={22} />
+            <div>
+              <div>{t('profile.documents.aiConsentLabel')}</div>
+              <div className={styles.linkedAccountStatus}>
+                {aiConsentAt
+                  ? t('profile.documents.aiConsentSince', { date: new Date(aiConsentAt).toLocaleDateString() })
+                  : t('profile.documents.aiConsentOff')}
+              </div>
+            </div>
+          </div>
+          <input
+            type="checkbox"
+            role="switch"
+            aria-label={t('profile.documents.aiConsentLabel')}
+            checked={Boolean(aiConsentAt)}
+            disabled={consentMut.isPending}
+            onChange={(e) => consentMut.mutate(e.target.checked)}
+          />
+        </label>
+        <p className={styles.hint}>{t('profile.documents.aiConsentText', { provider: 'Anthropic' })}</p>
+
+        <h3 className={styles.label}>{t('profile.documents.passwordsTitle')}</h3>
+        {pdfPasswords.length === 0 ? (
+          <p className={styles.hint}>{t('profile.documents.passwordsEmpty')}</p>
+        ) : (
+          pdfPasswords.map((pw) => (
+            <div key={pw.id} className={styles.linkedAccountRow}>
+              <div>
+                <div>{pw.label}</div>
+                <div className={styles.linkedAccountStatus}>
+                  {pw.lastUsedAt
+                    ? t('profile.documents.lastUsed', { date: new Date(pw.lastUsedAt).toLocaleDateString() })
+                    : t('profile.documents.neverUsed')}
+                </div>
+              </div>
+              <button
+                type="button"
+                className={`${styles.smallBtn} ${styles.smallBtnDanger}`}
+                disabled={removePasswordMut.isPending}
+                onClick={() => removePasswordMut.mutate(pw.id)}
+                aria-label={`${t('profile.documents.delete')} ${pw.label}`}
+              >
+                {t('profile.documents.delete')}
+              </button>
+            </div>
+          ))
+        )}
+        {pdfPasswords.length > 0 && (
+          <button
+            type="button"
+            className={`${styles.smallBtn} ${styles.smallBtnDanger}`}
+            disabled={revokeAllMut.isPending}
+            onClick={() => { if (confirm(t('profile.documents.revokeAllConfirm'))) revokeAllMut.mutate(); }}
+          >
+            {t('profile.documents.revokeAll')}
+          </button>
+        )}
+
+        <form
+          className={styles.field}
+          onSubmit={(e) => { e.preventDefault(); if (newPwLabel.trim() && newPwValue) addPasswordMut.mutate(); }}
+        >
+          <label className={styles.label} htmlFor="pdf-pw-label">{t('profile.documents.labelField')}</label>
+          <input id="pdf-pw-label" className={styles.input} value={newPwLabel} onChange={(e) => setNewPwLabel(e.target.value)} placeholder={t('profile.documents.labelPlaceholder')} />
+          <label className={styles.label} htmlFor="pdf-pw-value">{t('profile.documents.passwordField')}</label>
+          <input id="pdf-pw-value" className={styles.input} type="password" autoComplete="off" value={newPwValue} onChange={(e) => setNewPwValue(e.target.value)} />
+          <button type="submit" className={styles.smallBtn} disabled={addPasswordMut.isPending || !newPwLabel.trim() || !newPwValue}>
+            {t('profile.documents.add')}
+          </button>
+        </form>
+        <p className={styles.hint}>{t('profile.documents.passwordsNote')}</p>
       </Section>
 
       {securityEvents && securityEvents.length > 0 && (

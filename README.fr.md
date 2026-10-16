@@ -43,7 +43,7 @@ Application web de suivi thyroïdien, inspirée de l'app Clue.
 | Module | Détail |
 |---|---|
 | **Journal quotidien** | Énergie, humeur, anxiété, brouillard mental, 11 symptômes thyroïdiens, médicament pris, mesures physiques (poids/FC/sommeil synchronisables via Google Health, ex: Pixel Watch) |
-| **Analyses sanguines** | TSH, FT4, FT3, Anti-TPO, Anti-TG, carences (Ferritine, Vit D, B12…) avec graphiques d'évolution |
+| **Analyses sanguines** | TSH, FT4, FT3, Anti-TPO, Anti-TG, carences (Ferritine, Vit D, B12…) avec graphiques d'évolution ; **import de PDF** (par lot, PDF protégés par mot de passe pris en charge, relecture avant ajout, stockage chiffré, repli IA optionnel) |
 | **Médicaments** | Gestion du traitement (Levothyrox, etc.), dosage, fréquence, observance |
 | **Rendez-vous** | Agenda médical avec rappels, statuts, types spécialisés |
 | **Tableau de bord** | Streak médicament, observance, moyennes, prochain RDV, historique TSH |
@@ -357,6 +357,15 @@ GET    /api/lab-results
 POST   /api/lab-results
 PUT    /api/lab-results/:id
 DELETE /api/lab-results/:id
+POST   /api/lab-results/import                    (PDF en multipart → un brouillon par fichier)
+POST   /api/lab-results/import/:docId/confirm     (valeurs relues → crée le résultat)
+DELETE /api/lab-results/import/:docId             (rejette un brouillon)
+GET    /api/lab-results/documents/:docId          (télécharge le PDF stocké, propriétaire uniquement)
+GET    /api/pdf-passwords                         (libellés seulement — jamais les secrets)
+POST   /api/pdf-passwords
+DELETE /api/pdf-passwords/:id
+DELETE /api/pdf-passwords                         (tout révoquer)
+PUT    /api/profile/ai-extraction-consent         (consentement au repli IA, révocable)
 
 GET    /api/medications
 POST   /api/medications
