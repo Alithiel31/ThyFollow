@@ -36,6 +36,8 @@ export const labResultsController = {
     const results = await prisma.labResult.findMany({
       where: { userId: req.userId },
       orderBy: { date: 'desc' },
+      // PDF rattachés (import de bilans) : ids seulement, pour le bouton de téléchargement
+      include: { documents: { select: { id: true } } },
     });
     res.json(results);
   },
@@ -44,6 +46,7 @@ export const labResultsController = {
   getById: async (req: AuthRequest, res: Response): Promise<void> => {
     const result = await prisma.labResult.findFirst({
       where: { id: req.params.id, userId: req.userId },
+      include: { documents: { select: { id: true } } },
     });
     if (!result) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.labResult') }));
     res.json(result);
