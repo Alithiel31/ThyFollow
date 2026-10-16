@@ -30,6 +30,16 @@
       "notConfigured": "PDF lab report import is not configured on this server",
       "noFile": "No PDF file received",
       "alreadyConfirmed": "This document has already been added to the log"
+    },
+    "billing": {
+      "proRequired": "PDF lab import is reserved for Pro accounts (your free trial imports are used up)",
+      "monthlyQuotaReached": "Monthly limit of {{limit}} imports reached. It resets at the start of next month.",
+      "notConfigured": "Payments are not configured on this server",
+      "alreadySubscribed": "You already have an active subscription",
+      "checkoutFailed": "Could not create the checkout session",
+      "noSubscription": "No subscription to manage",
+      "invalidCode": "Invalid, expired or fully used code",
+      "codeAlreadyUsed": "You have already used this code"
     }
   },
   "auth": {

@@ -16,6 +16,23 @@ export interface User {
   // Connexion Google Health (poids/FC/sommeil, ex: Pixel Watch) — absente si
   // jamais connectée. Ne contient jamais de token, juste l'état de la synchro.
   googleHealthConnection?: { connectedAt: string; lastSyncedAt: string | null } | null;
+  // Accès Pro (import de bilans PDF) et solde d'imports — calculé par le serveur
+  entitlements?: Entitlements;
+}
+
+export interface Entitlements {
+  pro: boolean;
+  proUntil: string | null;
+  proSource: 'STRIPE' | 'PROMO' | 'GRANT' | null;
+  // Paiement par carte disponible sur ce serveur (sinon : codes promo seulement)
+  billingEnabled: boolean;
+  imports: {
+    // Hors Pro : essai à vie ('lifetime') ; Pro : plafond remis à zéro chaque mois ('month')
+    period: 'lifetime' | 'month';
+    limit: number;
+    used: number;
+    remaining: number;
+  };
 }
 
 // Historique des connexions/liaisons Google (voir backend authEvents.ts),
@@ -93,6 +110,8 @@ export interface DailyEntry {
   medicationTime?: string | null;
   medicationNotes?: string | null;
   notes?: string | null;
+  // MANUAL = saisi à la main ; PDF_IMPORT = lu depuis un PDF puis relu et confirmé
+  source?: 'MANUAL' | 'GOOGLE_HEALTH' | 'PDF_IMPORT';
   tags: string[];
 }
 
@@ -119,6 +138,8 @@ export interface LabResult {
   glucose?: number | null;
   hemoglobin?: number | null;
   notes?: string | null;
+  // MANUAL = saisi à la main ; PDF_IMPORT = lu depuis un PDF puis relu et confirmé
+  source?: 'MANUAL' | 'GOOGLE_HEALTH' | 'PDF_IMPORT';
   // PDF rattachés (import de bilans) — ids seulement, le contenu se télécharge
   // via labApi.downloadDocument
   documents?: { id: string }[];
@@ -132,7 +153,8 @@ export const LAB_MARKER_KEYS = [
 export type LabMarkerKey = (typeof LAB_MARKER_KEYS)[number];
 
 export type ImportStatus =
-  | 'ready' | 'password_required' | 'wrong_password' | 'invalid' | 'too_large' | 'duplicate' | 'failed';
+  | 'ready' | 'password_required' | 'wrong_password' | 'invalid' | 'too_large' | 'duplicate'
+  | 'quota_exceeded' | 'failed';
 
 export interface ImportDraft {
   date: string | null;

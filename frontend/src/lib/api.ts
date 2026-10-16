@@ -103,6 +103,14 @@ export const labApi = {
     api.get<Blob>(`/lab-results/documents/${documentId}`, { responseType: 'blob' }),
 };
 
+// ── Accès Pro : paiement Stripe et codes promo
+export const billingApi = {
+  checkout: () => api.post<{ url: string }>('/billing/checkout'),
+  portal: () => api.post<{ url: string }>('/billing/portal'),
+  redeem: (code: string) =>
+    api.post<{ entitlements: import('../types').Entitlements }>('/billing/redeem', { code }),
+};
+
 // ── Mots de passe de PDF mémorisés (import de bilans)
 export const pdfPasswordsApi = {
   list: () => api.get<import('../types').PdfPasswordEntry[]>('/pdf-passwords'),

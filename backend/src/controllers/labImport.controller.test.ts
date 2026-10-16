@@ -23,11 +23,33 @@ interface PwRow { id: string; userId: string; label: string; passwordEnc: string
 
 let docs: DocRow[];
 let pws: PwRow[];
-let user: { name: string; email: string; birthDate: Date | null; profile: { aiExtractionConsentAt: Date | null } | null };
+let user: {
+  id: string;
+  role: 'USER' | 'ADMIN';
+  proUntil: Date | null;
+  freeImportsUsed: number;
+  name: string;
+  email: string;
+  birthDate: Date | null;
+  profile: { aiExtractionConsentAt: Date | null } | null;
+};
+let monthlyCount: number;
 let seq = 0;
 
 const prismaMock = {
-  user: { findUnique: vi.fn(async () => user) },
+  user: {
+    findUnique: vi.fn(async () => user),
+    update: vi.fn(async () => {
+      user.freeImportsUsed += 1;
+      return user;
+    }),
+  },
+  importUsage: {
+    findUnique: vi.fn(async () => ({ count: monthlyCount })),
+    upsert: vi.fn(async () => {
+      monthlyCount += 1;
+    }),
+  },
   labDocument: {
     deleteMany: vi.fn(async ({ where }: { where: { userId: string; labResultId: null; createdAt: { lt: Date } } }) => {
       docs = docs.filter((d) => !(d.userId === where.userId && d.labResultId === null && d.createdAt < where.createdAt.lt));
@@ -117,7 +139,18 @@ beforeEach(() => {
   docs = [];
   pws = [];
   seq = 0;
-  user = { name: 'Élodie Dupont', email: 'e@example.com', birthDate: new Date(Date.UTC(1985, 2, 15)), profile: { aiExtractionConsentAt: null } };
+  monthlyCount = 0;
+  // Compte Pro par défaut : le verrou d'accès est testé à part (voir « accès Pro »)
+  user = {
+    id: USER_ID,
+    role: 'USER',
+    proUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    freeImportsUsed: 0,
+    name: 'Élodie Dupont',
+    email: 'e@example.com',
+    birthDate: new Date(Date.UTC(1985, 2, 15)),
+    profile: { aiExtractionConsentAt: null },
+  };
   prismaMock.labResult.findFirst.mockResolvedValue(null);
 });
 
@@ -328,6 +361,83 @@ describe('POST /api/lab-results/import', () => {
   });
 });
 
+describe('accès Pro et quotas', () => {
+  const send = async (app: express.Express, tags: string[]) => {
+    const req = request(app).post('/api/lab-results/import').set('Authorization', auth());
+    for (const tag of tags) req.attach('files', await makePdf(bilan(tag)), `${tag}.pdf`);
+    return req;
+  };
+
+  it('compte gratuit : 402 PRO_REQUIRED quand les 3 imports offerts sont consommés', async () => {
+    user.proUntil = null;
+    user.freeImportsUsed = 3;
+    const app = await buildApp();
+    const res = await send(app, ['A']);
+    expect(res.status).toBe(402);
+    expect(res.body.code).toBe('PRO_REQUIRED');
+    expect(docs).toHaveLength(0);
+  });
+
+  it('compte gratuit : un import offert est décompté', async () => {
+    user.proUntil = null;
+    const app = await buildApp();
+    const res = await send(app, ['B']);
+    expect(res.status).toBe(200);
+    expect(res.body.results[0].status).toBe('ready');
+    expect(user.freeImportsUsed).toBe(1);
+  });
+
+  it('compte gratuit : dans un lot, seuls les imports restants sont traités', async () => {
+    user.proUntil = null;
+    user.freeImportsUsed = 2;
+    const app = await buildApp();
+    const res = await send(app, ['C', 'D']);
+    expect(res.body.results.map((r: { status: string }) => r.status)).toEqual(['ready', 'quota_exceeded']);
+    expect(user.freeImportsUsed).toBe(3);
+    expect(docs).toHaveLength(1);
+  });
+
+  it('accès Pro expiré = compte gratuit', async () => {
+    user.proUntil = new Date(Date.now() - 1000);
+    user.freeImportsUsed = 3;
+    const app = await buildApp();
+    expect((await send(app, ['E'])).status).toBe(402);
+  });
+
+  it('Pro : le plafond mensuel (25) bloque avec 429 MONTHLY_QUOTA_REACHED', async () => {
+    monthlyCount = 25;
+    const app = await buildApp();
+    const res = await send(app, ['F']);
+    expect(res.status).toBe(429);
+    expect(res.body.code).toBe('MONTHLY_QUOTA_REACHED');
+  });
+
+  it('Pro : un import est décompté du mois, pas de l’essai gratuit', async () => {
+    const app = await buildApp();
+    await send(app, ['G']);
+    expect(monthlyCount).toBe(1);
+    expect(user.freeImportsUsed).toBe(0);
+  });
+
+  it('ADMIN : toujours Pro, même sans date d’accès', async () => {
+    user.role = 'ADMIN';
+    user.proUntil = null;
+    user.freeImportsUsed = 3;
+    const app = await buildApp();
+    expect((await send(app, ['H'])).status).toBe(200);
+  });
+
+  it('un doublon ou un échec ne consomme pas d’import', async () => {
+    user.proUntil = null;
+    const app = await buildApp();
+    await request(app)
+      .post('/api/lab-results/import')
+      .set('Authorization', auth())
+      .attach('files', Buffer.from('pas un pdf'), 'x.pdf');
+    expect(user.freeImportsUsed).toBe(0);
+  });
+});
+
 describe('confirmation, rejet et téléchargement', () => {
   const OTHER = 'Bearer ' + jwt.sign({ userId: 'user-2' }, JWT_SECRET, { expiresIn: '1h' });
 
@@ -348,7 +458,7 @@ describe('confirmation, rejet et téléchargement', () => {
       .set('Authorization', auth())
       .send({ date: '2026-03-12', lab: 'Biogroup', tsh: 2.4, ferritin: 64 });
     expect(res.status).toBe(201);
-    expect(res.body).toMatchObject({ userId: USER_ID, tsh: 2.4, ferritin: 64, lab: 'Biogroup' });
+    expect(res.body).toMatchObject({ userId: USER_ID, tsh: 2.4, ferritin: 64, lab: 'Biogroup', source: 'PDF_IMPORT' });
     expect(docs[0].labResultId).toBe(res.body.id);
   });
 

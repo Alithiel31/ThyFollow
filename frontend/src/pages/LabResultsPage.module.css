@@ -206,3 +206,17 @@
   .grid2, .grid3 { grid-template-columns: 1fr 1fr; }
   .header { flex-direction: column; gap: 12px; }
 }
+
+/* Accès Pro : pastille sur le bouton d'import, solde, et origine d'un résultat */
+.proTag {
+  margin-left: 6px; padding: 1px 6px; border-radius: 999px; font-size: 0.65rem;
+  font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+  background: var(--accent-soft); color: var(--accent);
+}
+.importQuota { font-size: 0.78rem; color: var(--text-muted); margin: -8px 0 16px; text-align: right; }
+.sourceBadge {
+  display: inline-block; align-self: flex-start; margin-top: 6px; padding: 2px 8px;
+  border-radius: 999px; font-size: 0.68rem; color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+.sourceBadge[data-source='PDF_IMPORT'] { color: var(--accent); border-color: var(--accent); }

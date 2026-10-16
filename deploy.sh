@@ -11,6 +11,8 @@
 #   PG_THYROTRACK_PASSWORD -> DB_PASSWORD (nom attendu par docker-compose.yml)
 #   PDF_ENCRYPTION_KEY     -> obligatoire : 64 caractères hexadécimaux
 #   ANTHROPIC_API_KEY      -> facultatif : sans elle, le repli IA est désactivé
+#   STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, STRIPE_PRICE_ID -> facultatifs :
+#                             sans eux, pas de paiement par carte (codes promo OK)
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -58,6 +60,10 @@ infisical run --token="$INFISICAL_TOKEN" --domain="$INFISICAL_API_URL" \
     fi
     if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
       echo "ℹ️  ANTHROPIC_API_KEY absente : repli IA désactivé (l extraction par règles reste active)."
+    fi
+
+    if [ -z "${STRIPE_SECRET_KEY:-}" ] || [ -z "${STRIPE_WEBHOOK_SECRET:-}" ] || [ -z "${STRIPE_PRICE_ID:-}" ]; then
+      echo "ℹ️  Stripe non configuré (STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET / STRIPE_PRICE_ID) : paiement désactivé, codes promo toujours actifs."
     fi
 
     docker compose up -d --build "$@"

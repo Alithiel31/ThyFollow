@@ -8,6 +8,7 @@ import { Save, LogOut, Watch, FileText } from 'lucide-react';
 import { aiConsentApi, authApi, pdfPasswordsApi, profileApi, securityApi } from '../lib/api';
 import { useAuthStore } from '../lib/store';
 import { GoogleIcon } from '../components/GoogleIcon';
+import { ProPaywall, ProStatus } from '../components/ProPanel';
 import { DIAGNOSIS_LABEL_KEYS, THYROID_STATUS_LABEL_KEYS, type AuthEventType, type UserProfile } from '../types';
 import styles from './ProfilePage.module.css';
 
@@ -397,6 +398,14 @@ export function ProfilePage() {
           )}
         </div>
       </Section>
+
+      {/* ── Accès Pro : hors <form> (même raison que « Comptes liés »). */}
+      {user?.entitlements && (
+        <Section title={t('pro.status.title')}>
+          <ProStatus entitlements={user.entitlements} />
+          {!user.entitlements.pro && <ProPaywall entitlements={user.entitlements} />}
+        </Section>
+      )}
 
       {/* ── Documents et IA : hors <form> (même raison que « Comptes liés »). */}
       <Section title={t('profile.documents.title')}>

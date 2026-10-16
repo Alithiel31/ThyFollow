@@ -43,7 +43,7 @@ Application web de suivi thyroïdien, inspirée de l'app Clue.
 | Module | Détail |
 |---|---|
 | **Journal quotidien** | Énergie, humeur, anxiété, brouillard mental, 11 symptômes thyroïdiens, médicament pris, mesures physiques (poids/FC/sommeil synchronisables via Google Health, ex: Pixel Watch) |
-| **Analyses sanguines** | TSH, FT4, FT3, Anti-TPO, Anti-TG, carences (Ferritine, Vit D, B12…) avec graphiques d'évolution ; **import de PDF** (par lot, PDF protégés par mot de passe pris en charge, relecture avant ajout, stockage chiffré, repli IA optionnel) |
+| **Analyses sanguines** | TSH, FT4, FT3, Anti-TPO, Anti-TG, carences (Ferritine, Vit D, B12…) avec graphiques d'évolution ; **import de PDF, réservé aux comptes Pro** après 3 imports d'essai (par lot, PDF protégés par mot de passe pris en charge, relecture avant ajout, stockage chiffré, repli IA optionnel) |
 | **Médicaments** | Gestion du traitement (Levothyrox, etc.), dosage, fréquence, observance |
 | **Rendez-vous** | Agenda médical avec rappels, statuts, types spécialisés |
 | **Tableau de bord** | Streak médicament, observance, moyennes, prochain RDV, historique TSH |
@@ -365,6 +365,11 @@ DELETE /api/lab-results/:id
 POST   /api/lab-results/import                    (PDF en multipart → un brouillon par fichier)
 POST   /api/lab-results/import/:docId/confirm     (valeurs relues → crée le résultat)
 DELETE /api/lab-results/import/:docId             (rejette un brouillon)
+POST   /api/billing/checkout                      (abonnement Pro : renvoie l'URL de paiement Stripe)
+POST   /api/billing/portal                        (portail client Stripe)
+POST   /api/billing/redeem                        (active l'accès Pro avec un code promo)
+POST   /api/webhooks/stripe                       (webhook Stripe, signature vérifiée)
+GET|POST|PATCH /api/admin/promo-codes             (ADMIN : gestion des codes promo)
 GET    /api/lab-results/documents/:docId          (télécharge le PDF stocké, propriétaire uniquement)
 GET    /api/pdf-passwords                         (libellés seulement — jamais les secrets)
 POST   /api/pdf-passwords
@@ -457,3 +462,28 @@ Les changements notables sont documentés dans [`CHANGELOG.md`](./CHANGELOG.md) 
 ## 📄 Licence
 
 Projet privé — voir [`LICENSE`](./LICENSE).
+
+## Accès Pro et codes promo
+
+La saisie manuelle des analyses et l'export restent **gratuits**. L'**import de bilans PDF** est
+réservé aux comptes Pro : 3 imports offerts à vie, puis un abonnement Stripe (plafond de 25
+imports par mois). Un compte `ADMIN` est toujours Pro. Le serveur fait foi (402/429) ; l'interface
+ne fait qu'orienter.
+
+Créer un code promo (compte ADMIN, jeton JWT dans `$TOKEN`) :
+
+```bash
+curl -X POST https://thyrotrack.alithiel31.dev/api/admin/promo-codes \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"durationDays": 90, "maxRedemptions": 5, "note": "famille"}'
+# => { "code": "THYRO-XXXX-XXXX", ... } ; "code" peut aussi être fourni (ex. "MAMAN")
+```
+
+La personne saisit le code dans **Profil → Abonnement Pro**. Désactiver un code :
+`PATCH /api/admin/promo-codes/:id` avec `{"active": false}`. Octroi manuel direct en base :
+`UPDATE users SET "proUntil" = '2027-12-31', "proSource" = 'GRANT' WHERE email = '...';`
+
+Stripe : créer un produit récurrent (→ `STRIPE_PRICE_ID`), un endpoint webhook
+`https://<domaine>/api/webhooks/stripe` abonné à `checkout.session.completed` et
+`customer.subscription.created|updated|deleted` (→ `STRIPE_WEBHOOK_SECRET`), puis renseigner les
+trois variables dans Infisical. Stripe ne reçoit que l'email du compte, jamais de données de santé.

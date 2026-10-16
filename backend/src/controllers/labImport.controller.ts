@@ -31,6 +31,7 @@ import { extractPdfText } from '../lib/labExtract/pdfText.js';
 import { parseLabText, type ParsedLabResult } from '../lib/labExtract/rules.js';
 import { extractWithLlm } from '../lib/labExtract/llm.js';
 import { MARKER_KEYS } from '../lib/labExtract/units.js';
+import { getImportAllowance, consumeImport } from '../lib/entitlements.js';
 
 // Texte minimal pour considérer qu'un PDF a une couche texte exploitable (en
 // dessous : PDF scanné, l'OCR est hors périmètre).
@@ -45,6 +46,7 @@ export type ImportStatus =
   | 'invalid'
   | 'too_large'
   | 'duplicate'
+  | 'quota_exceeded'
   | 'failed';
 
 export interface ImportFileResult {
@@ -186,24 +188,49 @@ export const labImportController = {
         req.t('errors.labImport.notConfigured')
       );
     }
+    const userId = req.userId!;
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        role: true,
+        proUntil: true,
+        freeImportsUsed: true,
+        name: true,
+        email: true,
+        birthDate: true,
+        profile: { select: { aiExtractionConsentAt: true } },
+      },
+    });
+    if (!user) throw new AppError(401, req.t('errors.tokenInvalid'));
+
+    // Accès Pro : refusé AVANT de lire le corps de la requête (les PDF), pour
+    // ne pas traiter un envoi qu'on sait refuser.
+    const allowance = await getImportAllowance(user);
+    if (allowance.remaining <= 0) {
+      throw allowance.pro
+        ? new AppError(
+            429,
+            req.t('errors.billing.monthlyQuotaReached', { limit: allowance.limit }),
+            true,
+            'MONTHLY_QUOTA_REACHED'
+          )
+        : new AppError(402, req.t('errors.billing.proRequired'), true, 'PRO_REQUIRED');
+    }
+    let remaining = allowance.remaining;
+
     await runUpload(req, res);
     const files = (req.files as Express.Multer.File[] | undefined) ?? [];
     if (files.length === 0) {
       throw new ValidationError(req.t('errors.labImport.noFile'));
     }
 
-    const userId = req.userId!;
     const body = req.body as Record<string, string | undefined>;
     const providedPassword = body.password || undefined;
     const remember = body.remember === 'true';
     const forceAi = body.forceAi === 'true';
     const passwordLabel = (body.passwordLabel || '').trim().slice(0, 60);
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { name: true, email: true, birthDate: true, profile: { select: { aiExtractionConsentAt: true } } },
-    });
-    if (!user) throw new AppError(401, req.t('errors.tokenInvalid'));
     const aiUser = {
       name: user.name,
       email: user.email,
@@ -278,6 +305,13 @@ export const labImportController = {
           continue;
         }
 
+        // Chaque extraction compte (elle peut déclencher un appel LLM payant) :
+        // au-delà du solde, le fichier est refusé individuellement.
+        if (remaining <= 0) {
+          results.push({ filename, status: 'quota_exceeded' });
+          continue;
+        }
+
         const extraction = await extract(data, aiUser, forceAi);
         if ('noText' in extraction) {
           results.push({ filename, status: 'failed', reason: 'no_text' });
@@ -297,6 +331,9 @@ export const labImportController = {
               keyVersion: config.pdfEncryptionKeyVersion,
             },
           }));
+
+        await consumeImport(userId, allowance.pro);
+        remaining -= 1;
 
         let possibleDuplicateOf: ImportFileResult['possibleDuplicateOf'];
         if (draft.date) {
@@ -334,7 +371,9 @@ export const labImportController = {
           req.t('errors.labImport.alreadyConfirmed')
         );
       }
-      const created = await tx.labResult.create({ data: { userId, date: new Date(date), ...data } });
+      const created = await tx.labResult.create({
+        data: { userId, date: new Date(date), source: 'PDF_IMPORT', ...data },
+      });
       await tx.labDocument.update({ where: { id: document.id }, data: { labResultId: created.id } });
       return created;
     });

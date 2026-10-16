@@ -26,6 +26,18 @@ pas synchronisé avec ces tags.
 
 ### Added
 
+- Accès Pro à l'import de bilans PDF : la saisie manuelle et l'export restent gratuits ; l'import
+  automatique (lecture du PDF + repli IA) est réservé aux comptes Pro, avec 3 imports offerts à vie
+  et un plafond de 25 imports par mois en Pro (`FREE_IMPORT_LIMIT`, `PRO_MONTHLY_IMPORT_LIMIT`).
+  Le droit est `User.proUntil` (source unique, `lib/entitlements.ts`), vérifié côté serveur
+  (402 `PRO_REQUIRED`, 429 `MONTHLY_QUOTA_REACHED`) ; un ADMIN est toujours Pro. Les PDF déjà
+  importés restent consultables et téléchargeables après la fin d'un accès.
+- Paiement par abonnement Stripe (Checkout + portail client) : `POST /api/billing/checkout`,
+  `/portal`, webhook `POST /api/webhooks/stripe` (corps brut, signature vérifiée). Variables
+  `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID` (facultatives : sans elles, 501).
+- Codes promo : `POST /api/billing/redeem` (le code prolonge l'accès de sa durée) et gestion
+  réservée aux ADMIN via `/api/admin/promo-codes` (création, liste, désactivation).
+- `LabResult.source` (`MANUAL` / `PDF_IMPORT`) : l'origine d'un résultat est affichée dans le carnet.
 - Déploiement de production avec secrets injectés par Infisical : `deploy.sh` (connexion Machine
   Identity, puis `docker compose up -d --build` dans `infisical run`), qui renomme
   `PG_THYROTRACK_PASSWORD` en `DB_PASSWORD` et refuse de déployer si `PDF_ENCRYPTION_KEY` est absente
