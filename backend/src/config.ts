@@ -43,6 +43,19 @@ export const config = {
   // base — voir lib/crypto.ts. Générée comme JWT_SECRET :
   // node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
   tokenEncryptionKey: process.env.TOKEN_ENCRYPTION_KEY || '',
+  // Import de bilans sanguins PDF (voir lib/pdfDecrypt.ts, lib/labExtract/).
+  // Clé de chiffrement (hex, 32 octets) des PDF et des mots de passe de PDF
+  // mémorisés, DISTINCTE de TOKEN_ENCRYPTION_KEY. Absente => l'import répond 501.
+  pdfEncryptionKey: process.env.PDF_ENCRYPTION_KEY || '',
+  // Version de la clé ci-dessus, stockée avec chaque document (prépare une
+  // future rotation ; aucun outil de re-chiffrement pour l'instant).
+  pdfEncryptionKeyVersion: parseInt(process.env.PDF_ENCRYPTION_KEY_VERSION || '1', 10),
+  // Extraction LLM de repli (opt-in utilisateur). Absente => repli désactivé.
+  anthropicApiKey: process.env.ANTHROPIC_API_KEY || '',
+  anthropicModel: process.env.ANTHROPIC_MODEL || 'claude-sonnet-5-5',
+  // Limites de l'import par lot.
+  pdfImportMaxFiles: parseInt(process.env.PDF_IMPORT_MAX_FILES || '10', 10),
+  pdfImportMaxBytes: parseInt(process.env.PDF_IMPORT_MAX_BYTES || String(10 * 1024 * 1024), 10),
   // Gestion de l'abonné webhook au niveau du projet (voir
   // lib/googleHealthSubscriber.ts) : distincte du flux OAuth utilisateur,
   // authentifiée via un compte de service IAM Google Cloud (recommandation
@@ -100,6 +113,19 @@ if (config.googleHealthClientId && !/^[0-9a-f]{64}$/i.test(config.tokenEncryptio
   const message =
     'TOKEN_ENCRYPTION_KEY manquante ou invalide (attendu : 64 caractères hexadécimaux / 32 octets) ' +
     'alors que GOOGLE_HEALTH_CLIENT_ID est configuré.';
+  if (config.isProd) {
+    console.error(`❌ ${message}`);
+    process.exit(1);
+  } else {
+    console.warn(`⚠️  ${message}`);
+  }
+}
+
+// Contrairement à TOKEN_ENCRYPTION_KEY, PDF_ENCRYPTION_KEY n'est pas requise
+// au démarrage : sans elle, seules les routes d'import PDF répondent 501.
+// Mais si elle est fournie, elle doit être valide.
+if (config.pdfEncryptionKey && !/^[0-9a-f]{64}$/i.test(config.pdfEncryptionKey)) {
+  const message = 'PDF_ENCRYPTION_KEY invalide (attendu : 64 caractères hexadécimaux / 32 octets).';
   if (config.isProd) {
     console.error(`❌ ${message}`);
     process.exit(1);

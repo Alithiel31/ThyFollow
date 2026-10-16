@@ -17,7 +17,8 @@ RUN npm run build
 FROM node:24-alpine
 WORKDIR /app
 
-RUN apk add --no-cache dumb-init openssl
+# qpdf : déchiffrement des PDF de bilans protégés par mot de passe (lib/pdfDecrypt.ts)
+RUN apk add --no-cache dumb-init openssl qpdf
 
 COPY package*.json ./
 COPY prisma ./prisma/
