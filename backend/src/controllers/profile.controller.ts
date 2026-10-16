@@ -20,6 +20,8 @@ const profileSchema = z.object({
   temperatureUnit: z.enum(['CELSIUS', 'FAHRENHEIT']).optional(),
 });
 
+const consentSchema = z.object({ consent: z.boolean() });
+
 export const profileController = {
   // GET /api/profile
   get: async (req: AuthRequest, res: Response): Promise<void> => {
@@ -62,5 +64,19 @@ export const profileController = {
       select: { id: true, provider: true, type: true, userAgent: true, createdAt: true },
     });
     res.json(events);
+  },
+
+  // PUT /api/profile/ai-extraction-consent — opt-in (révocable à tout moment)
+  // à l'envoi du texte anonymisé d'un bilan à l'API Anthropic quand
+  // l'extraction par règles échoue (voir lib/labExtract/llm.ts).
+  setAiExtractionConsent: async (req: AuthRequest, res: Response): Promise<void> => {
+    const { consent } = consentSchema.parse(req.body);
+    const aiExtractionConsentAt = consent ? new Date() : null;
+    await prisma.userProfile.upsert({
+      where: { userId: req.userId! },
+      create: { userId: req.userId!, aiExtractionConsentAt },
+      update: { aiExtractionConsentAt },
+    });
+    res.json({ aiExtractionConsentAt });
   },
 };
