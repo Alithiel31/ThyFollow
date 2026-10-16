@@ -153,3 +153,14 @@ describe('PUT /api/profile/ai-extraction-consent', () => {
     expect(res.status).toBe(400);
   });
 });
+
+describe('messages d’erreur traduits', () => {
+  it('404 sur un mot de passe inconnu : libellé de ressource traduit', async () => {
+    const app = await buildApp();
+    const fr = await request(app).delete('/api/pdf-passwords/inconnu').set('Authorization', token(ME));
+    const en = await request(app).delete('/api/pdf-passwords/inconnu?lng=en').set('Authorization', token(ME));
+    expect(fr.body.error).toBe('Mot de passe introuvable');
+    expect(en.body.error).toMatch(/Password .*not found|not found/i);
+    expect(en.body.error).not.toContain('resources.');
+  });
+});

@@ -33,7 +33,7 @@ export const pdfPasswordsController = {
     if (!isPdfEncryptionConfigured()) {
       throw new AppError(
         501,
-        req.t('errors.labImport.notConfigured', { defaultValue: "L'import de bilans PDF n'est pas configuré sur ce serveur" })
+        req.t('errors.labImport.notConfigured')
       );
     }
     const { label, password } = createSchema.parse(req.body);
@@ -52,7 +52,7 @@ export const pdfPasswordsController = {
   // DELETE /api/pdf-passwords/:id
   remove: async (req: AuthRequest, res: Response): Promise<void> => {
     const existing = await prisma.pdfPassword.findFirst({ where: { id: req.params.id, userId: req.userId } });
-    if (!existing) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.pdfPassword', { defaultValue: 'mot de passe' }) }));
+    if (!existing) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.pdfPassword') }));
     await prisma.pdfPassword.delete({ where: { id: existing.id } });
     res.json({ success: true });
   },
