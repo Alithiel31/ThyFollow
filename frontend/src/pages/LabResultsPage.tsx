@@ -3,7 +3,7 @@ import { useState, useId, cloneElement, isValidElement, type ReactElement } from
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
-import { Plus, Trash2, FlaskConical, TrendingUp } from 'lucide-react';
+import { Plus, Trash2, FlaskConical, TrendingUp, FileUp } from 'lucide-react';
 import { labApi } from '../lib/api';
 import { formatDate, tshStatus } from '../lib/utils';
 import { LAB_RANGES, type LabResult } from '../types';
@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 import { parseISO, format } from 'date-fns';
 import { fr, enUS } from 'date-fns/locale';
+import { LabImport, DocumentLink } from '../components/LabImport';
 import styles from './LabResultsPage.module.css';
 
 const EMPTY_FORM: Partial<LabResult> = {
@@ -27,6 +28,7 @@ export function LabResultsPage() {
   const { user } = useAuthStore();
   const qc = useQueryClient();
   const [showForm, setShowForm] = useState(false);
+  const [showImport, setShowImport] = useState(false);
   const [editItem, setEditItem] = useState<LabResult | null>(null);
   const [form, setForm] = useState<Partial<LabResult>>(EMPTY_FORM);
   const dateLocale = i18n.language?.startsWith('en') ? enUS : fr;
@@ -99,10 +101,17 @@ export function LabResultsPage() {
           <h1 className={styles.title}>{t('labResults.title')}</h1>
           <p className={styles.sub}>{t('labResults.subtitle')}</p>
         </div>
-        <button className={styles.addBtn} onClick={() => { setEditItem(null); setForm(EMPTY_FORM); setShowForm(true); }}>
-          <Plus size={16} /> {t('labResults.add')}
-        </button>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <button className={styles.addBtn} onClick={() => setShowImport((v) => !v)}>
+            <FileUp size={16} /> {t('labImport.button')}
+          </button>
+          <button className={styles.addBtn} onClick={() => { setEditItem(null); setForm(EMPTY_FORM); setShowForm(true); }}>
+            <Plus size={16} /> {t('labResults.add')}
+          </button>
+        </div>
       </div>
+
+      {showImport && <LabImport onClose={() => setShowImport(false)} />}
 
       {/* TSH Chart */}
       {chartData.length > 1 && (
@@ -225,6 +234,7 @@ export function LabResultsPage() {
                   )}
                 </div>
                 {r.notes && <p className={styles.resultNotes}>{r.notes}</p>}
+                {r.documents?.map((d) => <DocumentLink key={d.id} documentId={d.id} />)}
                 <button className={styles.deleteBtn}
                   onClick={(e) => { e.stopPropagation(); if (confirm(t('labResults.deleteConfirm'))) deleteMut.mutate(r.id); }}>
                   <Trash2 size={14} />
