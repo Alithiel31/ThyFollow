@@ -35,7 +35,7 @@ pas synchronisé avec ces tags.
   `PDF_ENCRYPTION_KEY`, colonne `bytea`) téléchargeables depuis le carnet. Mots de passe mémorisés
   révocables (un par un ou tous) dans la nouvelle section « Documents et IA » du profil. Nouvelles
   variables : `PDF_ENCRYPTION_KEY`, `PDF_ENCRYPTION_KEY_VERSION`, `ANTHROPIC_API_KEY`,
-  `ANTHROPIC_MODEL`, `PDF_IMPORT_MAX_FILES`, `PDF_IMPORT_MAX_BYTES` ; l'image Docker du backend
+  `ANTHROPIC_MODEL` (Haiku 5.5 par défaut), `PDF_IMPORT_MAX_FILES`, `PDF_IMPORT_MAX_BYTES` ; l'image Docker du backend
   embarque désormais `qpdf`. Limites : PDF scannés (pas d'OCR) et images non gérés ; le serveur peut
   déchiffrer les mots de passe mémorisés (voir `SECURITY.md`).
 - Page 404 dédiée (`NotFoundPage`, FR/EN) : une URL inconnue n'est plus redirigée silencieusement
