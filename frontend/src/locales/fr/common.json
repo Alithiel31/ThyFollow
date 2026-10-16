@@ -524,5 +524,73 @@
     "medicationLine": "{{name}}{{brand}} — {{dose}} {{unit}}, {{freq}}{{intakeTime}}",
     "intakeTimeSuffix": " à {{time}}",
     "footer": "Généré par ThyroTrack le {{date}} — données déclaratives saisies par le patient, à interpréter avec un professionnel de santé."
+  },
+  "labImport": {
+    "button": "Importer un bilan PDF",
+    "title": "Importer des bilans PDF",
+    "subtitle": "Déposez vos PDF de prise de sang : les valeurs sont lues automatiquement, puis vous les vérifiez avant l'ajout au carnet.",
+    "dropLabel": "Choisir ou déposer des PDF",
+    "dropHint": "Jusqu'à {{max}} fichiers PDF, 10 Mo chacun",
+    "close": "Fermer",
+    "notPdf": "Seuls les fichiers PDF sont acceptés",
+    "tooMany": "{{max}} fichiers maximum par envoi",
+    "uploadError": "L'envoi a échoué",
+    "status": {
+      "uploading": "Lecture en cours…",
+      "ready": "À vérifier",
+      "password_required": "Mot de passe requis",
+      "wrong_password": "Mot de passe incorrect",
+      "invalid": "Fichier PDF invalide",
+      "too_large": "Fichier trop volumineux",
+      "duplicate": "Déjà dans le carnet",
+      "failed": "Lecture impossible"
+    },
+    "reason": {
+      "no_text": "Ce PDF ne contient pas de texte (scan ?). Saisissez les valeurs à la main."
+    },
+    "duplicate": "Ce PDF est déjà dans votre carnet.",
+    "password": "Mot de passe du PDF",
+    "rememberPassword": "Mémoriser ce mot de passe (révocable dans votre profil)",
+    "passwordLabel": "Libellé du mot de passe",
+    "passwordLabelPlaceholder": "Libellé (ex. Biogroup)",
+    "retry": "Réessayer",
+    "method": {
+      "rules": "Lu automatiquement",
+      "llm": "Lu avec l'aide de l'IA"
+    },
+    "insufficient": "lecture incomplète : vérifiez et complétez les champs",
+    "possibleDuplicate": "Un résultat existe déjà à cette date : vérifiez pour éviter un doublon.",
+    "dateUncertain": "Date à vérifier",
+    "retryAi": "Réessayer avec l'IA",
+    "discard": "Ignorer",
+    "addToLog": "Ajouter au carnet",
+    "added": "Bilan ajouté au carnet",
+    "flags": {
+      "converted": "Converti dans l'unité du carnet",
+      "no_unit": "Unité absente : unité du carnet supposée",
+      "comparator": "Valeur « < » ou « > » : à saisir à la main",
+      "unknown_unit": "Unité non reconnue : à saisir à la main"
+    },
+    "markers": {
+      "tsh": "TSH (mUI/L)",
+      "ft4": "FT4 (pmol/L)",
+      "ft3": "FT3 (pmol/L)",
+      "t4": "T4 totale (nmol/L)",
+      "t3": "T3 totale (nmol/L)",
+      "antiTPO": "Anti-TPO (UI/mL)",
+      "antiTG": "Anti-thyroglobuline (UI/mL)",
+      "antiTSHR": "Anti-récepteurs TSH (UI/L)",
+      "thyroglobulin": "Thyroglobuline (µg/L)",
+      "ferritin": "Ferritine (µg/L)",
+      "vitaminD": "Vitamine D (nmol/L)",
+      "vitaminB12": "Vitamine B12 (pmol/L)",
+      "magnesium": "Magnésium (mmol/L)",
+      "selenium": "Sélénium (µg/L)",
+      "cholesterol": "Cholestérol total (mmol/L)",
+      "glucose": "Glycémie (mmol/L)",
+      "hemoglobin": "Hémoglobine (g/dL)"
+    },
+    "download": "Télécharger le PDF",
+    "downloadError": "Téléchargement impossible"
   }
 }

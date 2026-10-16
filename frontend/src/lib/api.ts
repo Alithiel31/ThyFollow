@@ -81,6 +81,41 @@ export const labApi = {
   update: (id: string, data: Partial<import('../types').LabResult>) =>
     api.put<import('../types').LabResult>(`/lab-results/${id}`, data),
   delete: (id: string) => api.delete(`/lab-results/${id}`),
+  // Import de bilans PDF (multipart) : un brouillon par fichier, à relire puis confirmer.
+  importFiles: (
+    files: File[],
+    opts: { password?: string; remember?: boolean; passwordLabel?: string; forceAi?: boolean } = {}
+  ) => {
+    const form = new FormData();
+    files.forEach((file) => form.append('files', file));
+    if (opts.password) form.append('password', opts.password);
+    if (opts.remember) form.append('remember', 'true');
+    if (opts.passwordLabel) form.append('passwordLabel', opts.passwordLabel);
+    if (opts.forceAi) form.append('forceAi', 'true');
+    return api.post<{ results: import('../types').ImportFileResult[] }>('/lab-results/import', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+  confirmImport: (documentId: string, data: Partial<import('../types').LabResult> & { date: string }) =>
+    api.post<import('../types').LabResult>(`/lab-results/import/${documentId}/confirm`, data),
+  discardImport: (documentId: string) => api.delete(`/lab-results/import/${documentId}`),
+  downloadDocument: (documentId: string) =>
+    api.get<Blob>(`/lab-results/documents/${documentId}`, { responseType: 'blob' }),
+};
+
+// ── Mots de passe de PDF mémorisés (import de bilans)
+export const pdfPasswordsApi = {
+  list: () => api.get<import('../types').PdfPasswordEntry[]>('/pdf-passwords'),
+  create: (data: { label: string; password: string }) =>
+    api.post<import('../types').PdfPasswordEntry>('/pdf-passwords', data),
+  remove: (id: string) => api.delete(`/pdf-passwords/${id}`),
+  removeAll: () => api.delete<{ success: boolean; deleted: number }>('/pdf-passwords'),
+};
+
+// ── Consentement à l'extraction par IA (repli de l'import de bilans)
+export const aiConsentApi = {
+  set: (consent: boolean) =>
+    api.put<{ aiExtractionConsentAt: string | null }>('/profile/ai-extraction-consent', { consent }),
 };
 
 // ── Medications
