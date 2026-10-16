@@ -5,6 +5,7 @@
 import express from 'express';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
+import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -35,6 +36,15 @@ const prismaMock = {
     findUnique: vi.fn(async ({ where }: { where: { userId_sha256: { userId: string; sha256: string } } }) =>
       docs.find((d) => d.userId === where.userId_sha256.userId && d.sha256 === where.userId_sha256.sha256) ?? null
     ),
+    findFirst: vi.fn(async ({ where }: { where: { id: string; userId: string } }) =>
+      docs.find((d) => d.id === where.id && d.userId === where.userId) ?? null
+    ),
+    update: vi.fn(async ({ where, data }: { where: { id: string }; data: Partial<DocRow> }) => {
+      Object.assign(docs.find((d) => d.id === where.id)!, data);
+    }),
+    delete: vi.fn(async ({ where }: { where: { id: string } }) => {
+      docs = docs.filter((d) => d.id !== where.id);
+    }),
     create: vi.fn(async ({ data }: { data: Omit<DocRow, 'id' | 'createdAt' | 'labResultId'> }) => {
       const row = { id: `doc-${++seq}`, createdAt: new Date(), labResultId: null, ...data } as DocRow;
       docs.push(row);
@@ -52,7 +62,11 @@ const prismaMock = {
       Object.assign(pws.find((p) => p.id === where.id)!, data);
     }),
   },
-  labResult: { findFirst: vi.fn(async () => null as { id: string } | null) },
+  labResult: {
+    findFirst: vi.fn(async () => null as { id: string } | null),
+    create: vi.fn(async ({ data }: { data: Record<string, unknown> }) => ({ id: `lab-${++seq}`, ...data })),
+  },
+  $transaction: vi.fn(async (fn: (tx: unknown) => Promise<unknown>) => fn(prismaMock)),
 };
 vi.mock('../lib/prisma.js', () => ({ prisma: prismaMock }));
 
@@ -65,6 +79,7 @@ async function buildApp() {
   const { default: router } = await import('../routers/labResults.router.js');
   const { errorHandler } = await import('../middleware/errorHandler.js');
   const app = express();
+  app.use(express.json());
   app.use(middleware.handle(i18next));
   app.use('/api/lab-results', router);
   app.use(errorHandler);
@@ -297,5 +312,93 @@ describe('POST /api/lab-results/import', () => {
     expect(JSON.stringify(res.body)).not.toContain(STORED_PASSWORD);
     expect(res.body.results[0].status).toBe('ready');
     expect(pws[0].lastUsedAt).not.toBeNull();
+  });
+});
+
+describe('confirmation, rejet et téléchargement', () => {
+  const OTHER = 'Bearer ' + jwt.sign({ userId: 'user-2' }, JWT_SECRET, { expiresIn: '1h' });
+
+  async function importOne(app: express.Express, tag: string, password?: string) {
+    const res = await request(app)
+      .post('/api/lab-results/import')
+      .set('Authorization', auth())
+      .field('password', password ?? '')
+      .attach('files', await makePdf(bilan(tag), password), `${tag}.pdf`);
+    return res.body.results[0] as { documentId: string; draft: { values: Record<string, number> } };
+  }
+
+  it('confirme : crée le résultat avec les valeurs corrigées et rattache le document', async () => {
+    const app = await buildApp();
+    const { documentId } = await importOne(app, 'S');
+    const res = await request(app)
+      .post(`/api/lab-results/import/${documentId}/confirm`)
+      .set('Authorization', auth())
+      .send({ date: '2026-03-12', lab: 'Biogroup', tsh: 2.4, ferritin: 64 });
+    expect(res.status).toBe(201);
+    expect(res.body).toMatchObject({ userId: USER_ID, tsh: 2.4, ferritin: 64, lab: 'Biogroup' });
+    expect(docs[0].labResultId).toBe(res.body.id);
+  });
+
+  it('confirmer deux fois → 409', async () => {
+    const app = await buildApp();
+    const { documentId } = await importOne(app, 'T');
+    const send = () =>
+      request(app).post(`/api/lab-results/import/${documentId}/confirm`).set('Authorization', auth()).send({ date: '2026-03-12', tsh: 2 });
+    expect((await send()).status).toBe(201);
+    expect((await send()).status).toBe(409);
+    expect(prismaMock.labResult.create).toHaveBeenCalledTimes(1);
+  });
+
+  it('valeurs invalides à la confirmation → 400, rien de créé', async () => {
+    const app = await buildApp();
+    const { documentId } = await importOne(app, 'U');
+    const res = await request(app)
+      .post(`/api/lab-results/import/${documentId}/confirm`)
+      .set('Authorization', auth())
+      .send({ date: '2026-03-12', tsh: 'beaucoup' });
+    expect(res.status).toBe(400);
+    expect(prismaMock.labResult.create).not.toHaveBeenCalled();
+    expect(docs[0].labResultId).toBeNull();
+  });
+
+  it('document d’un autre utilisateur → 404 (confirmation, rejet, téléchargement)', async () => {
+    const app = await buildApp();
+    const { documentId } = await importOne(app, 'V');
+    const confirm = await request(app).post(`/api/lab-results/import/${documentId}/confirm`).set('Authorization', OTHER).send({ date: '2026-03-12' });
+    const discard = await request(app).delete(`/api/lab-results/import/${documentId}`).set('Authorization', OTHER);
+    const download = await request(app).get(`/api/lab-results/documents/${documentId}`).set('Authorization', OTHER);
+    expect([confirm.status, discard.status, download.status]).toEqual([404, 404, 404]);
+    expect(docs).toHaveLength(1);
+  });
+
+  it('rejette un brouillon, mais pas un document déjà rattaché', async () => {
+    const app = await buildApp();
+    const { documentId } = await importOne(app, 'W');
+    docs[0].labResultId = 'lab-1';
+    expect((await request(app).delete(`/api/lab-results/import/${documentId}`).set('Authorization', auth())).status).toBe(409);
+    docs[0].labResultId = null;
+    const ok = await request(app).delete(`/api/lab-results/import/${documentId}`).set('Authorization', auth());
+    expect(ok.status).toBe(200);
+    expect(docs).toHaveLength(0);
+  });
+
+  it('télécharge exactement les octets du PDF déchiffré d’origine, avec les en-têtes attendus', async () => {
+    const app = await buildApp();
+    const { documentId } = await importOne(app, 'X', 'dl-password-1');
+    const res = await request(app)
+      .get(`/api/lab-results/documents/${documentId}`)
+      .set('Authorization', auth())
+      .buffer(true)
+      .parse((r, cb) => {
+        const chunks: Buffer[] = [];
+        r.on('data', (c: Buffer) => chunks.push(c));
+        r.on('end', () => cb(null, Buffer.concat(chunks)));
+      });
+    expect(res.status).toBe(200);
+    expect(crypto.createHash('sha256').update(res.body as Buffer).digest('hex')).toBe(docs[0].sha256);
+    expect((res.body as Buffer).subarray(0, 4).toString()).toBe('%PDF');
+    expect(res.headers['content-type']).toMatch(/application\/pdf/);
+    expect(res.headers['content-disposition']).toMatch(/^attachment/);
+    expect(res.headers['x-content-type-options']).toBe('nosniff');
   });
 });

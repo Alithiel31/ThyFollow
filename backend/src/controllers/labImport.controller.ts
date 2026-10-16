@@ -10,10 +10,12 @@ import path from 'node:path';
 import { prisma } from '../lib/prisma.js';
 import { config } from '../config.js';
 import { AuthRequest } from '../middleware/auth.js';
-import { AppError, ValidationError } from '../lib/errors.js';
+import { z } from 'zod';
+import { AppError, ConflictError, NotFoundError, ValidationError } from '../lib/errors.js';
 import { logger } from '../lib/logger.js';
 import {
   encryptBuffer,
+  decryptBuffer,
   encryptPdfSecret,
   decryptPdfSecret,
   isPdfEncryptionConfigured,
@@ -28,6 +30,7 @@ import {
 import { extractPdfText } from '../lib/labExtract/pdfText.js';
 import { parseLabText, type ParsedLabResult } from '../lib/labExtract/rules.js';
 import { extractWithLlm } from '../lib/labExtract/llm.js';
+import { MARKER_KEYS } from '../lib/labExtract/units.js';
 
 // Texte minimal pour considérer qu'un PDF a une couche texte exploitable (en
 // dessous : PDF scanné, l'OCR est hors périmètre).
@@ -165,6 +168,16 @@ async function extract(
   }
   return { draft: { ...result, method } };
 }
+
+// Mêmes champs que le formulaire manuel du carnet (labResults.controller.ts),
+// avec les marqueurs dérivés de la liste commune de l'extraction.
+const confirmSchema = z.object({
+  date: z.string().min(1),
+  lab: z.string().optional().nullable(),
+  orderedBy: z.string().optional().nullable(),
+  notes: z.string().optional().nullable(),
+  ...Object.fromEntries(MARKER_KEYS.map((key) => [key, z.number().optional().nullable()])),
+});
 
 export const labImportController = {
   // POST /api/lab-results/import  (multipart : files[], password?, passwordLabel?, remember?, forceAi?)
@@ -308,5 +321,56 @@ export const labImportController = {
     }
 
     res.json({ results });
+  },
+  // POST /api/lab-results/import/:docId/confirm
+  // Valeurs relues (et éventuellement corrigées) par l'utilisateur → création
+  // du résultat du carnet et rattachement du PDF, en une transaction.
+  confirm: async (req: AuthRequest, res: Response): Promise<void> => {
+    const { date, ...data } = confirmSchema.parse(req.body);
+    const userId = req.userId!;
+    const result = await prisma.$transaction(async (tx) => {
+      const document = await tx.labDocument.findFirst({ where: { id: req.params.docId, userId } });
+      if (!document) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.labResult') }));
+      if (document.labResultId) {
+        throw new ConflictError(
+          req.t('errors.labImport.alreadyConfirmed', { defaultValue: 'Ce document a déjà été ajouté au carnet' })
+        );
+      }
+      const created = await tx.labResult.create({ data: { userId, date: new Date(date), ...data } });
+      await tx.labDocument.update({ where: { id: document.id }, data: { labResultId: created.id } });
+      return created;
+    });
+    res.status(201).json(result);
+  },
+
+  // DELETE /api/lab-results/import/:docId — rejette un brouillon non confirmé
+  discard: async (req: AuthRequest, res: Response): Promise<void> => {
+    const document = await prisma.labDocument.findFirst({ where: { id: req.params.docId, userId: req.userId } });
+    if (!document) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.labResult') }));
+    if (document.labResultId) {
+      throw new ConflictError(
+        req.t('errors.labImport.alreadyConfirmed', { defaultValue: 'Ce document a déjà été ajouté au carnet' })
+      );
+    }
+    await prisma.labDocument.delete({ where: { id: document.id } });
+    res.json({ success: true });
+  },
+
+  // GET /api/lab-results/documents/:docId — PDF déchiffré, propriétaire uniquement
+  download: async (req: AuthRequest, res: Response): Promise<void> => {
+    if (!isPdfEncryptionConfigured()) {
+      throw new AppError(
+        501,
+        req.t('errors.labImport.notConfigured', { defaultValue: "L'import de bilans PDF n'est pas configuré sur ce serveur" })
+      );
+    }
+    const document = await prisma.labDocument.findFirst({ where: { id: req.params.docId, userId: req.userId } });
+    if (!document) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.labResult') }));
+
+    const data = decryptBuffer(Buffer.from(document.dataEnc));
+    res.attachment(document.filename);
+    res.type('application/pdf');
+    res.set({ 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'private, no-store' });
+    res.send(data);
   },
 };
