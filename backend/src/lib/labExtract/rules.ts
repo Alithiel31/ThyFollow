@@ -168,7 +168,14 @@ function findPrescriber(originalLines: string[], normalizedLines: string[]): str
 }
 
 export function parseLabText(text: string): ParsedLabResult {
-  const originalLines = text.split(/\r?\n/).map((l) => l.replace(/[  ]/g, ' ').trimEnd());
+  // Certains laboratoires écrivent leurs dates avec des tirets typographiques
+  // (signe moins U+2212, demi-cadratin...) : « 09−12−2025 ». On les ramène au « - »
+  // ASCII (1 caractère → 1 caractère, les index restent alignés) pour que dates
+  // et plages de référence soient reconnues.
+  const originalLines = text
+    .replace(/[\u2010-\u2015\u2212]/g, '-')
+    .split(/\r?\n/)
+    .map((l) => l.replace(/[  ]/g, ' ').trimEnd());
   const lines = originalLines.map(normalize);
 
   const values: Partial<Record<MarkerKey, number>> = {};
