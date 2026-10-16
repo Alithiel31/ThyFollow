@@ -299,6 +299,19 @@ describe('POST /api/lab-results/import', () => {
     expect(res.status).toBe(501);
   });
 
+  it('messages d’erreur traduits (fr par défaut, en avec ?lng=en), sans clé brute', async () => {
+    const app = await buildApp();
+    const fr = await request(app).post('/api/lab-results/import').set('Authorization', auth());
+    const en = await request(app).post('/api/lab-results/import?lng=en').set('Authorization', auth());
+    expect(fr.status).toBe(400);
+    expect(fr.body.error).toBe('Aucun fichier PDF reçu');
+    expect(en.body.error).toBe('No PDF file received');
+
+    const missing = await request(app).delete('/api/lab-results/import/inconnu').set('Authorization', auth());
+    expect(missing.body.error).not.toContain('errors.');
+    expect(missing.body.error).not.toContain('resources.');
+  });
+
   it('401 sans jeton', async () => {
     const app = await buildApp();
     expect((await request(app).post('/api/lab-results/import')).status).toBe(401);

@@ -74,14 +74,12 @@ function runUpload(req: Request, res: Response): Promise<void> {
       if (err instanceof multer.MulterError) {
         if (err.code === 'LIMIT_FILE_SIZE') {
           return reject(
-            new AppError(413, req.t('errors.labImport.fileTooLarge', { defaultValue: 'Fichier trop volumineux' }))
+            new AppError(413, req.t('errors.labImport.fileTooLarge'))
           );
         }
         return reject(
           new ValidationError(
-            req.t('errors.labImport.badUpload', {
-              defaultValue: `Envoi invalide (maximum ${config.pdfImportMaxFiles} fichiers PDF)`,
-            })
+            req.t('errors.labImport.badUpload', { max: config.pdfImportMaxFiles })
           )
         );
       }
@@ -185,13 +183,13 @@ export const labImportController = {
     if (!isPdfEncryptionConfigured()) {
       throw new AppError(
         501,
-        req.t('errors.labImport.notConfigured', { defaultValue: "L'import de bilans PDF n'est pas configuré sur ce serveur" })
+        req.t('errors.labImport.notConfigured')
       );
     }
     await runUpload(req, res);
     const files = (req.files as Express.Multer.File[] | undefined) ?? [];
     if (files.length === 0) {
-      throw new ValidationError(req.t('errors.labImport.noFile', { defaultValue: 'Aucun fichier PDF reçu' }));
+      throw new ValidationError(req.t('errors.labImport.noFile'));
     }
 
     const userId = req.userId!;
@@ -333,7 +331,7 @@ export const labImportController = {
       if (!document) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.labResult') }));
       if (document.labResultId) {
         throw new ConflictError(
-          req.t('errors.labImport.alreadyConfirmed', { defaultValue: 'Ce document a déjà été ajouté au carnet' })
+          req.t('errors.labImport.alreadyConfirmed')
         );
       }
       const created = await tx.labResult.create({ data: { userId, date: new Date(date), ...data } });
@@ -349,7 +347,7 @@ export const labImportController = {
     if (!document) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.labResult') }));
     if (document.labResultId) {
       throw new ConflictError(
-        req.t('errors.labImport.alreadyConfirmed', { defaultValue: 'Ce document a déjà été ajouté au carnet' })
+        req.t('errors.labImport.alreadyConfirmed')
       );
     }
     await prisma.labDocument.delete({ where: { id: document.id } });
@@ -361,7 +359,7 @@ export const labImportController = {
     if (!isPdfEncryptionConfigured()) {
       throw new AppError(
         501,
-        req.t('errors.labImport.notConfigured', { defaultValue: "L'import de bilans PDF n'est pas configuré sur ce serveur" })
+        req.t('errors.labImport.notConfigured')
       );
     }
     const document = await prisma.labDocument.findFirst({ where: { id: req.params.docId, userId: req.userId } });
