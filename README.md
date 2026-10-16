@@ -43,7 +43,7 @@ A web app for tracking thyroid health, inspired by the Clue app.
 | Module | Detail |
 |---|---|
 | **Daily log** | Energy, mood, anxiety, brain fog, 11 thyroid symptoms, medication taken, physical measurements (weight/heart rate/sleep, syncable via Google Health, e.g. Pixel Watch) |
-| **Lab results** | TSH, FT4, FT3, Anti-TPO, Anti-TG, deficiencies (Ferritin, Vit D, B12…) with trend charts |
+| **Lab results** | TSH, FT4, FT3, Anti-TPO, Anti-TG, deficiencies (Ferritin, Vit D, B12…) with trend charts; **PDF import** (batch, password-protected PDFs supported, review before adding, encrypted storage, optional AI fallback) |
 | **Medications** | Treatment management (Levothyroxine, etc.), dosage, frequency, adherence |
 | **Appointments** | Medical calendar with reminders, statuses, specialized types |
 | **Dashboard** | Medication streak, adherence, averages, next appointment, TSH history |
@@ -357,6 +357,15 @@ GET    /api/lab-results
 POST   /api/lab-results
 PUT    /api/lab-results/:id
 DELETE /api/lab-results/:id
+POST   /api/lab-results/import                    (multipart PDFs → one draft per file)
+POST   /api/lab-results/import/:docId/confirm     (reviewed values → creates the result)
+DELETE /api/lab-results/import/:docId             (discard a draft)
+GET    /api/lab-results/documents/:docId          (download the stored PDF, owner only)
+GET    /api/pdf-passwords                         (labels only — never the secrets)
+POST   /api/pdf-passwords
+DELETE /api/pdf-passwords/:id
+DELETE /api/pdf-passwords                         (revoke all)
+PUT    /api/profile/ai-extraction-consent         (opt in / out of the AI fallback)
 
 GET    /api/medications
 POST   /api/medications

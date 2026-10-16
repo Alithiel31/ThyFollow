@@ -66,6 +66,13 @@ Before reporting something already covered, a few existing mechanisms (detailed 
 - **Secrets at rest** — Google Health access and refresh tokens are encrypted with AES-256-GCM
   (`TOKEN_ENCRYPTION_KEY`); the server refuses to start in production without a valid key when the
   feature is enabled. The webhook endpoint checks a shared secret before doing anything.
+- **Lab report PDFs** — imported PDFs are decrypted with `qpdf` (the password goes through a
+  temporary file, never a command-line argument), then stored **encrypted** (AES-256-GCM,
+  `PDF_ENCRYPTION_KEY`, distinct from `TOKEN_ENCRYPTION_KEY`) and only served to their owner.
+  Remembered PDF passwords are encrypted the same way and revocable from the profile, but **the
+  server can decrypt them** (not zero-knowledge): a simultaneous leak of the database and the key
+  would expose them. The optional AI extraction sends **only anonymised text** (never the PDF) to
+  **Anthropic**, and only for users who opted in; the anonymisation is best-effort, not a guarantee.
 - **Inputs** — request bodies are validated with Zod and sanitised against XSS
   (`express-xss-sanitizer`); the JSON body parser keeps its default size limit.
 - **Headers** — `helmet` on the API; CSP, HSTS, `X-Frame-Options`, `X-Content-Type-Options`,
