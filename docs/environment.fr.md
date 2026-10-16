@@ -79,7 +79,7 @@ L'abonné webhook n'est créé au démarrage que si `GOOGLE_HEALTH_CLIENT_ID`,
 | `PDF_ENCRYPTION_KEY`        | ❌ (l'import répond `501` sans elle) | — | 64 caractères hexadécimaux (32 octets) qui chiffrent en AES-256-GCM les PDF stockés et les mots de passe de PDF mémorisés. **Distincte de `TOKEN_ENCRYPTION_KEY`.** Si elle est définie, elle doit être valide (la production refuse de démarrer sinon). Génération : `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
 | `PDF_ENCRYPTION_KEY_VERSION`| ❌     | `1`                    | Version de la clé ci-dessus, stockée avec chaque document (prépare une future rotation). |
 | `ANTHROPIC_API_KEY`         | ❌     | —                      | Active l'extraction de repli par IA (texte seul, anonymisé, et uniquement pour les utilisateurs qui y ont consenti). Sans elle, l'extraction par règles fonctionne toujours. |
-| `ANTHROPIC_MODEL`           | ❌     | `claude-sonnet-5-5`    | Modèle utilisé par l'extraction de repli. |
+| `ANTHROPIC_MODEL`           | ❌     | `claude-haiku-5-5`    | Modèle utilisé par l'extraction de repli (Haiku : suffisant pour du texte déjà extrait ; passer à un modèle plus grand si un labo est mal lu). |
 | `PDF_IMPORT_MAX_FILES`      | ❌     | `10`                   | Fichiers par envoi. |
 | `PDF_IMPORT_MAX_BYTES`      | ❌     | `10485760` (10 Mo)     | Taille maximale par fichier (un fichier entre la limite et le double est refusé seul ; au-delà, c'est tout l'envoi). |
 
