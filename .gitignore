@@ -7,6 +7,9 @@ coverage/
 !.env.example
 !*/.env.example
 
+# Identité Infisical de deploy.sh (secret + nom du tailnet)
+.infisical-identity.env
+
 *.log
 .DS_Store
 Thumbs.db
