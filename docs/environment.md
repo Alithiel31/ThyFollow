@@ -18,6 +18,26 @@ Only `.env.example` files are versioned — never commit a real `.env`.
 | Variable      | Required | Description                                                                                                                 |
 | ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `DB_PASSWORD` | ✅       | Password of the PostgreSQL role `thyrotrack_app` on the shared instance (for example `openssl rand -hex 24`). Compose builds `DATABASE_URL` from it. |
+| `PDF_ENCRYPTION_KEY` | ❌ | Forwarded to the backend (see [PDF lab report import](#pdf-lab-report-import)). Empty disables the import. |
+| `ANTHROPIC_API_KEY`  | ❌ | Forwarded to the backend: enables the AI fallback extraction. Empty disables it. |
+
+### Production secrets with Infisical (`deploy.sh`)
+
+On the production host the three variables above are **not** read from the root `.env`: `deploy.sh`
+logs in to Infisical (Machine Identity, Universal Auth) and runs `docker compose up -d --build`
+inside `infisical run`, so the secrets exist only in the process environment.
+
+| Infisical secret (project *Shared Keys*, environment `Production`) | Becomes | Notes |
+| --- | --- | --- |
+| `PG_THYROTRACK_PASSWORD` | `DB_PASSWORD` | Renamed by `deploy.sh`: Compose expects `DB_PASSWORD`. |
+| `PDF_ENCRYPTION_KEY`     | `PDF_ENCRYPTION_KEY` | **Required by `deploy.sh`**: 64 hexadecimal characters, otherwise the deployment stops before touching Docker. |
+| `ANTHROPIC_API_KEY`      | `ANTHROPIC_API_KEY`  | Optional: without it the AI fallback is disabled and `deploy.sh` says so. |
+
+`deploy.sh` reads its credentials from `.infisical-identity.env` (git-ignored; template:
+`.infisical-identity.env.example`): `INFISICAL_UNIVERSAL_AUTH_CLIENT_ID`,
+`INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET`, `INFISICAL_API_URL`, `INFISICAL_PROJECT_ID` and optionally
+`INFISICAL_ENV` (`prod` by default). The real file holds a secret and the real tailnet name: never
+commit it. Without Infisical, fill the root `.env` and run `docker compose up -d --build` as usual.
 
 ## Backend (`backend/.env`)
 

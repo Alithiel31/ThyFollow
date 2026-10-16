@@ -254,7 +254,9 @@ Deleting a `User` cascades to their data.
 ```
 ThyFollow/
 ├── docker-compose.yml          # backend + frontend; PostgreSQL and Traefik are external
-├── .env.example                # variables read by docker-compose.yml (DB_PASSWORD)
+├── .env.example                # variables read by docker-compose.yml (DB_PASSWORD, PDF_ENCRYPTION_KEY, ANTHROPIC_API_KEY)
+├── deploy.sh                   # production deploy: secrets injected from Infisical, then docker compose up
+├── .infisical-identity.env.example  # template of the (git-ignored) Infisical credentials used by deploy.sh
 ├── .nvmrc                      # Node 24
 ├── backend/
 │   ├── Dockerfile              # multi-stage, node:24-alpine, non-root, dumb-init, migrate deploy at start
