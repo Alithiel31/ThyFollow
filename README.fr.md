@@ -261,6 +261,11 @@ cp backend/.env.example backend/.env
 ```bash
 docker compose up -d --build
 ```
+> **Production sur Caesura (Infisical) :** les secrets (`DB_PASSWORD`, `PDF_ENCRYPTION_KEY`,
+> `ANTHROPIC_API_KEY`) ne sont pas lus dans `.env` : lancez plutôt `./deploy.sh`, qui les injecte
+> depuis Infisical (voir [environment.fr.md](./docs/environment.fr.md#secrets-de-production-avec-infisical-deploysh)).
+> Import de PDF facultatif : renseignez `PDF_ENCRYPTION_KEY` (et `ANTHROPIC_API_KEY` pour le repli IA) dans `.env`.
+
 Le conteneur backend exécute automatiquement `prisma migrate deploy` au démarrage (voir
 `backend/Dockerfile`) et rejoint PostgreSQL via `host.docker.internal` (voir `extra_hosts` dans
 `docker-compose.yml`) — la base doit donc déjà exister avec le rôle applicatif attendu par

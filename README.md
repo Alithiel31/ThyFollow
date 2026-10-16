@@ -261,6 +261,11 @@ cp backend/.env.example backend/.env
 ```bash
 docker compose up -d --build
 ```
+> **Production on Caesura (Infisical):** secrets (`DB_PASSWORD`, `PDF_ENCRYPTION_KEY`,
+> `ANTHROPIC_API_KEY`) are not read from `.env`: run `./deploy.sh` instead, which injects them from
+> Infisical (see [environment.md](./docs/environment.md#production-secrets-with-infisical-deploysh)).
+> Optional PDF import: set `PDF_ENCRYPTION_KEY` (and `ANTHROPIC_API_KEY` for the AI fallback) in `.env`.
+
 The backend container automatically runs `prisma migrate deploy` at startup (see
 `backend/Dockerfile`) and joins PostgreSQL via `host.docker.internal` (see `extra_hosts` in
 `docker-compose.yml`) — the database must therefore already exist with the application role

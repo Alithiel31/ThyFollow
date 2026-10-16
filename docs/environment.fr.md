@@ -18,6 +18,28 @@ Seuls les fichiers `.env.example` sont versionnés — ne jamais commiter un vra
 | Variable      | Obligatoire | Description                                                                                                                     |
 | ------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | `DB_PASSWORD` | ✅          | Mot de passe du rôle PostgreSQL `thyrotrack_app` sur l'instance partagée (par exemple `openssl rand -hex 24`). Compose en déduit `DATABASE_URL`. |
+| `PDF_ENCRYPTION_KEY` | ❌   | Transmise au backend (voir [Import de bilans PDF](#import-de-bilans-pdf)). Vide, l'import est désactivé. |
+| `ANTHROPIC_API_KEY`  | ❌   | Transmise au backend : active l'extraction de repli par IA. Vide, elle est désactivée. |
+
+### Secrets de production avec Infisical (`deploy.sh`)
+
+Sur l'hôte de production, les trois variables ci-dessus ne sont **pas** lues dans le `.env` racine :
+`deploy.sh` se connecte à Infisical (Machine Identity, Universal Auth) et lance
+`docker compose up -d --build` dans `infisical run`, si bien que les secrets n'existent que dans
+l'environnement du processus.
+
+| Secret Infisical (projet *Shared Keys*, environnement `Production`) | Devient | Remarques |
+| --- | --- | --- |
+| `PG_THYROTRACK_PASSWORD` | `DB_PASSWORD` | Renommé par `deploy.sh` : Compose attend `DB_PASSWORD`. |
+| `PDF_ENCRYPTION_KEY`     | `PDF_ENCRYPTION_KEY` | **Exigée par `deploy.sh`** : 64 caractères hexadécimaux, sinon le déploiement s'arrête avant de toucher à Docker. |
+| `ANTHROPIC_API_KEY`      | `ANTHROPIC_API_KEY`  | Facultative : sans elle, le repli IA est désactivé et `deploy.sh` le signale. |
+
+`deploy.sh` lit ses identifiants dans `.infisical-identity.env` (ignoré par git ; modèle :
+`.infisical-identity.env.example`) : `INFISICAL_UNIVERSAL_AUTH_CLIENT_ID`,
+`INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET`, `INFISICAL_API_URL`, `INFISICAL_PROJECT_ID` et, en option,
+`INFISICAL_ENV` (`prod` par défaut). Le vrai fichier contient un secret et le vrai nom du tailnet :
+ne jamais le commiter. Sans Infisical, renseignez le `.env` racine et lancez
+`docker compose up -d --build` comme d'habitude.
 
 ## Backend (`backend/.env`)
 

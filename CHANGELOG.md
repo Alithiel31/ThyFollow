@@ -26,6 +26,13 @@ pas synchronisé avec ces tags.
 
 ### Added
 
+- Déploiement de production avec secrets injectés par Infisical : `deploy.sh` (connexion Machine
+  Identity, puis `docker compose up -d --build` dans `infisical run`), qui renomme
+  `PG_THYROTRACK_PASSWORD` en `DB_PASSWORD` et refuse de déployer si `PDF_ENCRYPTION_KEY` est absente
+  ou n'est pas une clé de 64 caractères hexadécimaux. `docker-compose.yml` transmet désormais
+  `PDF_ENCRYPTION_KEY` et `ANTHROPIC_API_KEY` au backend (facultatives hors `deploy.sh` : sans elles,
+  l'import de bilans PDF répond 501). Nouveau modèle `.infisical-identity.env.example`
+  (`.infisical-identity.env` est ignoré par git : il contient un secret et le nom du tailnet).
 - Import de bilans sanguins PDF dans le carnet (`LabResultsPage` → « Importer un bilan PDF ») :
   dépôt par lot (10 fichiers, 10 Mo), PDF protégés par mot de passe pris en charge (mot de passe
   fourni, mémorisé ou date de naissance du profil ; déchiffrement via `qpdf`), extraction par règles
