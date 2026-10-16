@@ -29,10 +29,6 @@ const PASSWORD = 's3cret-Pa$$ w0rd';
 let plainPdf: Buffer;
 let protectedPdf: Buffer;
 
-function leftoverTempDirs(): string[] {
-  return readdirSync(tmpdir()).filter((n) => n.startsWith('thyrotrack-pdf-'));
-}
-
 beforeAll(async () => {
   const doc = await PDFDocument.create();
   doc.addPage().drawText('TSH 2.35 mUI/L');
@@ -96,10 +92,20 @@ describe('lib/pdfDecrypt', () => {
   });
 
   it('leaves no temporary file behind (success and failure)', async () => {
-    const before = leftoverTempDirs().length;
-    await decryptPdf(protectedPdf, PASSWORD);
-    await expect(decryptPdf(protectedPdf, 'nope')).rejects.toThrow();
-    await expect(decryptPdf(Buffer.from('%PDF-1.7\ngarbage'))).rejects.toThrow();
-    expect(leftoverTempDirs().length).toBe(before);
+    // TMPDIR privé : un répertoire partagé verrait aussi les fichiers créés en
+    // parallèle par d'autres fichiers de tests (import de bilans).
+    const previous = process.env.TMPDIR;
+    const sandbox = mkdtempSync(path.join(tmpdir(), 'tmpdir-sandbox-'));
+    process.env.TMPDIR = sandbox;
+    try {
+      await decryptPdf(protectedPdf, PASSWORD);
+      await expect(decryptPdf(protectedPdf, 'nope')).rejects.toThrow();
+      await expect(decryptPdf(Buffer.from('%PDF-1.7\ngarbage'))).rejects.toThrow();
+      expect(readdirSync(sandbox)).toEqual([]);
+    } finally {
+      if (previous === undefined) delete process.env.TMPDIR;
+      else process.env.TMPDIR = previous;
+      rmSync(sandbox, { recursive: true, force: true });
+    }
   });
 });
