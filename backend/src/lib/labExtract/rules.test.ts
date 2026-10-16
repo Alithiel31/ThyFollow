@@ -148,6 +148,37 @@ describe('labExtract/rules — unités et cas particuliers', () => {
     expect(r.dateConfidence).toBe('high');
   });
 
+  it('lit une date écrite avec le signe moins U+2212 (« 09−12−2025 »)', () => {
+    const r = parseLabText('Prélevé le 09\u221212\u22122025 08:04\nTSH 2,3 mUI/L');
+    expect(r.date).toBe('2025-12-09');
+    expect(r.dateConfidence).toBe('high');
+  });
+
+  it('lit une date écrite avec un tiret demi-cadratin (U+2013)', () => {
+    const r = parseLabText('Prélevé le 09\u201312\u20132025\nTSH 2,3 mUI/L');
+    expect(r.date).toBe('2025-12-09');
+    expect(r.dateConfidence).toBe('high');
+  });
+
+  it('la ligne « Prélevé le » l’emporte sur une date citée dans une note', () => {
+    const r = parseLabText(
+      [
+        'Prélevé le 09\u221212\u22122025 08:04',
+        'Edité le Mardi 09 Décembre 2025 à 12:43',
+        'TSH 2,3 mUI/L',
+        'Note : arrêté ministériel (JO du 30/4/2024), recommandations HAS 2023.',
+        'Résultat antérieur du 03\u221211\u22122025',
+      ].join('\n')
+    );
+    expect(r.date).toBe('2025-12-09');
+    expect(r.dateConfidence).toBe('high');
+  });
+
+  it('une plage de référence écrite avec U+2212 n’est pas prise pour la valeur', () => {
+    const r = parseLabText('Prélevé le 01/02/2026\nTSH (0,27 \u2212 4,20) 2,35 mUI/L');
+    expect(r.values.tsh).toBe(2.35);
+  });
+
   it('utilise une date non étiquetée avec une confiance faible', () => {
     const r = parseLabText('Compte rendu du 12/03/2026\nTSH 2,3 mUI/L');
     expect(r.date).toBe('2026-03-12');
