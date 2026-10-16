@@ -258,7 +258,9 @@ Supprimer un `User` supprime en cascade ses données.
 ```
 ThyFollow/
 ├── docker-compose.yml          # backend + frontend ; PostgreSQL et Traefik sont externes
-├── .env.example                # variables lues par docker-compose.yml (DB_PASSWORD)
+├── .env.example                # variables lues par docker-compose.yml (DB_PASSWORD, PDF_ENCRYPTION_KEY, ANTHROPIC_API_KEY)
+├── deploy.sh                   # déploiement de production : secrets injectés depuis Infisical, puis docker compose up
+├── .infisical-identity.env.example  # modèle des identifiants Infisical (ignorés par git) utilisés par deploy.sh
 ├── .nvmrc                      # Node 24
 ├── backend/
 │   ├── Dockerfile              # multi-étapes, node:24-alpine, non-root, dumb-init, migrate deploy au démarrage
