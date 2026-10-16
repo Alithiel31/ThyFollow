@@ -64,6 +64,17 @@ const authLimiter = rateLimit({
   skipSuccessfulRequests: true,
 });
 
+// ── Rate limiting dédié à l'import de bilans PDF (chaque envoi déclenche
+// qpdf, pdfjs et, si l'utilisateur y a consenti, un appel LLM payant).
+app.post(
+  '/api/lab-results/import',
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    message: (req: express.Request) => ({ error: req.t('errors.tooManyRequests') }),
+  })
+);
+
 app.use(express.json());
 
 // ── Nécessaire pour lire le cookie httpOnly qui porte le state/nonce/PKCE
