@@ -98,11 +98,14 @@ If the Raspberry Pi is lost or replaced but the code and the secrets above are a
   can read the repository, rotate what needs rotating, and decide whether to purge the history.
 - **Session tokens in `localStorage`** with a 30-day lifetime (`JWT_EXPIRES_IN`) — a cross-site
   scripting flaw would expose them; the CSP in `frontend/nginx.conf` (`script-src 'self'`) is the mitigation.
-- **Client IP behind several proxies.** The backend runs with `trust proxy` set to `1`, while a request
-  crosses `cloudflared`, Traefik and nginx before it. The sister project WeatherQC needed 3 hops for
-  an equivalent chain. If the rate limiter ends up keying every visitor on the same proxy address,
-  they would all share one quota: check from two different networks (as described in
-  WeatherQC's `architecture.md`) before relying on `AUTH_RATE_LIMIT_MAX`.
+  They can be revoked: incrementing `User.tokenVersion` (done automatically on password reset)
+  invalidates every session of that user.
+- **Client IP behind several proxies.** nginx replaces `X-Forwarded-For` with the IP read from
+  `CF-Connecting-IP` (set by Cloudflare), and the backend trusts that single hop (`trust proxy` set to
+  `1`). A request that did not go through Cloudflare (direct tailnet access) keeps Traefik's IP. If the
+  topology changes (no more Cloudflare, another proxy), revisit `set_real_ip_from` / `real_ip_header`
+  in `frontend/nginx.conf`, then check from two different networks that the `RateLimit-Remaining`
+  counters are independent.
 - **Google Health parsing is best-effort** — `fetchDailyMetrics` was written without real payloads
   (see the CHANGELOG), so synced values may be missing or wrong until verified.
 - **Google consent screen in testing mode** — while the application is not published, only listed test

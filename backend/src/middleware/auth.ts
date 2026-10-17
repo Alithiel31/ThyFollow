@@ -1,13 +1,14 @@
 // src/middleware/auth.ts
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { config } from '../config.js';
+import { verifySessionToken } from '../lib/session.js';
 
 export interface AuthRequest extends Request {
   userId?: string;
 }
 
-export const authenticate = (req: AuthRequest, res: Response, next: NextFunction): void => {
+// Async : la version de session est relue en base à chaque requête (voir
+// lib/session.ts), pour qu'un token révoqué soit refusé immédiatement.
+export const authenticate = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   const token = req.headers.authorization?.split(' ')[1];
 
   if (!token) {
@@ -15,11 +16,17 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     return;
   }
 
+  let userId: string | null;
   try {
-    const decoded = jwt.verify(token, config.jwtSecret) as { userId: string };
-    req.userId = decoded.userId;
-    next();
-  } catch {
-    res.status(401).json({ error: req.t('errors.tokenInvalid') });
+    userId = await verifySessionToken(token);
+  } catch (err) {
+    next(err);
+    return;
   }
+  if (!userId) {
+    res.status(401).json({ error: req.t('errors.tokenInvalid') });
+    return;
+  }
+  req.userId = userId;
+  next();
 };
