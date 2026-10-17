@@ -365,17 +365,18 @@ DELETE /api/lab-results/:id
 POST   /api/lab-results/import                    (PDF en multipart → un brouillon par fichier)
 POST   /api/lab-results/import/:docId/confirm     (valeurs relues → crée le résultat)
 DELETE /api/lab-results/import/:docId             (rejette un brouillon)
-POST   /api/billing/checkout                      (abonnement Pro : renvoie l'URL de paiement Stripe)
-POST   /api/billing/portal                        (portail client Stripe)
-POST   /api/billing/redeem                        (active l'accès Pro avec un code promo)
-POST   /api/webhooks/stripe                       (webhook Stripe, signature vérifiée)
-GET|POST|PATCH /api/admin/promo-codes             (ADMIN : gestion des codes promo)
 GET    /api/lab-results/documents/:docId          (télécharge le PDF stocké, propriétaire uniquement)
 GET    /api/pdf-passwords                         (libellés seulement — jamais les secrets)
 POST   /api/pdf-passwords
 DELETE /api/pdf-passwords/:id
 DELETE /api/pdf-passwords                         (tout révoquer)
 PUT    /api/profile/ai-extraction-consent         (consentement au repli IA, révocable)
+
+POST   /api/billing/checkout                      (abonnement Pro : renvoie l'URL de paiement Stripe)
+POST   /api/billing/portal                        (portail client Stripe)
+POST   /api/billing/redeem                        (active l'accès Pro avec un code promo)
+POST   /api/webhooks/stripe                       (webhook Stripe, signature vérifiée)
+GET|POST|PATCH /api/admin/promo-codes             (ADMIN : gestion des codes promo)
 
 GET    /api/medications
 POST   /api/medications
@@ -449,21 +450,7 @@ Chaque guide existe aussi en anglais (sans suffixe).
 
 ---
 
-## 🤝 Contribuer
-
-Voir [`CONTRIBUTING.fr.md`](./CONTRIBUTING.fr.md) pour l'environnement de développement, comment
-reproduire la CI en local, et le format des PR. En cas de problème, [`TROUBLESHOOTING.fr.md`](./TROUBLESHOOTING.fr.md)
-documente les incidents déjà rencontrés (et leur diagnostic) sur ce projet.
-
-## 📝 Changelog
-
-Les changements notables sont documentés dans [`CHANGELOG.md`](./CHANGELOG.md) (disponible en français uniquement).
-
-## 📄 Licence
-
-Projet privé — voir [`LICENSE`](./LICENSE).
-
-## Accès Pro et codes promo
+## 💳 Accès Pro et codes promo
 
 La saisie manuelle des analyses et l'export restent **gratuits**. L'**import de bilans PDF** est
 réservé aux comptes Pro : 3 imports offerts à vie, puis un abonnement Stripe (plafond de 25
@@ -486,4 +473,18 @@ La personne saisit le code dans **Profil → Abonnement Pro**. Désactiver un co
 Stripe : créer un produit récurrent (→ `STRIPE_PRICE_ID`), un endpoint webhook
 `https://<domaine>/api/webhooks/stripe` abonné à `checkout.session.completed` et
 `customer.subscription.created|updated|deleted` (→ `STRIPE_WEBHOOK_SECRET`), puis renseigner les
-trois variables dans Infisical. Stripe ne reçoit que l'email du compte, jamais de données de santé.
+trois variables dans Infisical (et activer le portail client dans le dashboard Stripe). Stripe ne reçoit que l'email du compte, jamais de données de santé. Détails : [`docs/environment.fr.md`](./docs/environment.fr.md#accès-pro-stripe).
+
+## 🤝 Contribuer
+
+Voir [`CONTRIBUTING.fr.md`](./CONTRIBUTING.fr.md) pour l'environnement de développement, comment
+reproduire la CI en local, et le format des PR. En cas de problème, [`TROUBLESHOOTING.fr.md`](./TROUBLESHOOTING.fr.md)
+documente les incidents déjà rencontrés (et leur diagnostic) sur ce projet.
+
+## 📝 Changelog
+
+Les changements notables sont documentés dans [`CHANGELOG.md`](./CHANGELOG.md) (disponible en français uniquement).
+
+## 📄 Licence
+
+Projet privé — voir [`LICENSE`](./LICENSE).

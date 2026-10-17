@@ -20,10 +20,11 @@ Seuls les fichiers `.env.example` sont versionnés — ne jamais commiter un vra
 | `DB_PASSWORD` | ✅          | Mot de passe du rôle PostgreSQL `thyrotrack_app` sur l'instance partagée (par exemple `openssl rand -hex 24`). Compose en déduit `DATABASE_URL`. |
 | `PDF_ENCRYPTION_KEY` | ❌   | Transmise au backend (voir [Import de bilans PDF](#import-de-bilans-pdf)). Vide, l'import est désactivé. |
 | `ANTHROPIC_API_KEY`  | ❌   | Transmise au backend : active l'extraction de repli par IA. Vide, elle est désactivée. |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID` | ❌ | Transmises au backend : paiement de l'abonnement Pro (voir [Accès Pro (Stripe)](#accès-pro-stripe)). Vides, le paiement répond `501` ; les codes promo fonctionnent quand même. |
 
 ### Secrets de production avec Infisical (`deploy.sh`)
 
-Sur l'hôte de production, les trois variables ci-dessus ne sont **pas** lues dans le `.env` racine :
+Sur l'hôte de production, les variables ci-dessus ne sont **pas** lues dans le `.env` racine :
 `deploy.sh` se connecte à Infisical (Machine Identity, Universal Auth) et lance
 `docker compose up -d --build` dans `infisical run`, si bien que les secrets n'existent que dans
 l'environnement du processus.
@@ -33,6 +34,9 @@ l'environnement du processus.
 | `PG_THYROTRACK_PASSWORD` | `DB_PASSWORD` | Renommé par `deploy.sh` : Compose attend `DB_PASSWORD`. |
 | `PDF_ENCRYPTION_KEY`     | `PDF_ENCRYPTION_KEY` | **Exigée par `deploy.sh`** : 64 caractères hexadécimaux, sinon le déploiement s'arrête avant de toucher à Docker. |
 | `ANTHROPIC_API_KEY`      | `ANTHROPIC_API_KEY`  | Facultative : sans elle, le repli IA est désactivé et `deploy.sh` le signale. |
+| `STRIPE_SECRET_KEY`      | `STRIPE_SECRET_KEY`  | Facultative : clé secrète (ou restreinte `rk_…`) de Stripe. `sk_test_…` pour tester, `sk_live_…` en production. |
+| `STRIPE_WEBHOOK_SECRET`  | `STRIPE_WEBHOOK_SECRET` | Facultatif : secret `whsec_…` de l'endpoint webhook (affiché par Stripe à sa création). |
+| `STRIPE_PRICE_ID`        | `STRIPE_PRICE_ID`    | Facultatif : identifiant `price_…` du prix récurrent de l'abonnement Pro. |
 
 `deploy.sh` lit ses identifiants dans `.infisical-identity.env` (ignoré par git ; modèle :
 `.infisical-identity.env.example`) : `INFISICAL_UNIVERSAL_AUTH_CLIENT_ID`,
@@ -112,6 +116,34 @@ local, installez-le avec votre gestionnaire de paquets — `apt install qpdf`, `
 > mémorisés : il n'existe pas encore d'outil de rechiffrement. Les PDF sont stockés dans la base
 > (`lab_documents.dataEnc`, `bytea`) : ils en augmentent la taille, et celle des sauvegardes.
 
+### Accès Pro (Stripe)
+
+L'import de bilans PDF est réservé aux comptes Pro (voir [Accès Pro et paiement](./architecture.fr.md#accès-pro-et-paiement)).
+
+| Variable                   | Obligatoire | Défaut | Description |
+| -------------------------- | ----------- | ------ | ----------- |
+| `FREE_IMPORT_LIMIT`        | ❌          | `3`    | Imports offerts **à vie** à un compte non Pro. |
+| `PRO_MONTHLY_IMPORT_LIMIT` | ❌          | `25`   | Plafond d'imports par mois (UTC) d'un compte Pro : borne le coût de l'API Anthropic. |
+| `STRIPE_SECRET_KEY`        | ❌ (le paiement répond `501` sans les trois) | — | Clé secrète Stripe. Préférer une **clé restreinte** (`rk_…`) limitée à l'écriture des sessions Checkout et du portail client, et à la lecture des abonnements. La clé publiable (`pk_…`) n'est **pas** utilisée : le paiement passe par Stripe Checkout (page hébergée). |
+| `STRIPE_WEBHOOK_SECRET`    | ❌          | —      | Secret `whsec_…` de l'endpoint `https://<domaine>/api/webhooks/stripe`. Sans lui, le webhook répond `501`. |
+| `STRIPE_PRICE_ID`          | ❌          | —      | `price_…` du produit récurrent (le mode test et le mode live ont des prix distincts). |
+
+Mise en place côté Stripe :
+
+1. Créer un produit avec un prix **récurrent** → `STRIPE_PRICE_ID`.
+2. Ajouter l'endpoint webhook `https://<domaine>/api/webhooks/stripe` abonné à
+   `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated` et
+   `customer.subscription.deleted` → `STRIPE_WEBHOOK_SECRET`. En local :
+   `stripe listen --forward-to localhost:3001/api/webhooks/stripe` affiche le `whsec_…` à utiliser.
+3. Activer le **portail client** (Réglages → Facturation → Portail client) : sans lui, « Gérer
+   l'abonnement » échoue.
+4. Commencer en **mode test** (carte `4242 4242 4242 4242`), puis refaire les étapes 1 à 3 en mode live.
+
+Ordre conseillé en production : déployer avec `STRIPE_SECRET_KEY` et `STRIPE_PRICE_ID`, créer
+l'endpoint webhook (l'URL doit être joignable en HTTPS), puis ajouter `STRIPE_WEBHOOK_SECRET` et
+redéployer. Stripe ne reçoit que l'email du compte, jamais de données de santé. Les taxes (Stripe Tax)
+ne sont pas activées.
+
 ### Limitation de débit
 
 | Variable                     | Défaut             | Description                                                  |
@@ -120,6 +152,8 @@ local, installez-le avec votre gestionnaire de paquets — `apt install qpdf`, `
 | `RATE_LIMIT_MAX`             | `100`              | Requêtes par fenêtre et par IP, sur toute l'API              |
 | `AUTH_RATE_LIMIT_WINDOW_MS`  | `900000` (15 min)  | Fenêtre du limiteur de `/api/auth`                           |
 | `AUTH_RATE_LIMIT_MAX`        | `20`               | Tentatives échouées par fenêtre et par IP sur `/api/auth` (les requêtes réussies ne comptent pas) |
+
+Deux limiteurs dédiés ont des valeurs fixes dans `backend/src/index.ts` : `POST /api/lab-results/import` (20 requêtes / 15 min, chaque envoi peut déclencher un appel LLM payant) et `POST /api/billing/redeem` (10 requêtes / 15 min, contre la devinette de codes promo).
 
 ## Frontend
 

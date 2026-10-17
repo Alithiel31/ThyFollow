@@ -38,6 +38,7 @@ pas synchronisé avec ces tags.
 - Codes promo : `POST /api/billing/redeem` (le code prolonge l'accès de sa durée) et gestion
   réservée aux ADMIN via `/api/admin/promo-codes` (création, liste, désactivation).
 - `LabResult.source` (`MANUAL` / `PDF_IMPORT`) : l'origine d'un résultat est affichée dans le carnet.
+- Documentation : README (FR/EN), `docs/` (architecture, développement, environnement, FR/EN) et `SECURITY` décrivent l'accès Pro, le paiement Stripe et les codes promo.
 - Déploiement de production avec secrets injectés par Infisical : `deploy.sh` (connexion Machine
   Identity, puis `docker compose up -d --build` dans `infisical run`), qui renomme
   `PG_THYROTRACK_PASSWORD` en `DB_PASSWORD` et refuse de déployer si `PDF_ENCRYPTION_KEY` est absente
