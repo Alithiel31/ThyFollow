@@ -6,6 +6,18 @@ import { logger } from './logger.js';
 
 const resend = config.resendApiKey ? new Resend(config.resendApiKey) : null;
 
+// Le nom est saisi librement à l'inscription : inséré tel quel dans le HTML,
+// il permettrait d'injecter liens et mise en forme dans un email envoyé à une
+// adresse tierce (inscription avec l'email de quelqu'un d'autre).
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function buildVerifyUrl(token: string): string {
   return `${config.appUrl}/verify-email?token=${token}`;
 }
@@ -16,7 +28,7 @@ function buildEmail(name: string, verifyUrl: string, lang: string): { subject: s
   const subject = isEn ? 'Confirm your ThyroTrack account' : 'Confirmez votre compte ThyroTrack';
 
   const title = isEn ? 'Welcome to ThyroTrack' : 'Bienvenue sur ThyroTrack';
-  const greeting = isEn ? `Hi ${name},` : `Bonjour ${name},`;
+  const greeting = isEn ? `Hi ${escapeHtml(name)},` : `Bonjour ${escapeHtml(name)},`;
   const body = isEn
     ? 'Confirm your email address to activate your account and start tracking your thyroid health.'
     : 'Confirmez votre adresse email pour activer votre compte et commencer à suivre votre santé thyroïdienne.';
@@ -77,7 +89,7 @@ function buildResetEmail(name: string, resetUrl: string, lang: string): { subjec
   const subject = isEn ? 'Reset your ThyroTrack password' : 'Réinitialisez votre mot de passe ThyroTrack';
 
   const title = isEn ? 'Password reset' : 'Réinitialisation du mot de passe';
-  const greeting = isEn ? `Hi ${name},` : `Bonjour ${name},`;
+  const greeting = isEn ? `Hi ${escapeHtml(name)},` : `Bonjour ${escapeHtml(name)},`;
   const body = isEn
     ? "We received a request to reset your password. If you didn't make this request, you can safely ignore this email."
     : "Nous avons reçu une demande de réinitialisation de votre mot de passe. Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email en toute sécurité.";

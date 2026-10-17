@@ -51,6 +51,18 @@ describe('POST /api/webhooks/google-health', () => {
     expect(res.status).toBe(401);
   });
 
+  it('rejects a wrong Authorization header of the same length as the secret', async () => {
+    const app = await buildApp();
+    const sameLength = WEBHOOK_SECRET.slice(0, -1) + (WEBHOOK_SECRET.endsWith('x') ? 'y' : 'x');
+
+    const res = await request(app)
+      .post('/api/webhooks/google-health')
+      .set('Authorization', sameLength)
+      .send({ type: 'verification' });
+
+    expect(res.status).toBe(401);
+  });
+
   it('responds 200 to an authorized verification challenge', async () => {
     const app = await buildApp();
 

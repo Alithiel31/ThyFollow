@@ -26,6 +26,18 @@ pas synchronisé avec ces tags.
 
 ### Security
 
+- **Quota d'imports PDF non contournable par requêtes simultanées.** Le solde lu en début de requête
+  n'était décompté qu'après chaque fichier : plusieurs envois simultanés passaient tous le contrôle
+  (au-delà des 3 imports offerts, ou du plafond mensuel Pro, avec autant d'appels IA payants). Chaque
+  import est désormais réservé avant l'extraction par un incrément conditionnel en base
+  (`reserveImport`), et rendu si l'extraction échoue (`releaseImport`) : un échec ne consomme
+  toujours pas d'import.
+- **Pré-création de compte neutralisée.** Quand « Se connecter avec Google » rattache un compte
+  existant jamais vérifié (créé par un tiers avec l'email de la victime), son mot de passe et ses
+  jetons sont effacés et l'email est marqué vérifié : le créateur ne peut plus s'y connecter.
+- **Emails : nom échappé.** Le nom saisi à l'inscription n'est plus interprété comme du HTML dans
+  les emails de vérification et de réinitialisation.
+- **Webhook Google Health : secret comparé à temps constant** (`crypto.timingSafeEqual`).
 - **Liaison Google et Google Health : cookies de flux signés.** Le cookie qui porte l'id du compte à
   lier était un JSON en clair, modifiable par l'utilisateur dans son navigateur : remplacer cet id
   permettait de rattacher son propre compte Google au compte de quelqu'un d'autre, puis de s'y

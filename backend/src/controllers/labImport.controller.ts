@@ -31,7 +31,7 @@ import { extractPdfText } from '../lib/labExtract/pdfText.js';
 import { parseLabText, type ParsedLabResult } from '../lib/labExtract/rules.js';
 import { extractWithLlm } from '../lib/labExtract/llm.js';
 import { MARKER_KEYS, type MarkerKey } from '../lib/labExtract/units.js';
-import { getImportAllowance, consumeImport } from '../lib/entitlements.js';
+import { getImportAllowance, reserveImport, releaseImport } from '../lib/entitlements.js';
 
 // Texte minimal pour considérer qu'un PDF a une couche texte exploitable (en
 // dessous : PDF scanné, l'OCR est hors périmètre).
@@ -282,7 +282,9 @@ export const labImportController = {
           )
         : new AppError(402, req.t('errors.billing.proRequired'), true, 'PRO_REQUIRED');
     }
-    let remaining = allowance.remaining;
+    // Date unique de la requête : la réservation et son éventuelle restitution
+    // portent sur le même mois.
+    const quotaNow = new Date();
 
     await runUpload(req, res);
     const files = (req.files as Express.Multer.File[] | undefined) ?? [];
@@ -330,6 +332,8 @@ export const labImportController = {
 
     for (const file of files) {
       const filename = sanitizeFilename(file.originalname);
+      // Import réservé pour ce fichier et pas encore acquis (à rendre en cas d'échec)
+      let reserved = false;
       try {
         if (file.size > config.pdfImportMaxBytes) {
           results.push({ filename, status: 'too_large' });
@@ -372,14 +376,18 @@ export const labImportController = {
         }
 
         // Chaque extraction compte (elle peut déclencher un appel LLM payant) :
-        // au-delà du solde, le fichier est refusé individuellement.
-        if (remaining <= 0) {
+        // l'import est réservé avant, de façon atomique ; au-delà du solde, le
+        // fichier est refusé individuellement.
+        if (!(await reserveImport(userId, allowance.pro, quotaNow))) {
           results.push({ filename, status: 'quota_exceeded' });
           continue;
         }
+        reserved = true;
 
         const extraction = await extract(data, aiUser, forceAi);
         if ('noText' in extraction) {
+          await releaseImport(userId, allowance.pro, quotaNow);
+          reserved = false;
           results.push({ filename, status: 'failed', reason: 'no_text' });
           continue;
         }
@@ -398,8 +406,8 @@ export const labImportController = {
             },
           }));
 
-        await consumeImport(userId, allowance.pro);
-        remaining -= 1;
+        // Brouillon enregistré : l'import est acquis.
+        reserved = false;
 
         let possibleDuplicateOf: ImportFileResult['possibleDuplicateOf'];
         if (draft.date) {
@@ -412,6 +420,11 @@ export const labImportController = {
 
         results.push({ filename, status: 'ready', documentId: document.id, draft, possibleDuplicateOf });
       } catch (err) {
+        if (reserved) {
+          await releaseImport(userId, allowance.pro, quotaNow).catch((releaseErr) => {
+            logger.error('Restitution d’un import réservé échouée', releaseErr instanceof Error ? releaseErr.message : 'unknown');
+          });
+        }
         if (err instanceof InvalidPdfError) {
           results.push({ filename, status: 'invalid' });
         } else {
