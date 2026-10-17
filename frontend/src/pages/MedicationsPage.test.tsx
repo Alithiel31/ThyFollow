@@ -14,6 +14,7 @@ const updateMock = vi.fn();
 const addDosePeriodMock = vi.fn();
 const updateDosePeriodMock = vi.fn();
 const deleteDosePeriodMock = vi.fn();
+const labListMock = vi.fn();
 
 vi.mock('../lib/api', () => ({
   medApi: {
@@ -25,6 +26,7 @@ vi.mock('../lib/api', () => ({
     updateDosePeriod: (...args: unknown[]) => updateDosePeriodMock(...args),
     deleteDosePeriod: (...args: unknown[]) => deleteDosePeriodMock(...args),
   },
+  labApi: { list: (...args: unknown[]) => labListMock(...args) },
 }));
 
 const toastErrorMock = vi.fn();
@@ -51,6 +53,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   listMock.mockResolvedValue({ data: [] });
   listIntakesMock.mockResolvedValue({ data: [] });
+  labListMock.mockResolvedValue({ data: [] });
 });
 
 // Clés renvoyées par le `t` des tests (voir src/test/setup.ts).
@@ -213,5 +216,58 @@ describe('MedicationsPage — modification et historique', () => {
     });
     expect(await within(history).findAllByRole('listitem')).toHaveLength(2);
     expect(updateMock).not.toHaveBeenCalled(); // le formulaire principal n'est pas soumis
+  });
+});
+
+describe('MedicationsPage — TSH par période de posologie', () => {
+  const med: Medication = {
+    ...LEVO,
+    dosePeriods: [
+      { id: 'p-1', startDate: '2025-01-01T00:00:00.000Z', slots: [{ time: '07:00', doses: [50] }] },
+      { id: 'p-2', startDate: '2026-03-01T00:00:00.000Z', slots: [{ time: '07:00', doses: [75, 100] }] },
+      { id: 'p-3', startDate: '2026-09-01T00:00:00.000Z', slots: [{ time: '07:00', doses: [100] }] },
+    ],
+  };
+  const labs = [
+    { id: 'l-1', date: '2025-06-10', tsh: 3.2 },
+    { id: 'l-2', date: '2026-02-28', tsh: 2.1 },
+    { id: 'l-3', date: '2026-07-21', tsh: 1.776 },
+    { id: 'l-4', date: '2026-08-01', tsh: null, ferritin: 60 },
+  ];
+
+  async function openHistory() {
+    listMock.mockResolvedValue({ data: [med] });
+    labListMock.mockResolvedValue({ data: labs });
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(await screen.findByText('Levothyrox'));
+  }
+
+  it('range chaque TSH dans la période en vigueur le jour de l’analyse', async () => {
+    await openHistory();
+    const first = await screen.findByTestId('period-labs-p-1');
+    expect(first).toHaveTextContent('3,2');
+    expect(first).toHaveTextContent('2,1');
+    const second = screen.getByTestId('period-labs-p-2');
+    expect(second).toHaveTextContent('1,776');
+    expect(second).not.toHaveTextContent('3,2');
+    expect(second).not.toHaveTextContent('2,1');
+    expect(labListMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('une période sans analyse l’indique', async () => {
+    await openHistory();
+    await screen.findByTestId('period-labs-p-1');
+    expect(screen.getByTestId('period-labs-p-3')).toHaveTextContent('medications.history.noLabs');
+  });
+
+  it('pas de TSH pour un médicament hors graphique', async () => {
+    listMock.mockResolvedValue({ data: [{ ...med, showOnChart: false }] });
+    labListMock.mockResolvedValue({ data: labs });
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(await screen.findByText('Levothyrox'));
+    expect(screen.queryByTestId('period-labs-p-1')).not.toBeInTheDocument();
+    expect(labListMock).not.toHaveBeenCalled();
   });
 });

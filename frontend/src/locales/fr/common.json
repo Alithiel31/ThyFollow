@@ -388,7 +388,10 @@
       "delete": "Supprimer cette période",
       "deleteConfirm": "Supprimer cette période de l'historique ?",
       "added": "Période ajoutée",
-      "deleted": "Période supprimée"
+      "deleted": "Période supprimée",
+      "tsh": "TSH :",
+      "noLabs": "Aucune analyse pendant cette période",
+      "unstable": "Mesurée moins de {{weeks}} semaines après un changement de dose : valeur pas encore stabilisée"
     },
     "noIntakeToday": "Pas de prise aujourd'hui"
   },

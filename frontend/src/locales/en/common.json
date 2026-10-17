@@ -388,7 +388,10 @@
       "delete": "Delete this period",
       "deleteConfirm": "Delete this period from the history?",
       "added": "Period added",
-      "deleted": "Period deleted"
+      "deleted": "Period deleted",
+      "tsh": "TSH:",
+      "noLabs": "No lab result during this period",
+      "unstable": "Measured less than {{weeks}} weeks after a dose change: value not yet stabilised"
     },
     "noIntakeToday": "No dose today"
   },

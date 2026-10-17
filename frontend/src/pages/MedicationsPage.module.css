@@ -209,6 +209,9 @@
 }
 .historyDate { font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
 .historySchedule { font-size: 0.85rem; color: var(--text); }
+.historyLabs { font-size: 0.75rem; color: var(--text-dim); margin-top: 3px; }
+.labDate { color: var(--text-muted); }
+.labUnstable { font-style: italic; }
 .currentTag {
   padding: 1px 6px; border-radius: 999px; font-size: 0.65rem; font-weight: 600;
   background: var(--accent-soft); color: var(--accent);

@@ -4,9 +4,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { Plus, Pill, Trash2, ToggleLeft, ToggleRight, CheckCircle2, Circle, X, History } from 'lucide-react';
-import { medApi } from '../lib/api';
-import { formatDate, toISODate } from '../lib/utils';
-import { periodAtDay, formatSchedule, dosesForDate } from '../lib/doseCycle';
+import { medApi, labApi } from '../lib/api';
+import { useAuthStore } from '../lib/store';
+import { formatDate, toISODate, tshStatus } from '../lib/utils';
+import {
+  periodAtDay, formatSchedule, dosesForDate, labsDuringPeriod, weeksSinceDoseChange, STABILIZATION_WEEKS,
+} from '../lib/doseCycle';
 import type { DoseSlot, Medication, MedicationIntake } from '../types';
 import styles from './MedicationsPage.module.css';
 
@@ -466,12 +469,22 @@ function DoseHistory({ med, unitLabel, today, onChange }: {
   today: string;
   onChange: (med: Medication) => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const profile = useAuthStore((s) => s.user?.profile);
   const [adding, setAdding] = useState(false);
   const [pastDate, setPastDate] = useState('');
   const [pastSchedule, setPastSchedule] = useState<Schedule>(EMPTY_SCHEDULE);
   const current = periodAtDay(med.dosePeriods, today);
-  const periods = [...med.dosePeriods].reverse(); // la plus récente en premier
+  // Pour un médicament du graphique TSH : les TSH mesurées pendant chaque période. Même
+  // requête (et même cache) que la page Analyses.
+  const { data: labs = [] } = useQuery({
+    queryKey: ['lab-results'],
+    queryFn: () => labApi.list().then((r) => r.data),
+    enabled: med.showOnChart,
+  });
+  const periods = med.dosePeriods
+    .map((p, i) => ({ ...p, labs: labsDuringPeriod(p, med.dosePeriods[i + 1]?.startDate ?? null, labs) }))
+    .reverse(); // la plus récente en premier
 
   const addMut = useMutation({
     mutationFn: () => medApi.addDosePeriod(med.id, { startDate: pastDate, slots: slotsFromSchedule(pastSchedule) }),
@@ -507,6 +520,31 @@ function DoseHistory({ med, unitLabel, today, onChange }: {
                 {p.id === current?.id && <span className={styles.currentTag}>{t('medications.history.current')}</span>}
               </div>
               <div className={styles.historySchedule}>{formatSchedule(p.slots, unitLabel, t)}</div>
+              {med.showOnChart && (
+                <div className={styles.historyLabs} data-testid={`period-labs-${p.id}`}>
+                  {p.labs.length === 0 ? t('medications.history.noLabs') : (
+                    <>
+                      {t('medications.history.tsh')}{' '}
+                      {[...p.labs].sort((a, b) => a.date.localeCompare(b.date)).map((l, i) => {
+                        const unstable = (weeksSinceDoseChange([med], l.date.slice(0, 10)) ?? Infinity) < STABILIZATION_WEEKS;
+                        return (
+                          <span key={l.id}>
+                            {i > 0 && ' · '}
+                            <span
+                              className={unstable ? styles.labUnstable : undefined}
+                              style={{ color: tshStatus(l.tsh!, profile?.targetTSH_min, profile?.targetTSH_max).color }}
+                              title={unstable ? t('medications.history.unstable', { weeks: STABILIZATION_WEEKS }) : undefined}
+                            >
+                              {l.tsh!.toLocaleString(i18n.language)}
+                            </span>
+                            <span className={styles.labDate}> ({formatDate(l.date)})</span>
+                          </span>
+                        );
+                      })}
+                    </>
+                  )}
+                </div>
+              )}
             </div>
             {periods.length > 1 && (
               <button
