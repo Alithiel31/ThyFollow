@@ -2,11 +2,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Activity, MailCheck } from 'lucide-react';
+import { MailCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { authApi } from '../lib/api';
 import { GoogleIcon } from '../components/GoogleIcon';
 import styles from './AuthPage.module.css';
+import { LogoMark } from '../components/LogoMark';
 
 export function RegisterPage() {
   const { t } = useTranslation();
@@ -38,7 +39,7 @@ export function RegisterPage() {
       <div className={styles.page}>
         <div className={styles.card}>
           <div className={styles.logoRow}>
-            <div className={styles.logoIcon}><Activity size={20} /></div>
+            <div className={styles.logoIcon}><LogoMark size={26} /></div>
             <span className={styles.logoText}>{t('app.name')}</span>
           </div>
 
@@ -61,7 +62,7 @@ export function RegisterPage() {
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.logoRow}>
-          <div className={styles.logoIcon}><Activity size={20} /></div>
+          <div className={styles.logoIcon}><LogoMark size={26} /></div>
           <span className={styles.logoText}>{t('app.name')}</span>
         </div>
 

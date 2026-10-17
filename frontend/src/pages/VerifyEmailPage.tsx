@@ -2,10 +2,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Activity, CheckCircle2, XCircle } from 'lucide-react';
+import { CheckCircle2, XCircle } from 'lucide-react';
 import { authApi } from '../lib/api';
 import { useAuthStore } from '../lib/store';
 import styles from './AuthPage.module.css';
+import { LogoMark } from '../components/LogoMark';
 
 type Status = 'verifying' | 'success' | 'error';
 
@@ -36,7 +37,7 @@ export function VerifyEmailPage() {
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.logoRow}>
-          <div className={styles.logoIcon}><Activity size={20} /></div>
+          <div className={styles.logoIcon}><LogoMark size={26} /></div>
           <span className={styles.logoText}>{t('app.name')}</span>
         </div>
 
