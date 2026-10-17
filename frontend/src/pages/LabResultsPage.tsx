@@ -6,7 +6,9 @@ import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { Plus, Trash2, FlaskConical, TrendingUp, FileUp } from 'lucide-react';
 import { labApi, medApi } from '../lib/api';
-import { buildDoseSteps, formatSchedule, periodAt, periodAtDay } from '../lib/doseCycle';
+import {
+  buildDoseSteps, formatSchedule, periodAt, periodAtDay, weeksSinceDoseChange, STABILIZATION_WEEKS,
+} from '../lib/doseCycle';
 import { formatDate, tshStatus, cn, toISODate } from '../lib/utils';
 import { LAB_RANGES, MARKER_DISPLAY, type LabMarkerKey, type LabResult } from '../types';
 import { useAuthStore } from '../lib/store';
@@ -190,6 +192,15 @@ export function LabResultsPage() {
     return t('labResults.onTreatment', { schedule: schedules.join(' · ') });
   };
 
+  // Semaines depuis le dernier changement de dose si la mesure n'est pas encore stabilisée
+  // (moins de STABILIZATION_WEEKS), sinon null.
+  const unstableWeeks = (day: string): number | null => {
+    const weeks = weeksSinceDoseChange(medications, day);
+    return weeks != null && weeks < STABILIZATION_WEEKS ? weeks : null;
+  };
+  const tsDay = (ts: number) => toISODate(new Date(ts));
+  const hasUnstablePoint = visibleData.some((d) => unstableWeeks(tsDay(d.ts)) != null);
+
   const formatAxisDate = (ts: number) => format(ts, 'MMM yy', { locale: dateLocale });
   const formatTooltipDate = (ts: number) => format(ts, 'd MMMM yyyy', { locale: dateLocale });
 
@@ -283,7 +294,11 @@ export function LabResultsPage() {
                 labelFormatter={(ts) => formatTooltipDate(Number(ts))}
                 formatter={(v, _name, item) => {
                   const series = doseSeries.find((d) => d.key === item.dataKey);
-                  if (!series) return [`${Number(v).toLocaleString(i18n.language)} ${LAB_RANGES.tsh.unit}`, LAB_RANGES.tsh.label];
+                  if (!series) {
+                    const value = `${Number(v).toLocaleString(i18n.language)} ${LAB_RANGES.tsh.unit}`;
+                    const weeks = unstableWeeks(tsDay(Number(item.payload.ts)));
+                    return [weeks == null ? value : `${value} — ${t('labResults.unstableTooltip', { count: weeks })}`, LAB_RANGES.tsh.label];
+                  }
                   // Posologie en vigueur à cette date (« Sous traitement : … »), et sa moyenne quotidienne.
                   const period = periodAtDay(series.med.dosePeriods, toISODate(new Date(Number(item.payload.ts))));
                   const schedule = period ? formatSchedule(period.slots, t('medications.dosageUnits.MCG'), t) : '';
@@ -310,14 +325,14 @@ export function LabResultsPage() {
               <Line
                 yAxisId="tsh" type="linear" dataKey="tsh" name={LAB_RANGES.tsh.label} stroke="var(--chart-1)" strokeWidth={2}
                 connectNulls isAnimationActive={false}
-                dot={(props: { cx?: number; cy?: number; index?: number; payload?: { tsh?: number } }) => (
-                  props.payload?.tsh == null ? <g key={props.index} /> : (
-                    <circle
-                      key={props.index} cx={props.cx} cy={props.cy} r={4.5} strokeWidth={0}
-                      fill={tshStatus(props.payload.tsh, targetMin, targetMax).color}
-                    />
-                  )
-                )}
+                dot={(props: { cx?: number; cy?: number; index?: number; payload?: { ts: number; tsh?: number } }) => {
+                  if (props.payload?.tsh == null) return <g key={props.index} />;
+                  const color = tshStatus(props.payload.tsh, targetMin, targetMax).color;
+                  // Point creux : mesure faite peu après un changement de dose, pas encore stabilisée.
+                  return unstableWeeks(tsDay(props.payload.ts)) == null
+                    ? <circle key={props.index} cx={props.cx} cy={props.cy} r={4.5} strokeWidth={0} fill={color} />
+                    : <circle key={props.index} cx={props.cx} cy={props.cy} r={4} strokeWidth={2} stroke={color} fill="var(--bg-card)" />;
+                }}
                 activeDot={{ r: 6 }}
               />
             </LineChart>
@@ -334,6 +349,7 @@ export function LabResultsPage() {
             </ul>
           )}
           <p className={styles.chartNote}>{t('labResults.chartNote', { min: targetMin, max: targetMax })}</p>
+          {hasUnstablePoint && <p className={styles.chartNote}>{t('labResults.unstableNote', { weeks: STABILIZATION_WEEKS })}</p>}
         </div>
       )}
 
@@ -419,6 +435,7 @@ export function LabResultsPage() {
           {results.map((r) => {
             const tshInfo = r.tsh != null ? tshStatus(r.tsh, profile?.targetTSH_min, profile?.targetTSH_max) : null;
             const treatment = onTreatment(r.date.slice(0, 10));
+            const weeksSinceChange = r.tsh != null ? unstableWeeks(r.date.slice(0, 10)) : null;
             return (
               <div
                 key={r.id}
@@ -437,7 +454,15 @@ export function LabResultsPage() {
                     const label = t(`labResults.marker.${key}`);
                     const value = r[key] as number;
                     if (key === 'tsh') {
-                      return <Marker key={key} label={label} value={value} unit={unit} color={tshInfo?.color} bg={tshInfo?.bg} badge={tshInfo?.label} />;
+                      return (
+                        <Marker
+                          key={key} label={label} value={value} unit={unit} color={tshInfo?.color} bg={tshInfo?.bg} badge={tshInfo?.label}
+                          flag={weeksSinceChange == null ? undefined : {
+                            label: t('labResults.unstable'),
+                            title: t('labResults.unstableTooltip', { count: weeksSinceChange }),
+                          }}
+                        />
+                      );
                     }
                     if (key === 'antiTPO') {
                       return <Marker key={key} label={label} value={value} unit={unit}
@@ -499,8 +524,9 @@ function NumField({ label, field, form, set, step, placeholder }: {
   );
 }
 
-function Marker({ label, value, unit, color, bg, badge }: {
+function Marker({ label, value, unit, color, bg, badge, flag }: {
   label: string; value: number; unit: string; color?: string; bg?: string; badge?: string;
+  flag?: { label: string; title: string }; // badge secondaire (ex. « Non stabilisée »)
 }) {
   return (
     <div className={styles.marker}>
@@ -509,6 +535,7 @@ function Marker({ label, value, unit, color, bg, badge }: {
         {value} <span className={styles.markerUnit}>{unit}</span>
       </span>
       {badge && <span className={styles.markerBadge} style={{ color, background: bg ?? 'var(--bg-raised)' }}>{badge}</span>}
+      {flag && <span className={`${styles.markerBadge} ${styles.unstableBadge}`} title={flag.title}>{flag.label}</span>}
     </div>
   );
 }

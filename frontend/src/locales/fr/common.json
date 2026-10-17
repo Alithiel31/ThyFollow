@@ -294,7 +294,12 @@
     "doseTooltip": "{{treatment}} (moy. {{average, number}} {{unitLabel}})",
     "doseLegend": "{{name}} — dose moyenne ({{unitLabel}})",
     "legend": "Légende du graphique",
-    "onTreatment": "Sous traitement : {{schedule}}"
+    "onTreatment": "Sous traitement : {{schedule}}",
+    "unstable": "Non stabilisée",
+    "unstableTooltip_one": "dose changée il y a {{count}} semaine, valeur pas encore stabilisée",
+    "unstableTooltip_other": "dose changée il y a {{count}} semaines, valeur pas encore stabilisée",
+    "unstableTooltip_zero": "dose changée cette semaine, valeur pas encore stabilisée",
+    "unstableNote": "Point creux = mesure faite moins de {{weeks}} semaines après un changement de dose : valeur pas encore stabilisée"
   },
   "medications": {
     "frequency": {

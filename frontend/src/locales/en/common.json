@@ -294,7 +294,12 @@
     "doseTooltip": "{{treatment}} (avg. {{average, number}} {{unitLabel}})",
     "doseLegend": "{{name}} — average dose ({{unitLabel}})",
     "legend": "Chart legend",
-    "onTreatment": "On treatment: {{schedule}}"
+    "onTreatment": "On treatment: {{schedule}}",
+    "unstable": "Not stabilised",
+    "unstableTooltip_one": "dose changed {{count}} week ago, value not yet stabilised",
+    "unstableTooltip_other": "dose changed {{count}} weeks ago, value not yet stabilised",
+    "unstableTooltip_zero": "dose changed this week, value not yet stabilised",
+    "unstableNote": "Hollow dot = measured less than {{weeks}} weeks after a dose change: value not yet stabilised"
   },
   "medications": {
     "frequency": {

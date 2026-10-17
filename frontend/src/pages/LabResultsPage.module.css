@@ -187,6 +187,7 @@
   border-radius: 100px; margin-top: 2px; width: fit-content;
 }
 
+.unstableBadge { color: var(--warn); background: var(--warn-soft); margin-left: 4px; }
 .resultTreatment { font-size: 0.78rem; color: var(--text-dim); margin: 8px 0 0; }
 .resultNotes {
   font-size: 0.82rem; color: var(--text-muted);

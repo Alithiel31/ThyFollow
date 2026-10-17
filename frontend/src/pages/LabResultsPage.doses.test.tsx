@@ -67,3 +67,30 @@ describe('LabResultsPage — dose en vigueur sur chaque analyse', () => {
     expect(card('Labo a')).toHaveTextContent('Sous traitement : 75 / 100 µg en alternance');
   });
 });
+
+describe('LabResultsPage — mesures non stabilisées', () => {
+  // Première période le 2026-01-01 (pas un changement), changement de dose le 2026-03-01.
+  const meds = [levo(period('p-1', '2026-01-01', [75]), period('p-2', '2026-03-01', [75, 100]))];
+
+  it('badge « Non stabilisée » 4 semaines après un changement de dose, pas 10 semaines après', async () => {
+    await renderWith([lab('a', '2026-03-29', 2.5), lab('b', '2026-05-10', 1.4), lab('c', '2026-02-01', 3.1)], meds);
+    expect(card('Labo a')).toHaveTextContent('Non stabilisée');
+    expect(screen.getByText('Non stabilisée')).toHaveAttribute(
+      'title', 'dose changée il y a 4 semaines, valeur pas encore stabilisée',
+    );
+    expect(card('Labo b')).not.toHaveTextContent('Non stabilisée');
+    // 4 semaines après la toute première période : ce n'est pas un changement de dose.
+    expect(card('Labo c')).not.toHaveTextContent('Non stabilisée');
+    expect(screen.getAllByText('Non stabilisée')).toHaveLength(1);
+  });
+
+  it('la note du graphique explique le point creux dès qu’un point est concerné', async () => {
+    await renderWith([lab('a', '2026-03-29', 2.5), lab('b', '2026-05-10', 1.4)], meds);
+    expect(screen.getByText(/Point creux = mesure faite moins de 6 semaines/)).toBeInTheDocument();
+  });
+
+  it('pas de note sans point concerné', async () => {
+    await renderWith([lab('b', '2026-05-10', 1.4), lab('d', '2026-07-01', 1.1)], meds);
+    expect(screen.queryByText(/Point creux/)).not.toBeInTheDocument();
+  });
+});
