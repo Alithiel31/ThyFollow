@@ -384,7 +384,8 @@
       "deleteConfirm": "Supprimer cette période de l'historique ?",
       "added": "Période ajoutée",
       "deleted": "Période supprimée"
-    }
+    },
+    "noIntakeToday": "Pas de prise aujourd'hui"
   },
   "appointments": {
     "types": {
@@ -615,8 +616,7 @@
     "temperature": "Température",
     "heartRate": "Rythme cardiaque",
     "sleep": "Sommeil",
-    "medicationLine": "{{name}}{{brand}} — {{dose}} {{unit}}, {{freq}}{{intakeTime}}",
-    "intakeTimeSuffix": " à {{time}}",
+    "medicationLine": "{{name}}{{brand}} — {{schedule}}{{freq}}",
     "footer": "Généré par ThyroTrack le {{date}} — données déclaratives saisies par le patient, à interpréter avec un professionnel de santé."
   },
   "labImport": {

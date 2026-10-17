@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { Plus, Pill, Trash2, ToggleLeft, ToggleRight, CheckCircle2, Circle, X, History } from 'lucide-react';
 import { medApi } from '../lib/api';
 import { formatDate, toISODate } from '../lib/utils';
-import { periodAtDay, formatSchedule } from '../lib/doseCycle';
+import { periodAtDay, formatSchedule, dosesForDate } from '../lib/doseCycle';
 import type { DoseSlot, Medication, MedicationIntake } from '../types';
 import styles from './MedicationsPage.module.css';
 
@@ -312,7 +312,7 @@ export function MedicationsPage() {
               <div className={styles.list}>
                 {activeMeds.map((m) => (
                   <MedCard
-                    key={m.id} med={m} freqLabels={FREQ_LABELS} unitLabels={UNIT_LABELS} intakes={intakes}
+                    key={m.id} med={m} freqLabels={FREQ_LABELS} unitLabels={UNIT_LABELS} intakes={intakes} today={today}
                     onEdit={openEdit} onDelete={(id) => { if (confirm(t('medications.deleteConfirm'))) deleteMut.mutate(id); }}
                     onToggle={toggleActive}
                     onTake={(id, time) => takeMut.mutate({ id, time })}
@@ -328,7 +328,7 @@ export function MedicationsPage() {
               <div className={styles.list}>
                 {inactiveMeds.map((m) => (
                   <MedCard
-                    key={m.id} med={m} freqLabels={FREQ_LABELS} unitLabels={UNIT_LABELS} intakes={intakes}
+                    key={m.id} med={m} freqLabels={FREQ_LABELS} unitLabels={UNIT_LABELS} intakes={intakes} today={today}
                     onEdit={openEdit} onDelete={(id) => { if (confirm(t('medications.deleteConfirm'))) deleteMut.mutate(id); }}
                     onToggle={toggleActive}
                     onTake={(id, time) => takeMut.mutate({ id, time })}
@@ -541,11 +541,12 @@ function DoseHistory({ med, unitLabel, today, onChange }: {
   );
 }
 
-function MedCard({ med, freqLabels, unitLabels, intakes, onEdit, onDelete, onToggle, onTake, onUntake }: {
+function MedCard({ med, freqLabels, unitLabels, intakes, today, onEdit, onDelete, onToggle, onTake, onUntake }: {
   med: Medication;
   freqLabels: Record<Medication['frequency'], string>;
   unitLabels: Record<Medication['dosageUnit'], string>;
   intakes: MedicationIntake[];
+  today: string;
   onEdit: (m: Medication) => void;
   onDelete: (id: string) => void;
   onToggle: (m: Medication) => void;
@@ -554,23 +555,35 @@ function MedCard({ med, freqLabels, unitLabels, intakes, onEdit, onDelete, onTog
 }) {
   const { t } = useTranslation();
   const takenTimes = new Set(intakes.filter((i) => i.medicationId === med.id).map((i) => i.time));
+  const unitLabel = unitLabels[med.dosageUnit];
+  const period = periodAtDay(med.dosePeriods, today) ?? med.dosePeriods[med.dosePeriods.length - 1];
+  // Créneaux à heure fixe du jour ; ceux à 0 aujourd'hui (jour sans prise du cycle) sont masqués.
+  const timedToday = dosesForDate(med, today).filter((d): d is { time: string; dose: number } => d.time !== null);
+  const dueToday = timedToday.filter((d) => d.dose > 0);
+  const singleTime = period?.slots.length === 1 ? period.slots[0].time : null;
 
   return (
     <div className={`${styles.medCard} ${!med.active ? styles.medCardInactive : ''}`} onClick={() => onEdit(med)}>
       <div className={styles.medIcon}><Pill size={18} /></div>
       <div className={styles.medInfo}>
-        <div className={styles.medName}>{med.name} <span className={styles.medDose}>{med.dosage} {unitLabels[med.dosageUnit]}</span></div>
+        <div className={styles.medName}>
+          {med.name}{' '}
+          <span className={styles.medDose}>{period ? formatSchedule(period.slots, unitLabel, t) : `${med.dosage} ${unitLabel}`}</span>
+        </div>
         {med.brand && <div className={styles.medBrand}>{med.brand}</div>}
         <div className={styles.medMeta}>
-          {freqLabels[med.frequency]}
-          {med.intakeTimes.length > 0 && ` · ${med.intakeTimes.join(', ')}`}
-          {med.instructions && ` · ${med.instructions}`}
+          {[
+            med.frequency === 'AS_NEEDED' ? freqLabels.AS_NEEDED : null,
+            singleTime,
+            med.instructions,
+          ].filter(Boolean).join(' · ')}
         </div>
         <div className={styles.medDate}>{t('medications.since', { date: formatDate(med.startDate) })}</div>
 
-        {med.active && med.intakeTimes.length > 0 && (
+        {med.active && timedToday.length > 0 && (
           <div className={styles.doseChecklist} onClick={(e) => e.stopPropagation()}>
-            {med.intakeTimes.map((time) => {
+            {dueToday.length === 0 && <span className={styles.noIntakeToday}>{t('medications.noIntakeToday')}</span>}
+            {dueToday.map(({ time, dose }) => {
               const taken = takenTimes.has(time);
               return (
                 <button
@@ -580,7 +593,7 @@ function MedCard({ med, freqLabels, unitLabels, intakes, onEdit, onDelete, onTog
                   onClick={() => (taken ? onUntake(med.id, time) : onTake(med.id, time))}
                 >
                   {taken ? <CheckCircle2 size={14} /> : <Circle size={14} />}
-                  {time} — {taken ? t('medications.doseTaken') : t('medications.doseNotTaken')}
+                  {time} — {t('medications.schedule.dose', { dose, unitLabel })} · {taken ? t('medications.doseTaken') : t('medications.doseNotTaken')}
                 </button>
               );
             })}

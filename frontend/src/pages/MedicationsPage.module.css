@@ -140,6 +140,7 @@
 .timeSlotsRow .input { width: auto; flex: 1 1 100px; }
 
 .doseChecklist { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.noIntakeToday { font-size: 0.78rem; color: var(--text-muted); font-style: italic; }
 
 .doseBtn {
   display: flex; align-items: center; gap: 5px;

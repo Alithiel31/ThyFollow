@@ -11,6 +11,12 @@ function parseDays(value: unknown, fallback: number): number {
   return Number.isFinite(n) && n > 0 ? n : fallback;
 }
 
+// Posologies des médicaments actifs : l'interface affiche celle en vigueur (cycle, créneaux).
+const dosePeriodsSelect = {
+  select: { startDate: true, slots: true },
+  orderBy: { startDate: 'asc' as const },
+};
+
 export const analyticsController = {
   // GET /api/analytics/overview?days=90
   overview: async (req: AuthRequest, res: Response): Promise<void> => {
@@ -40,7 +46,7 @@ export const analyticsController = {
       }),
       prisma.medication.findMany({
         where: { userId: req.userId, active: true },
-        select: { name: true, dosage: true, dosageUnit: true, intakeTimes: true },
+        select: { name: true, dosage: true, dosageUnit: true, intakeTimes: true, dosePeriods: dosePeriodsSelect },
       }),
       prisma.appointment.findFirst({
         where: {
@@ -112,7 +118,7 @@ export const analyticsController = {
       }),
       prisma.medication.findMany({
         where: { userId: req.userId, active: true },
-        select: { name: true, brand: true, dosage: true, dosageUnit: true, frequency: true, intakeTimes: true },
+        select: { name: true, brand: true, dosage: true, dosageUnit: true, frequency: true, intakeTimes: true, dosePeriods: dosePeriodsSelect },
       }),
     ]);
 

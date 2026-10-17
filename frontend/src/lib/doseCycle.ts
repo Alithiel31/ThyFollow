@@ -13,8 +13,8 @@ function daysBetween(from: string, to: string): number {
 }
 
 // Période en vigueur un jour donné : la plus récente ayant commencé ce jour-là ou avant.
-export function periodAtDay(periods: DosePeriod[], day: string): DosePeriod | null {
-  let found: DosePeriod | null = null;
+export function periodAtDay<T extends Pick<DosePeriod, 'startDate'>>(periods: T[], day: string): T | null {
+  let found: T | null = null;
   for (const p of periods) {
     const start = p.startDate.slice(0, 10);
     if (start <= day && (!found || start > found.startDate.slice(0, 10))) found = p;
@@ -66,4 +66,19 @@ export function formatSchedule(slots: DoseSlot[], unit: string, t: TFunction): s
       return s.time ? t('medications.schedule.atTime', { label, time: s.time }) : label;
     })
     .join(' + ');
+}
+
+// Posologie en vigueur un jour donné (à défaut, la plus récente), avec l'heure quand il n'y a
+// qu'une prise : « 75 / 100 µg en alternance · 07:00 ». Sans période : la dose enregistrée.
+export function scheduleLabel(
+  med: Pick<Medication, 'dosage' | 'intakeTimes'> & { dosePeriods: Pick<DosePeriod, 'startDate' | 'slots'>[] },
+  day: string,
+  unit: string,
+  t: TFunction,
+): string {
+  const period = periodAtDay(med.dosePeriods, day) ?? med.dosePeriods[med.dosePeriods.length - 1];
+  if (!period) return [t('medications.schedule.dose', { dose: med.dosage, unitLabel: unit }), ...med.intakeTimes].join(' · ');
+  const label = formatSchedule(period.slots, unit, t);
+  const time = period.slots.length === 1 ? period.slots[0].time : null;
+  return time ? `${label} · ${time}` : label;
 }

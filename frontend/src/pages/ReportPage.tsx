@@ -7,7 +7,8 @@ import type { TFunction } from 'i18next';
 import { ArrowLeft, Printer, Download } from 'lucide-react';
 import { analyticsApi } from '../lib/api';
 import { useAuthStore } from '../lib/store';
-import { formatDate, symptomLabel } from '../lib/utils';
+import { formatDate, symptomLabel, toISODate } from '../lib/utils';
+import { scheduleLabel } from '../lib/doseCycle';
 import { LAB_RANGES } from '../types';
 import type { ReportData } from '../types';
 import styles from './ReportPage.module.css';
@@ -173,10 +174,8 @@ export function ReportPage() {
                   {t('report.medicationLine', {
                     name: m.name,
                     brand: m.brand ? ` (${m.brand})` : '',
-                    dose: m.dosage,
-                    unit: t(`medications.dosageUnits.${m.dosageUnit}`),
-                    freq: freqLabel(t, m.frequency),
-                    intakeTime: m.intakeTimes.length > 0 ? t('report.intakeTimeSuffix', { time: m.intakeTimes.join(', ') }) : '',
+                    schedule: scheduleLabel(m, toISODate(new Date()), t(`medications.dosageUnits.${m.dosageUnit}`), t),
+                    freq: m.frequency === 'AS_NEEDED' ? `, ${freqLabel(t, m.frequency)}` : '',
                   })}
                 </li>
               ))}

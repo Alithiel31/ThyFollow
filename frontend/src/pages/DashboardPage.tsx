@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { analyticsApi, articlesApi } from '../lib/api';
 import { useAuthStore } from '../lib/store';
 import { formatDate, formatDateShort, tshStatus, toISODate } from '../lib/utils';
+import { scheduleLabel } from '../lib/doseCycle';
 import { LAB_RANGES } from '../types';
 import {
   Flame, TrendingUp, Pill, Calendar, FlaskConical,
@@ -230,9 +231,7 @@ export function DashboardPage() {
                   <div className={styles.medIcon}><Pill size={14} /></div>
                   <div>
                     <p className={styles.medName}>{m.name}</p>
-                    <p className={styles.medDose}>{m.dosage} {t(`medications.dosageUnits.${m.dosageUnit}`)}
-                      {m.intakeTimes.length > 0 && ` · ${m.intakeTimes.join(', ')}`}
-                    </p>
+                    <p className={styles.medDose}>{scheduleLabel(m, toISODate(new Date()), t(`medications.dosageUnits.${m.dosageUnit}`), t)}</p>
                   </div>
                 </div>
               ))

@@ -252,7 +252,7 @@ export interface AnalyticsOverview {
   streak: number;
   averages: { energy: number | null; mood: number | null };
   medicationAdherence: number | null;
-  activeMedications: Pick<Medication, 'name' | 'dosage' | 'dosageUnit' | 'intakeTimes'>[];
+  activeMedications: (Pick<Medication, 'name' | 'dosage' | 'dosageUnit' | 'intakeTimes'> & { dosePeriods: Pick<DosePeriod, 'startDate' | 'slots'>[] })[];
   latestLabResult: Pick<LabResult, 'date' | 'tsh' | 'ft4' | 'ft3'> | null;
   labHistory: Pick<LabResult, 'date' | 'tsh' | 'ft4' | 'ft3'>[];
   nextAppointment: Appointment | null;
@@ -332,6 +332,6 @@ export interface ReportData {
     sleepHours: number | null;
   };
   medicationAdherence: number | null;
-  activeMedications: Pick<Medication, 'name' | 'brand' | 'dosage' | 'dosageUnit' | 'frequency' | 'intakeTimes'>[];
+  activeMedications: (Pick<Medication, 'name' | 'brand' | 'dosage' | 'dosageUnit' | 'frequency' | 'intakeTimes'> & { dosePeriods: Pick<DosePeriod, 'startDate' | 'slots'>[] })[];
   labResults: LabResult[];
 }
