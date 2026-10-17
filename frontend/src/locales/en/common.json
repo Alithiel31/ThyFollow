@@ -448,7 +448,9 @@
       "added": "Password remembered",
       "deleted": "Password deleted",
       "revoked": "All passwords were deleted",
-      "error": "Something went wrong"
+      "error": "Something went wrong",
+      "aiAlwaysLabel": "AI reading on every import",
+      "aiAlwaysHint": "Compares the automatic reading with the AI's and flags differences. Otherwise the AI is only a fallback. Requires the permission above."
     }
   },
   "diagnosis": {
@@ -579,7 +581,8 @@
     "retry": "Retry",
     "method": {
       "rules": "Read automatically",
-      "llm": "Read with AI assistance"
+      "llm": "Read with AI assistance",
+      "both": "Two readings compared (rules and AI)"
     },
     "insufficient": "incomplete reading: please check and fill in the fields",
     "possibleDuplicate": "A result already exists on this date: check to avoid a duplicate.",
@@ -614,6 +617,8 @@
       "hemoglobin": "Hemoglobin (g/dL)"
     },
     "download": "Download PDF",
-    "downloadError": "Download failed"
+    "downloadError": "Download failed",
+    "conflict": "To check: automatic reading {{rules}} · AI {{ai}}",
+    "conflictNone": "nothing found"
   }
 }

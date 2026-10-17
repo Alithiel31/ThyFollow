@@ -10,7 +10,7 @@ const SECRET = 'my-lab-pw-9876';
 
 interface Row { id: string; userId: string; label: string; passwordEnc: string; keyVersion: number; createdAt: Date; lastUsedAt: Date | null }
 let rows: Row[];
-let profile: { userId: string; aiExtractionConsentAt: Date | null } | null;
+let profile: { userId: string; aiExtractionConsentAt: Date | null; aiExtractionAlways: boolean } | null;
 let seq = 0;
 
 const pick = (r: Row, select?: Record<string, boolean>) =>
@@ -39,7 +39,8 @@ const prismaMock = {
     }),
   },
   userProfile: {
-    upsert: vi.fn(async ({ create, update }: { create: { userId: string; aiExtractionConsentAt: Date | null }; update: { aiExtractionConsentAt: Date | null } }) => {
+    findUnique: vi.fn(async () => profile),
+    upsert: vi.fn(async ({ create, update }: { create: NonNullable<typeof profile>; update: Partial<NonNullable<typeof profile>> }) => {
       profile = profile ? { ...profile, ...update } : create;
       return profile;
     }),
@@ -145,6 +146,28 @@ describe('PUT /api/profile/ai-extraction-consent', () => {
     const off = await request(app).put('/api/profile/ai-extraction-consent').set('Authorization', token(ME)).send({ consent: false });
     expect(off.body.aiExtractionConsentAt).toBeNull();
     expect(profile?.aiExtractionConsentAt).toBeNull();
+  });
+
+  it('« always » : activé avec le consentement, conservé si on ne le renvoie pas, désactivé avec le consentement', async () => {
+    const app = await buildApp();
+    const put = (body: object) => request(app).put('/api/profile/ai-extraction-consent').set('Authorization', token(ME)).send(body);
+
+    expect((await put({ consent: true, always: true })).body.aiExtractionAlways).toBe(true);
+    const since = profile?.aiExtractionConsentAt;
+    // même consentement, « always » non renvoyé : conservé, et la date de consentement ne bouge pas
+    const again = await put({ consent: true });
+    expect(again.body.aiExtractionAlways).toBe(true);
+    expect(profile?.aiExtractionConsentAt).toEqual(since);
+    // retrait du consentement : « always » retombe à false
+    const off = await put({ consent: false });
+    expect(off.body).toEqual({ aiExtractionConsentAt: null, aiExtractionAlways: false });
+    expect(profile?.aiExtractionAlways).toBe(false);
+  });
+
+  it('« always » sans consentement reste false', async () => {
+    const app = await buildApp();
+    const res = await request(app).put('/api/profile/ai-extraction-consent').set('Authorization', token(ME)).send({ consent: false, always: true });
+    expect(res.body.aiExtractionAlways).toBe(false);
   });
 
   it('refuse un corps invalide', async () => {

@@ -252,7 +252,9 @@ function ItemRow({ item, hasAiConsent, onChange, onRetryPassword, onRetryAi, onC
 
   // Champs de relecture : marqueurs habituels + tout ce qui a été lu ou signalé
   const fieldKeys = LAB_MARKER_KEYS.filter(
-    (key) => MAIN_MARKERS.includes(key) || key in (draft?.values ?? {}) || draft?.flags.some((f) => f.marker === key)
+    (key) =>
+      MAIN_MARKERS.includes(key) || key in (draft?.values ?? {}) ||
+      draft?.flags.some((f) => f.marker === key) || draft?.conflicts.some((c) => c.field === key)
   );
 
   return (
@@ -305,6 +307,7 @@ function ItemRow({ item, hasAiConsent, onChange, onRetryPassword, onRetryAi, onC
               <span className={styles.label}>{t('labResults.date')}</span>
               <input className={styles.input} type="date" value={item.form.date} onChange={(e) => setForm({ date: e.target.value })} />
               {draft.dateConfidence === 'low' && <span className={styles.flag}>{t('labImport.dateUncertain')}</span>}
+              <ConflictNote conflict={draft.conflicts.find((c) => c.field === 'date')} />
             </label>
             <label className={styles.field}>
               <span className={styles.label}>{t('labResults.lab')}</span>
@@ -326,6 +329,7 @@ function ItemRow({ item, hasAiConsent, onChange, onRetryPassword, onRetryAi, onC
                   {flags.map((f) => (
                     <span key={f.reason} className={styles.flag}>{t(`labImport.flags.${f.reason}`)}</span>
                   ))}
+                  <ConflictNote conflict={draft.conflicts.find((c) => c.field === key)} />
                 </label>
               );
             })}
@@ -352,5 +356,17 @@ function ItemRow({ item, hasAiConsent, onChange, onRetryPassword, onRetryAi, onC
         </div>
       )}
     </li>
+  );
+}
+
+// Désaccord entre la lecture automatique (règles) et la lecture par IA : on montre les deux.
+function ConflictNote({ conflict }: { conflict?: ImportDraft['conflicts'][number] }) {
+  const { t } = useTranslation();
+  if (!conflict) return null;
+  const show = (v: string | number | null) => (v === null ? t('labImport.conflictNone') : String(v));
+  return (
+    <span className={styles.conflict} role="note">
+      {t('labImport.conflict', { rules: show(conflict.rules), ai: show(conflict.ai) })}
+    </span>
   );
 }

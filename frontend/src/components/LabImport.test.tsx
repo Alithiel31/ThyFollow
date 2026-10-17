@@ -28,7 +28,7 @@ const readyResult = (filename: string, extra: Partial<ImportFileResult> = {}): I
   documentId: `doc-${filename}`,
   draft: {
     date: '2026-03-12', dateConfidence: 'high', lab: 'Biogroup', orderedBy: null,
-    values: { tsh: 2.35, ferritin: 64 }, flags: [], insufficient: false, method: 'rules',
+    values: { tsh: 2.35, ferritin: 64 }, flags: [], insufficient: false, method: 'rules', conflicts: [],
   },
   ...extra,
 });
@@ -128,6 +128,43 @@ describe('LabImport', () => {
     renderImport();
     await userEvent.setup().upload(dropInput(), pdf('d.pdf'));
     expect(await screen.findByText('labImport.possibleDuplicate')).toBeInTheDocument();
+  });
+
+  it('affiche les deux lectures quand elles divergent (valeur, valeur absente, date)', async () => {
+    importFilesMock.mockResolvedValue({
+      data: {
+        results: [
+          readyResult('x.pdf', {
+            draft: {
+              date: '2025-01-01', dateConfidence: 'low', lab: 'Biogroup', orderedBy: null,
+              values: { tsh: 3.1, ferritin: 64 }, flags: [], insufficient: false, method: 'both',
+              conflicts: [
+                { field: 'tsh', rules: 8, ai: 3.1 },
+                { field: 'ferritin', rules: 64, ai: null },
+                { field: 'date', rules: '2026-03-12', ai: '2025-01-01' },
+              ],
+            },
+          }),
+        ],
+      },
+    });
+    renderImport();
+    await userEvent.setup().upload(dropInput(), pdf('x.pdf'));
+
+    expect(await screen.findByText('labImport.method.both')).toBeInTheDocument();
+    const notes = screen.getAllByRole('note').map((n) => n.textContent);
+    expect(notes).toHaveLength(3);
+    expect(notes.join('|')).toContain('"rules":"8","ai":"3.1"');
+    expect(notes.join('|')).toContain('"rules":"64","ai":"labImport.conflictNone"');
+    expect(notes.join('|')).toContain('"rules":"2026-03-12","ai":"2025-01-01"');
+  });
+
+  it('sans divergence, aucune note « à vérifier »', async () => {
+    importFilesMock.mockResolvedValue({ data: { results: [readyResult('y.pdf')] } });
+    renderImport();
+    await userEvent.setup().upload(dropInput(), pdf('y.pdf'));
+    await screen.findByText('labImport.status.ready');
+    expect(screen.queryAllByRole('note')).toHaveLength(0);
   });
 
   it('un PDF déjà au carnet (duplicate) n’a pas d’écran de vérification', async () => {
