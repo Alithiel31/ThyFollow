@@ -9,20 +9,14 @@ import {
   ClipboardEdit, User, LogOut,
   Sun, Moon, MonitorSmartphone, BookOpen, PenLine, Languages, MoreHorizontal,
 } from 'lucide-react';
+import { LogoMark } from './LogoMark';
 import styles from './AppShell.module.css';
 
-/* Logo « papillon » de la maquette (version icône) : ellipses bleu / orange */
-function LogoMark() {
+/* Logo « papillon » dans son écrin (cadre clair le jour, halo bleuté la nuit) */
+function LogoBadge() {
   return (
     <div className={styles.logoIcon} aria-hidden="true">
-      <svg width="24" height="18" viewBox="0 0 64 48" style={{ display: 'block' }}>
-        <ellipse cx="34" cy="20" rx="4.4" ry="16" fill="#91adff" transform="rotate(-45 34 36)" />
-        <ellipse cx="34" cy="22" rx="3.9" ry="14" fill="#6384e6" transform="rotate(-30 34 36)" />
-        <ellipse cx="34" cy="26" rx="3.1" ry="10" fill="#91adff" transform="rotate(-15 34 36)" />
-        <ellipse cx="34" cy="20" rx="4.4" ry="16" fill="#df8b79" transform="rotate(45 34 36)" />
-        <ellipse cx="34" cy="22" rx="3.9" ry="14" fill="#c56e64" transform="rotate(30 34 36)" />
-        <ellipse cx="34" cy="26" rx="3.1" ry="10" fill="#df8b79" transform="rotate(15 34 36)" />
-      </svg>
+      <LogoMark size={26} />
     </div>
   );
 }
@@ -85,7 +79,7 @@ export function AppShell() {
       {/* ── Sidebar (desktop) */}
       <aside className={styles.sidebar} aria-label={t('nav.mainLabel')}>
         <button className={styles.logo} type="button" onClick={() => navigate('/dashboard')}>
-          <LogoMark />
+          <LogoBadge />
           <span className={styles.logoText}>{t('app.name')}</span>
         </button>
 
@@ -141,7 +135,7 @@ export function AppShell() {
       {/* ── Header (mobile) : logo, thème, accès profil */}
       <header className={styles.mobileHeader}>
         <button className={styles.logo} type="button" onClick={() => navigate('/dashboard')}>
-          <LogoMark />
+          <LogoBadge />
           <span className={styles.logoText}>{t('app.name')}</span>
         </button>
         <div className={styles.mobileHeaderActions}>
