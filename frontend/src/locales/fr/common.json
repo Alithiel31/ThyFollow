@@ -291,9 +291,10 @@
       "all": "Tout"
     },
     "doseAxis": "µg/j",
-    "doseTooltip": "{{schedule}} (moy. {{average, number}} {{unitLabel}})",
+    "doseTooltip": "{{treatment}} (moy. {{average, number}} {{unitLabel}})",
     "doseLegend": "{{name}} — dose moyenne ({{unitLabel}})",
-    "legend": "Légende du graphique"
+    "legend": "Légende du graphique",
+    "onTreatment": "Sous traitement : {{schedule}}"
   },
   "medications": {
     "frequency": {

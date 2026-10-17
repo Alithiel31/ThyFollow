@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { Plus, Trash2, FlaskConical, TrendingUp, FileUp } from 'lucide-react';
 import { labApi, medApi } from '../lib/api';
-import { buildDoseSteps, formatSchedule, periodAtDay } from '../lib/doseCycle';
+import { buildDoseSteps, formatSchedule, periodAt, periodAtDay } from '../lib/doseCycle';
 import { formatDate, tshStatus, cn, toISODate } from '../lib/utils';
 import { LAB_RANGES, MARKER_DISPLAY, type LabMarkerKey, type LabResult } from '../types';
 import { useAuthStore } from '../lib/store';
@@ -178,6 +178,18 @@ export function LabResultsPage() {
   const doseTicks = Array.from({ length: Math.ceil((doseMax * 1.15) / doseStep) + 1 }, (_, i) => i * doseStep);
   const doseUnit = t('labResults.doseAxis');
 
+  // « Sous traitement : 75 / 100 µg en alternance » : posologie en vigueur le jour d'une analyse
+  // (médicaments du graphique TSH). Null si aucune n'est connue à cette date.
+  const onTreatment = (day: string): string | null => {
+    const current = periodAt(medications, day);
+    if (current.length === 0) return null;
+    const schedules = current.map(({ med, period }) => {
+      const schedule = formatSchedule(period.slots, t(`medications.dosageUnits.${med.dosageUnit}`), t);
+      return current.length > 1 ? `${med.name} ${schedule}` : schedule;
+    });
+    return t('labResults.onTreatment', { schedule: schedules.join(' · ') });
+  };
+
   const formatAxisDate = (ts: number) => format(ts, 'MMM yy', { locale: dateLocale });
   const formatTooltipDate = (ts: number) => format(ts, 'd MMMM yyyy', { locale: dateLocale });
 
@@ -272,10 +284,13 @@ export function LabResultsPage() {
                 formatter={(v, _name, item) => {
                   const series = doseSeries.find((d) => d.key === item.dataKey);
                   if (!series) return [`${Number(v).toLocaleString(i18n.language)} ${LAB_RANGES.tsh.unit}`, LAB_RANGES.tsh.label];
-                  // Posologie en vigueur à cette date, et sa moyenne quotidienne.
+                  // Posologie en vigueur à cette date (« Sous traitement : … »), et sa moyenne quotidienne.
                   const period = periodAtDay(series.med.dosePeriods, toISODate(new Date(Number(item.payload.ts))));
                   const schedule = period ? formatSchedule(period.slots, t('medications.dosageUnits.MCG'), t) : '';
-                  return [t('labResults.doseTooltip', { schedule, average: Number(v), unitLabel: doseUnit }), series.med.name];
+                  return [
+                    t('labResults.doseTooltip', { treatment: t('labResults.onTreatment', { schedule }), average: Number(v), unitLabel: doseUnit }),
+                    series.med.name,
+                  ];
                 }}
                 contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, fontSize: 12, color: 'var(--text)', boxShadow: 'var(--shadow)' }}
               />
@@ -403,6 +418,7 @@ export function LabResultsPage() {
         <div className={styles.list}>
           {results.map((r) => {
             const tshInfo = r.tsh != null ? tshStatus(r.tsh, profile?.targetTSH_min, profile?.targetTSH_max) : null;
+            const treatment = onTreatment(r.date.slice(0, 10));
             return (
               <div
                 key={r.id}
@@ -433,6 +449,7 @@ export function LabResultsPage() {
                     <span className={styles.markerUnit}>{t('labResults.noValues')}</span>
                   )}
                 </div>
+                {treatment && <p className={styles.resultTreatment}>{treatment}</p>}
                 {r.notes && <p className={styles.resultNotes}>{r.notes}</p>}
                 {r.source && r.source !== 'GOOGLE_HEALTH' && (
                   <span className={styles.sourceBadge} data-source={r.source}>{t(`pro.source.${r.source}`)}</span>

@@ -187,6 +187,7 @@
   border-radius: 100px; margin-top: 2px; width: fit-content;
 }
 
+.resultTreatment { font-size: 0.78rem; color: var(--text-dim); margin: 8px 0 0; }
 .resultNotes {
   font-size: 0.82rem; color: var(--text-muted);
   margin-top: 12px; line-height: 1.5;
