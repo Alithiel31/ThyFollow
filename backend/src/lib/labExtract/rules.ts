@@ -154,11 +154,23 @@ const LAB_BRANDS: Array<[RegExp, string]> = [
   [/\blabco\b/, 'Labco'],
 ];
 
+const MAX_LAB_LINE_WORDS = 8;
+const LAB_LINE_REJECT = /(accredit|cofrac|\bliste\b|portee|n°|\bwww\b|\d{3,})/;
+
 function findLab(originalLines: string[], normalizedLines: string[]): string | null {
   for (const [pattern, name] of LAB_BRANDS) {
     if (normalizedLines.some((l) => pattern.test(l))) return name;
   }
-  const index = normalizedLines.findIndex((l) => /\blaboratoires?\b/.test(l) && !/prescri/.test(l));
+  // Repli : une ligne « Laboratoire X ». On n'accepte qu'une ligne COURTE et sans mention
+  // d'accréditation/numéro : « Laboratoire accrédité n°8-3165. Liste des sites… » (pied de
+  // page) n'est pas un nom de laboratoire. À défaut, l'utilisateur le saisit à la relecture.
+  const index = normalizedLines.findIndex(
+    (l) =>
+      /\blaboratoires?\b/.test(l) &&
+      !/prescri/.test(l) &&
+      !LAB_LINE_REJECT.test(l) &&
+      l.trim().split(/\s+/).length <= MAX_LAB_LINE_WORDS
+  );
   if (index === -1) return null;
   return originalLines[index].replace(/\s{2,}.*$/, '').trim().slice(0, 80) || null;
 }
