@@ -40,6 +40,15 @@ model User {
   // d'un coup toutes les sessions ouvertes (ex. réinitialisation du mot de passe).
   tokenVersion Int @default(0)
 
+  // ── Accès Pro (import de bilans PDF). Source de vérité unique : « Pro tant
+  // que proUntil est dans le futur », que la date vienne d'un abonnement
+  // Stripe, d'un code promo ou d'un octroi manuel (voir lib/entitlements.ts).
+  proUntil         DateTime?
+  proSource        ProSource?
+  stripeCustomerId String?    @unique
+  // Imports offerts consommés hors Pro (essai gratuit, à vie)
+  freeImportsUsed  Int        @default(0)
+
   // Relations
   profile                UserProfile?
   entries                DailyEntry[]
@@ -53,8 +62,67 @@ model User {
   oauthAccounts          OAuthAccount[]
   authEvents             AuthEvent[]
   googleHealthConnection GoogleHealthConnection?
+  importUsages           ImportUsage[]
+  promoRedemptions       PromoRedemption[]
 
   @@map("users")
+}
+
+enum ProSource {
+  STRIPE // abonnement payant
+  PROMO // code promo
+  GRANT // octroi manuel
+}
+
+// ─────────────────────────────────────────────
+// IMPORT USAGE (compteur mensuel d'imports de bilans PDF pour les comptes Pro)
+// ─────────────────────────────────────────────
+model ImportUsage {
+  userId String
+  // Mois UTC au format "YYYY-MM"
+  month  String
+  count  Int    @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, month])
+  @@map("import_usages")
+}
+
+// ─────────────────────────────────────────────
+// PROMO CODE (accès Pro offert pour une durée donnée)
+// ─────────────────────────────────────────────
+model PromoCode {
+  id              String    @id @default(cuid())
+  // Toujours stocké en majuscules
+  code            String    @unique
+  durationDays    Int
+  // null = utilisations illimitées
+  maxRedemptions  Int?
+  redemptionCount Int       @default(0)
+  // Date limite pour saisir le code (null = pas de limite)
+  expiresAt       DateTime?
+  active          Boolean   @default(true)
+  note            String?
+  createdAt       DateTime  @default(now())
+
+  redemptions PromoRedemption[]
+
+  @@map("promo_codes")
+}
+
+model PromoRedemption {
+  id        String   @id @default(cuid())
+  codeId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  code PromoCode @relation(fields: [codeId], references: [id], onDelete: Cascade)
+  user User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Un même compte ne peut utiliser un code qu'une seule fois
+  @@unique([codeId, userId])
+  @@map("promo_redemptions")
 }
 
 // ─────────────────────────────────────────────
@@ -358,8 +426,10 @@ model LabResult {
 
   notes       String?
   documentUrl String? // PDF upload link
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  // MANUAL (saisie à la main) ou PDF_IMPORT (lu depuis un PDF puis relu et confirmé)
+  source      DataSource @default(MANUAL)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
   user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   documents LabDocument[]
@@ -503,6 +573,7 @@ enum TempUnit {
 enum DataSource {
   MANUAL
   GOOGLE_HEALTH
+  PDF_IMPORT
 }
 
 enum SymptomCategory {

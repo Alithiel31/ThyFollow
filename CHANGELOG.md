@@ -47,6 +47,19 @@ pas synchronisé avec ces tags.
 
 ### Added
 
+- Accès Pro à l'import de bilans PDF : la saisie manuelle et l'export restent gratuits ; l'import
+  automatique (lecture du PDF + repli IA) est réservé aux comptes Pro, avec 3 imports offerts à vie
+  et un plafond de 25 imports par mois en Pro (`FREE_IMPORT_LIMIT`, `PRO_MONTHLY_IMPORT_LIMIT`).
+  Le droit est `User.proUntil` (source unique, `lib/entitlements.ts`), vérifié côté serveur
+  (402 `PRO_REQUIRED`, 429 `MONTHLY_QUOTA_REACHED`) ; un ADMIN est toujours Pro. Les PDF déjà
+  importés restent consultables et téléchargeables après la fin d'un accès.
+- Paiement par abonnement Stripe (Checkout + portail client) : `POST /api/billing/checkout`,
+  `/portal`, webhook `POST /api/webhooks/stripe` (corps brut, signature vérifiée). Variables
+  `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID` (facultatives : sans elles, 501).
+- Codes promo : `POST /api/billing/redeem` (le code prolonge l'accès de sa durée) et gestion
+  réservée aux ADMIN via `/api/admin/promo-codes` (création, liste, désactivation).
+- `LabResult.source` (`MANUAL` / `PDF_IMPORT`) : l'origine d'un résultat est affichée dans le carnet.
+- Documentation : README (FR/EN), `docs/` (architecture, développement, environnement, FR/EN) et `SECURITY` décrivent l'accès Pro, le paiement Stripe et les codes promo.
 - Carnet : les cartes affichent désormais **tous les marqueurs renseignés** (ferritine, vitamines, T4/T3,
   thyroglobuline, magnésium, sélénium, cholestérol, glycémie, hémoglobine, en plus de TSH/FT4/FT3/anti-TPO),
   avec « Aucune valeur saisie » quand il n'y en a aucun ; la modale d'édition gagne une section « Autres

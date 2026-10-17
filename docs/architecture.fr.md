@@ -187,6 +187,39 @@ sequenceDiagram
   le profil ; le PDF stocké est une copie déchiffrée, donc révoquer un mot de passe n'empêche pas
   l'utilisateur de consulter ses documents.
 - **Non géré** — PDF scannés (pas de couche texte, pas d'OCR), images, marqueurs hors `LabResult`.
+- **Accès Pro** — voir [Accès Pro et paiement](#accès-pro-et-paiement) : l'import est vérifié côté
+  serveur *avant* la lecture des PDF (`402 PRO_REQUIRED` hors Pro sans essai restant, `429
+  MONTHLY_QUOTA_REACHED` au plafond mensuel). `confirm`, `discard` et `download` restent ouverts : les
+  documents déjà importés restent accessibles après la fin d'un accès. Un lot dépassant le solde est
+  traité jusqu'au solde ; les fichiers suivants reçoivent le statut `quota_exceeded`. Le résultat créé à
+  la confirmation porte `source: PDF_IMPORT` (`MANUAL` pour la saisie à la main).
+
+---
+
+## Accès Pro et paiement
+
+La saisie manuelle et l'export sont gratuits ; l'**import de bilans PDF** est réservé aux comptes Pro.
+
+- **Source unique du droit** — `User.proUntil` (+ `proSource` : `STRIPE`, `PROMO` ou `GRANT`).
+  `lib/entitlements.ts#isPro` : Pro tant que `proUntil` est dans le futur, ou rôle `ADMIN`. Le reste du
+  code ignore la provenance de l'accès. `/api/auth/me` n'expose que le résumé `entitlements`.
+- **Solde d'imports** — hors Pro : essai de `FREE_IMPORT_LIMIT` (3) imports **à vie**
+  (`User.freeImportsUsed`) ; Pro : `PRO_MONTHLY_IMPORT_LIMIT` (25) par mois UTC (`import_usages`,
+  une ligne par utilisateur et par mois). Seule une extraction réellement effectuée consomme un
+  import (pas un doublon, un mot de passe manquant ou un PDF invalide).
+- **Stripe** — `POST /api/billing/checkout` crée une session Checkout (`client_reference_id` et
+  `subscription_data.metadata.userId` = id du compte), `POST /api/billing/portal` ouvre le portail
+  client. Le webhook `POST /api/webhooks/stripe` est monté **avant** `express.json()` (corps brut
+  nécessaire à la vérification de la signature). À chaque évènement d'abonnement il **relit
+  l'abonnement chez Stripe** (l'ordre de livraison n'est pas garanti, un évènement peut être rejoué) et
+  écrit `proUntil` = fin de la période payée (statuts `active`, `trialing`, `past_due`) ou `now`
+  (abonnement terminé). Le compte est retrouvé par `stripeCustomerId`, à défaut par `metadata.userId`.
+  Un échec de traitement répond `500` : Stripe réessaie.
+- **Codes promo** — `PromoCode` (durée, nombre max d'utilisations, date limite, actif) et
+  `PromoRedemption` (un compte ne peut utiliser un code qu'une fois). `POST /api/billing/redeem`
+  prolonge `proUntil` de la durée du code ; le compteur est incrémenté de façon conditionnelle (le
+  dernier slot ne passe pas deux fois). Un code inconnu, désactivé, expiré ou épuisé renvoie la même
+  erreur. Refusé si un abonnement Stripe est actif. Gestion : `/api/admin/promo-codes` (ADMIN).
 
 ---
 
@@ -243,6 +276,8 @@ User ─┬─ UserProfile            diagnostic, statut thyroïdien, plages cib
       ├─ LabResult[]            TSH, FT4, FT3, anticorps, carences
       │    └─ LabDocument[]     PDF chiffré du bilan (bytea), brouillon tant que non confirmé
       ├─ PdfPassword[]          mots de passe de PDF mémorisés (chiffrés, révocables)
+      ├─ ImportUsage[]          imports PDF du mois (comptes Pro)
+      ├─ PromoRedemption[]      codes promo utilisés
       ├─ Medication[]           traitements (dosage, fréquence, créneaux de prise)
       │    └─ MedicationIntake[]  prises enregistrées
       ├─ Appointment[]          rendez-vous médicaux (type, statut)
@@ -251,6 +286,7 @@ User ─┬─ UserProfile            diagnostic, statut thyroïdien, plages cib
       ├─ GoogleHealthConnection jetons chiffrés, lastSyncedAt, healthUserId
       └─ NotificationSetting
 
+PromoCode                        code promo (durée, limite d'utilisations) — accès Pro offert
 Article                          contenu éditorial : ARTICLE (« Comprendre ») ou TIP (encart du tableau de bord)
 ```
 

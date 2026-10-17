@@ -1,5 +1,6 @@
 // src/pages/LabResultsPage.tsx
-import { useState, useId, useMemo, cloneElement, isValidElement, type ReactElement } from 'react';
+import { useState, useEffect, useId, useMemo, cloneElement, isValidElement, type ReactElement } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
@@ -15,6 +16,8 @@ import {
 import { parseISO, format, subMonths } from 'date-fns';
 import { fr, enUS } from 'date-fns/locale';
 import { LabImport, DocumentLink } from '../components/LabImport';
+import { ProPaywall } from '../components/ProPanel';
+import { importsSummary, useRefreshUser } from '../lib/entitlements';
 import styles from './LabResultsPage.module.css';
 
 // Marqueurs sans champ dédié dans les sections principales du formulaire : ils peuvent venir
@@ -42,6 +45,12 @@ export function LabResultsPage() {
   const qc = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [showImport, setShowImport] = useState(false);
+  const refreshUser = useRefreshUser();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const entitlements = user?.entitlements;
+  // Essai épuisé hors Pro : l'import ouvre l'écran « passer Pro » (le serveur
+  // refuse de toute façon : voir 402 PRO_REQUIRED).
+  const importBlocked = Boolean(entitlements && !entitlements.pro && entitlements.imports.remaining <= 0);
   const [editItem, setEditItem] = useState<LabResult | null>(null);
   const [form, setForm] = useState<Partial<LabResult>>(EMPTY_FORM);
   const [chartPeriod, setChartPeriod] = useState<ChartPeriod | null>(null);
@@ -126,6 +135,23 @@ export function LabResultsPage() {
   const formatAxisDate = (ts: number) => format(ts, 'MMM yy', { locale: dateLocale });
   const formatTooltipDate = (ts: number) => format(ts, 'd MMMM yyyy', { locale: dateLocale });
 
+  // Retour de la page de paiement Stripe. Le webhook peut arriver quelques
+  // secondes après la redirection : on recharge les droits tout de suite puis
+  // une seconde fois.
+  const billingReturn = searchParams.get('billing');
+  useEffect(() => {
+    if (!billingReturn) return;
+    if (billingReturn === 'success') {
+      toast.success(t('pro.billingSuccess'));
+      refreshUser().catch(() => undefined);
+      setTimeout(() => refreshUser().catch(() => undefined), 4000);
+    } else {
+      toast(t('pro.billingCancelled'));
+    }
+    setSearchParams({}, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [billingReturn]);
+
   return (
     <div className={styles.page}>
       {/* Header */}
@@ -137,6 +163,7 @@ export function LabResultsPage() {
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           <button className={styles.addBtn} onClick={() => setShowImport((v) => !v)}>
             <FileUp size={16} /> {t('labImport.button')}
+            {entitlements && <span className={styles.proTag}>{t('pro.badge')}</span>}
           </button>
           <button className={styles.addBtn} onClick={() => { setEditItem(null); setForm(EMPTY_FORM); setShowForm(true); }}>
             <Plus size={16} /> {t('labResults.add')}
@@ -144,7 +171,13 @@ export function LabResultsPage() {
         </div>
       </div>
 
-      {showImport && <LabImport onClose={() => setShowImport(false)} />}
+      {showImport && entitlements && importBlocked && (
+        <ProPaywall entitlements={entitlements} onClose={() => setShowImport(false)} />
+      )}
+      {showImport && !importBlocked && <LabImport onClose={() => setShowImport(false)} />}
+      {entitlements && !showImport && (
+        <p className={styles.importQuota}>{importsSummary(entitlements, t)}</p>
+      )}
 
       {/* TSH Chart */}
       {chartData.length > 1 && (
@@ -318,6 +351,9 @@ export function LabResultsPage() {
                   )}
                 </div>
                 {r.notes && <p className={styles.resultNotes}>{r.notes}</p>}
+                {r.source && r.source !== 'GOOGLE_HEALTH' && (
+                  <span className={styles.sourceBadge} data-source={r.source}>{t(`pro.source.${r.source}`)}</span>
+                )}
                 {r.documents?.map((d) => <DocumentLink key={d.id} documentId={d.id} />)}
                 <button className={styles.deleteBtn}
                   onClick={(e) => { e.stopPropagation(); if (confirm(t('labResults.deleteConfirm'))) deleteMut.mutate(r.id); }}>

@@ -25,6 +25,11 @@ services:
       # Absentes, l'import répond 501 et le repli IA est désactivé.
       PDF_ENCRYPTION_KEY: ${PDF_ENCRYPTION_KEY:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      # Abonnement Pro (Stripe). Absents, le paiement répond 501 ; les codes
+      # promo fonctionnent sans Stripe.
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STRIPE_PRICE_ID: ${STRIPE_PRICE_ID:-}
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
       interval: 30s

@@ -597,6 +597,7 @@
       "too_large": "File too large",
       "duplicate": "Already in your log",
       "failed": "Could not read",
+      "quota_exceeded": "Import limit reached",
       "rate_limited": "Too many requests",
       "error": "Upload failed"
     },
@@ -653,5 +654,46 @@
     "rateLimited": "You sent many files in a short time. This is not a bug nor a reading error: the server limits the number of uploads. Please try again in about {{minutes}} min.",
     "rateLimitedSoon": "You sent many files in a short time. This is not a bug nor a reading error: the server limits the number of uploads. Please try again in a few minutes.",
     "uploadFailedHint": "The upload did not go through (server unreachable or in error). This is not a problem with reading your PDF: please try again."
+  },
+  "pro": {
+    "badge": "Pro",
+    "title": "Automatic PDF lab import",
+    "lead": "Manual entry stays free. Automatic import (PDF reading, AI assistance) is reserved for Pro accounts.",
+    "trialLeft_one": "{{count}} free import left",
+    "trialLeft_other": "{{count}} free imports left",
+    "trialOver": "Your {{limit}} free imports are used up.",
+    "monthLeft": "{{remaining}} / {{limit}} imports left this month",
+    "subscribe": "Go Pro",
+    "redirecting": "Redirecting…",
+    "checkoutError": "Could not open the payment page",
+    "orCode": "Have a code?",
+    "codePlaceholder": "Promo code",
+    "codeLabel": "Promo code",
+    "redeem": "Activate",
+    "redeemed": "Pro access activated",
+    "billingSuccess": "Thank you! Your Pro access is being activated.",
+    "billingCancelled": "Payment cancelled.",
+    "monthlyQuota": "Monthly limit reached: it resets next month.",
+    "status": {
+      "title": "Pro subscription",
+      "free": "Free account: unlimited manual entry, PDF import as a trial.",
+      "activeUntil": "Pro active until {{date}}",
+      "activeAdmin": "Pro active (administrator)",
+      "source": {
+        "STRIPE": "subscription",
+        "PROMO": "promo code",
+        "GRANT": "granted access"
+      },
+      "manage": "Manage subscription",
+      "manageError": "Could not open the subscription portal"
+    },
+    "source": {
+      "MANUAL": "Manual entry",
+      "PDF_IMPORT": "Read from a PDF"
+    },
+    "errors": {
+      "invalidCode": "Invalid, expired or fully used code",
+      "generic": "Something went wrong"
+    }
   }
 }
