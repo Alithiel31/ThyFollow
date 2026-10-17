@@ -351,6 +351,39 @@
       "days": "{{label}} ({{count}} j)",
       "noIntake": "aucune prise",
       "atTime": "{{label}} à {{time}}"
+    },
+    "scheduleEditor": {
+      "title": "Posologie",
+      "unit": "Unité",
+      "time": "Heure de la prise {{index}}",
+      "dose": "Dose de la prise {{index}}",
+      "addSlot": "Ajouter une prise",
+      "removeSlot": "Retirer cette prise",
+      "perDay": "Dose différente selon les jours",
+      "cycleLength": "Durée du cycle",
+      "cycleDays": "Cycle de {{count}} jours",
+      "day": "J{{day}}",
+      "dayCell": "Jour {{day}}, prise {{index}}",
+      "sameEveryDay": "Même dose tous les jours",
+      "gridHint": "Doses en {{unit}}. Case vide = pas de prise ce jour-là. Le jour 1 est la date de début de la posologie, puis le cycle recommence.",
+      "asNeeded": "Au besoin (sans prise régulière)",
+      "showOnChart": "Afficher sur le graphique TSH",
+      "showOnChartHint": "réservé aux médicaments en µg",
+      "effectiveDate": "Date d'effet de la nouvelle posologie *",
+      "effectiveHint": "La posologie précédente est conservée dans l'historique.",
+      "invalid": "Chaque jour du cycle doit avoir au moins une dose"
+    },
+    "history": {
+      "title": "Historique des posologies",
+      "since": "À partir du {{date}}",
+      "current": "en cours",
+      "addPast": "Ajouter une période passée",
+      "startDate": "Début de la période",
+      "add": "Ajouter la période",
+      "delete": "Supprimer cette période",
+      "deleteConfirm": "Supprimer cette période de l'historique ?",
+      "added": "Période ajoutée",
+      "deleted": "Période supprimée"
     }
   },
   "appointments": {

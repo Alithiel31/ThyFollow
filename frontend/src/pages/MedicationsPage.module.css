@@ -163,7 +163,59 @@
   gap: 12px; padding: 80px 0; color: var(--text-muted); text-align: center;
 }
 
+/* Éditeur de posologie */
+.schedule { display: flex; flex-direction: column; gap: 8px; }
+.slotRow { display: flex; gap: 8px; align-items: center; }
+.slotRow > .input { width: auto; flex: 0 0 120px; }
+.doseField { display: flex; align-items: center; gap: 6px; flex: 1; }
+.unit { font-size: 0.82rem; color: var(--text-muted); white-space: nowrap; }
+.scheduleActions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.inputSmall {
+  background: var(--bg-raised); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 5px 8px;
+  color: var(--text); font-family: var(--font-body); font-size: 0.8rem;
+}
+.linkBtn {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: none; border: none; padding: 2px 0; cursor: pointer;
+  color: var(--accent); font-family: var(--font-body); font-size: 0.8rem; font-weight: 500;
+}
+.linkBtn:hover { text-decoration: underline; }
+.checks { display: flex; flex-direction: column; gap: 6px; }
+.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-dim); cursor: pointer; }
+.check:has(input:disabled) { cursor: default; opacity: 0.6; }
+.hint { font-size: 0.75rem; color: var(--text-muted); margin: 0; }
+
+.cycleGridWrap { overflow-x: auto; }
+.cycleGrid { border-collapse: collapse; font-size: 0.78rem; }
+.cycleGrid th { font-weight: 500; color: var(--text-muted); padding: 2px 4px; text-align: center; white-space: nowrap; }
+.cycleGrid tbody th { text-align: left; color: var(--text-dim); }
+.cycleGrid td { padding: 2px; }
+.cellInput {
+  width: 52px; background: var(--bg-raised); border: 1px solid var(--border);
+  border-radius: 6px; padding: 5px 4px; text-align: center;
+  color: var(--text); font-family: var(--font-body); font-size: 0.8rem;
+}
+.cellInput:focus { outline: none; border-color: var(--accent); }
+
+/* Historique des posologies */
+.history { border-top: 1px solid var(--border); padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.historyTitle { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 600; color: var(--text-dim); margin: 0; }
+.historyList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.historyItem {
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px;
+}
+.historyDate { font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+.historySchedule { font-size: 0.85rem; color: var(--text); }
+.currentTag {
+  padding: 1px 6px; border-radius: 999px; font-size: 0.65rem; font-weight: 600;
+  background: var(--accent-soft); color: var(--accent);
+}
+.historyForm { display: flex; flex-direction: column; gap: 10px; padding: 10px; border: 1px dashed var(--border); border-radius: var(--radius-sm); }
+
 @media (max-width: 600px) {
   .header { flex-direction: column; gap: 12px; }
   .grid2 { grid-template-columns: 1fr; }
+  .slotRow > .input { flex-basis: 100px; }
 }

@@ -351,6 +351,39 @@
       "days": "{{label}} ({{count}} d)",
       "noIntake": "no dose",
       "atTime": "{{label}} at {{time}}"
+    },
+    "scheduleEditor": {
+      "title": "Dosage",
+      "unit": "Unit",
+      "time": "Time of dose {{index}}",
+      "dose": "Amount of dose {{index}}",
+      "addSlot": "Add a dose",
+      "removeSlot": "Remove this dose",
+      "perDay": "Different dose depending on the day",
+      "cycleLength": "Cycle length",
+      "cycleDays": "{{count}}-day cycle",
+      "day": "D{{day}}",
+      "dayCell": "Day {{day}}, dose {{index}}",
+      "sameEveryDay": "Same dose every day",
+      "gridHint": "Amounts in {{unit}}. Empty cell = no dose that day. Day 1 is the start date of the dosage, then the cycle repeats.",
+      "asNeeded": "As needed (no regular intake)",
+      "showOnChart": "Show on the TSH chart",
+      "showOnChartHint": "µg medications only",
+      "effectiveDate": "Effective date of the new dosage *",
+      "effectiveHint": "The previous dosage is kept in the history.",
+      "invalid": "Every day of the cycle needs at least one dose"
+    },
+    "history": {
+      "title": "Dosage history",
+      "since": "From {{date}}",
+      "current": "current",
+      "addPast": "Add a past period",
+      "startDate": "Period start",
+      "add": "Add the period",
+      "delete": "Delete this period",
+      "deleteConfirm": "Delete this period from the history?",
+      "added": "Period added",
+      "deleted": "Period deleted"
     }
   },
   "appointments": {
