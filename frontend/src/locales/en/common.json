@@ -261,7 +261,28 @@
     "submitting": "Saving…",
     "empty": "No lab results recorded",
     "addFirst": "Add my first lab result",
-    "deleteConfirm": "Delete this lab result?"
+    "deleteConfirm": "Delete this lab result?",
+    "marker": {
+      "tsh": "TSH",
+      "ft4": "FT4",
+      "ft3": "FT3",
+      "t4": "Total T4",
+      "t3": "Total T3",
+      "antiTPO": "Anti-TPO",
+      "antiTG": "Anti-TG",
+      "antiTSHR": "Anti-TSHR",
+      "thyroglobulin": "Thyroglobulin",
+      "ferritin": "Ferritin",
+      "vitaminD": "Vitamin D",
+      "vitaminB12": "Vitamin B12",
+      "magnesium": "Magnesium",
+      "selenium": "Selenium",
+      "cholesterol": "Cholesterol",
+      "glucose": "Glucose",
+      "hemoglobin": "Hemoglobin"
+    },
+    "otherMarkers": "Other markers",
+    "noValues": "No values entered"
   },
   "medications": {
     "frequency": {

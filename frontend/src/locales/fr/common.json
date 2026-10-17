@@ -261,7 +261,28 @@
     "submitting": "Enregistrement…",
     "empty": "Aucune analyse enregistrée",
     "addFirst": "Ajouter ma première analyse",
-    "deleteConfirm": "Supprimer cette analyse ?"
+    "deleteConfirm": "Supprimer cette analyse ?",
+    "marker": {
+      "tsh": "TSH",
+      "ft4": "FT4",
+      "ft3": "FT3",
+      "t4": "T4 totale",
+      "t3": "T3 totale",
+      "antiTPO": "Anti-TPO",
+      "antiTG": "Anti-TG",
+      "antiTSHR": "Anti-TSHR",
+      "thyroglobulin": "Thyroglobuline",
+      "ferritin": "Ferritine",
+      "vitaminD": "Vitamine D",
+      "vitaminB12": "Vitamine B12",
+      "magnesium": "Magnésium",
+      "selenium": "Sélénium",
+      "cholesterol": "Cholestérol",
+      "glucose": "Glycémie",
+      "hemoglobin": "Hémoglobine"
+    },
+    "otherMarkers": "Autres marqueurs",
+    "noValues": "Aucune valeur saisie"
   },
   "medications": {
     "frequency": {
