@@ -43,7 +43,7 @@ A web app for tracking thyroid health, inspired by the Clue app.
 | Module | Detail |
 |---|---|
 | **Daily log** | Energy, mood, anxiety, brain fog, 11 thyroid symptoms, medication taken, physical measurements (weight/heart rate/sleep, syncable via Google Health, e.g. Pixel Watch) |
-| **Lab results** | TSH, FT4, FT3, Anti-TPO, Anti-TG, deficiencies (Ferritin, Vit D, B12…) with trend charts; **PDF import** (batch, password-protected PDFs supported, review before adding, encrypted storage, optional AI fallback) |
+| **Lab results** | TSH, FT4, FT3, Anti-TPO, Anti-TG, deficiencies (Ferritin, Vit D, B12…) with trend charts; **PDF import, Pro accounts only** after 3 free trial imports (batch, password-protected PDFs supported, review before adding, encrypted storage, optional AI fallback) |
 | **Medications** | Treatment management (Levothyroxine, etc.), dosage, frequency, adherence |
 | **Appointments** | Medical calendar with reminders, statuses, specialized types |
 | **Dashboard** | Medication streak, adherence, averages, next appointment, TSH history |
@@ -265,6 +265,7 @@ docker compose up -d --build
 > `ANTHROPIC_API_KEY`) are not read from `.env`: run `./deploy.sh` instead, which injects them from
 > Infisical (see [environment.md](./docs/environment.md#production-secrets-with-infisical-deploysh)).
 > Optional PDF import: set `PDF_ENCRYPTION_KEY` (and `ANTHROPIC_API_KEY` for the AI fallback) in `.env`.
+> Optional card payments for the Pro plan: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID` (see [Pro access and promo codes](#-pro-access-and-promo-codes)).
 
 The backend container automatically runs `prisma migrate deploy` at startup (see
 `backend/Dockerfile`) and joins PostgreSQL via `host.docker.internal` (see `extra_hosts` in
@@ -372,6 +373,12 @@ DELETE /api/pdf-passwords/:id
 DELETE /api/pdf-passwords                         (revoke all)
 PUT    /api/profile/ai-extraction-consent         (opt in / out of the AI reading; optional `always`)
 
+POST   /api/billing/checkout                      (Pro plan: returns the Stripe payment page URL)
+POST   /api/billing/portal                        (Stripe customer portal)
+POST   /api/billing/redeem                        (activates Pro access with a promo code)
+POST   /api/webhooks/stripe                       (Stripe webhook, signature verified)
+GET|POST|PATCH /api/admin/promo-codes             (ADMIN: manage promo codes)
+
 GET    /api/medications
 POST   /api/medications
 PUT    /api/medications/:id
@@ -443,6 +450,31 @@ POST   /graphql                                   (additive to the REST API abov
 Each guide has a French version (`*.fr.md`).
 
 ---
+
+## 💳 Pro access and promo codes
+
+Manual entry of lab results and the export stay **free**. **PDF lab report import** is reserved for
+Pro accounts: 3 free imports for life, then a Stripe subscription (cap of 25 imports per month). An
+`ADMIN` account is always Pro. The server is the authority (`402`/`429`); the interface only guides.
+
+Create a promo code (ADMIN account, JWT in `$TOKEN`):
+
+```bash
+curl -X POST https://thyrotrack.alithiel31.dev/api/admin/promo-codes \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"durationDays": 90, "maxRedemptions": 5, "note": "family"}'
+# => { "code": "THYRO-XXXX-XXXX", ... } ; "code" can also be supplied (e.g. "MAMAN")
+```
+
+The person enters the code under **Profile → Pro subscription**. Deactivate a code with
+`PATCH /api/admin/promo-codes/:id` and `{"active": false}`. Granting access directly in the database:
+`UPDATE users SET "proUntil" = '2027-12-31', "proSource" = 'GRANT' WHERE email = '...';`
+
+Stripe: create a recurring product (→ `STRIPE_PRICE_ID`) and a webhook endpoint
+`https://<domain>/api/webhooks/stripe` subscribed to `checkout.session.completed` and
+`customer.subscription.created|updated|deleted` (→ `STRIPE_WEBHOOK_SECRET`), enable the customer
+portal in the Stripe dashboard, then set the three variables in Infisical. Stripe only receives the
+account's email, never any health data. Details: [`docs/environment.md`](./docs/environment.md#pro-access-stripe).
 
 ## 🤝 Contributing
 

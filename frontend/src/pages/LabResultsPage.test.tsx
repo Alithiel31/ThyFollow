@@ -5,6 +5,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MemoryRouter } from 'react-router-dom';
 import { LabResultsPage } from './LabResultsPage';
 import type { LabResult } from '../types';
 
@@ -29,7 +30,10 @@ function renderPage() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={client}>
-      <LabResultsPage />
+      {/* La page lit les paramètres d'URL (retour de paiement Stripe) */}
+      <MemoryRouter>
+        <LabResultsPage />
+      </MemoryRouter>
     </QueryClientProvider>
   );
 }

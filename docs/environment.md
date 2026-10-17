@@ -20,10 +20,11 @@ Only `.env.example` files are versioned — never commit a real `.env`.
 | `DB_PASSWORD` | ✅       | Password of the PostgreSQL role `thyrotrack_app` on the shared instance (for example `openssl rand -hex 24`). Compose builds `DATABASE_URL` from it. |
 | `PDF_ENCRYPTION_KEY` | ❌ | Forwarded to the backend (see [PDF lab report import](#pdf-lab-report-import)). Empty disables the import. |
 | `ANTHROPIC_API_KEY`  | ❌ | Forwarded to the backend: enables the AI fallback extraction. Empty disables it. |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID` | ❌ | Forwarded to the backend: Pro subscription payments (see [Pro access (Stripe)](#pro-access-stripe)). Empty, payments answer `501`; promo codes still work. |
 
 ### Production secrets with Infisical (`deploy.sh`)
 
-On the production host the three variables above are **not** read from the root `.env`: `deploy.sh`
+On the production host the variables above are **not** read from the root `.env`: `deploy.sh`
 logs in to Infisical (Machine Identity, Universal Auth) and runs `docker compose up -d --build`
 inside `infisical run`, so the secrets exist only in the process environment.
 
@@ -32,6 +33,9 @@ inside `infisical run`, so the secrets exist only in the process environment.
 | `PG_THYROTRACK_PASSWORD` | `DB_PASSWORD` | Renamed by `deploy.sh`: Compose expects `DB_PASSWORD`. |
 | `PDF_ENCRYPTION_KEY`     | `PDF_ENCRYPTION_KEY` | **Required by `deploy.sh`**: 64 hexadecimal characters, otherwise the deployment stops before touching Docker. |
 | `ANTHROPIC_API_KEY`      | `ANTHROPIC_API_KEY`  | Optional: without it the AI fallback is disabled and `deploy.sh` says so. |
+| `STRIPE_SECRET_KEY`      | `STRIPE_SECRET_KEY`  | Optional: Stripe secret (or restricted `rk_…`) key. `sk_test_…` to test, `sk_live_…` in production. |
+| `STRIPE_WEBHOOK_SECRET`  | `STRIPE_WEBHOOK_SECRET` | Optional: the webhook endpoint's `whsec_…` secret (shown by Stripe when the endpoint is created). |
+| `STRIPE_PRICE_ID`        | `STRIPE_PRICE_ID`    | Optional: the `price_…` ID of the recurring Pro price. |
 
 `deploy.sh` reads its credentials from `.infisical-identity.env` (git-ignored; template:
 `.infisical-identity.env.example`): `INFISICAL_UNIVERSAL_AUTH_CLIENT_ID`,
@@ -110,6 +114,34 @@ development install it with your package manager — `apt install qpdf`, `brew i
 > there is no re-encryption tool yet. Stored PDFs live in the database (`lab_documents.dataEnc`,
 > `bytea`), so they grow the database and its backups.
 
+### Pro access (Stripe)
+
+PDF lab report import is reserved for Pro accounts (see [Pro access and payment](./architecture.md#pro-access-and-payment)).
+
+| Variable                   | Required | Default | Description |
+| -------------------------- | -------- | ------- | ----------- |
+| `FREE_IMPORT_LIMIT`        | ❌       | `3`     | Imports given **for life** to a non-Pro account. |
+| `PRO_MONTHLY_IMPORT_LIMIT` | ❌       | `25`    | Imports per (UTC) month for a Pro account: bounds the Anthropic API cost. |
+| `STRIPE_SECRET_KEY`        | ❌ (payments answer `501` without all three) | — | Stripe secret key. Prefer a **restricted key** (`rk_…`) limited to writing Checkout sessions and the customer portal, and reading subscriptions. The publishable key (`pk_…`) is **not** used: payment goes through Stripe Checkout (a hosted page). |
+| `STRIPE_WEBHOOK_SECRET`    | ❌       | —       | `whsec_…` secret of the `https://<domain>/api/webhooks/stripe` endpoint. Without it the webhook answers `501`. |
+| `STRIPE_PRICE_ID`          | ❌       | —       | `price_…` of the recurring product (test mode and live mode have separate prices). |
+
+Setting up Stripe:
+
+1. Create a product with a **recurring** price → `STRIPE_PRICE_ID`.
+2. Add the webhook endpoint `https://<domain>/api/webhooks/stripe` subscribed to
+   `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`
+   and `customer.subscription.deleted` → `STRIPE_WEBHOOK_SECRET`. Locally,
+   `stripe listen --forward-to localhost:3001/api/webhooks/stripe` prints the `whsec_…` to use.
+3. Enable the **customer portal** (Settings → Billing → Customer portal): without it, "Manage
+   subscription" fails.
+4. Start in **test mode** (card `4242 4242 4242 4242`), then repeat steps 1 to 3 in live mode.
+
+Recommended order in production: deploy with `STRIPE_SECRET_KEY` and `STRIPE_PRICE_ID`, create the
+webhook endpoint (the URL must be reachable over HTTPS), then add `STRIPE_WEBHOOK_SECRET` and
+redeploy. Stripe only receives the account's email, never any health data. Taxes (Stripe Tax) are
+not enabled.
+
 ### Rate limiting
 
 | Variable                     | Default            | Description                                              |
@@ -118,6 +150,8 @@ development install it with your package manager — `apt install qpdf`, `brew i
 | `RATE_LIMIT_MAX`             | `100`              | Requests per window per IP, whole API                    |
 | `AUTH_RATE_LIMIT_WINDOW_MS`  | `900000` (15 min)  | Window of the `/api/auth` limiter                        |
 | `AUTH_RATE_LIMIT_MAX`        | `20`               | Failed attempts per window per IP on `/api/auth` (successful requests are not counted) |
+
+Two dedicated limiters have fixed values in `backend/src/index.ts`: `POST /api/lab-results/import` (20 requests / 15 min, each upload can trigger a paid LLM call) and `POST /api/billing/redeem` (10 requests / 15 min, against promo-code guessing).
 
 ## Frontend
 

@@ -590,6 +590,7 @@
       "too_large": "Fichier trop volumineux",
       "duplicate": "Déjà dans le carnet",
       "failed": "Lecture impossible",
+      "quota_exceeded": "Quota d'imports atteint",
       "rate_limited": "Trop de requêtes",
       "error": "Envoi échoué"
     },
@@ -646,5 +647,46 @@
     "rateLimited": "Vous avez envoyé beaucoup de fichiers en peu de temps. Ce n'est pas un bug ni une erreur de lecture : le serveur limite le nombre d'envois. Réessayez dans environ {{minutes}} min.",
     "rateLimitedSoon": "Vous avez envoyé beaucoup de fichiers en peu de temps. Ce n'est pas un bug ni une erreur de lecture : le serveur limite le nombre d'envois. Réessayez dans quelques minutes.",
     "uploadFailedHint": "L'envoi n'a pas abouti (serveur injoignable ou en erreur). Ce n'est pas un problème de lecture de votre PDF : réessayez."
+  },
+  "pro": {
+    "badge": "Pro",
+    "title": "Import automatique de bilans PDF",
+    "lead": "La saisie à la main reste gratuite. L'import automatique (lecture du PDF, aide de l'IA) est réservé aux comptes Pro.",
+    "trialLeft_one": "{{count}} import offert restant",
+    "trialLeft_other": "{{count}} imports offerts restants",
+    "trialOver": "Vos {{limit}} imports offerts sont utilisés.",
+    "monthLeft": "{{remaining}} / {{limit}} imports restants ce mois-ci",
+    "subscribe": "Passer Pro",
+    "redirecting": "Redirection…",
+    "checkoutError": "Impossible d'ouvrir la page de paiement",
+    "orCode": "Vous avez un code ?",
+    "codePlaceholder": "Code promo",
+    "codeLabel": "Code promo",
+    "redeem": "Activer",
+    "redeemed": "Accès Pro activé",
+    "billingSuccess": "Merci ! Votre accès Pro est en cours d'activation.",
+    "billingCancelled": "Paiement annulé.",
+    "monthlyQuota": "Plafond mensuel atteint : il se remet à zéro le mois prochain.",
+    "status": {
+      "title": "Abonnement Pro",
+      "free": "Compte gratuit : saisie manuelle illimitée, import PDF en essai.",
+      "activeUntil": "Pro actif jusqu'au {{date}}",
+      "activeAdmin": "Pro actif (administrateur)",
+      "source": {
+        "STRIPE": "abonnement",
+        "PROMO": "code promo",
+        "GRANT": "accès offert"
+      },
+      "manage": "Gérer l'abonnement",
+      "manageError": "Impossible d'ouvrir le portail d'abonnement"
+    },
+    "source": {
+      "MANUAL": "Saisie manuelle",
+      "PDF_IMPORT": "Lu depuis un PDF"
+    },
+    "errors": {
+      "invalidCode": "Code invalide, expiré ou épuisé",
+      "generic": "Une erreur est survenue"
+    }
   }
 }

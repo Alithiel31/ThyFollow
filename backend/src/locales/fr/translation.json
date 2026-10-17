@@ -30,6 +30,16 @@
       "notConfigured": "L'import de bilans PDF n'est pas configuré sur ce serveur",
       "noFile": "Aucun fichier PDF reçu",
       "alreadyConfirmed": "Ce document a déjà été ajouté au carnet"
+    },
+    "billing": {
+      "proRequired": "L'import de bilans PDF est réservé aux comptes Pro (vos imports d'essai sont épuisés)",
+      "monthlyQuotaReached": "Plafond de {{limit}} imports ce mois-ci atteint. Il se remet à zéro au début du mois prochain.",
+      "notConfigured": "Le paiement n'est pas configuré sur ce serveur",
+      "alreadySubscribed": "Vous avez déjà un abonnement actif",
+      "checkoutFailed": "Impossible de créer la session de paiement",
+      "noSubscription": "Aucun abonnement à gérer",
+      "invalidCode": "Code invalide, expiré ou épuisé",
+      "codeAlreadyUsed": "Vous avez déjà utilisé ce code"
     }
   },
   "auth": {

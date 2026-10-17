@@ -8,6 +8,7 @@ import { prisma } from '../lib/prisma.js';
 import { AuthRequest } from '../middleware/auth.js';
 import { signSessionToken, hashOneTimeToken } from '../lib/session.js';
 import { ConflictError, AuthenticationError, EmailNotVerifiedError, ValidationError, NotFoundError } from '../lib/errors.js';
+import { getEntitlements } from '../lib/entitlements.js';
 import { sendVerificationEmail, sendResetPasswordEmail } from '../lib/resend.js';
 
 // Les schémas dépendent de `t` (messages traduits selon la langue de la
@@ -200,6 +201,9 @@ export const authController = {
         role: true,
         birthDate: true,
         createdAt: true,
+        proUntil: true,
+        proSource: true,
+        freeImportsUsed: true,
         profile: true,
         // Comptes fédérés liés (ex: Google) — le frontend s'en sert pour
         // afficher l'état "connecté/non connecté" dans le Profil.
@@ -211,6 +215,10 @@ export const authController = {
     });
 
     if (!user) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.user') }));
-    res.json(user);
+    // Les colonnes brutes servent au calcul des droits : seul le résumé
+    // `entitlements` est exposé au client.
+    const { proUntil, proSource, freeImportsUsed, ...publicUser } = user;
+    const entitlements = await getEntitlements({ id: user.id, role: user.role, proUntil, proSource, freeImportsUsed });
+    res.json({ ...publicUser, entitlements });
   },
 };

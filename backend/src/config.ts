@@ -56,6 +56,16 @@ export const config = {
   // Limites de l'import par lot.
   pdfImportMaxFiles: parseInt(process.env.PDF_IMPORT_MAX_FILES || '10', 10),
   pdfImportMaxBytes: parseInt(process.env.PDF_IMPORT_MAX_BYTES || String(10 * 1024 * 1024), 10),
+  // Accès Pro à l'import de bilans PDF (voir lib/entitlements.ts).
+  // Imports offerts hors Pro (à vie) et plafond mensuel des comptes Pro :
+  // chaque import peut déclencher un appel LLM payant.
+  freeImportLimit: parseInt(process.env.FREE_IMPORT_LIMIT || '3', 10),
+  proMonthlyImportLimit: parseInt(process.env.PRO_MONTHLY_IMPORT_LIMIT || '25', 10),
+  // Stripe (abonnement Pro). Sans ces trois valeurs, le paiement répond 501 ;
+  // les codes promo et octrois manuels fonctionnent quand même.
+  stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
+  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
+  stripePriceId: process.env.STRIPE_PRICE_ID || '',
   // Gestion de l'abonné webhook au niveau du projet (voir
   // lib/googleHealthSubscriber.ts) : distincte du flux OAuth utilisateur,
   // authentifiée via un compte de service IAM Google Cloud (recommandation

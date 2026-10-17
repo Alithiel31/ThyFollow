@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 import { FileUp, Download, X, Sparkles, AlertTriangle } from 'lucide-react';
 import { labApi } from '../lib/api';
 import { useAuthStore } from '../lib/store';
+import { useRefreshUser } from '../lib/entitlements';
 import {
   LAB_MARKER_KEYS, type ImportDraft, type ImportFileResult, type LabMarkerKey, type LabResult,
 } from '../types';
@@ -105,6 +106,7 @@ export function LabImport({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const { user } = useAuthStore();
+  const refreshUser = useRefreshUser();
   const hasAiConsent = Boolean(user?.profile?.aiExtractionConsentAt);
   const inputRef = useRef<HTMLInputElement>(null);
   const nextId = useRef(1);
@@ -128,7 +130,19 @@ export function LabImport({ onClose }: { onClose: () => void }) {
         if (!target) return;
         patch(target.id, { state: result.status, result, form: toForm(result.draft), busy: false });
       });
+      // Le solde d'imports a changé : on met à jour le compteur affiché
+      refreshUser().catch(() => undefined);
     } catch (err) {
+      // Le serveur fait foi sur les droits : si l'état local était périmé
+      // (essai épuisé ailleurs, accès expiré), on recharge l'utilisateur.
+      // Testé avant la limite de débit : MONTHLY_QUOTA_REACHED est aussi un 429.
+      const code = axios.isAxiosError(err) ? (err.response?.data as { code?: string } | undefined)?.code : undefined;
+      if (code === 'PRO_REQUIRED' || code === 'MONTHLY_QUOTA_REACHED') {
+        toast.error(code === 'PRO_REQUIRED' ? t('pro.trialOver', { limit: user?.entitlements?.imports.limit ?? 0 }) : t('pro.monthlyQuota'));
+        refreshUser().catch(() => undefined);
+        targets.forEach((it) => remove(it.id));
+        return;
+      }
       // 429 : limite de débit, pas un échec de lecture ; autre erreur : l'envoi n'a pas abouti.
       const limit = tooManyRequests(err);
       toast.error(requestErrorMessage(t, err, 'labImport.uploadError'));

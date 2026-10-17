@@ -19,6 +19,9 @@ import analyticsRouter from './routers/analytics.router.js';
 import articlesRouter from './routers/articles.router.js';
 import googleHealthRouter from './routers/googleHealth.router.js';
 import googleHealthWebhookRouter from './routers/googleHealthWebhook.router.js';
+import billingRouter from './routers/billing.router.js';
+import adminPromoRouter from './routers/adminPromo.router.js';
+import { stripeWebhookController } from './controllers/stripeWebhook.controller.js';
 import { ensureProjectSubscriber } from './lib/googleHealthSubscriber.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { mountGraphQL } from './graphql/index.js';
@@ -78,6 +81,20 @@ app.post(
   })
 );
 
+// ── Rate limiting des codes promo (anti-devinette de codes).
+app.post(
+  '/api/billing/redeem',
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    message: (req: express.Request) => ({ error: req.t('errors.tooManyRequests') }),
+  })
+);
+
+// ── Webhook Stripe : corps BRUT requis pour vérifier la signature, donc monté
+// AVANT express.json() (qui le transformerait en objet).
+app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), stripeWebhookController.handle);
+
 app.use(express.json());
 
 // ── Nécessaire pour lire le cookie httpOnly qui porte le state/nonce/PKCE
@@ -102,6 +119,8 @@ app.use('/api/medications', medicationsRouter);
 app.use('/api/appointments', appointmentsRouter);
 app.use('/api/profile', profileRouter);
 app.use('/api/pdf-passwords', pdfPasswordsRouter);
+app.use('/api/billing', billingRouter);
+app.use('/api/admin/promo-codes', adminPromoRouter);
 app.use('/api/analytics', analyticsRouter);
 app.use('/api/articles', articlesRouter);
 app.use('/api/integrations/google-health', googleHealthRouter);
