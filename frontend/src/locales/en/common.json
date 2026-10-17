@@ -239,7 +239,7 @@
     "add": "Add",
     "tshEvolution": "TSH over time",
     "targetZone": "Target zone",
-    "chartNote": "Green zone = target TSH range ({{min}}–{{max}} mIU/L)",
+    "chartNote": "Blue band = target TSH range ({{min}}–{{max}} mIU/L) · logarithmic scale · green dots = within target",
     "editTitle": "Edit lab result",
     "newTitle": "New lab result",
     "date": "Date *",
@@ -282,7 +282,14 @@
       "hemoglobin": "Hemoglobin"
     },
     "otherMarkers": "Other markers",
-    "noValues": "No values entered"
+    "noValues": "No values entered",
+    "chartPeriod": "Displayed period",
+    "periods": {
+      "6m": "6 months",
+      "1y": "1 year",
+      "2y": "2 years",
+      "all": "All"
+    }
   },
   "medications": {
     "frequency": {
