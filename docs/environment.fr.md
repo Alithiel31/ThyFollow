@@ -25,9 +25,20 @@ Seuls les fichiers `.env.example` sont versionnés — ne jamais commiter un vra
 ### Secrets de production avec Infisical (`deploy.sh`)
 
 Sur l'hôte de production, les variables ci-dessus ne sont **pas** lues dans le `.env` racine :
-`deploy.sh` se connecte à Infisical (Machine Identity, Universal Auth) et lance
-`docker compose up -d --build` dans `infisical run`, si bien que les secrets n'existent que dans
-l'environnement du processus.
+`deploy.sh`, lancé depuis le poste de travail (Docker visant le Pi par `DOCKER_HOST` ou le context
+actif), se connecte à Infisical (Machine Identity, Universal Auth) et lance le déploiement dans
+`infisical run`, si bien que les secrets n'existent que dans l'environnement du processus :
+
+1. vérifie que les images `sha-<commit>` du dernier `main` (ou de `--tag`) existent sur GHCR ;
+2. fait un `pg_dump -Fc` de `thyrotrack` sur le Pi, par ssh, dans `/mnt/storage/backups/pre-deploy`
+   (`--skip-backup` pour s'en passer) ;
+3. `docker compose pull` puis `docker compose up -d` : le service `migrate` passe en premier, et
+   le backend n'est recréé que si les migrations ont réussi ;
+4. attend le healthcheck du backend, puis interroge le `/health` public, et affiche la commande de
+   retour arrière (`./deploy.sh --tag <version précédente>`).
+
+Variables facultatives : `DEPLOY_SSH` (cible ssh du Pi, déduite sinon de l'hôte Docker),
+`DEPLOY_BACKUP_DIR`, `DEPLOY_HEALTH_URL`.
 
 | Secret Infisical (projet *Shared Keys*, environnement `Production`) | Devient | Remarques |
 | --- | --- | --- |
@@ -43,7 +54,7 @@ l'environnement du processus.
 `INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET`, `INFISICAL_API_URL`, `INFISICAL_PROJECT_ID` et, en option,
 `INFISICAL_ENV` (`prod` par défaut). Le vrai fichier contient un secret et le vrai nom du tailnet :
 ne jamais le commiter. Sans Infisical, renseignez le `.env` racine et lancez
-`docker compose up -d --build` comme d'habitude.
+`docker compose up -d` comme d'habitude.
 
 ## Backend (`backend/.env`)
 

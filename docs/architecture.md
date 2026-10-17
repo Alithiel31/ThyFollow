@@ -235,7 +235,7 @@ A request goes through the same stack in `src/index.ts`:
 - **Controllers** (`controllers/*.controller.ts`) hold the business logic and validate input with
   **Zod**, with error messages translated through i18next (`locales/{fr,en}/translation.json`).
 - **Persistence** — Prisma 5 on PostgreSQL. Schema changes go through migrations in
-  `prisma/migrations/`, replayed at container start (`prisma migrate deploy`).
+  `prisma/migrations/`, replayed by the `migrate` Compose service before the backend starts (`prisma migrate deploy`).
 - **GraphQL** — `POST /graphql` (Apollo Server 5) is a deliberate technical demo, **additive** to the
   REST API: no REST route was removed and the frontend uses REST only. It reproduces the JWT check,
   uses DataLoaders to avoid the N+1 trap, and is described in [`backend/docs/graphql.md`](../backend/docs/graphql.md).
@@ -296,13 +296,14 @@ Deleting a `User` cascades to their data.
 
 ```
 ThyFollow/
-├── docker-compose.yml          # backend + frontend; PostgreSQL and Traefik are external
+├── docker-compose.yml          # migrate + backend + frontend (GHCR images); PostgreSQL and Traefik are external
+├── docker-compose.build.yml    # overlay: builds the images from source
 ├── .env.example                # variables read by docker-compose.yml (DB_PASSWORD, PDF_ENCRYPTION_KEY, ANTHROPIC_API_KEY)
-├── deploy.sh                   # production deploy: secrets injected from Infisical, then docker compose up
+├── deploy.sh                   # production deploy: Infisical secrets, database dump, pull, migrations, check
 ├── .infisical-identity.env.example  # template of the (git-ignored) Infisical credentials used by deploy.sh
 ├── .nvmrc                      # Node 24
 ├── backend/
-│   ├── Dockerfile              # multi-stage, node:24-alpine, non-root, dumb-init, migrate deploy at start
+│   ├── Dockerfile              # multi-stage, node:24-alpine, non-root, dumb-init (migrations: `migrate` service)
 │   ├── prisma/                 # schema.prisma, migrations/, seed.ts
 │   ├── docs/graphql.md
 │   └── src/

@@ -236,7 +236,7 @@ Une requête traverse toujours la même pile, dans `src/index.ts` :
 - **Contrôleurs** (`controllers/*.controller.ts`) portent la logique métier et valident l'entrée avec
   **Zod**, messages d'erreur traduits via i18next (`locales/{fr,en}/translation.json`).
 - **Persistance** — Prisma 5 sur PostgreSQL. Les changements de schéma passent par des migrations
-  dans `prisma/migrations/`, rejouées au démarrage du conteneur (`prisma migrate deploy`).
+  dans `prisma/migrations/`, rejouées par le service Compose `migrate` avant le démarrage du backend (`prisma migrate deploy`).
 - **GraphQL** — `POST /graphql` (Apollo Server 5) est une démonstration technique assumée,
   **additive** à la REST API : aucune route REST n'a été retirée et le frontend n'utilise que REST. Il
   reproduit la vérification du JWT, utilise des DataLoaders pour éviter le piège du N+1, et est décrit
@@ -299,13 +299,14 @@ Supprimer un `User` supprime en cascade ses données.
 
 ```
 ThyFollow/
-├── docker-compose.yml          # backend + frontend ; PostgreSQL et Traefik sont externes
+├── docker-compose.yml          # migrate + backend + frontend (images GHCR) ; PostgreSQL et Traefik sont externes
+├── docker-compose.build.yml    # surcouche : construit les images depuis les sources
 ├── .env.example                # variables lues par docker-compose.yml (DB_PASSWORD, PDF_ENCRYPTION_KEY, ANTHROPIC_API_KEY)
-├── deploy.sh                   # déploiement de production : secrets injectés depuis Infisical, puis docker compose up
+├── deploy.sh                   # déploiement de production : secrets Infisical, dump de la base, pull, migrations, vérification
 ├── .infisical-identity.env.example  # modèle des identifiants Infisical (ignorés par git) utilisés par deploy.sh
 ├── .nvmrc                      # Node 24
 ├── backend/
-│   ├── Dockerfile              # multi-étapes, node:24-alpine, non-root, dumb-init, migrate deploy au démarrage
+│   ├── Dockerfile              # multi-étapes, node:24-alpine, non-root, dumb-init (migrations : service `migrate`)
 │   ├── prisma/                 # schema.prisma, migrations/, seed.ts
 │   ├── docs/graphql.md
 │   └── src/

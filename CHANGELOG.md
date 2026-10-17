@@ -59,6 +59,14 @@ pas synchronisé avec ces tags.
 
 ### Added
 
+- Déploiement continu (déclenché à la main) : `docker-compose.yml` tire les images publiées sur
+  GHCR (`IMAGE_TAG`, `sha-<commit>` ou `main`) au lieu de les construire sur le Pi ;
+  `docker-compose.build.yml` garde la construction depuis les sources. `deploy.sh` déploie le
+  dernier `main` (ou `--tag` pour revenir en arrière) : vérification des images, `pg_dump` de la
+  base sur le Pi par ssh, pull, migrations, attente du healthcheck et test du `/health` public.
+- Service Compose `migrate` : `prisma migrate deploy` tourne dans un conteneur à part avant le
+  backend, qui n'est recréé que si les migrations réussissent (l'ancienne version reste en ligne
+  sinon). Le `CMD` de l'image backend ne lance plus les migrations.
 - CI : après chaque merge sur `main`, les images backend et frontend sont construites pour
   `linux/arm64` (runner ARM natif) et publiées sur GHCR (`ghcr.io/alithiel31/thyfollow-backend`,
   `…-frontend`), taguées `sha-<commit>` et `main`. Le build Docker des PR tourne lui aussi sur

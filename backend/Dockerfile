@@ -35,4 +35,6 @@ USER node
 EXPOSE 3001
 
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]
+# Les migrations ne tournent plus ici : le service `migrate` de
+# docker-compose.yml les applique avant de (re)créer le backend.
+CMD ["node", "dist/index.js"]
