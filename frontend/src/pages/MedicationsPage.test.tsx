@@ -1,5 +1,5 @@
 // src/pages/MedicationsPage.test.tsx
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -15,6 +15,8 @@ const addDosePeriodMock = vi.fn();
 const updateDosePeriodMock = vi.fn();
 const deleteDosePeriodMock = vi.fn();
 const labListMock = vi.fn();
+const apptListMock = vi.fn();
+const apptCreateMock = vi.fn();
 
 vi.mock('../lib/api', () => ({
   medApi: {
@@ -27,6 +29,10 @@ vi.mock('../lib/api', () => ({
     deleteDosePeriod: (...args: unknown[]) => deleteDosePeriodMock(...args),
   },
   labApi: { list: (...args: unknown[]) => labListMock(...args) },
+  apptApi: {
+    list: (...args: unknown[]) => apptListMock(...args),
+    create: (...args: unknown[]) => apptCreateMock(...args),
+  },
 }));
 
 const toastErrorMock = vi.fn();
@@ -54,6 +60,7 @@ beforeEach(() => {
   listMock.mockResolvedValue({ data: [] });
   listIntakesMock.mockResolvedValue({ data: [] });
   labListMock.mockResolvedValue({ data: [] });
+  apptListMock.mockResolvedValue({ data: [] });
 });
 
 // Clés renvoyées par le `t` des tests (voir src/test/setup.ts).
@@ -269,5 +276,65 @@ describe('MedicationsPage — TSH par période de posologie', () => {
     await user.click(await screen.findByText('Levothyrox'));
     expect(screen.queryByTestId('period-labs-p-1')).not.toBeInTheDocument();
     expect(labListMock).not.toHaveBeenCalled();
+  });
+});
+
+describe('MedicationsPage — proposition de bilan de contrôle', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(2026, 9, 17, 10, 0)); // 17 octobre 2026
+    updateMock.mockResolvedValue({ data: LEVO });
+    addDosePeriodMock.mockResolvedValue({ data: LEVO });
+    apptCreateMock.mockResolvedValue({ data: {} });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  // Passe la dose à 100 µg à partir du 2026-10-20 et enregistre.
+  async function changeDoseFrom20October() {
+    const user = await openEditForm();
+    const dose = screen.getByLabelText(doseLabel(1));
+    await user.clear(dose);
+    await user.type(dose, '100');
+    fireEvent.change(screen.getByLabelText('medications.scheduleEditor.effectiveDate'), { target: { value: '2026-10-20' } });
+    await user.click(screen.getByRole('button', { name: 'common.update' }));
+    return user;
+  }
+
+  it('propose le 1er décembre 2026, et « Planifier » crée la prise de sang', async () => {
+    const user = await changeDoseFrom20October();
+    const date = await screen.findByLabelText('medications.control.date');
+    expect(date).toHaveValue('2026-12-01');
+    // formatDate suit la langue de l'instance i18n globale, non fixée sous jsdom.
+    expect(screen.getByText(/medications\.control\.question/)).toHaveTextContent(/1 (décembre|December) 2026/);
+    expect(apptCreateMock).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole('button', { name: 'medications.control.plan' }));
+    expect(apptCreateMock).toHaveBeenCalledTimes(1);
+    const appt = apptCreateMock.mock.calls[0][0];
+    expect(appt.type).toBe('BLOOD_TEST');
+    expect(appt.date.startsWith('2026-12-01')).toBe(true);
+    expect(appt.notes).toContain('medications.control.note');
+  });
+
+  it('« Plus tard » ferme la proposition sans rien créer', async () => {
+    const user = await changeDoseFrom20October();
+    await screen.findByLabelText('medications.control.date');
+    await user.click(screen.getByRole('button', { name: 'medications.control.later' }));
+    expect(screen.queryByLabelText('medications.control.date')).not.toBeInTheDocument();
+    expect(apptCreateMock).not.toHaveBeenCalled();
+  });
+
+  it('pas de proposition si une prise de sang est déjà prévue le 2026-11-25', async () => {
+    apptListMock.mockResolvedValue({
+      data: [{ id: 'a-1', date: '2026-11-25T08:00:00.000Z', type: 'BLOOD_TEST', status: 'UPCOMING', reminder: true }],
+    });
+    await changeDoseFrom20October();
+    await vi.waitFor(() => expect(apptListMock).toHaveBeenCalled());
+    await vi.waitFor(() => expect(screen.queryByRole('button', { name: 'common.update' })).not.toBeInTheDocument());
+    expect(screen.queryByLabelText('medications.control.date')).not.toBeInTheDocument();
+    expect(apptCreateMock).not.toHaveBeenCalled();
   });
 });

@@ -3,8 +3,9 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
-import { Plus, Pill, Trash2, ToggleLeft, ToggleRight, CheckCircle2, Circle, X, History } from 'lucide-react';
-import { medApi, labApi } from '../lib/api';
+import { Plus, Pill, Trash2, ToggleLeft, ToggleRight, CheckCircle2, Circle, X, History, Droplet } from 'lucide-react';
+import { medApi, labApi, apptApi } from '../lib/api';
+import { addDays, parseISO } from 'date-fns';
 import { useAuthStore } from '../lib/store';
 import { formatDate, toISODate, tshStatus } from '../lib/utils';
 import {
@@ -44,6 +45,12 @@ const slotsFromSchedule = (schedule: Schedule): DoseSlot[] => schedule.rows.map(
 }));
 
 // Même règle que le serveur : au moins une dose chaque jour du cycle, aucune négative.
+// Contrôle proposé ~6 semaines après un changement de dose ; un rendez-vous de prise de sang
+// déjà prévu entre 4 et 10 semaines après rend la proposition inutile.
+const CONTROL_DAYS = STABILIZATION_WEEKS * 7;
+const CONTROL_WINDOW_DAYS = [28, 70] as const;
+const shiftDay = (day: string, days: number) => toISODate(addDays(parseISO(day), days));
+
 const isScheduleValid = (slots: DoseSlot[]) =>
   slots.every((s) => s.doses.every((d) => Number.isFinite(d) && d >= 0))
   && slots[0].doses.every((_, day) => slots.some((s) => s.doses[day] > 0));
@@ -58,6 +65,9 @@ export function MedicationsPage() {
   const [initialSlots, setInitialSlots] = useState<DoseSlot[] | null>(null);
   const today = toISODate(new Date());
   const [effectiveDate, setEffectiveDate] = useState(today);
+  // Après un changement de dose : proposition de prise de sang de contrôle (rien n'est créé
+  // sans clic sur « Planifier »).
+  const [control, setControl] = useState<{ date: string; schedule: string } | null>(null);
 
   const FREQ_LABELS: Record<Medication['frequency'], string> = {
     DAILY: t('medications.frequency.DAILY'),
@@ -104,7 +114,36 @@ export function MedicationsPage() {
       if (sameDay) await medApi.updateDosePeriod(med.id, sameDay.id, { slots: period.slots });
       else await medApi.addDosePeriod(med.id, period);
     },
-    onSuccess: () => { toast.success(t('medications.updated')); qc.invalidateQueries({ queryKey: ['medications'] }); resetForm(); },
+    onSuccess: async (_res, { data, period }) => {
+      toast.success(t('medications.updated'));
+      qc.invalidateQueries({ queryKey: ['medications'] });
+      // Nouvelle dose (à partir d'aujourd'hui) d'un médicament agissant sur la TSH : proposer
+      // un contrôle, sauf si une prise de sang est déjà prévue au bon moment.
+      if (period && period.startDate >= today && data.showOnChart) {
+        const appts = await qc.fetchQuery({ queryKey: ['appointments'], queryFn: () => apptApi.list().then((r) => r.data) })
+          .catch(() => []);
+        const [from, to] = CONTROL_WINDOW_DAYS.map((d) => shiftDay(period.startDate, d));
+        const planned = appts.some((a) => a.type === 'BLOOD_TEST' && a.status === 'UPCOMING'
+          && toISODate(new Date(a.date)) >= from && toISODate(new Date(a.date)) <= to);
+        if (!planned) {
+          setControl({
+            date: shiftDay(period.startDate, CONTROL_DAYS),
+            schedule: formatSchedule(period.slots, UNIT_LABELS[data.dosageUnit ?? 'MCG'], t),
+          });
+          return;
+        }
+      }
+      resetForm();
+    },
+    onError: () => toast.error(t('medications.error')),
+  });
+
+  const controlMut = useMutation({
+    mutationFn: (c: { date: string; schedule: string }) => apptApi.create({
+      date: `${c.date}T08:00`, type: 'BLOOD_TEST', reminder: true,
+      notes: t('medications.control.note', { schedule: c.schedule }),
+    }),
+    onSuccess: () => { toast.success(t('medications.control.planned')); qc.invalidateQueries({ queryKey: ['appointments'] }); resetForm(); },
     onError: () => toast.error(t('medications.error')),
   });
 
@@ -139,7 +178,7 @@ export function MedicationsPage() {
   });
 
   const resetForm = () => {
-    setShowForm(false); setEditItem(null); setForm(EMPTY);
+    setShowForm(false); setEditItem(null); setForm(EMPTY); setControl(null);
     setSchedule(EMPTY_SCHEDULE); setInitialSlots(null); setEffectiveDate(today);
   };
 
@@ -213,6 +252,29 @@ export function MedicationsPage() {
       {showForm && (
         <div className={styles.overlay} onClick={(e) => e.target === e.currentTarget && resetForm()}>
           <div className={styles.modal}>
+            {control ? (
+              <div className={styles.form}>
+                <h2 className={styles.modalTitle}><Droplet size={18} /> {t('medications.control.title')}</h2>
+                <p className={styles.controlText}>{t('medications.control.question', { date: formatDate(control.date) })}</p>
+                <p className={styles.hint}>{t('medications.control.hint', { weeks: STABILIZATION_WEEKS })}</p>
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="control-date">{t('medications.control.date')}</label>
+                  <input
+                    id="control-date" className={styles.input} type="date" min={today}
+                    value={control.date} onChange={(e) => setControl({ ...control, date: e.target.value })}
+                  />
+                </div>
+                <div className={styles.formActions}>
+                  <button type="button" className={styles.cancelBtn} onClick={resetForm}>{t('medications.control.later')}</button>
+                  <button
+                    type="button" className={styles.submitBtn} disabled={!control.date || controlMut.isPending}
+                    onClick={() => controlMut.mutate(control)}
+                  >
+                    {t('medications.control.plan')}
+                  </button>
+                </div>
+              </div>
+            ) : (<>
             <h2 className={styles.modalTitle}>
               <Pill size={18} />
               {editItem ? t('medications.editTitle') : t('medications.newTitle')}
@@ -295,6 +357,7 @@ export function MedicationsPage() {
                 </button>
               </div>
             </form>
+            </>)}
           </div>
         </div>
       )}

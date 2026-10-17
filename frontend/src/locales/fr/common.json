@@ -398,7 +398,17 @@
       "noLabs": "Aucune analyse pendant cette période",
       "unstable": "Mesurée moins de {{weeks}} semaines après un changement de dose : valeur pas encore stabilisée"
     },
-    "noIntakeToday": "Pas de prise aujourd'hui"
+    "noIntakeToday": "Pas de prise aujourd'hui",
+    "control": {
+      "title": "Bilan de contrôle",
+      "question": "Planifier une prise de sang de contrôle vers le {{date}} ?",
+      "hint": "La TSH met en général {{weeks}} à 8 semaines à refléter un changement de dose.",
+      "date": "Date de la prise de sang",
+      "plan": "Planifier",
+      "later": "Plus tard",
+      "note": "Contrôle après passage à {{schedule}}",
+      "planned": "Prise de sang ajoutée aux rendez-vous"
+    }
   },
   "appointments": {
     "types": {

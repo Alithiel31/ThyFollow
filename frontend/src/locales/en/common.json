@@ -398,7 +398,17 @@
       "noLabs": "No lab result during this period",
       "unstable": "Measured less than {{weeks}} weeks after a dose change: value not yet stabilised"
     },
-    "noIntakeToday": "No dose today"
+    "noIntakeToday": "No dose today",
+    "control": {
+      "title": "Follow-up test",
+      "question": "Schedule a follow-up blood test around {{date}}?",
+      "hint": "TSH usually takes {{weeks}} to 8 weeks to reflect a dose change.",
+      "date": "Blood test date",
+      "plan": "Schedule",
+      "later": "Later",
+      "note": "Follow-up after switching to {{schedule}}",
+      "planned": "Blood test added to appointments"
+    }
   },
   "appointments": {
     "types": {
