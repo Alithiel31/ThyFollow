@@ -38,6 +38,9 @@ export const billingController = {
       ...(user.stripeCustomerId ? { customer: user.stripeCustomerId } : { customer_email: user.email }),
       success_url: `${config.appUrl}/lab-results?billing=success`,
       cancel_url: `${config.appUrl}/lab-results?billing=cancelled`,
+      // userId aussi sur l'abonnement : permet au webhook de rattacher un
+      // abonnement à son compte même si les évènements arrivent dans le désordre
+      subscription_data: { metadata: { userId: user.id } },
       allow_promotion_codes: false,
     });
     if (!session.url) throw new AppError(502, req.t('errors.billing.checkoutFailed'));

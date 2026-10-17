@@ -9,13 +9,27 @@ import { config } from '../config.js';
 import { logger } from '../lib/logger.js';
 import { getStripe, proFromSubscription } from '../lib/stripe.js';
 
-async function syncSubscription(subscription: Stripe.Subscription): Promise<void> {
+// Les évènements Stripe peuvent arriver dans le désordre ou être rejoués : on
+// n'applique jamais l'état du payload, on relit l'abonnement chez Stripe
+// (état courant) et on applique celui-là. Le payload ne sert de repli que si
+// la relecture échoue.
+async function syncSubscription(payload: Stripe.Subscription): Promise<void> {
+  let subscription = payload;
+  try {
+    subscription = await getStripe().subscriptions.retrieve(payload.id);
+  } catch (err) {
+    logger.warn('Webhook Stripe : relecture de l’abonnement impossible, payload utilisé', err instanceof Error ? err.name : 'unknown');
+  }
   const customerId = typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
   const data = proFromSubscription(subscription);
   if (!data) return;
+  // Rattachement par client Stripe ; à défaut (l'évènement subscription.created
+  // peut précéder checkout.session.completed), par l'userId posé en metadata à
+  // la création de la session de paiement.
+  const metadataUserId = subscription.metadata?.userId;
   const result = await prisma.user.updateMany({
-    where: { stripeCustomerId: customerId },
-    data: data as { proUntil: Date; proSource: 'STRIPE' },
+    where: { OR: [{ stripeCustomerId: customerId }, ...(metadataUserId ? [{ id: metadataUserId }] : [])] },
+    data: { ...(data as { proUntil: Date; proSource: 'STRIPE' }), stripeCustomerId: customerId },
   });
   if (result.count === 0) logger.warn('Webhook Stripe : aucun utilisateur pour le client', customerId);
 }

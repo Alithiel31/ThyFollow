@@ -19,8 +19,9 @@ const prismaMock = {
   user: {
     findUnique: vi.fn(async () => user),
     update: vi.fn(async ({ data }: { data: Record<string, unknown> }) => Object.assign(user, data)),
-    updateMany: vi.fn(async ({ where, data }: { where: { id?: string; stripeCustomerId?: string }; data: Record<string, unknown> }) => {
-      const matches = where.id ? user.id === where.id : user.stripeCustomerId === where.stripeCustomerId;
+    updateMany: vi.fn(async ({ where, data }: { where: { id?: string; stripeCustomerId?: string; OR?: { id?: string; stripeCustomerId?: string }[] }; data: Record<string, unknown> }) => {
+      const conditions = where.OR ?? [where];
+      const matches = conditions.some((c) => (c.id ? user.id === c.id : user.stripeCustomerId === c.stripeCustomerId));
       if (!matches) return { count: 0 };
       Object.assign(user, data);
       return { count: 1 };
@@ -187,7 +188,9 @@ describe('POST /api/webhooks/stripe', () => {
     if (signature) req.set('stripe-signature', signature);
     return req.send('{"id":"evt_1"}');
   };
-  const subscription = (status: string, end: number) => ({
+  const subscription = (status: string, end: number, metadata: Record<string, string> = {}) => ({
+    id: 'sub_1',
+    metadata,
     customer: 'cus_1',
     status,
     items: { data: [{ current_period_end: end }] },
@@ -222,10 +225,9 @@ describe('POST /api/webhooks/stripe', () => {
     user.stripeCustomerId = 'cus_1';
     user.proUntil = new Date(Date.now() + 20 * DAY);
     user.proSource = 'STRIPE';
-    constructEvent.mockReturnValue({
-      type: 'customer.subscription.deleted',
-      data: { object: subscription('canceled', Math.floor((Date.now() + 20 * DAY) / 1000)) },
-    });
+    const canceled = subscription('canceled', Math.floor((Date.now() + 20 * DAY) / 1000));
+    retrieveSubscription.mockResolvedValue(canceled);
+    constructEvent.mockReturnValue({ type: 'customer.subscription.deleted', data: { object: canceled } });
     const app = await buildApp();
     expect((await post(app, 'sig')).status).toBe(200);
     expect(user.proUntil!.getTime()).toBeLessThanOrEqual(Date.now());
@@ -234,7 +236,9 @@ describe('POST /api/webhooks/stripe', () => {
   it('subscription.updated en past_due : l’accès court jusqu’à la fin de la période payée', async () => {
     user.stripeCustomerId = 'cus_1';
     const end = Math.floor((Date.now() + 5 * DAY) / 1000);
-    constructEvent.mockReturnValue({ type: 'customer.subscription.updated', data: { object: subscription('past_due', end) } });
+    const pastDue = subscription('past_due', end);
+    retrieveSubscription.mockResolvedValue(pastDue);
+    constructEvent.mockReturnValue({ type: 'customer.subscription.updated', data: { object: pastDue } });
     const app = await buildApp();
     await post(app, 'sig');
     expect(user.proUntil!.getTime()).toBe(end * 1000);
@@ -243,11 +247,36 @@ describe('POST /api/webhooks/stripe', () => {
   it('répond 500 (Stripe réessaiera) si le traitement échoue', async () => {
     user.stripeCustomerId = 'cus_1';
     prismaMock.user.updateMany.mockRejectedValueOnce(new Error('db down'));
-    constructEvent.mockReturnValue({
-      type: 'customer.subscription.updated',
-      data: { object: subscription('active', Math.floor((Date.now() + DAY) / 1000)) },
-    });
+    const active = subscription('active', Math.floor((Date.now() + DAY) / 1000));
+    retrieveSubscription.mockResolvedValue(active);
+    constructEvent.mockReturnValue({ type: 'customer.subscription.updated', data: { object: active } });
     const app = await buildApp();
     expect((await post(app, 'sig')).status).toBe(500);
+  });
+
+  it('évènement en retard : l’état courant chez Stripe l’emporte sur le payload', async () => {
+    user.stripeCustomerId = 'cus_1';
+    user.proUntil = new Date(Date.now() + 20 * DAY);
+    user.proSource = 'STRIPE';
+    // Le payload (ancien) dit « active », Stripe dit désormais « canceled »
+    constructEvent.mockReturnValue({
+      type: 'customer.subscription.updated',
+      data: { object: subscription('active', Math.floor((Date.now() + 20 * DAY) / 1000)) },
+    });
+    retrieveSubscription.mockResolvedValue(subscription('canceled', Math.floor((Date.now() + 20 * DAY) / 1000)));
+    const app = await buildApp();
+    await post(app, 'sig');
+    expect(user.proUntil!.getTime()).toBeLessThanOrEqual(Date.now());
+  });
+
+  it('subscription.created avant checkout.session.completed : rattachée par metadata.userId', async () => {
+    const end = Math.floor((Date.now() + 30 * DAY) / 1000);
+    const sub = subscription('active', end, { userId: USER_ID });
+    retrieveSubscription.mockResolvedValue(sub);
+    constructEvent.mockReturnValue({ type: 'customer.subscription.created', data: { object: sub } });
+    const app = await buildApp();
+    await post(app, 'sig');
+    expect(user.stripeCustomerId).toBe('cus_1');
+    expect(user.proUntil!.getTime()).toBe(end * 1000);
   });
 });
