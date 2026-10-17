@@ -175,13 +175,14 @@ export function ProfilePage() {
     onError: () => toast.error(t('profile.documents.error')),
   });
   const consentMut = useMutation({
-    mutationFn: (consent: boolean) => aiConsentApi.set(consent).then((r) => r.data),
-    onSuccess: ({ aiExtractionConsentAt }) => {
+    mutationFn: ({ consent, always }: { consent: boolean; always?: boolean }) =>
+      (always === undefined ? aiConsentApi.set(consent) : aiConsentApi.set(consent, always)).then((r) => r.data),
+    onSuccess: ({ aiExtractionConsentAt, aiExtractionAlways }) => {
       qc.invalidateQueries({ queryKey: ['profile'] });
       // L'import de bilans (LabImport) lit le consentement dans le store
       // d'authentification : on le tient à jour sans attendre un rechargement.
       if (user && token) {
-        setAuth({ ...user, profile: { ...(user.profile as UserProfile), aiExtractionConsentAt } }, token);
+        setAuth({ ...user, profile: { ...(user.profile as UserProfile), aiExtractionConsentAt, aiExtractionAlways } }, token);
       }
     },
     onError: () => toast.error(t('profile.documents.error')),
@@ -418,7 +419,23 @@ export function ProfilePage() {
             aria-label={t('profile.documents.aiConsentLabel')}
             checked={Boolean(aiConsentAt)}
             disabled={consentMut.isPending}
-            onChange={(e) => consentMut.mutate(e.target.checked)}
+            onChange={(e) => consentMut.mutate({ consent: e.target.checked })}
+          />
+        </label>
+        <label className={styles.linkedAccountRow}>
+          <div className={styles.linkedAccountInfo}>
+            <div>
+              <div>{t('profile.documents.aiAlwaysLabel')}</div>
+              <div className={styles.linkedAccountStatus}>{t('profile.documents.aiAlwaysHint')}</div>
+            </div>
+          </div>
+          <input
+            type="checkbox"
+            role="switch"
+            aria-label={t('profile.documents.aiAlwaysLabel')}
+            checked={Boolean(aiConsentAt) && Boolean(profile?.aiExtractionAlways)}
+            disabled={!aiConsentAt || consentMut.isPending}
+            onChange={(e) => consentMut.mutate({ consent: true, always: e.target.checked })}
           />
         </label>
         <p className={styles.hint}>{t('profile.documents.aiConsentText', { provider: 'Anthropic' })}</p>

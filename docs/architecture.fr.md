@@ -174,6 +174,12 @@ sequenceDiagram
   consenti (`UserProfile.aiExtractionConsentAt`) ; il reçoit un texte anonymisé par
   `lib/labExtract/scrub.ts` (nom, date de naissance, coordonnées, n° de sécurité sociale, lignes de
   prescripteur et d'adresse supprimés) — jamais le PDF. L'anonymisation est faite au mieux, sans garantie.
+  Avec le réglage du profil **« Lecture par IA à chaque import »** (`UserProfile.aiExtractionAlways`,
+  désactivé par défaut, exige le consentement), l'IA lit chaque bilan et les deux lectures sont
+  **comparées** : la valeur de l'IA est proposée, et tout désaccord (valeur différente, valeur lue par
+  les règles seulement — typiquement une note de bas de page — ou date différente) est renvoyé dans
+  `draft.conflicts` et affiché « à vérifier » dans l'écran de relecture. « Réessayer avec l'IA » sur un
+  brouillon fait la même comparaison une fois. Retirer le consentement désactive aussi ce réglage.
 - **Chiffrement au repos** — PDF et mots de passe mémorisés utilisent `PDF_ENCRYPTION_KEY` (distincte
   de `TOKEN_ENCRYPTION_KEY`), format `[version de clé][iv][tag][chiffré]`. Les mots de passe mémorisés
   (`pdf_passwords`) sont **déchiffrables par le serveur**, par construction (il doit ouvrir les PDF de

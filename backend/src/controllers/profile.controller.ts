@@ -20,7 +20,7 @@ const profileSchema = z.object({
   temperatureUnit: z.enum(['CELSIUS', 'FAHRENHEIT']).optional(),
 });
 
-const consentSchema = z.object({ consent: z.boolean() });
+const consentSchema = z.object({ consent: z.boolean(), always: z.boolean().optional() });
 
 export const profileController = {
   // GET /api/profile
@@ -67,16 +67,24 @@ export const profileController = {
   },
 
   // PUT /api/profile/ai-extraction-consent — opt-in (révocable à tout moment)
-  // à l'envoi du texte anonymisé d'un bilan à l'API Anthropic quand
-  // l'extraction par règles échoue (voir lib/labExtract/llm.ts).
+  // à l'envoi du texte anonymisé d'un bilan à l'API Anthropic (voir
+  // lib/labExtract/llm.ts). `always` : lecture par IA à chaque import, les deux
+  // lectures étant comparées (sinon l'IA ne sert que de repli). Retirer le
+  // consentement désactive aussi `always`.
   setAiExtractionConsent: async (req: AuthRequest, res: Response): Promise<void> => {
-    const { consent } = consentSchema.parse(req.body);
-    const aiExtractionConsentAt = consent ? new Date() : null;
+    const { consent, always } = consentSchema.parse(req.body);
+    const existing = await prisma.userProfile.findUnique({
+      where: { userId: req.userId! },
+      select: { aiExtractionConsentAt: true, aiExtractionAlways: true },
+    });
+    // La date de consentement ne bouge pas tant que le consentement reste donné.
+    const aiExtractionConsentAt = consent ? (existing?.aiExtractionConsentAt ?? new Date()) : null;
+    const aiExtractionAlways = consent && (always ?? existing?.aiExtractionAlways ?? false);
     await prisma.userProfile.upsert({
       where: { userId: req.userId! },
-      create: { userId: req.userId!, aiExtractionConsentAt },
-      update: { aiExtractionConsentAt },
+      create: { userId: req.userId!, aiExtractionConsentAt, aiExtractionAlways },
+      update: { aiExtractionConsentAt, aiExtractionAlways },
     });
-    res.json({ aiExtractionConsentAt });
+    res.json({ aiExtractionConsentAt, aiExtractionAlways });
   },
 };

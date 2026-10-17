@@ -173,6 +173,12 @@ sequenceDiagram
   (`UserProfile.aiExtractionConsentAt`); it receives text anonymised by `lib/labExtract/scrub.ts`
   (name, date of birth, contact details, social-security number, prescriber and address lines
   removed) — never the PDF. The anonymisation is best-effort, not a guarantee.
+  With the profile setting **« AI reading on every import »** (`UserProfile.aiExtractionAlways`,
+  off by default, requires the consent), the AI reads every report and the two readings are
+  **compared**: the AI's value is proposed, and any disagreement (different value, value read by the
+  rules only — typically a footnote — or different date) is returned in `draft.conflicts` and shown
+  as « to check » in the review screen. « Retry with AI » on a draft does the same comparison once.
+  Withdrawing the consent also switches this setting off.
 - **Encryption at rest** — PDFs and remembered passwords use `PDF_ENCRYPTION_KEY` (distinct from
   `TOKEN_ENCRYPTION_KEY`), format `[key version][iv][tag][ciphertext]`. Remembered passwords
   (`pdf_passwords`) are **decryptable by the server**, by design (it must open the user's PDFs): this

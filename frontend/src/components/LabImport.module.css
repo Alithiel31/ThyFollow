@@ -54,6 +54,9 @@
 .field { display: flex; flex-direction: column; gap: 4px; }
 .label { font-size: 0.75rem; font-weight: 500; color: var(--text-dim); }
 .flag { font-size: 0.68rem; color: var(--text-muted); line-height: 1.35; }
+.conflict {
+  font-size: 0.7rem; font-weight: 600; line-height: 1.35; color: var(--rose);
+}
 .check { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-dim); }
 
 .input {

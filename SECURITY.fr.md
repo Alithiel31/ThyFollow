@@ -75,7 +75,7 @@ Avant de signaler un problème déjà couvert, quelques mécanismes existants (d
   mais **le serveur peut les déchiffrer** (pas de zero-knowledge) : une fuite simultanée de la base et
   de la clé les exposerait. L'extraction optionnelle par IA envoie **uniquement du texte anonymisé**
   (jamais le PDF) à **Anthropic**, et seulement pour les utilisateurs qui y ont consenti ;
-  l'anonymisation est faite au mieux, sans garantie.
+  l'anonymisation est faite au mieux, sans garantie. Un réglage optionnel du profil (« Lecture par IA à chaque import ») envoie le texte anonymisé de **chaque** bilan importé, et non plus seulement des échecs.
 - **Entrées** — les corps de requête sont validés avec Zod et assainis contre le XSS
   (`express-xss-sanitizer`) ; l'analyseur JSON garde sa limite de taille par défaut.
 - **En-têtes** — `helmet` côté API ; CSP, HSTS, `X-Frame-Options`, `X-Content-Type-Options`,
