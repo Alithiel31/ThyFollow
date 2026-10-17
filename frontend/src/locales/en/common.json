@@ -568,7 +568,9 @@
       "invalid": "Invalid PDF file",
       "too_large": "File too large",
       "duplicate": "Already in your log",
-      "failed": "Could not read"
+      "failed": "Could not read",
+      "rate_limited": "Too many requests",
+      "error": "Upload failed"
     },
     "reason": {
       "no_text": "This PDF has no text layer (scan?). Please enter the values by hand."
@@ -619,6 +621,9 @@
     "download": "Download PDF",
     "downloadError": "Download failed",
     "conflict": "To check: automatic reading {{rules}} · AI {{ai}}",
-    "conflictNone": "nothing found"
+    "conflictNone": "nothing found",
+    "rateLimited": "You sent many files in a short time. This is not a bug nor a reading error: the server limits the number of uploads. Please try again in about {{minutes}} min.",
+    "rateLimitedSoon": "You sent many files in a short time. This is not a bug nor a reading error: the server limits the number of uploads. Please try again in a few minutes.",
+    "uploadFailedHint": "The upload did not go through (server unreachable or in error). This is not a problem with reading your PDF: please try again."
   }
 }

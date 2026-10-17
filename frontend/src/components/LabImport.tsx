@@ -4,6 +4,8 @@
 // AVANT l'ajout au carnet — l'extraction automatique peut se tromper.
 import { useId, useRef, useState, type ChangeEvent, type DragEvent } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { FileUp, Download, X, Sparkles, AlertTriangle } from 'lucide-react';
@@ -28,7 +30,9 @@ interface Form {
 interface Item {
   id: number;
   file: File;
-  state: 'uploading' | ImportFileResult['status'];
+  state: 'uploading' | ImportFileResult['status'] | 'rate_limited' | 'error';
+  // Délai d'attente (minutes) annoncé par le serveur après un 429, si connu
+  retryMinutes?: number | null;
   result?: ImportFileResult;
   password: string;
   remember: boolean;
@@ -49,6 +53,25 @@ function toForm(draft: ImportDraft | undefined): Form {
   };
 }
 
+// Réponse 429 du serveur (limite de débit) : `express-rate-limit` renvoie `Retry-After` en
+// secondes. On le convertit en minutes (au supérieur) ; null si absent ou illisible.
+function tooManyRequests(err: unknown): { minutes: number | null } | null {
+  if (!axios.isAxiosError(err) || err.response?.status !== 429) return null;
+  const seconds = Number(err.response.headers?.['retry-after']);
+  return { minutes: Number.isFinite(seconds) && seconds > 0 ? Math.ceil(seconds / 60) : null };
+}
+
+function rateLimitMessage(t: TFunction, minutes: number | null): string {
+  return minutes ? t('labImport.rateLimited', { minutes }) : t('labImport.rateLimitedSoon');
+}
+
+// Message d'erreur d'une requête : précis pour une limite de débit (pour qu'on ne croie pas
+// à un bug), générique sinon.
+function requestErrorMessage(t: TFunction, err: unknown, fallbackKey: string): string {
+  const limit = tooManyRequests(err);
+  return limit ? rateLimitMessage(t, limit.minutes) : t(fallbackKey);
+}
+
 function isPdf(file: File): boolean {
   return file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
 }
@@ -67,8 +90,8 @@ export function DocumentLink({ documentId }: { documentId: string }) {
       a.download = 'bilan.pdf';
       a.click();
       URL.revokeObjectURL(url);
-    } catch {
-      toast.error(t('labImport.downloadError'));
+    } catch (err) {
+      toast.error(requestErrorMessage(t, err, 'labImport.downloadError'));
     }
   };
   return (
@@ -105,9 +128,13 @@ export function LabImport({ onClose }: { onClose: () => void }) {
         if (!target) return;
         patch(target.id, { state: result.status, result, form: toForm(result.draft), busy: false });
       });
-    } catch {
-      toast.error(t('labImport.uploadError'));
-      targets.forEach((it) => patch(it.id, { state: 'failed', busy: false }));
+    } catch (err) {
+      // 429 : limite de débit, pas un échec de lecture ; autre erreur : l'envoi n'a pas abouti.
+      const limit = tooManyRequests(err);
+      toast.error(requestErrorMessage(t, err, 'labImport.uploadError'));
+      targets.forEach((it) =>
+        patch(it.id, { state: limit ? 'rate_limited' : 'error', retryMinutes: limit?.minutes ?? null, busy: false })
+      );
     }
   };
 
@@ -157,8 +184,8 @@ export function LabImport({ onClose }: { onClose: () => void }) {
       toast.success(t('labImport.added'));
       await qc.invalidateQueries({ queryKey: ['lab-results'] });
       remove(item.id);
-    } catch {
-      toast.error(t('labResults.error'));
+    } catch (err) {
+      toast.error(requestErrorMessage(t, err, 'labResults.error'));
       patch(item.id, { busy: false });
     }
   };
@@ -169,8 +196,8 @@ export function LabImport({ onClose }: { onClose: () => void }) {
       patch(item.id, { busy: true });
       try {
         await labApi.discardImport(documentId);
-      } catch {
-        toast.error(t('labResults.error'));
+      } catch (err) {
+        toast.error(requestErrorMessage(t, err, 'labResults.error'));
         patch(item.id, { busy: false });
         return;
       }
@@ -222,6 +249,7 @@ export function LabImport({ onClose }: { onClose: () => void }) {
               send([item], { password: item.password, remember: item.remember, passwordLabel: item.passwordLabel })
             }
             onRetryAi={() => send([item], { forceAi: true })}
+            onRetry={() => send([item])}
             onConfirm={() => confirm(item)}
             onDiscard={() => discard(item)}
           />
@@ -231,12 +259,13 @@ export function LabImport({ onClose }: { onClose: () => void }) {
   );
 }
 
-function ItemRow({ item, hasAiConsent, onChange, onRetryPassword, onRetryAi, onConfirm, onDiscard }: {
+function ItemRow({ item, hasAiConsent, onChange, onRetryPassword, onRetryAi, onRetry, onConfirm, onDiscard }: {
   item: Item;
   hasAiConsent: boolean;
   onChange: (changes: Partial<Item>) => void;
   onRetryPassword: () => void;
   onRetryAi: () => void;
+  onRetry: () => void;
   onConfirm: () => void;
   onDiscard: () => void;
 }) {
@@ -268,6 +297,10 @@ function ItemRow({ item, hasAiConsent, onChange, onRetryPassword, onRetryAi, onC
         <p className={styles.note}>{t('labImport.reason.no_text')}</p>
       )}
       {item.state === 'duplicate' && <p className={styles.note}>{t('labImport.duplicate')}</p>}
+      {item.state === 'rate_limited' && (
+        <p className={styles.note} role="status">{rateLimitMessage(t, item.retryMinutes ?? null)}</p>
+      )}
+      {item.state === 'error' && <p className={styles.note} role="status">{t('labImport.uploadFailedHint')}</p>}
 
       {needsPassword && (
         <div className={styles.passwordBox}>
@@ -352,6 +385,11 @@ function ItemRow({ item, hasAiConsent, onChange, onRetryPassword, onRetryAi, onC
 
       {finished && (
         <div className={styles.actions}>
+          {(item.state === 'rate_limited' || item.state === 'error') && (
+            <button type="button" className={styles.primaryBtn} disabled={item.busy} onClick={onRetry}>
+              {t('labImport.retry')}
+            </button>
+          )}
           <button type="button" className={styles.secondaryBtn} onClick={onDiscard}>{t('labImport.discard')}</button>
         </div>
       )}

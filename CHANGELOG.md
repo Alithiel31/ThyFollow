@@ -26,6 +26,10 @@ pas synchronisé avec ces tags.
 
 ### Added
 
+- Import de bilans PDF : une réponse **429** (trop de requêtes) affiche désormais « Trop de requêtes »
+  avec le délai d'attente annoncé par le serveur (`Retry-After`) et la précision que ce n'est ni un bug
+  ni une erreur de lecture, avec un bouton « Réessayer » ; une panne d'envoi (réseau, erreur serveur)
+  affiche « Envoi échoué » au lieu de « Lecture impossible ».
 - Import de bilans PDF : lecture plus robuste et réglage **« Lecture par IA à chaque import »**
   (profil, désactivé par défaut, exige le consentement IA). L'IA lit chaque bilan, les deux lectures
   (règles et IA) sont comparées et les désaccords sont signalés « à vérifier » dans l'écran de
