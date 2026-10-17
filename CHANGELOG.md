@@ -47,6 +47,19 @@ pas synchronisé avec ces tags.
 
 ### Added
 
+- **Cycles de doses et historique des posologies.** Une posologie est une liste de prises
+  (heure + cycle de doses répété en boucle, 1 à 14 jours) : alternance 75 / 100 µg, schéma
+  hebdomadaire, un jour sur deux, dose répartie matin et soir. Chaque changement crée une période
+  (`DosePeriod`, migration `20261017140000_add_dose_periods`) au lieu d'écraser la dose ; l'ancienne
+  reste dans l'historique, et des périodes passées peuvent être ajoutées. API :
+  `POST/PUT/DELETE /api/medications/:id/dose-periods[/:periodId]`, `slots` à la création ; GraphQL
+  `Medication.dosePeriods`. La checklist du jour affiche la dose du jour de chaque prise.
+- **Doses et analyses reliées** (médicaments en µg cochés « afficher sur le graphique TSH ») : paliers
+  de dose moyenne quotidienne superposés au graphique TSH ; posologie en vigueur sur chaque bilan
+  (« Sous traitement : … ») ; TSH mesurées pendant chaque période dans l'historique des posologies ;
+  mesures faites moins de 6 semaines après un changement de dose signalées « Non stabilisée » ;
+  proposition d'une prise de sang de contrôle (rendez-vous `BLOOD_TEST`) après un changement de dose.
+  L'application constate et signale, elle ne suggère jamais de dose.
 - Accès Pro à l'import de bilans PDF : la saisie manuelle et l'export restent gratuits ; l'import
   automatique (lecture du PDF + repli IA) est réservé aux comptes Pro, avec 3 imports offerts à vie
   et un plafond de 25 imports par mois en Pro (`FREE_IMPORT_LIMIT`, `PRO_MONTHLY_IMPORT_LIMIT`).
@@ -129,6 +142,15 @@ pas synchronisé avec ces tags.
 
 ### Changed
 
+- **`Medication.dosage` devient la dose moyenne quotidienne** (tous créneaux additionnés) de la
+  période en cours, et `intakeTimes` les heures de ses créneaux ; tous deux sont recalculés par le
+  serveur et ne se modifient plus par `PUT /api/medications/:id`. La migration convertit les
+  médicaments existants : chaque heure de prise devient un créneau à l'ancienne dose (comprise
+  comme dose par prise), « un jour sur deux » devient le cycle `[d, 0]`, « hebdomadaire »
+  `[d, 0, 0, 0, 0, 0, 0]`, et `frequency` ne distingue plus que « au besoin ».
+- Graphique « Évolution du TSH » lisible sur une longue période : échelle logarithmique, axe du
+  temps proportionnel, choix de la période (6 mois / 1 an / 2 ans / tout), points colorés selon la
+  cible.
 - Identité visuelle unifiée : le logo « papillon » (pétales bleus et orange) est désormais le seul
   logo de l'application — icône de l'onglet, icônes de l'app installée (PWA, iPhone), pages de
   connexion/inscription/mot de passe/vérification, page 404 et en-tête du rapport imprimable. Il
