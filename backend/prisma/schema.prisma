@@ -346,15 +346,33 @@ model Medication {
   startDate    DateTime
   endDate      DateTime?
   active       Boolean      @default(true)
+  showOnChart  Boolean      @default(false) // superposé au graphique TSH (médicaments en µg uniquement)
   instructions String? // "à jeun 30 min avant le repas"
   notes        String?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
-  user    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  intakes MedicationIntake[]
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  intakes     MedicationIntake[]
+  dosePeriods DosePeriod[]
 
   @@map("medications")
+}
+
+// ─────────────────────────────────────────────
+// DOSE PERIODS (historique des posologies : une période dure jusqu'au début de la suivante)
+// ─────────────────────────────────────────────
+model DosePeriod {
+  id           String   @id @default(cuid())
+  medicationId String
+  startDate    DateTime @db.Date // jour 1 du cycle
+  slots        Json // [{ time: "07:00" | null, doses: [75, 100] }] : un cycle par créneau, même longueur pour tous
+  createdAt    DateTime @default(now())
+
+  medication Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+
+  @@unique([medicationId, startDate])
+  @@map("dose_periods")
 }
 
 // ─────────────────────────────────────────────
