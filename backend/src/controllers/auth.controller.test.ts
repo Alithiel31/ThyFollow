@@ -9,7 +9,6 @@ import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const prismaMock = {
@@ -51,7 +50,9 @@ function signToken(userId: string, tv?: number): string {
   return jwt.sign({ userId, ...(tv !== undefined && { tv }) }, JWT_SECRET, { expiresIn: '1h' });
 }
 
-const sha256 = (value: string) => crypto.createHash('sha256').update(value).digest('hex');
+// Empreinte SHA-256 de 'good-token' (valeur de référence fixe : les tests ne
+// hachent rien eux-mêmes, ils vérifient l'aller-retour avec le contrôleur).
+const GOOD_TOKEN_SHA256 = '461caa80a52104436e34006189430d13aba103b2c4344d446ea3d9324b0de1c0';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -89,7 +90,12 @@ describe('register', () => {
     const emailedToken = sendVerificationEmailMock.mock.calls[0][2] as string;
     const stored = prismaMock.user.create.mock.calls[0][0].data.verificationToken;
     expect(stored).not.toBe(emailedToken);
-    expect(stored).toBe(sha256(emailedToken));
+    expect(stored).toMatch(/^[0-9a-f]{64}$/);
+
+    // Aller-retour : le jeton reçu par email retrouve exactement l'empreinte stockée.
+    prismaMock.user.findUnique.mockResolvedValue(null);
+    await request(app).post('/api/auth/verify-email').send({ token: emailedToken });
+    expect(prismaMock.user.findUnique).toHaveBeenLastCalledWith({ where: { verificationToken: stored } });
   });
 
   it('rejects registration with a 409 when the email is already used', async () => {
@@ -223,7 +229,7 @@ describe('verifyEmail', () => {
     const res = await request(app).post('/api/auth/verify-email').send({ token: 'good-token' });
 
     expect(res.status).toBe(200);
-    expect(prismaMock.user.findUnique).toHaveBeenCalledWith({ where: { verificationToken: sha256('good-token') } });
+    expect(prismaMock.user.findUnique).toHaveBeenCalledWith({ where: { verificationToken: GOOD_TOKEN_SHA256 } });
     expect(typeof res.body.token).toBe('string');
     expect(res.body.user.tokenVersion).toBeUndefined();
     expect(prismaMock.user.update).toHaveBeenCalledWith(
@@ -291,7 +297,14 @@ describe('forgotPassword', () => {
     expect(res.status).toBe(200);
     expect(sendResetPasswordEmailMock).toHaveBeenCalledOnce();
     const emailedToken = sendResetPasswordEmailMock.mock.calls[0][2] as string;
-    expect(prismaMock.user.update.mock.calls[0][0].data.resetToken).toBe(sha256(emailedToken));
+    const stored = prismaMock.user.update.mock.calls[0][0].data.resetToken;
+    expect(stored).not.toBe(emailedToken);
+    expect(stored).toMatch(/^[0-9a-f]{64}$/);
+
+    // Aller-retour : le jeton reçu par email retrouve exactement l'empreinte stockée.
+    prismaMock.user.findUnique.mockResolvedValue(null);
+    await request(app).post('/api/auth/reset-password').send({ token: emailedToken, password: 'newpassword1' });
+    expect(prismaMock.user.findUnique).toHaveBeenLastCalledWith({ where: { resetToken: stored } });
   });
 });
 
@@ -321,7 +334,7 @@ describe('resetPassword', () => {
       .send({ token: 'good-token', password: 'newpassword1' });
 
     expect(res.status).toBe(200);
-    expect(prismaMock.user.findUnique).toHaveBeenCalledWith({ where: { resetToken: sha256('good-token') } });
+    expect(prismaMock.user.findUnique).toHaveBeenCalledWith({ where: { resetToken: GOOD_TOKEN_SHA256 } });
     const updateArgs = prismaMock.user.update.mock.calls[0][0];
     expect(updateArgs.data.resetToken).toBeNull();
     expect(await bcrypt.compare('newpassword1', updateArgs.data.password)).toBe(true);
