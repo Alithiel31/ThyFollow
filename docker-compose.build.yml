@@ -1,0 +1,16 @@
+# Construit les images depuis les sources au lieu de tirer celles de GHCR
+# (développement, ou hôte sans accès au registre) :
+#   docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
+# Les images locales portent un nom à part pour ne pas masquer celles de GHCR.
+services:
+  migrate:
+    image: thyfollow-backend:local
+    build: ./backend
+
+  backend:
+    image: thyfollow-backend:local
+    build: ./backend
+
+  frontend:
+    image: thyfollow-frontend:local
+    build: ./frontend

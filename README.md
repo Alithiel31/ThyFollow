@@ -259,16 +259,20 @@ cp backend/.env.example backend/.env
 
 ### 2. Launch
 ```bash
-docker compose up -d --build
+docker compose up -d                       # arm64 images published to GHCR by CI
+# or, to build from source (other architecture, local changes):
+docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
 ```
 > **Production on Caesura (Infisical):** secrets (`DB_PASSWORD`, `PDF_ENCRYPTION_KEY`,
 > `ANTHROPIC_API_KEY`) are not read from `.env`: run `./deploy.sh` instead, which injects them from
-> Infisical (see [environment.md](./docs/environment.md#production-secrets-with-infisical-deploysh)).
+> Infisical (see [environment.md](./docs/environment.md#production-secrets-with-infisical-deploysh)),
+> backs up the database, deploys the latest `main` (or `--tag sha-<commit>` to roll back) and
+> checks the public `/health`.
 > Optional PDF import: set `PDF_ENCRYPTION_KEY` (and `ANTHROPIC_API_KEY` for the AI fallback) in `.env`.
 > Optional card payments for the Pro plan: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID` (see [Pro access and promo codes](#-pro-access-and-promo-codes)).
 
-The backend container automatically runs `prisma migrate deploy` at startup (see
-`backend/Dockerfile`) and joins PostgreSQL via `host.docker.internal` (see `extra_hosts` in
+The `migrate` service runs `prisma migrate deploy` before every backend (re)creation, and the
+backend only starts once the migrations have succeeded. The backend joins PostgreSQL via `host.docker.internal` (see `extra_hosts` in
 `docker-compose.yml`) — the database must therefore already exist with the application role
 expected by `DATABASE_URL`. The frontend is routed by Traefik based on its `traefik.*` labels
 (a `Host` rule on the configured domain), the backend stays internal on `3001`.

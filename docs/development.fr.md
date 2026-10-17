@@ -121,9 +121,10 @@ rendez-vous figure dans `[Unreleased] > À faire` du CHANGELOG.
 | ------------ | ------------------------------------------------------------------------------------------------------------------------- |
 | `backend`    | `npm ci`, lint, `npm run build` (types), `npm test`                                                                       |
 | `frontend`   | `npm ci`, lint, `npm run build`, `npm test`                                                                               |
-| `docker`     | Construit les deux images (sans push), avec un cache de couches GitHub Actions                                            |
+| `docker`     | Construit les deux images `linux/arm64` sur un runner ARM (sans push), avec un cache de couches GitHub Actions            |
 | `migrations` | Démarre PostgreSQL 17, lance `prisma migrate deploy`, puis échoue si `schema.prisma` et les migrations ont divergé        |
 | `audit`      | `npm audit --omit=dev --audit-level=high` sur les deux paquets                                                            |
+| `publish`    | Après un merge sur `main` uniquement, une fois `backend`, `frontend`, `docker` et `migrations` verts : pousse les images sur GHCR (`ghcr.io/alithiel31/thyfollow-{backend,frontend}`), taguées `sha-<commit>` et `main` |
 
 `codeql.yml` lance une analyse CodeQL à chaque push, pull request et chaque semaine. Dependabot
 (hebdomadaire) regroupe les dépendances de développement et ignore les montées de version **majeures** —
@@ -142,14 +143,19 @@ Reproduire avant de pousser :
 ```bash
 cp .env.example .env              # DB_PASSWORD
 cp backend/.env.example backend/.env
-docker compose up -d --build
+docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
 docker compose logs -f backend
 ```
 
+`docker-compose.yml` seul tire les images publiées par la CI (`IMAGE_TAG`, `main` par défaut) ;
+`docker-compose.build.yml` les construit depuis les sources sous un nom local
+(`thyfollow-*:local`).
+
 Ce fichier Compose suppose un PostgreSQL joignable sur `host.docker.internal:5432` (rôle et base déjà
 créés) et un réseau Docker externe `traefik-net` ; voir le README, « Déploiement », pour ce qu'il faut
-changer sur un hôte qui n'en dispose pas. Le conteneur backend lance `prisma migrate deploy` avant
-`node dist/index.js`, et `frontend` attend le healthcheck du backend (`GET /health`).
+changer sur un hôte qui n'en dispose pas. Le service `migrate` lance `prisma migrate deploy` puis
+s'arrête ; `backend` ne démarre que s'il a réussi, et `frontend` attend le healthcheck du backend
+(`GET /health`).
 
 Le script de seed a besoin de `ts-node`, une dépendance de développement que l'image de production
 n'embarque pas (`npm ci --omit=dev`) : lancer `npm run db:seed` depuis une copie de développement

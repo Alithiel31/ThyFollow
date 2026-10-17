@@ -35,7 +35,7 @@ sauvegarde ci-dessous sont plus que des formalités.
 | Conteneurs        | `docker-compose.yml` à la racine (`thyrotrack-backend`, `thyrotrack-frontend`) | `docker compose ps` sur le Pi                                                          |
 | Reverse proxy     | **Traefik**, partagé avec les autres projets du Pi              | Non géré par ce dépôt ; `frontend` rejoint `traefik-net` et porte les labels de routage                         |
 | Base de données   | **PostgreSQL 17**, instance native **hors Docker**, partagée avec d'autres projets | Base `thyrotrack`, rôle `thyrotrack_app`, jointe via `host.docker.internal:5432`                |
-| Déploiement       | **Manuel** : `docker compose up -d --build` sur le Pi           | Aucun workflow de déploiement continu ; GitHub Actions ne fait que des vérifications                           |
+| Déploiement       | **Déclenché à la main** : `./deploy.sh` depuis le poste de travail | La CI publie les images arm64 sur GHCR après chaque merge ; `deploy.sh` sauvegarde la base, migre et déploie |
 | Courriel          | **Resend**                                                      | Compte qui détient la clé API et le domaine d'envoi vérifié                                                    |
 | Google            | Un projet Google Cloud                                          | Client OAuth (login), client OAuth (Google Health), compte de service (abonné webhook), écran de consentement   |
 
@@ -73,12 +73,12 @@ Si le Raspberry Pi est perdu ou remplacé mais que le code et les secrets ci-des
    S'assurer que le serveur écoute sur une adresse atteignable depuis la passerelle Docker
    (`host.docker.internal` résout vers la passerelle de l'hôte grâce à `extra_hosts`).
 3. **Restaurer la dernière sauvegarde** dans `thyrotrack` s'il en existe une — voir plus bas. Sinon, le
-   conteneur crée un schéma vide en rejouant les migrations au démarrage.
+   service `migrate` crée un schéma vide en rejouant les migrations.
 4. Démarrer un **Traefik** partagé (provider Docker, entrypoint `web`) et créer le réseau :
    `docker network create traefik-net`.
 5. Reconfigurer le tunnel Cloudflare pour que `thyrotrack.alithiel31.dev` atteigne Traefik.
 6. Recréer `.env` et `backend/.env` ([environment.fr.md](./environment.fr.md)).
-7. `docker compose up -d --build`, puis vérifier `docker compose ps` (les deux services démarrés /
+7. `./deploy.sh` (ou `docker compose up -d` sans Infisical), puis vérifier `docker compose ps` (les deux services démarrés /
    `healthy`) et `curl localhost:8000/health -H 'Host: thyrotrack.alithiel31.dev'` ou le `/health` public.
 8. Si Google Health est utilisé : vérifier dans le journal du backend
    `Google Health webhook subscriber "thyrotrack-webhook" created.` et que les URI de redirection

@@ -24,9 +24,21 @@ Only `.env.example` files are versioned — never commit a real `.env`.
 
 ### Production secrets with Infisical (`deploy.sh`)
 
-On the production host the variables above are **not** read from the root `.env`: `deploy.sh`
-logs in to Infisical (Machine Identity, Universal Auth) and runs `docker compose up -d --build`
-inside `infisical run`, so the secrets exist only in the process environment.
+On the production host the variables above are **not** read from the root `.env`: `deploy.sh`,
+run from the workstation (Docker targeting the Pi through `DOCKER_HOST` or the active context), logs
+in to Infisical (Machine Identity, Universal Auth) and deploys inside `infisical run`, so the secrets
+exist only in the process environment:
+
+1. checks that the `sha-<commit>` images of the latest `main` (or of `--tag`) exist on GHCR;
+2. takes a `pg_dump -Fc` of `thyrotrack` on the Pi, over ssh, into `/mnt/storage/backups/pre-deploy`
+   (`--skip-backup` to skip it);
+3. `docker compose pull` then `docker compose up -d`: the `migrate` service runs first, and the
+   backend is only recreated if the migrations succeeded;
+4. waits for the backend healthcheck, then queries the public `/health`, and prints the rollback
+   command (`./deploy.sh --tag <previous version>`).
+
+Optional variables: `DEPLOY_SSH` (ssh target of the Pi, otherwise derived from the Docker host),
+`DEPLOY_BACKUP_DIR`, `DEPLOY_HEALTH_URL`.
 
 | Infisical secret (project *Shared Keys*, environment `Production`) | Becomes | Notes |
 | --- | --- | --- |
@@ -41,7 +53,7 @@ inside `infisical run`, so the secrets exist only in the process environment.
 `.infisical-identity.env.example`): `INFISICAL_UNIVERSAL_AUTH_CLIENT_ID`,
 `INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET`, `INFISICAL_API_URL`, `INFISICAL_PROJECT_ID` and optionally
 `INFISICAL_ENV` (`prod` by default). The real file holds a secret and the real tailnet name: never
-commit it. Without Infisical, fill the root `.env` and run `docker compose up -d --build` as usual.
+commit it. Without Infisical, fill the root `.env` and run `docker compose up -d` as usual.
 
 ## Backend (`backend/.env`)
 

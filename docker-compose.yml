@@ -1,9 +1,29 @@
+# Images publiées par la CI (job `publish`) pour linux/arm64. IMAGE_TAG choisit
+# la version : sha-<commit> (immuable, posé par deploy.sh) ou main (dernière
+# version de main). Pour construire localement à la place :
+#   docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
+x-database-url: &database-url postgresql://thyrotrack_app:${DB_PASSWORD}@host.docker.internal:5432/thyrotrack
+
 services:
 
+  # Applique les migrations Prisma puis s'arrête. Le backend n'est (re)créé que
+  # si elle réussit : une migration en échec laisse l'ancienne version en ligne.
+  migrate:
+    image: ghcr.io/alithiel31/thyfollow-backend:${IMAGE_TAG:-main}
+    container_name: thyrotrack-migrate
+    command: ["npx", "prisma", "migrate", "deploy"]
+    restart: "no"
+    labels:
+      - "homelab.tier=app"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      DATABASE_URL: *database-url
+    networks:
+      - thyrotrack-network
+
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: ghcr.io/alithiel31/thyfollow-backend:${IMAGE_TAG:-main}
     container_name: thyrotrack-backend
     restart: unless-stopped
     labels:
@@ -13,7 +33,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      DATABASE_URL: postgresql://thyrotrack_app:${DB_PASSWORD}@host.docker.internal:5432/thyrotrack
+      DATABASE_URL: *database-url
       NODE_ENV: production
       PORT: 3001
       # Frontend et API partagent la même origine via Nginx (le navigateur
@@ -36,13 +56,14 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
     networks:
       - thyrotrack-network
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: ghcr.io/alithiel31/thyfollow-frontend:${IMAGE_TAG:-main}
     container_name: thyrotrack-frontend
     restart: unless-stopped
     depends_on:
