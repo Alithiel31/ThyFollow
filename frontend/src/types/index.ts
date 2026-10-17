@@ -37,6 +37,8 @@ export interface UserProfile {
   endocrinologistName?: string;
   // Consentement (opt-in) à l'extraction de bilans par IA en repli ; null/absent = non consenti
   aiExtractionConsentAt?: string | null;
+  // Lecture par IA à chaque import (comparée aux règles), au lieu d'un simple repli
+  aiExtractionAlways?: boolean;
   targetTSH_min?: number;
   targetTSH_max?: number;
   targetFT4_min?: number;
@@ -142,7 +144,10 @@ export interface ImportDraft {
   values: Partial<Record<LabMarkerKey, number>>;
   flags: { marker: LabMarkerKey; reason: 'comparator' | 'unknown_unit' | 'no_unit' | 'converted' }[];
   insufficient: boolean;
-  method: 'rules' | 'llm';
+  // rules : lecture locale ; llm : complétée par l'IA ; both : les deux lectures comparées
+  method: 'rules' | 'llm' | 'both';
+  // Champs sur lesquels les deux lectures divergent (null = rien trouvé par ce lecteur)
+  conflicts: { field: 'date' | LabMarkerKey; rules: string | number | null; ai: string | number | null }[];
 }
 
 export interface ImportFileResult {

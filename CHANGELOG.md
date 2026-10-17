@@ -26,6 +26,15 @@ pas synchronisé avec ces tags.
 
 ### Added
 
+- Import de bilans PDF : lecture plus robuste et réglage **« Lecture par IA à chaque import »**
+  (profil, désactivé par défaut, exige le consentement IA). L'IA lit chaque bilan, les deux lectures
+  (règles et IA) sont comparées et les désaccords sont signalés « à vérifier » dans l'écran de
+  relecture (valeur différente, valeur lue par les règles seules, date différente) ; « Réessayer avec
+  l'IA » fait la même comparaison. Nouvelle colonne `user_profiles.aiExtractionAlways` (migration
+  `20261017100000_add_ai_extraction_always`) ; `PUT /api/profile/ai-extraction-consent` accepte
+  `always`. Côté règles : libellés abrégés avec points (`T.S.H.`), lignes de commentaire ignorées (une
+  note citant « TSH # 8 mUI/L » n'est plus prise pour un résultat), précision des valeurs conservée
+  (`1,776` n'est plus arrondi à `1,78`) et dates écrites avec des tirets typographiques (`09−12−2025`).
 - Déploiement de production avec secrets injectés par Infisical : `deploy.sh` (connexion Machine
   Identity, puis `docker compose up -d --build` dans `infisical run`), qui renomme
   `PG_THYROTRACK_PASSWORD` en `DB_PASSWORD` et refuse de déployer si `PDF_ENCRYPTION_KEY` est absente

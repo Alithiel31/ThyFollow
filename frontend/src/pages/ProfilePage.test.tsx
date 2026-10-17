@@ -124,6 +124,38 @@ describe('ProfilePage — Documents et IA', () => {
     expect(consentSetMock).toHaveBeenCalledTimes(2);
   });
 
+  it('« IA à chaque import » est inactif sans consentement, puis envoie consent + always', async () => {
+    let consentAt: string | null = null;
+    let always = false;
+    profileGetMock.mockImplementation(() =>
+      Promise.resolve({ data: { aiExtractionConsentAt: consentAt, aiExtractionAlways: always } })
+    );
+    consentSetMock.mockImplementation((consent: boolean, alwaysValue?: boolean) => {
+      consentAt = consent ? '2026-03-12T10:00:00Z' : null;
+      always = consent && (alwaysValue ?? always);
+      return Promise.resolve({ data: { aiExtractionConsentAt: consentAt, aiExtractionAlways: always } });
+    });
+    renderProfilePage();
+    const user = userEvent.setup();
+
+    const alwaysSwitch = await screen.findByRole('switch', { name: 'profile.documents.aiAlwaysLabel' });
+    expect(alwaysSwitch).toBeDisabled();
+
+    await user.click(screen.getByRole('switch', { name: 'profile.documents.aiConsentLabel' }));
+    await waitFor(() => expect(alwaysSwitch).toBeEnabled());
+    expect(alwaysSwitch).not.toBeChecked();
+
+    await user.click(alwaysSwitch);
+    await waitFor(() => expect(consentSetMock).toHaveBeenLastCalledWith(true, true));
+    await waitFor(() => expect(alwaysSwitch).toBeChecked());
+    expect(useAuthStore.getState().user?.profile?.aiExtractionAlways).toBe(true);
+
+    // retirer le consentement désactive aussi « à chaque import »
+    await user.click(screen.getByRole('switch', { name: 'profile.documents.aiConsentLabel' }));
+    await waitFor(() => expect(alwaysSwitch).toBeDisabled());
+    expect(alwaysSwitch).not.toBeChecked();
+  });
+
   it('le texte du consentement nomme le sous-traitant (Anthropic)', async () => {
     renderProfilePage();
     expect(await screen.findByText(/profile\.documents\.aiConsentText.*Anthropic/)).toBeInTheDocument();

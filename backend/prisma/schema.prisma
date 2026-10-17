@@ -151,6 +151,10 @@ model UserProfile {
   // Consentement (opt-in) à l'envoi du texte anonymisé d'un bilan à l'API
   // Anthropic en repli de l'extraction par règles. null = pas de consentement.
   aiExtractionConsentAt DateTime?
+  // Lecture par IA à CHAQUE import (au lieu de seulement en repli) : les deux lectures
+  // (règles et IA) sont comparées et les divergences signalées. Exige le consentement
+  // ci-dessus ; repasse à false quand il est retiré.
+  aiExtractionAlways    Boolean        @default(false)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
