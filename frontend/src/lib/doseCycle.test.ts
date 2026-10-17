@@ -4,7 +4,9 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { createInstance, type TFunction } from 'i18next';
 import fr from '../locales/fr/common.json';
-import { dosesForDate, averageDailyDose, formatSchedule, buildDoseSteps } from './doseCycle';
+import {
+  dosesForDate, averageDailyDose, formatSchedule, buildDoseSteps, periodAt, labsDuringPeriod, weeksSinceDoseChange,
+} from './doseCycle';
 import { toISODate } from './utils';
 import type { DosePeriod } from '../types';
 
@@ -122,5 +124,39 @@ describe('buildDoseSteps', () => {
       { ts: ts('2026-02-01'), dose: 50 },
     ]);
     expect(buildDoseSteps(periods, ts('2023-01-01'), ts('2024-01-01'))).toEqual([]);
+  });
+});
+
+describe('croisement doses ↔ analyses', () => {
+  const p50 = period('2025-01-01T00:00:00.000Z', [{ time: '07:00', doses: [50] }]);
+  const pAlt = period('2026-03-01T00:00:00.000Z', [{ time: '07:00', doses: [75, 100] }]);
+  const levo = {
+    id: 'm1', name: 'Levothyrox', dosageUnit: 'MCG' as const, showOnChart: true, dosePeriods: [p50, pAlt],
+  };
+  const vitD = {
+    id: 'm2', name: 'Vitamine D', dosageUnit: 'IU' as const, showOnChart: false,
+    dosePeriods: [period('2024-01-01', [{ time: '08:00', doses: [1000] }]), period('2026-03-20', [{ time: '08:00', doses: [2000] }])],
+  };
+
+  it('periodAt : posologie en vigueur, médicaments du graphique seulement', () => {
+    expect(periodAt([levo, vitD], '2026-02-28').map((x) => x.period.slots[0].doses)).toEqual([[50]]);
+    expect(periodAt([levo, vitD], '2026-03-01').map((x) => x.period.slots[0].doses)).toEqual([[75, 100]]);
+    expect(periodAt([levo], '2024-12-31')).toEqual([]);
+  });
+
+  it('weeksSinceDoseChange : semaines depuis le dernier changement, la première période n’en est pas un', () => {
+    expect(weeksSinceDoseChange([levo, vitD], '2026-03-29')).toBe(4); // vitD (hors graphique) ignorée
+    expect(weeksSinceDoseChange([levo], '2026-03-01')).toBe(0);
+    expect(weeksSinceDoseChange([levo], '2025-06-01')).toBeNull();
+  });
+
+  it('labsDuringPeriod : une analyse appartient à la période en vigueur ce jour-là', () => {
+    const labs = [
+      { date: '2026-02-28', tsh: 2.1 },
+      { date: '2026-03-01', tsh: 1.4 },
+      { date: '2026-05-10', tsh: null },
+    ];
+    expect(labsDuringPeriod(p50, pAlt.startDate, labs)).toEqual([{ date: '2026-02-28', tsh: 2.1 }]);
+    expect(labsDuringPeriod(pAlt, null, labs)).toEqual([{ date: '2026-03-01', tsh: 1.4 }]);
   });
 });

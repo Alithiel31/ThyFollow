@@ -3,7 +3,7 @@
 // cycle `doses` se répète en boucle à partir du début de la période (jour 1 = startDate).
 // Les jours sont des dates calendaires YYYY-MM-DD : le calcul ne dépend pas du fuseau.
 import type { TFunction } from 'i18next';
-import type { DosePeriod, DoseSlot, Medication } from '../types';
+import type { DosePeriod, DoseSlot, LabResult, Medication } from '../types';
 
 const DAY_MS = 86_400_000;
 
@@ -101,4 +101,49 @@ export function buildDoseSteps(
   });
   if (steps.length > 0 && steps[steps.length - 1].ts < to) steps.push({ ts: to, dose: steps[steps.length - 1].dose });
   return steps;
+}
+
+// ── Croisement doses ↔ analyses. Seuls les médicaments affichés sur le graphique TSH
+// (showOnChart) sont concernés : ce sont eux dont la dose agit sur la TSH.
+
+// Délai usuel avant qu'une TSH reflète un changement de dose de lévothyroxine.
+export const STABILIZATION_WEEKS = 6;
+
+type ChartMed = Pick<Medication, 'id' | 'name' | 'dosageUnit' | 'showOnChart' | 'dosePeriods'>;
+
+// Posologie en vigueur un jour donné, pour chaque médicament concerné qui en a une.
+export function periodAt<M extends ChartMed>(meds: M[], day: string): { med: M; period: DosePeriod }[] {
+  return meds.flatMap((med) => {
+    if (!med.showOnChart) return [];
+    const period = periodAtDay(med.dosePeriods, day);
+    return period ? [{ med, period }] : [];
+  });
+}
+
+// Analyses avec une TSH mesurée pendant une période (de son début, inclus, au début de la
+// suivante, exclu ; `nextStart` null pour la période en cours).
+export function labsDuringPeriod<L extends Pick<LabResult, 'date' | 'tsh'>>(
+  period: Pick<DosePeriod, 'startDate'>,
+  nextStart: string | null,
+  labs: L[],
+): L[] {
+  const from = period.startDate.slice(0, 10);
+  const to = nextStart?.slice(0, 10);
+  return labs.filter((l) => {
+    const day = l.date.slice(0, 10);
+    return l.tsh != null && day >= from && (!to || day < to);
+  });
+}
+
+// Semaines entières écoulées depuis le dernier changement de posologie (ce jour-là ou avant),
+// tous médicaments concernés confondus. La première période d'un médicament n'est pas un
+// changement : null si aucun changement n'a encore eu lieu.
+export function weeksSinceDoseChange(meds: ChartMed[], day: string): number | null {
+  let last: string | null = null;
+  for (const med of meds) {
+    if (!med.showOnChart) continue;
+    const starts = med.dosePeriods.map((p) => p.startDate.slice(0, 10)).sort().slice(1);
+    for (const start of starts) if (start <= day && (!last || start > last)) last = start;
+  }
+  return last ? Math.floor(daysBetween(last, day) / 7) : null;
 }
