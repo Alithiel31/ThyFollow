@@ -4,13 +4,14 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { ArrowLeft, Printer, Download, Activity } from 'lucide-react';
+import { ArrowLeft, Printer, Download } from 'lucide-react';
 import { analyticsApi } from '../lib/api';
 import { useAuthStore } from '../lib/store';
 import { formatDate, symptomLabel } from '../lib/utils';
 import { LAB_RANGES } from '../types';
 import type { ReportData } from '../types';
 import styles from './ReportPage.module.css';
+import { LogoMark } from '../components/LogoMark';
 
 function freqLabel(t: TFunction, freq: string): string {
   return t(`medications.frequency.${freq}`, { defaultValue: freq }).toLowerCase();
@@ -93,7 +94,7 @@ export function ReportPage() {
       <div className={styles.sheet}>
         <header className={styles.header}>
           <div className={styles.brand}>
-            <Activity size={18} /> {t('app.name')}
+            <LogoMark size={22} /> {t('app.name')}
           </div>
           <h1 className={styles.title}>{t('report.docTitle')}</h1>
           <p className={styles.meta}>

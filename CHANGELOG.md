@@ -90,6 +90,10 @@ pas synchronisé avec ces tags.
 
 ### Changed
 
+- Identité visuelle unifiée : le logo « papillon » (pétales bleus et orange) est désormais le seul
+  logo de l'application — icône de l'onglet, icônes de l'app installée (PWA, iPhone), pages de
+  connexion/inscription/mot de passe/vérification, page 404 et en-tête du rapport imprimable. Il
+  remplace l'ancien carré vert à ligne de pouls. Les icônes de l'app passent sur fond bleu nuit.
 - Documents non applicatifs de la racine (`ConceptArt/`, `thyro-track-conceptArt.pdf`, la
   maquette HTML standalone) regroupés sous un unique dossier `Docs/`, ignoré en une seule ligne
   de `.gitignore` au lieu de trois. `thyrotrack_backup_20260822.dump` (un dump PostgreSQL commité

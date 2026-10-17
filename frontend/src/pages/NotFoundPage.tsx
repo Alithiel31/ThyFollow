@@ -1,8 +1,9 @@
 // src/pages/NotFoundPage.tsx
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Activity, Compass } from 'lucide-react';
+import { Compass } from 'lucide-react';
 import styles from './AuthPage.module.css';
+import { LogoMark } from '../components/LogoMark';
 
 export function NotFoundPage() {
   const { t } = useTranslation();
@@ -11,7 +12,7 @@ export function NotFoundPage() {
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.logoRow}>
-          <div className={styles.logoIcon}><Activity size={20} /></div>
+          <div className={styles.logoIcon}><LogoMark size={26} /></div>
           <span className={styles.logoText}>{t('app.name')}</span>
         </div>
 
