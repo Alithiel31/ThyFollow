@@ -26,6 +26,11 @@ pas synchronisé avec ces tags.
 
 ### Added
 
+- Carnet : les cartes affichent désormais **tous les marqueurs renseignés** (ferritine, vitamines, T4/T3,
+  thyroglobuline, magnésium, sélénium, cholestérol, glycémie, hémoglobine, en plus de TSH/FT4/FT3/anti-TPO),
+  avec « Aucune valeur saisie » quand il n'y en a aucun ; la modale d'édition gagne une section « Autres
+  marqueurs » pour les voir et les corriger. Import de PDF : une phrase de pied de page (« Laboratoire
+  accrédité n°8-3165. Liste des sites… ») n'est plus prise pour le nom du laboratoire.
 - Import de bilans PDF : une réponse **429** (trop de requêtes) affiche désormais « Trop de requêtes »
   avec le délai d'attente annoncé par le serveur (`Retry-After`) et la précision que ce n'est ni un bug
   ni une erreur de lecture, avec un bouton « Réessayer » ; une panne d'envoi (réseau, erreur serveur)

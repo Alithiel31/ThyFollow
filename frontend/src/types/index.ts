@@ -229,6 +229,29 @@ export const LAB_RANGES = {
   antiTPO: { min: 0, max: 34, unit: 'UI/mL', label: 'Anti-TPO' },
 } as const;
 
+// Marqueurs affichés sur les cartes du carnet, dans l'ordre : thyroïde, anticorps, carences,
+// métabolisme. Les unités sont celles du modèle (voir backend/src/lib/labExtract/units.ts) ;
+// les libellés courts sont traduits (`labResults.marker.<clé>`).
+export const MARKER_DISPLAY: ReadonlyArray<{ key: LabMarkerKey; unit: string }> = [
+  { key: 'tsh', unit: 'mUI/L' },
+  { key: 'ft4', unit: 'pmol/L' },
+  { key: 'ft3', unit: 'pmol/L' },
+  { key: 't4', unit: 'nmol/L' },
+  { key: 't3', unit: 'nmol/L' },
+  { key: 'antiTPO', unit: 'UI/mL' },
+  { key: 'antiTG', unit: 'UI/mL' },
+  { key: 'antiTSHR', unit: 'UI/L' },
+  { key: 'thyroglobulin', unit: 'µg/L' },
+  { key: 'ferritin', unit: 'µg/L' },
+  { key: 'vitaminD', unit: 'nmol/L' },
+  { key: 'vitaminB12', unit: 'pmol/L' },
+  { key: 'magnesium', unit: 'mmol/L' },
+  { key: 'selenium', unit: 'µg/L' },
+  { key: 'cholesterol', unit: 'mmol/L' },
+  { key: 'glucose', unit: 'mmol/L' },
+  { key: 'hemoglobin', unit: 'g/dL' },
+];
+
 // Les libellés sont traduits via i18next (namespaces "diagnosis" / "thyroidStatus") ;
 // ces tableaux ne servent qu'à itérer les valeurs possibles dans l'UI.
 export const DIAGNOSIS_LABEL_KEYS: DiagnosisType[] = [

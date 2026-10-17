@@ -211,6 +211,21 @@ describe('labExtract/rules — unités et cas particuliers', () => {
     expect(r.values.tsh).toBe(1.776);
   });
 
+  it('ne prend pas une phrase d’accréditation pour le nom du laboratoire', () => {
+    const r = parseLabText(
+      'Prélevé le 29/04/2025\nLaboratoire accrédité n°8-3165. Liste des sites et portées disponibles sur www.cofrac.fr\nFerritine 630 µg/L'
+    );
+    expect(r.lab).toBeNull();
+    expect(r.values.ferritin).toBe(630);
+  });
+
+  it('garde un nom de laboratoire court introduit par « Laboratoire »', () => {
+    expect(parseLabText('Laboratoire Durand\nTSH 2,3 mUI/L').lab).toBe('Laboratoire Durand');
+    expect(parseLabText('Laboratoire de biologie médicale Martin\nTSH 2,3 mUI/L').lab).toBe(
+      'Laboratoire de biologie médicale Martin'
+    );
+  });
+
   it('utilise une date non étiquetée avec une confiance faible', () => {
     const r = parseLabText('Compte rendu du 12/03/2026\nTSH 2,3 mUI/L');
     expect(r.date).toBe('2026-03-12');
