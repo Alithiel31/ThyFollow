@@ -3,7 +3,7 @@
 // cycle `doses` se répète en boucle à partir de la date de début de la période.
 import { z } from 'zod';
 
-const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+export const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 export const MAX_SLOTS = 8;
 export const MAX_CYCLE_DAYS = 14;

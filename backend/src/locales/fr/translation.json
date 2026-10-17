@@ -40,7 +40,10 @@
       "noSubscription": "Aucun abonnement à gérer",
       "invalidCode": "Code invalide, expiré ou épuisé",
       "codeAlreadyUsed": "Vous avez déjà utilisé ce code"
-    }
+    },
+    "doseRequired": "Indiquez une dose",
+    "chartMcgOnly": "Seuls les médicaments en µg peuvent être affichés sur le graphique TSH",
+    "lastDosePeriod": "Un médicament doit garder au moins une période de posologie"
   },
   "auth": {
     "verificationEmailSent": "Un email de confirmation a été envoyé",
@@ -56,7 +59,8 @@
     "entry": "Entrée",
     "labResult": "Résultat",
     "medication": "Médicament",
-    "pdfPassword": "Mot de passe"
+    "pdfPassword": "Mot de passe",
+    "dosePeriod": "Période de posologie"
   },
   "validation": {
     "emailInvalid": "Email invalide",

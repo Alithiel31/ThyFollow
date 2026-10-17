@@ -40,7 +40,10 @@
       "noSubscription": "No subscription to manage",
       "invalidCode": "Invalid, expired or fully used code",
       "codeAlreadyUsed": "You have already used this code"
-    }
+    },
+    "doseRequired": "A dose is required",
+    "chartMcgOnly": "Only µg medications can be shown on the TSH chart",
+    "lastDosePeriod": "A medication must keep at least one dosing period"
   },
   "auth": {
     "verificationEmailSent": "A confirmation email has been sent",
@@ -56,7 +59,8 @@
     "entry": "Entry",
     "labResult": "Lab result",
     "medication": "Medication",
-    "pdfPassword": "Password"
+    "pdfPassword": "Password",
+    "dosePeriod": "Dosing period"
   },
   "validation": {
     "emailInvalid": "Invalid email",
