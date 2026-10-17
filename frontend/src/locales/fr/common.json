@@ -239,7 +239,7 @@
     "add": "Ajouter",
     "tshEvolution": "Évolution du TSH",
     "targetZone": "Zone cible",
-    "chartNote": "Zone verte = plage cible TSH ({{min}}–{{max}} mUI/L)",
+    "chartNote": "Bande bleutée = plage cible TSH ({{min}}–{{max}} mUI/L) · échelle logarithmique · points verts = dans la cible",
     "editTitle": "Modifier l'analyse",
     "newTitle": "Nouvelle analyse",
     "date": "Date *",
@@ -282,7 +282,14 @@
       "hemoglobin": "Hémoglobine"
     },
     "otherMarkers": "Autres marqueurs",
-    "noValues": "Aucune valeur saisie"
+    "noValues": "Aucune valeur saisie",
+    "chartPeriod": "Période affichée",
+    "periods": {
+      "6m": "6 mois",
+      "1y": "1 an",
+      "2y": "2 ans",
+      "all": "Tout"
+    }
   },
   "medications": {
     "frequency": {

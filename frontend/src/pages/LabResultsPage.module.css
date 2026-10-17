@@ -206,3 +206,18 @@
   .grid2, .grid3 { grid-template-columns: 1fr 1fr; }
   .header { flex-direction: column; gap: 12px; }
 }
+
+.periods {
+  display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end;
+  margin: -6px 0 12px;
+}
+.periodBtn {
+  padding: 4px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 500;
+  border: 1px solid var(--border); background: transparent; color: var(--text-dim);
+  cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.periodBtn:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+.periodBtn:disabled { opacity: 0.4; cursor: default; }
+.periodBtnActive, .periodBtnActive:hover:not(:disabled) {
+  background: var(--accent-soft); border-color: var(--accent); color: var(--accent);
+}
