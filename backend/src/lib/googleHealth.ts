@@ -181,24 +181,31 @@ export interface DailyHealthMetrics {
 // - Pour `sleep` : ni `interval.start_time` ni `interval.civil_start_time`
 //   ne sont acceptés ("not supported for filtering", confirmé deux fois en
 //   usage réel) — semble ne supporter aucun filtre temporel côté serveur
-//   sur `dataPoints`. On récupère donc sans filtre et on ne garde que les
-//   points qui recoupent la journée demandée (voir `filterPointsForDate`).
-//   ⚠️ Suppose que la réponse expose des champs `startTime`/`endTime" —
-//   toujours pas confirmé contre un vrai payload.
+//   sur `dataPoints`. On récupère donc sans filtre et on attribue chaque
+//   nuit nous-mêmes (voir `sleepHoursForDate`).
+//   ⚠️ La forme exacte d'un point n'est toujours pas confirmée contre un
+//   vrai payload : `readSleepSession` accepte les deux formes plausibles.
 const DATA_TYPES = {
   weight: { path: 'weight', filterField: 'weight.sample_time.physical_time' as string | null },
   heartRate: { path: 'heart-rate', filterField: 'heart_rate.sample_time.physical_time' as string | null },
   sleep: { path: 'sleep', filterField: null as string | null },
 } as const;
 
-export async function fetchDailyMetrics(accessToken: string, date: string): Promise<DailyHealthMetrics> {
-  // Intervalle semi-ouvert [début du jour, début du lendemain[ — confirmé
-  // nécessaire en usage réel : certains champs (ex: heart_rate.sample_time)
-  // rejettent LESS_THAN_EQUALS avec "only supports comparators
-  // GREATER_THAN_EQUALS and LESS_THAN". Univoque de toute façon (pas de
-  // double-comptage d'une mesure pile à minuit).
-  const startTime = new Date(`${date}T00:00:00.000Z`).toISOString();
-  const endTime = new Date(new Date(`${date}T00:00:00.000Z`).getTime() + 24 * 60 * 60 * 1000).toISOString();
+// `date` (YYYY-MM-DD) s'entend dans le fuseau de l'utilisateur
+// (UserProfile.timezone) : une journée découpée en UTC s'arrêterait vers
+// 19-20h heure locale au Québec, et rangerait la soirée au lendemain.
+export async function fetchDailyMetrics(
+  accessToken: string,
+  date: string,
+  timeZone: string
+): Promise<DailyHealthMetrics> {
+  // Intervalle semi-ouvert [minuit local, minuit local du lendemain[ —
+  // confirmé nécessaire en usage réel : certains champs (ex:
+  // heart_rate.sample_time) rejettent LESS_THAN_EQUALS avec "only supports
+  // comparators GREATER_THAN_EQUALS and LESS_THAN". Univoque de toute façon
+  // (pas de double-comptage d'une mesure pile à minuit).
+  const startTime = new Date(zonedMidnightUtc(date, timeZone)).toISOString();
+  const endTime = new Date(zonedMidnightUtc(addDays(date, 1), timeZone)).toISOString();
 
   async function fetchDataType(dataType: { path: string; filterField: string | null }): Promise<unknown[]> {
     const url = new URL(`${GOOGLE_HEALTH_API_BASE}/users/me/dataTypes/${dataType.path}/dataPoints`);
@@ -240,7 +247,7 @@ export async function fetchDailyMetrics(accessToken: string, date: string): Prom
   return {
     weightKg: extractLatestNumericValue(weightPoints),
     heartRateBpm: extractLatestNumericValue(heartRatePoints),
-    sleepHours: sumSleepDurationHours(filterPointsForDate(sleepPoints, startTime, endTime)),
+    sleepHours: sleepHoursForDate(sleepPoints, date, timeZone),
   };
 }
 
@@ -249,25 +256,113 @@ function extractLatestNumericValue(points: unknown[]): number | null {
   return typeof last?.value === 'number' ? last.value : null;
 }
 
-// Filtrage côté code, pour les types sans filtre serveur fonctionnel (voir
-// `sleep` dans DATA_TYPES) : ne garde qu'un point dont l'intervalle recoupe
-// [startTimeIso, endTimeIso[.
-function filterPointsForDate(points: unknown[], startTimeIso: string, endTimeIso: string): unknown[] {
-  const from = new Date(startTimeIso).getTime();
-  const to = new Date(endTimeIso).getTime();
-  return (points as { startTime?: string; endTime?: string }[]).filter((p) => {
-    if (!p.startTime || !p.endTime) return false;
-    const pointStart = new Date(p.startTime).getTime();
-    const pointEnd = new Date(p.endTime).getTime();
-    return pointStart < to && pointEnd > from;
-  });
+// ── Fuseau horaire ────────────────────────────────────────────────────────
+// Sans dépendance : Intl donne l'heure murale d'un instant dans un fuseau,
+// on en déduit le décalage.
+
+function addDays(date: string, days: number): string {
+  const d = new Date(`${date}T00:00:00.000Z`);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
 }
 
-function sumSleepDurationHours(points: unknown[]): number | null {
-  if (points.length === 0) return null;
-  const totalMs = (points as { startTime?: string; endTime?: string }[]).reduce((sum, p) => {
-    if (!p.startTime || !p.endTime) return sum;
-    return sum + (new Date(p.endTime).getTime() - new Date(p.startTime).getTime());
-  }, 0);
-  return totalMs > 0 ? totalMs / (1000 * 60 * 60) : null;
+// Décalage (ms) du fuseau par rapport à UTC à l'instant donné (ex: -4h à
+// Montréal l'été, +2h à Paris).
+function timeZoneOffsetMs(instantMs: number, timeZone: string): number {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    hourCycle: 'h23',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).formatToParts(new Date(instantMs));
+  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value);
+  const wallClockAsUtc = Date.UTC(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'));
+  return wallClockAsUtc - Math.floor(instantMs / 1000) * 1000;
+}
+
+// Instant UTC (ms) de minuit local pour `date` dans `timeZone`. Le
+// décalage est recalculé une fois au résultat pour encaisser un changement
+// d'heure entre minuit UTC et minuit local.
+export function zonedMidnightUtc(date: string, timeZone: string): number {
+  const naive = new Date(`${date}T00:00:00.000Z`).getTime();
+  const guess = naive - timeZoneOffsetMs(naive, timeZone);
+  return naive - timeZoneOffsetMs(guess, timeZone);
+}
+
+// Date civile (YYYY-MM-DD) d'un instant dans `timeZone`.
+export function localDateOf(instantMs: number, timeZone: string): string {
+  // en-CA formate en YYYY-MM-DD.
+  return new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(
+    new Date(instantMs)
+  );
+}
+
+// ── Sommeil ───────────────────────────────────────────────────────────────
+
+interface SleepSession {
+  startMs: number;
+  endMs: number;
+  // Durée réellement dormie (phases d'éveil exclues) quand les phases sont
+  // fournies, sinon la durée de la session (temps au lit).
+  asleepMs: number;
+}
+
+interface RawInterval {
+  startTime?: string;
+  endTime?: string;
+}
+
+interface RawSleepStage extends RawInterval {
+  type?: string;
+}
+
+// Lit une session de sommeil dans un point de l'API. Deux formes acceptées,
+// faute de payload confirmé : intervalle à plat (`startTime`/`endTime`), ou
+// imbriqué sous `sleep.interval` — forme suggérée par le nom du champ de
+// filtre rejeté (`sleep.interval.start_time`), comme `weight.sample_time`.
+function readSleepSession(point: unknown): SleepSession | null {
+  const p = point as RawInterval & { sleep?: { interval?: RawInterval; stages?: RawSleepStage[] } };
+  const interval = p.sleep?.interval ?? p;
+  const startMs = interval.startTime ? Date.parse(interval.startTime) : NaN;
+  const endMs = interval.endTime ? Date.parse(interval.endTime) : NaN;
+  if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs <= startMs) return null;
+
+  let asleepMs = endMs - startMs;
+  const stages = p.sleep?.stages;
+  if (Array.isArray(stages) && stages.length > 0) {
+    const awakeMs = stages.reduce((sum, s) => {
+      if (!s.type || !/AWAKE/i.test(s.type) || !s.startTime || !s.endTime) return sum;
+      const d = Date.parse(s.endTime) - Date.parse(s.startTime);
+      return Number.isFinite(d) && d > 0 ? sum + d : sum;
+    }, 0);
+    asleepMs = Math.max(0, asleepMs - awakeMs);
+  }
+  return { startMs, endMs, asleepMs };
+}
+
+// Heures de sommeil attribuées à `date` : chaque session est rangée
+// entièrement au jour de son RÉVEIL (heure de fin, en heure locale), comme
+// le fait l'app Fitbit. Une nuit 23h → 7h appartient donc au matin du 7h,
+// et n'est plus comptée sur les deux jours qu'elle chevauche. Les siestes
+// du jour s'ajoutent. Une même session renvoyée deux fois n'est comptée
+// qu'une fois.
+export function sleepHoursForDate(points: unknown[], date: string, timeZone: string): number | null {
+  const seen = new Set<string>();
+  let totalMs = 0;
+  let found = false;
+  for (const point of points) {
+    const session = readSleepSession(point);
+    if (!session || localDateOf(session.endMs, timeZone) !== date) continue;
+    const key = `${session.startMs}-${session.endMs}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    found = true;
+    totalMs += session.asleepMs;
+  }
+  if (!found) return null;
+  return totalMs > 0 ? Math.round((totalMs / (1000 * 60 * 60)) * 100) / 100 : null;
 }

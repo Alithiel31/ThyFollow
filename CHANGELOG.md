@@ -24,6 +24,14 @@ pas synchronisé avec ces tags.
 - Évaluer la montée de version Prisma 5 → 6 et Express 4 → 5 (aucune faille connue identifiée,
   mais l'écart grandit).
 
+### Fixed
+
+- **Synchro Google Health : nuits mieux découpées.** Une nuit qui traversait minuit était comptée
+  en entier sur les deux jours. Chaque nuit est maintenant rangée au jour du réveil, en heure
+  locale, comme dans l'app Fitbit. Les siestes du jour s'y ajoutent, et les phases d'éveil sont
+  retirées quand l'API les fournit. Les bornes de la journée (poids, rythme cardiaque, sommeil)
+  suivent le fuseau du profil au lieu d'UTC.
+
 ### Security
 
 - **Quota d'imports PDF non contournable par requêtes simultanées.** Le solde lu en début de requête

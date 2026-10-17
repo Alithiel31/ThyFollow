@@ -135,6 +135,69 @@ describe('lib/googleHealth', () => {
     });
   });
 
+  describe('zonedMidnightUtc / localDateOf', () => {
+    it('places local midnight at the right UTC instant, DST included', () => {
+      // Montréal : UTC-4 l'été, UTC-5 l'hiver.
+      expect(new Date(googleHealth.zonedMidnightUtc('2026-07-01', 'America/Montreal')).toISOString()).toBe(
+        '2026-07-01T04:00:00.000Z'
+      );
+      expect(new Date(googleHealth.zonedMidnightUtc('2026-01-15', 'America/Montreal')).toISOString()).toBe(
+        '2026-01-15T05:00:00.000Z'
+      );
+      // Paris : jour du passage à l'heure d'été (minuit encore en UTC+1).
+      expect(new Date(googleHealth.zonedMidnightUtc('2026-03-29', 'Europe/Paris')).toISOString()).toBe(
+        '2026-03-28T23:00:00.000Z'
+      );
+    });
+
+    it('gives the civil date of an instant in the user time zone', () => {
+      // 01:30 UTC le 18 = 21:30 le 17 à Montréal.
+      expect(googleHealth.localDateOf(Date.parse('2026-10-18T01:30:00Z'), 'America/Montreal')).toBe('2026-10-17');
+      expect(googleHealth.localDateOf(Date.parse('2026-10-18T01:30:00Z'), 'Europe/Paris')).toBe('2026-10-18');
+    });
+  });
+
+  describe('sleepHoursForDate', () => {
+    const tz = 'America/Montreal';
+    // Nuit du 16 au 17 octobre, 23:00 → 07:00 heure locale (UTC-4).
+    const night = { startTime: '2026-10-17T03:00:00Z', endTime: '2026-10-17T11:00:00Z' };
+
+    it('counts a night crossing midnight once, on the wake-up day only', () => {
+      expect(googleHealth.sleepHoursForDate([night], '2026-10-17', tz)).toBe(8);
+      expect(googleHealth.sleepHoursForDate([night], '2026-10-16', tz)).toBeNull();
+    });
+
+    it('uses the local wake-up date, not the UTC one', () => {
+      // Réveil 21:30 heure locale le 17 = 01:30 UTC le 18 (sieste du soir).
+      const nap = { startTime: '2026-10-18T00:30:00Z', endTime: '2026-10-18T01:30:00Z' };
+      expect(googleHealth.sleepHoursForDate([nap], '2026-10-17', tz)).toBe(1);
+      expect(googleHealth.sleepHoursForDate([nap], '2026-10-18', tz)).toBeNull();
+    });
+
+    it('adds naps of the same day and ignores a duplicated session', () => {
+      const nap = { startTime: '2026-10-17T18:00:00Z', endTime: '2026-10-17T18:30:00Z' };
+      expect(googleHealth.sleepHoursForDate([night, nap, night], '2026-10-17', tz)).toBe(8.5);
+    });
+
+    it('reads the nested sleep.interval shape and subtracts awake stages', () => {
+      const point = {
+        sleep: {
+          interval: night,
+          stages: [
+            { type: 'LIGHT', startTime: '2026-10-17T03:00:00Z', endTime: '2026-10-17T06:00:00Z' },
+            { type: 'AWAKE', startTime: '2026-10-17T06:00:00Z', endTime: '2026-10-17T06:30:00Z' },
+            { type: 'DEEP', startTime: '2026-10-17T06:30:00Z', endTime: '2026-10-17T11:00:00Z' },
+          ],
+        },
+      };
+      expect(googleHealth.sleepHoursForDate([point], '2026-10-17', tz)).toBe(7.5);
+    });
+
+    it('returns null when no point has a usable interval', () => {
+      expect(googleHealth.sleepHoursForDate([{}, { startTime: 'x', endTime: 'y' }], '2026-10-17', tz)).toBeNull();
+    });
+  });
+
   describe('getHealthUserId', () => {
     it('returns healthUserId when present in the response', async () => {
       vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ healthUserId: 'hu-1' }) }));

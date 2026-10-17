@@ -15,6 +15,23 @@ import { logger } from './logger.js';
 // vide côté Google si l'horloge locale dérive légèrement.
 const TOKEN_REFRESH_MARGIN_MS = 60 * 1000;
 
+// Même valeur que le défaut de UserProfile.timezone (prisma/schema.prisma),
+// pour un utilisateur sans profil.
+const DEFAULT_TIME_ZONE = 'Europe/Paris';
+
+// Le profil n'accepte qu'une chaîne libre (profile.controller.ts) : un fuseau
+// inconnu ferait lever Intl (RangeError) et bloquerait toute synchro.
+function resolveTimeZone(timeZone: string | undefined): string {
+  if (!timeZone) return DEFAULT_TIME_ZONE;
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone });
+    return timeZone;
+  } catch {
+    logger.warn(`Fuseau horaire de profil invalide "${timeZone}", repli sur ${DEFAULT_TIME_ZONE}`);
+    return DEFAULT_TIME_ZONE;
+  }
+}
+
 async function getValidAccessToken(connection: GoogleHealthConnection): Promise<string> {
   if (connection.tokenExpiresAt.getTime() - TOKEN_REFRESH_MARGIN_MS > Date.now()) {
     return decrypt(connection.accessTokenEnc);
@@ -40,8 +57,13 @@ export async function syncDailyMetricsForUser(userId: string, date: string): Pro
   const connection = await prisma.googleHealthConnection.findUnique({ where: { userId } });
   if (!connection) return;
 
+  // `date` est une date civile de l'utilisateur : les bornes de la journée
+  // et l'attribution des nuits se font dans son fuseau.
+  const profile = await prisma.userProfile.findUnique({ where: { userId }, select: { timezone: true } });
+  const timeZone = resolveTimeZone(profile?.timezone);
+
   const accessToken = await getValidAccessToken(connection);
-  const metrics = await fetchDailyMetrics(accessToken, date);
+  const metrics = await fetchDailyMetrics(accessToken, date, timeZone);
 
   const existing = await prisma.dailyEntry.findUnique({
     where: { userId_date: { userId, date: new Date(date) } },
