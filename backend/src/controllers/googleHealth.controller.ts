@@ -18,6 +18,7 @@ import {
 } from '../lib/googleHealth.js';
 import { encrypt } from '../lib/crypto.js';
 import { recordAuthEvent } from '../lib/authEvents.js';
+import { signCookieValue, unsignCookieValue } from '../lib/signedCookie.js';
 import { logger } from '../lib/logger.js';
 import { AppError } from '../lib/errors.js';
 
@@ -44,7 +45,9 @@ export const googleHealthController = {
     const { url, flow } = await buildGoogleHealthAuthorizationUrl();
     const linkFlow: GoogleHealthLinkFlowState = { ...flow, userId: req.userId! };
 
-    res.cookie(GOOGLE_HEALTH_COOKIE, JSON.stringify(linkFlow), {
+    // Signé : sans signature, remplacer l'id utilisateur du cookie suffirait à
+    // brancher sa propre source Google Health sur le compte de quelqu'un d'autre.
+    res.cookie(GOOGLE_HEALTH_COOKIE, signCookieValue(JSON.stringify(linkFlow)), {
       httpOnly: true,
       secure: config.isProd,
       sameSite: 'lax',
@@ -60,14 +63,14 @@ export const googleHealthController = {
   // vers le Profil plutôt que de répondre en JSON brut.
   callback: async (req: AuthRequest, res: Response): Promise<void> => {
     const profileUrl = new URL('/profile', config.appUrl);
-    const rawCookie = req.cookies?.[GOOGLE_HEALTH_COOKIE];
+    const rawCookie = unsignCookieValue(req.cookies?.[GOOGLE_HEALTH_COOKIE]);
     res.clearCookie(GOOGLE_HEALTH_COOKIE, { path: GOOGLE_HEALTH_COOKIE_PATH });
 
     let flow: GoogleHealthLinkFlowState | undefined;
 
     try {
       if (googleHealthNotConfigured()) throw new Error('Google Health non configuré');
-      if (!rawCookie) throw new Error('Cookie de flux Google Health absent/expiré');
+      if (!rawCookie) throw new Error('Cookie de flux Google Health absent, expiré ou falsifié');
 
       flow = JSON.parse(rawCookie);
       const callbackUrl = new URL(req.originalUrl, config.googleHealthRedirectUri);

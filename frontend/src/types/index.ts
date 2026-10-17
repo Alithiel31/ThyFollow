@@ -54,6 +54,8 @@ export interface UserProfile {
   endocrinologistName?: string;
   // Consentement (opt-in) à l'extraction de bilans par IA en repli ; null/absent = non consenti
   aiExtractionConsentAt?: string | null;
+  // Lecture par IA à chaque import (comparée aux règles), au lieu d'un simple repli
+  aiExtractionAlways?: boolean;
   targetTSH_min?: number;
   targetTSH_max?: number;
   targetFT4_min?: number;
@@ -164,7 +166,10 @@ export interface ImportDraft {
   values: Partial<Record<LabMarkerKey, number>>;
   flags: { marker: LabMarkerKey; reason: 'comparator' | 'unknown_unit' | 'no_unit' | 'converted' }[];
   insufficient: boolean;
-  method: 'rules' | 'llm';
+  // rules : lecture locale ; llm : complétée par l'IA ; both : les deux lectures comparées
+  method: 'rules' | 'llm' | 'both';
+  // Champs sur lesquels les deux lectures divergent (null = rien trouvé par ce lecteur)
+  conflicts: { field: 'date' | LabMarkerKey; rules: string | number | null; ai: string | number | null }[];
 }
 
 export interface ImportFileResult {
@@ -245,6 +250,29 @@ export const LAB_RANGES = {
   ft3: { min: 3.5, max: 6.5, unit: 'pmol/L', label: 'FT3' },
   antiTPO: { min: 0, max: 34, unit: 'UI/mL', label: 'Anti-TPO' },
 } as const;
+
+// Marqueurs affichés sur les cartes du carnet, dans l'ordre : thyroïde, anticorps, carences,
+// métabolisme. Les unités sont celles du modèle (voir backend/src/lib/labExtract/units.ts) ;
+// les libellés courts sont traduits (`labResults.marker.<clé>`).
+export const MARKER_DISPLAY: ReadonlyArray<{ key: LabMarkerKey; unit: string }> = [
+  { key: 'tsh', unit: 'mUI/L' },
+  { key: 'ft4', unit: 'pmol/L' },
+  { key: 'ft3', unit: 'pmol/L' },
+  { key: 't4', unit: 'nmol/L' },
+  { key: 't3', unit: 'nmol/L' },
+  { key: 'antiTPO', unit: 'UI/mL' },
+  { key: 'antiTG', unit: 'UI/mL' },
+  { key: 'antiTSHR', unit: 'UI/L' },
+  { key: 'thyroglobulin', unit: 'µg/L' },
+  { key: 'ferritin', unit: 'µg/L' },
+  { key: 'vitaminD', unit: 'nmol/L' },
+  { key: 'vitaminB12', unit: 'pmol/L' },
+  { key: 'magnesium', unit: 'mmol/L' },
+  { key: 'selenium', unit: 'µg/L' },
+  { key: 'cholesterol', unit: 'mmol/L' },
+  { key: 'glucose', unit: 'mmol/L' },
+  { key: 'hemoglobin', unit: 'g/dL' },
+];
 
 // Les libellés sont traduits via i18next (namespaces "diagnosis" / "thyroidStatus") ;
 // ces tableaux ne servent qu'à itérer les valeurs possibles dans l'UI.

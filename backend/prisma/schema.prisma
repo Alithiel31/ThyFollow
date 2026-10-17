@@ -33,6 +33,12 @@ model User {
   // ── Réinitialisation de mot de passe (lien envoyé par email, courte durée de vie)
   resetToken          String?   @unique
   resetTokenExpiresAt DateTime?
+  // verificationToken / resetToken : empreinte SHA-256 du jeton envoyé par
+  // email, jamais le jeton lui-même (voir lib/session.ts#hashOneTimeToken).
+
+  // ── Version de session : portée par chaque JWT, incrémentée pour révoquer
+  // d'un coup toutes les sessions ouvertes (ex. réinitialisation du mot de passe).
+  tokenVersion Int @default(0)
 
   // ── Accès Pro (import de bilans PDF). Source de vérité unique : « Pro tant
   // que proUntil est dans le futur », que la date vienne d'un abonnement
@@ -219,6 +225,10 @@ model UserProfile {
   // Consentement (opt-in) à l'envoi du texte anonymisé d'un bilan à l'API
   // Anthropic en repli de l'extraction par règles. null = pas de consentement.
   aiExtractionConsentAt DateTime?
+  // Lecture par IA à CHAQUE import (au lieu de seulement en repli) : les deux lectures
+  // (règles et IA) sont comparées et les divergences signalées. Exige le consentement
+  // ci-dessus ; repasse à false quand il est retiré.
+  aiExtractionAlways    Boolean        @default(false)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

@@ -1,6 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#45775f"/>
-  <path d="M96 256h64l40-104 56 208 48-152 32 48h80"
-        fill="none" stroke="#ffffff" stroke-width="34"
-        stroke-linecap="round" stroke-linejoin="round"/>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0" stop-color="#111c33"/>
+      <stop offset="1" stop-color="#0a0d14"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <g transform="translate(-9.51 68.58) scale(7.8091)">
+    <ellipse cx="34" cy="20" rx="4.4" ry="16" fill="#91adff" transform="rotate(-45 34 36)"/>
+    <ellipse cx="34" cy="22" rx="3.9" ry="14" fill="#6384e6" transform="rotate(-30 34 36)"/>
+    <ellipse cx="34" cy="26" rx="3.1" ry="10" fill="#91adff" transform="rotate(-15 34 36)"/>
+    <ellipse cx="34" cy="20" rx="4.4" ry="16" fill="#df8b79" transform="rotate(45 34 36)"/>
+    <ellipse cx="34" cy="22" rx="3.9" ry="14" fill="#c56e64" transform="rotate(30 34 36)"/>
+    <ellipse cx="34" cy="26" rx="3.1" ry="10" fill="#df8b79" transform="rotate(15 34 36)"/>
+  </g>
 </svg>

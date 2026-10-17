@@ -99,12 +99,15 @@ Si le Raspberry Pi est perdu ou remplacé mais que le code et les secrets ci-des
   divulgué à toute personne pouvant lire le dépôt, renouveler ce qui doit l'être et décider s'il faut
   purger l'historique.
 - **Jetons de session dans `localStorage`**, valables 30 jours (`JWT_EXPIRES_IN`) — une faille XSS les
-  exposerait ; la CSP de `frontend/nginx.conf` (`script-src 'self'`) est la parade.
-- **IP du client derrière plusieurs proxys.** Le backend tourne avec `trust proxy` à `1`, alors qu'une
-  requête traverse `cloudflared`, Traefik puis nginx. Le projet frère WeatherQC a eu besoin de 3 sauts
-  pour une chaîne équivalente. Si le limiteur de débit finit par identifier tous les visiteurs par
-  l'adresse du même proxy, ils partageraient un seul quota : vérifier depuis deux réseaux différents
-  (méthode décrite dans l'`architecture.md` de WeatherQC) avant de compter sur `AUTH_RATE_LIMIT_MAX`.
+  exposerait ; la CSP de `frontend/nginx.conf` (`script-src 'self'`) est la parade. Ils sont révocables :
+  incrémenter `User.tokenVersion` (fait automatiquement à la réinitialisation du mot de passe) invalide
+  toutes les sessions de l'utilisateur.
+- **IP du client derrière plusieurs proxys.** nginx remplace `X-Forwarded-For` par l'IP lue dans
+  `CF-Connecting-IP` (posé par Cloudflare), et le backend fait confiance à ce seul saut (`trust proxy`
+  à `1`). Une requête qui n'est pas passée par Cloudflare (accès direct par le tailnet) garde l'IP de
+  Traefik. Si la topologie change (plus de Cloudflare, autre proxy), revoir `set_real_ip_from` /
+  `real_ip_header` dans `frontend/nginx.conf`, puis vérifier depuis deux réseaux différents que les
+  compteurs `RateLimit-Remaining` sont indépendants.
 - **Le parsing Google Health est au mieux** — `fetchDailyMetrics` a été écrit sans charges utiles réelles
   (voir le CHANGELOG) : les valeurs synchronisées peuvent manquer ou être fausses tant qu'il n'est pas vérifié.
 - **Écran de consentement Google en mode test** — tant que l'application n'est pas publiée, seuls les

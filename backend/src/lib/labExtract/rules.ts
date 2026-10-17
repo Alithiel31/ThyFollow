@@ -37,6 +37,7 @@ function normalize(text: string): string {
     .replace(/[  ]/g, ' ');
 }
 
+// Les libellés abrégés s'écrivent parfois avec des points (« T.S.H. », « F.T.4 ») : `\.?`.
 // Ordre = priorité : les motifs les plus spécifiques d'abord (« anti-thyroglobuline »
 // avant « thyroglobuline », « t4 libre » avant « t4 totale »…). Une ligne n'est
 // attribuée qu'au premier marqueur reconnu.
@@ -45,11 +46,11 @@ const MARKER_PATTERNS: Array<[MarkerKey, RegExp]> = [
   ['antiTPO', /(anti[- ]?tpo|anti[- ]?thyroperoxydase|\batpo\b|anti[- ]?peroxydase)/],
   ['antiTG', /(anti[- ]?tg\b|anti[- ]?thyroglobuline)/],
   ['thyroglobulin', /\bthyroglobuline\b/],
-  ['ft4', /(\bft4\b|\bt4 libre\b|thyroxine libre|free t4|l[- ]?thyroxine libre)/],
-  ['ft3', /(\bft3\b|\bt3 libre\b|triiodothyronine libre|free t3)/],
-  ['t4', /(\bt4 totale?\b|thyroxine totale?|total t4)/],
-  ['t3', /(\bt3 totale?\b|triiodothyronine totale?|total t3)/],
-  ['tsh', /(\btsh\b|thyreostimuline|thyrotropine)/],
+  ['ft4', /(\bf\.?t\.?4\b|\bt\.?4 libre\b|thyroxine libre|free t4|l[- ]?thyroxine libre)/],
+  ['ft3', /(\bf\.?t\.?3\b|\bt\.?3 libre\b|triiodothyronine libre|free t3)/],
+  ['t4', /(\bt\.?4 totale?\b|thyroxine totale?|total t4)/],
+  ['t3', /(\bt\.?3 totale?\b|triiodothyronine totale?|total t3)/],
+  ['tsh', /(\bt\.?s\.?h\b|thyreostimuline|thyrotropine)/],
   ['ferritin', /\bferritine\b/],
   ['vitaminD', /(25[- ]?\(?oh\)?[- ]?(?:vitamine )?d\b|vitamine d\b|25[- ]?hydroxy[- ]?vitamine d)/],
   ['vitaminB12', /(vitamine b ?12\b|\bb ?12\b|cobalamine)/],
@@ -59,6 +60,12 @@ const MARKER_PATTERNS: Array<[MarkerKey, RegExp]> = [
   ['glucose', /(\bglycemie\b|\bglucose\b)/],
   ['hemoglobin', /\bhemoglobine\b/],
 ];
+
+// Une ligne de résultat compte quelques mots ; une phrase de commentaire (note de bas de
+// page, « exemple : TSH # 8 mUI/L pour une personne de 80 à 89 ans ») en compte beaucoup
+// plus. On ne cherche pas de marqueur dans les lignes de prose : mieux vaut un champ vide
+// qu'une valeur tirée d'une note.
+const MAX_RESULT_LINE_WORDS = 20;
 
 // Pour qu'une ligne « TSH 3eme generation » ne prenne pas « 3 » pour la valeur.
 const NOISE_AFTER_LABEL = /^\s*(?:ultra[- ]?sensible|us|3 ?(?:eme|e)\s*generation|iii|\(.*?\))*/;
@@ -147,11 +154,23 @@ const LAB_BRANDS: Array<[RegExp, string]> = [
   [/\blabco\b/, 'Labco'],
 ];
 
+const MAX_LAB_LINE_WORDS = 8;
+const LAB_LINE_REJECT = /(accredit|cofrac|\bliste\b|portee|n°|\bwww\b|\d{3,})/;
+
 function findLab(originalLines: string[], normalizedLines: string[]): string | null {
   for (const [pattern, name] of LAB_BRANDS) {
     if (normalizedLines.some((l) => pattern.test(l))) return name;
   }
-  const index = normalizedLines.findIndex((l) => /\blaboratoires?\b/.test(l) && !/prescri/.test(l));
+  // Repli : une ligne « Laboratoire X ». On n'accepte qu'une ligne COURTE et sans mention
+  // d'accréditation/numéro : « Laboratoire accrédité n°8-3165. Liste des sites… » (pied de
+  // page) n'est pas un nom de laboratoire. À défaut, l'utilisateur le saisit à la relecture.
+  const index = normalizedLines.findIndex(
+    (l) =>
+      /\blaboratoires?\b/.test(l) &&
+      !/prescri/.test(l) &&
+      !LAB_LINE_REJECT.test(l) &&
+      l.trim().split(/\s+/).length <= MAX_LAB_LINE_WORDS
+  );
   if (index === -1) return null;
   return originalLines[index].replace(/\s{2,}.*$/, '').trim().slice(0, 80) || null;
 }
@@ -191,6 +210,7 @@ export function parseLabText(text: string): ParsedLabResult {
   };
 
   for (let i = 0; i < lines.length; i++) {
+    if (lines[i].trim().split(/\s+/).length > MAX_RESULT_LINE_WORDS) continue;
     const label = labelOf(lines[i]);
     if (!label || seen.has(label.marker)) continue;
 
@@ -215,7 +235,9 @@ export function parseLabText(text: string): ParsedLabResult {
     }
     if (!raw.unit) flags.push({ marker: label.marker, reason: 'no_unit' });
     else if (converted.converted) flags.push({ marker: label.marker, reason: 'converted' });
-    values[label.marker] = Math.round(converted.value * 100) / 100;
+    // On n'arrondit qu'après une conversion d'unité : une valeur lue telle quelle
+    // (ex. 1,776) garde la précision donnée par le laboratoire.
+    values[label.marker] = converted.converted ? Math.round(converted.value * 100) / 100 : converted.value;
   }
 
   const { date, confidence } = findDate(lines);

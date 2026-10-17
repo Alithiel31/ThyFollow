@@ -24,6 +24,27 @@ pas synchronisé avec ces tags.
 - Évaluer la montée de version Prisma 5 → 6 et Express 4 → 5 (aucune faille connue identifiée,
   mais l'écart grandit).
 
+### Security
+
+- **Liaison Google et Google Health : cookies de flux signés.** Le cookie qui porte l'id du compte à
+  lier était un JSON en clair, modifiable par l'utilisateur dans son navigateur : remplacer cet id
+  permettait de rattacher son propre compte Google au compte de quelqu'un d'autre, puis de s'y
+  connecter (ou d'injecter ses données Google Health dans son journal). Les cookies de flux sont
+  désormais signés par HMAC (`lib/signedCookie.ts`) ; une valeur modifiée ou non signée est rejetée.
+- **IP réelle du client derrière Cloudflare.** nginx lit `CF-Connecting-IP` (module realip, seulement
+  depuis un pair du réseau Docker) et transmet cette IP au backend. Auparavant, le backend voyait
+  l'IP du conteneur Traefik pour tous les visiteurs : un quota de limitation de débit commun à tout le
+  monde (429 en usage normal) et 20 échecs de connexion, d'où qu'ils viennent, bloquaient les connexions
+  de tous les utilisateurs pendant 15 minutes. Les IP des `AuthEvent` sont désormais justes.
+- **Sessions révocables.** Chaque JWT porte la version de session de l'utilisateur
+  (`User.tokenVersion`, migration `20261017120000_add_user_token_version`), relue en base à chaque
+  requête (REST et GraphQL). La réinitialisation du mot de passe l'incrémente : toutes les sessions
+  ouvertes auparavant sont refusées. Le token d'un compte supprimé est refusé (401). Les tokens
+  existants restent valides jusqu'au premier incrément. L'algorithme du JWT est figé à HS256.
+- **Jetons de vérification d'email et de réinitialisation stockés hachés** (SHA-256) : une fuite de la
+  base ne permet plus de réinitialiser un mot de passe. Les liens envoyés avant ce déploiement ne
+  fonctionnent plus (en redemander un).
+
 ### Added
 
 - Accès Pro à l'import de bilans PDF : la saisie manuelle et l'export restent gratuits ; l'import
@@ -39,6 +60,24 @@ pas synchronisé avec ces tags.
   réservée aux ADMIN via `/api/admin/promo-codes` (création, liste, désactivation).
 - `LabResult.source` (`MANUAL` / `PDF_IMPORT`) : l'origine d'un résultat est affichée dans le carnet.
 - Documentation : README (FR/EN), `docs/` (architecture, développement, environnement, FR/EN) et `SECURITY` décrivent l'accès Pro, le paiement Stripe et les codes promo.
+- Carnet : les cartes affichent désormais **tous les marqueurs renseignés** (ferritine, vitamines, T4/T3,
+  thyroglobuline, magnésium, sélénium, cholestérol, glycémie, hémoglobine, en plus de TSH/FT4/FT3/anti-TPO),
+  avec « Aucune valeur saisie » quand il n'y en a aucun ; la modale d'édition gagne une section « Autres
+  marqueurs » pour les voir et les corriger. Import de PDF : une phrase de pied de page (« Laboratoire
+  accrédité n°8-3165. Liste des sites… ») n'est plus prise pour le nom du laboratoire.
+- Import de bilans PDF : une réponse **429** (trop de requêtes) affiche désormais « Trop de requêtes »
+  avec le délai d'attente annoncé par le serveur (`Retry-After`) et la précision que ce n'est ni un bug
+  ni une erreur de lecture, avec un bouton « Réessayer » ; une panne d'envoi (réseau, erreur serveur)
+  affiche « Envoi échoué » au lieu de « Lecture impossible ».
+- Import de bilans PDF : lecture plus robuste et réglage **« Lecture par IA à chaque import »**
+  (profil, désactivé par défaut, exige le consentement IA). L'IA lit chaque bilan, les deux lectures
+  (règles et IA) sont comparées et les désaccords sont signalés « à vérifier » dans l'écran de
+  relecture (valeur différente, valeur lue par les règles seules, date différente) ; « Réessayer avec
+  l'IA » fait la même comparaison. Nouvelle colonne `user_profiles.aiExtractionAlways` (migration
+  `20261017100000_add_ai_extraction_always`) ; `PUT /api/profile/ai-extraction-consent` accepte
+  `always`. Côté règles : libellés abrégés avec points (`T.S.H.`), lignes de commentaire ignorées (une
+  note citant « TSH # 8 mUI/L » n'est plus prise pour un résultat), précision des valeurs conservée
+  (`1,776` n'est plus arrondi à `1,78`) et dates écrites avec des tirets typographiques (`09−12−2025`).
 - Déploiement de production avec secrets injectés par Infisical : `deploy.sh` (connexion Machine
   Identity, puis `docker compose up -d --build` dans `infisical run`), qui renomme
   `PG_THYROTRACK_PASSWORD` en `DB_PASSWORD` et refuse de déployer si `PDF_ENCRYPTION_KEY` est absente
@@ -90,6 +129,10 @@ pas synchronisé avec ces tags.
 
 ### Changed
 
+- Identité visuelle unifiée : le logo « papillon » (pétales bleus et orange) est désormais le seul
+  logo de l'application — icône de l'onglet, icônes de l'app installée (PWA, iPhone), pages de
+  connexion/inscription/mot de passe/vérification, page 404 et en-tête du rapport imprimable. Il
+  remplace l'ancien carré vert à ligne de pouls. Les icônes de l'app passent sur fond bleu nuit.
 - Documents non applicatifs de la racine (`ConceptArt/`, `thyro-track-conceptArt.pdf`, la
   maquette HTML standalone) regroupés sous un unique dossier `Docs/`, ignoré en une seule ligne
   de `.gitignore` au lieu de trois. `thyrotrack_backup_20260822.dump` (un dump PostgreSQL commité

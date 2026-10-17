@@ -75,7 +75,7 @@ Avant de signaler un problème déjà couvert, quelques mécanismes existants (d
   mais **le serveur peut les déchiffrer** (pas de zero-knowledge) : une fuite simultanée de la base et
   de la clé les exposerait. L'extraction optionnelle par IA envoie **uniquement du texte anonymisé**
   (jamais le PDF) à **Anthropic**, et seulement pour les utilisateurs qui y ont consenti ;
-  l'anonymisation est faite au mieux, sans garantie.
+  l'anonymisation est faite au mieux, sans garantie. Un réglage optionnel du profil (« Lecture par IA à chaque import ») envoie le texte anonymisé de **chaque** bilan importé, et non plus seulement des échecs.
 - **Paiement** — l'abonnement Pro passe par **Stripe Checkout** (page hébergée par Stripe) : les
   données de carte n'atteignent jamais le serveur, et Stripe ne reçoit que l'email du compte, jamais de
   données de santé. Le webhook vérifie la signature Stripe sur le corps brut avant tout traitement, et

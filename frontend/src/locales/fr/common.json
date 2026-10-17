@@ -261,7 +261,28 @@
     "submitting": "Enregistrement…",
     "empty": "Aucune analyse enregistrée",
     "addFirst": "Ajouter ma première analyse",
-    "deleteConfirm": "Supprimer cette analyse ?"
+    "deleteConfirm": "Supprimer cette analyse ?",
+    "marker": {
+      "tsh": "TSH",
+      "ft4": "FT4",
+      "ft3": "FT3",
+      "t4": "T4 totale",
+      "t3": "T3 totale",
+      "antiTPO": "Anti-TPO",
+      "antiTG": "Anti-TG",
+      "antiTSHR": "Anti-TSHR",
+      "thyroglobulin": "Thyroglobuline",
+      "ferritin": "Ferritine",
+      "vitaminD": "Vitamine D",
+      "vitaminB12": "Vitamine B12",
+      "magnesium": "Magnésium",
+      "selenium": "Sélénium",
+      "cholesterol": "Cholestérol",
+      "glucose": "Glycémie",
+      "hemoglobin": "Hémoglobine"
+    },
+    "otherMarkers": "Autres marqueurs",
+    "noValues": "Aucune valeur saisie"
   },
   "medications": {
     "frequency": {
@@ -448,7 +469,9 @@
       "added": "Mot de passe mémorisé",
       "deleted": "Mot de passe supprimé",
       "revoked": "Tous les mots de passe ont été supprimés",
-      "error": "Une erreur est survenue"
+      "error": "Une erreur est survenue",
+      "aiAlwaysLabel": "Lecture par IA à chaque import",
+      "aiAlwaysHint": "Compare la lecture automatique et celle de l'IA, et signale les écarts. Sinon, l'IA ne sert que de repli. Exige l'autorisation ci-dessus."
     }
   },
   "diagnosis": {
@@ -567,7 +590,9 @@
       "too_large": "Fichier trop volumineux",
       "duplicate": "Déjà dans le carnet",
       "failed": "Lecture impossible",
-      "quota_exceeded": "Quota d'imports atteint"
+      "quota_exceeded": "Quota d'imports atteint",
+      "rate_limited": "Trop de requêtes",
+      "error": "Envoi échoué"
     },
     "reason": {
       "no_text": "Ce PDF ne contient pas de texte (scan ?). Saisissez les valeurs à la main."
@@ -580,7 +605,8 @@
     "retry": "Réessayer",
     "method": {
       "rules": "Lu automatiquement",
-      "llm": "Lu avec l'aide de l'IA"
+      "llm": "Lu avec l'aide de l'IA",
+      "both": "Deux lectures comparées (règles et IA)"
     },
     "insufficient": "lecture incomplète : vérifiez et complétez les champs",
     "possibleDuplicate": "Un résultat existe déjà à cette date : vérifiez pour éviter un doublon.",
@@ -615,7 +641,12 @@
       "hemoglobin": "Hémoglobine (g/dL)"
     },
     "download": "Télécharger le PDF",
-    "downloadError": "Téléchargement impossible"
+    "downloadError": "Téléchargement impossible",
+    "conflict": "À vérifier : lecture automatique {{rules}} · IA {{ai}}",
+    "conflictNone": "rien trouvé",
+    "rateLimited": "Vous avez envoyé beaucoup de fichiers en peu de temps. Ce n'est pas un bug ni une erreur de lecture : le serveur limite le nombre d'envois. Réessayez dans environ {{minutes}} min.",
+    "rateLimitedSoon": "Vous avez envoyé beaucoup de fichiers en peu de temps. Ce n'est pas un bug ni une erreur de lecture : le serveur limite le nombre d'envois. Réessayez dans quelques minutes.",
+    "uploadFailedHint": "L'envoi n'a pas abouti (serveur injoignable ou en erreur). Ce n'est pas un problème de lecture de votre PDF : réessayez."
   },
   "pro": {
     "badge": "Pro",

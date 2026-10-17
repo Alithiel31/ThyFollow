@@ -31,7 +31,7 @@ let user: {
   name: string;
   email: string;
   birthDate: Date | null;
-  profile: { aiExtractionConsentAt: Date | null } | null;
+  profile: { aiExtractionConsentAt: Date | null; aiExtractionAlways?: boolean } | null;
 };
 let monthlyCount: number;
 let seq = 0;
@@ -91,6 +91,19 @@ const prismaMock = {
   $transaction: vi.fn(async (fn: (tx: unknown) => Promise<unknown>) => fn(prismaMock)),
 };
 vi.mock('../lib/prisma.js', () => ({ prisma: prismaMock }));
+
+// La vérification de la version de session en base (lib/session.ts) est
+// couverte par auth.controller.test.ts : ici, seule la signature du JWT compte.
+vi.mock('../lib/session.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../lib/session.js')>()),
+  verifySessionToken: async (token: string) => {
+    try {
+      return (jwt.verify(token, JWT_SECRET) as { userId: string }).userId;
+    } catch {
+      return null;
+    }
+  },
+}));
 
 const llmMock = vi.fn();
 vi.mock('../lib/labExtract/llm.js', () => ({ extractWithLlm: (...args: unknown[]) => llmMock(...args) }));
@@ -322,6 +335,83 @@ describe('POST /api/lab-results/import', () => {
     llmMock.mockClear();
     await request(app).post('/api/lab-results/import').set('Authorization', auth()).attach('files', await makePdf(bilan('P')), 'p.pdf');
     expect(llmMock).toHaveBeenCalledTimes(0);
+  });
+
+  describe('mode « lecture par IA à chaque import » (comparaison des deux lectures)', () => {
+    const llmResult = (values: Record<string, number>, date = '2026-03-12') => ({
+      ok: true,
+      result: { date, dateConfidence: 'low', lab: 'Biogroup', orderedBy: null, values, flags: [], insufficient: false },
+    });
+    const importBilan = async (tag: string, forceAi = false) => {
+      const app = await buildApp();
+      let req = request(app).post('/api/lab-results/import').set('Authorization', auth());
+      if (forceAi) req = req.field('forceAi', 'true');
+      const res = await req.attach('files', await makePdf(bilan(tag)), `${tag}.pdf`);
+      return res.body.results[0].draft;
+    };
+
+    it('appelle l’IA même si les règles suffisent, et ne signale rien quand les lectures concordent', async () => {
+      user.profile = { aiExtractionConsentAt: new Date(), aiExtractionAlways: true };
+      llmMock.mockResolvedValue(llmResult({ tsh: 2.35, ferritin: 64 }));
+      const draft = await importBilan('ALW1');
+      expect(llmMock).toHaveBeenCalledTimes(1);
+      expect(draft.method).toBe('both');
+      expect(draft.conflicts).toEqual([]);
+      expect(draft.values).toEqual({ tsh: 2.35, ferritin: 64 });
+    });
+
+    it('signale une divergence : la valeur de l’IA est proposée, celle des règles est conservée dans le signalement', async () => {
+      user.profile = { aiExtractionConsentAt: new Date(), aiExtractionAlways: true };
+      llmMock.mockResolvedValue(llmResult({ tsh: 3.1, ferritin: 64 }));
+      const draft = await importBilan('ALW2');
+      expect(draft.values.tsh).toBe(3.1);
+      expect(draft.conflicts).toEqual([{ field: 'tsh', rules: 2.35, ai: 3.1 }]);
+    });
+
+    it('signale une valeur lue par les règles seulement, et une date divergente', async () => {
+      user.profile = { aiExtractionConsentAt: new Date(), aiExtractionAlways: true };
+      llmMock.mockResolvedValue(llmResult({ ferritin: 64 }, '2025-01-01'));
+      const draft = await importBilan('ALW3');
+      expect(draft.values.tsh).toBe(2.35); // gardée, mais suspecte
+      expect(draft.conflicts).toEqual(
+        expect.arrayContaining([
+          { field: 'tsh', rules: 2.35, ai: null },
+          { field: 'date', rules: '2026-03-12', ai: '2025-01-01' },
+        ])
+      );
+      expect(draft.date).toBe('2025-01-01');
+      expect(draft.dateConfidence).toBe('low');
+    });
+
+    it('sans consentement, « toujours » ne déclenche aucun appel', async () => {
+      user.profile = { aiExtractionConsentAt: null, aiExtractionAlways: true };
+      const draft = await importBilan('ALW4');
+      expect(llmMock).not.toHaveBeenCalled();
+      expect(draft.method).toBe('rules');
+      expect(draft.conflicts).toEqual([]);
+    });
+
+    it('si l’IA échoue, la lecture par règles est proposée telle quelle', async () => {
+      user.profile = { aiExtractionConsentAt: new Date(), aiExtractionAlways: true };
+      llmMock.mockResolvedValue({ ok: false, reason: 'error' });
+      const draft = await importBilan('ALW5');
+      expect(draft.method).toBe('rules');
+      expect(draft.values).toEqual({ tsh: 2.35, ferritin: 64 });
+    });
+
+    it('« Réessayer avec l’IA » compare aussi les deux lectures, sans le réglage « toujours »', async () => {
+      user.profile = { aiExtractionConsentAt: new Date(), aiExtractionAlways: false };
+      llmMock.mockResolvedValue(llmResult({ tsh: 3.1, ferritin: 64 }));
+      const draft = await importBilan('ALW6', true);
+      expect(draft.method).toBe('both');
+      expect(draft.conflicts).toEqual([{ field: 'tsh', rules: 2.35, ai: 3.1 }]);
+    });
+
+    it('sans le réglage « toujours », l’IA n’est pas appelée quand les règles suffisent', async () => {
+      user.profile = { aiExtractionConsentAt: new Date(), aiExtractionAlways: false };
+      await importBilan('ALW7');
+      expect(llmMock).not.toHaveBeenCalled();
+    });
   });
 
   it('501 sans PDF_ENCRYPTION_KEY', async () => {

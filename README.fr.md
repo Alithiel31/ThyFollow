@@ -370,7 +370,7 @@ GET    /api/pdf-passwords                         (libellés seulement — jamai
 POST   /api/pdf-passwords
 DELETE /api/pdf-passwords/:id
 DELETE /api/pdf-passwords                         (tout révoquer)
-PUT    /api/profile/ai-extraction-consent         (consentement au repli IA, révocable)
+PUT    /api/profile/ai-extraction-consent         (consentement à la lecture IA, révocable ; `always` en option)
 
 POST   /api/billing/checkout                      (abonnement Pro : renvoie l'URL de paiement Stripe)
 POST   /api/billing/portal                        (portail client Stripe)

@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import { Plus, Trash2, FlaskConical, TrendingUp, FileUp } from 'lucide-react';
 import { labApi } from '../lib/api';
 import { formatDate, tshStatus } from '../lib/utils';
-import { LAB_RANGES, type LabResult } from '../types';
+import { LAB_RANGES, MARKER_DISPLAY, type LabMarkerKey, type LabResult } from '../types';
 import { useAuthStore } from '../lib/store';
 import {
   LineChart, Line, XAxis, YAxis, Tooltip,
@@ -19,6 +19,10 @@ import { LabImport, DocumentLink } from '../components/LabImport';
 import { ProPaywall } from '../components/ProPanel';
 import { importsSummary, useRefreshUser } from '../lib/entitlements';
 import styles from './LabResultsPage.module.css';
+
+// Marqueurs sans champ dédié dans les sections principales du formulaire : ils peuvent venir
+// d'un import de PDF et doivent rester visibles et corrigeables.
+const OTHER_MARKERS: LabMarkerKey[] = ['t4', 't3', 'thyroglobulin', 'magnesium', 'selenium', 'cholesterol', 'glucose', 'hemoglobin'];
 
 const EMPTY_FORM: Partial<LabResult> = {
   date: '', lab: '', orderedBy: '', tsh: undefined, ft4: undefined, ft3: undefined,
@@ -216,6 +220,17 @@ export function LabResultsPage() {
                 <NumField label={t('labResults.vitaminB12')} field="vitaminB12" form={form} set={set} step="0.1" placeholder="300" />
               </div>
 
+              <div className={styles.formSection}>{t('labResults.otherMarkers')}</div>
+              <div className={styles.grid3}>
+                {OTHER_MARKERS.map((key) => {
+                  const unit = MARKER_DISPLAY.find((m) => m.key === key)?.unit ?? '';
+                  return (
+                    <NumField key={key} label={`${t(`labResults.marker.${key}`)} (${unit})`} field={key}
+                      form={form} set={set} step="0.01" placeholder="—" />
+                  );
+                })}
+              </div>
+
               <Field label={t('labResults.notes')}>
                 <textarea className={styles.textarea} rows={3} value={form.notes ?? ''} onChange={set('notes')} placeholder={t('labResults.notesPlaceholder')} />
               </Field>
@@ -256,14 +271,22 @@ export function LabResultsPage() {
                 <div className={styles.resultDate}>{formatDate(r.date)}</div>
                 {r.lab && <div className={styles.resultLab}>{r.lab}</div>}
                 <div className={styles.markers}>
-                  {r.tsh != null && (
-                    <Marker label="TSH" value={r.tsh} unit="mUI/L" color={tshInfo?.color} bg={tshInfo?.bg} badge={tshInfo?.label} />
-                  )}
-                  {r.ft4 != null && <Marker label="FT4" value={r.ft4} unit="pmol/L" />}
-                  {r.ft3 != null && <Marker label="FT3" value={r.ft3} unit="pmol/L" />}
-                  {r.antiTPO != null && (
-                    <Marker label="Anti-TPO" value={r.antiTPO} unit="UI/mL"
-                      color={r.antiTPO > LAB_RANGES.antiTPO.max ? 'var(--rose)' : 'var(--teal)'} />
+                  {/* Tous les marqueurs renseignés (importés ou saisis), pas seulement la thyroïde :
+                      c'est ce qui dit de quoi se compose le bilan. */}
+                  {MARKER_DISPLAY.filter(({ key }) => r[key] != null).map(({ key, unit }) => {
+                    const label = t(`labResults.marker.${key}`);
+                    const value = r[key] as number;
+                    if (key === 'tsh') {
+                      return <Marker key={key} label={label} value={value} unit={unit} color={tshInfo?.color} bg={tshInfo?.bg} badge={tshInfo?.label} />;
+                    }
+                    if (key === 'antiTPO') {
+                      return <Marker key={key} label={label} value={value} unit={unit}
+                        color={value > LAB_RANGES.antiTPO.max ? 'var(--rose)' : 'var(--teal)'} />;
+                    }
+                    return <Marker key={key} label={label} value={value} unit={unit} />;
+                  })}
+                  {MARKER_DISPLAY.every(({ key }) => r[key] == null) && (
+                    <span className={styles.markerUnit}>{t('labResults.noValues')}</span>
                   )}
                 </div>
                 {r.notes && <p className={styles.resultNotes}>{r.notes}</p>}

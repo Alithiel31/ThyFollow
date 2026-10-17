@@ -30,6 +30,8 @@ const app = express();
 
 // ── Fait confiance au reverse-proxy nginx placé devant (X-Forwarded-For),
 // nécessaire pour qu'express-rate-limit identifie correctement les IP clientes.
+// Un seul saut suffit : nginx remplace X-Forwarded-For par l'IP réelle du
+// visiteur, tirée de CF-Connecting-IP (voir frontend/nginx.conf).
 app.set('trust proxy', 1);
 
 // ── Sécurité : en-têtes HTTP standards

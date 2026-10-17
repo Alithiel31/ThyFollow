@@ -2,9 +2,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Activity, MailCheck } from 'lucide-react';
+import { MailCheck } from 'lucide-react';
 import { authApi } from '../lib/api';
 import styles from './AuthPage.module.css';
+import { LogoMark } from '../components/LogoMark';
 
 export function ForgotPasswordPage() {
   const { t } = useTranslation();
@@ -30,7 +31,7 @@ export function ForgotPasswordPage() {
       <div className={styles.page}>
         <div className={styles.card}>
           <div className={styles.logoRow}>
-            <div className={styles.logoIcon}><Activity size={20} /></div>
+            <div className={styles.logoIcon}><LogoMark size={26} /></div>
             <span className={styles.logoText}>{t('app.name')}</span>
           </div>
 
@@ -53,7 +54,7 @@ export function ForgotPasswordPage() {
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.logoRow}>
-          <div className={styles.logoIcon}><Activity size={20} /></div>
+          <div className={styles.logoIcon}><LogoMark size={26} /></div>
           <span className={styles.logoText}>{t('app.name')}</span>
         </div>
 

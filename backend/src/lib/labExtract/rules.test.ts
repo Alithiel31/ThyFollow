@@ -179,6 +179,53 @@ describe('labExtract/rules — unités et cas particuliers', () => {
     expect(r.values.tsh).toBe(2.35);
   });
 
+  it('reconnaît un libellé abrégé avec des points (« T.S.H. ») et garde la précision lue', () => {
+    const r = parseLabText('Prélevé le 21/07/26\nT.S.H.  1,776 mUI/L  0.35 à 4.94');
+    expect(r.values.tsh).toBe(1.776);
+  });
+
+  it('ne prend pas la valeur d’une note de bas de page qui cite le marqueur', () => {
+    const note =
+      'Après 60 ans la valeur recommandée doit être inférieure à la décennie d’âge (exemple : TSH # 8 mUI/L pour une personne de 80 à 89 ans)';
+    const withResult = parseLabText(`Prélevé le 21/07/26\nT.S.H.  1,776 mUI/L  0.35 à 4.94\n${note}`);
+    expect(withResult.values.tsh).toBe(1.776);
+
+    const noteBeforeResult = parseLabText(`Prélevé le 21/07/26\n${note}\nT.S.H.  1,776 mUI/L`);
+    expect(noteBeforeResult.values.tsh).toBe(1.776);
+
+    const noteOnly = parseLabText(`Prélevé le 21/07/26\n${note}`);
+    expect(noteOnly.values.tsh).toBeUndefined();
+    expect(noteOnly.insufficient).toBe(true);
+  });
+
+  it('reconnaît F.T.4, T.4 libre et F.T.3 écrits avec des points', () => {
+    const r = parseLabText('Prélevé le 01/02/2026\nF.T.4  14,2 pmol/L\nF.T.3  4,1 pmol/L');
+    expect(r.values.ft4).toBe(14.2);
+    expect(r.values.ft3).toBe(4.1);
+    expect(parseLabText('Prélevé le 01/02/2026\nT.4 libre  15 pmol/L').values.ft4).toBe(15);
+  });
+
+  it('arrondit une valeur convertie mais pas une valeur lue telle quelle', () => {
+    const r = parseLabText('Prélevé le 01/02/2026\nFT4 1,10 ng/dL\nTSH 1,776 mUI/L');
+    expect(r.values.ft4).toBe(14.16);
+    expect(r.values.tsh).toBe(1.776);
+  });
+
+  it('ne prend pas une phrase d’accréditation pour le nom du laboratoire', () => {
+    const r = parseLabText(
+      'Prélevé le 29/04/2025\nLaboratoire accrédité n°8-3165. Liste des sites et portées disponibles sur www.cofrac.fr\nFerritine 630 µg/L'
+    );
+    expect(r.lab).toBeNull();
+    expect(r.values.ferritin).toBe(630);
+  });
+
+  it('garde un nom de laboratoire court introduit par « Laboratoire »', () => {
+    expect(parseLabText('Laboratoire Durand\nTSH 2,3 mUI/L').lab).toBe('Laboratoire Durand');
+    expect(parseLabText('Laboratoire de biologie médicale Martin\nTSH 2,3 mUI/L').lab).toBe(
+      'Laboratoire de biologie médicale Martin'
+    );
+  });
+
   it('utilise une date non étiquetée avec une confiance faible', () => {
     const r = parseLabText('Compte rendu du 12/03/2026\nTSH 2,3 mUI/L');
     expect(r.date).toBe('2026-03-12');

@@ -72,7 +72,7 @@ Before reporting something already covered, a few existing mechanisms (detailed 
   Remembered PDF passwords are encrypted the same way and revocable from the profile, but **the
   server can decrypt them** (not zero-knowledge): a simultaneous leak of the database and the key
   would expose them. The optional AI extraction sends **only anonymised text** (never the PDF) to
-  **Anthropic**, and only for users who opted in; the anonymisation is best-effort, not a guarantee.
+  **Anthropic**, and only for users who opted in; the anonymisation is best-effort, not a guarantee. An optional profile setting (« AI reading on every import ») sends the anonymised text of **every** imported report instead of only the failures.
 - **Payments** — the Pro plan is paid through **Stripe Checkout** (a page hosted by Stripe): card
   details never reach the server, and Stripe only receives the account's email, never health data.
   The webhook verifies the Stripe signature on the raw body before doing anything, and re-reads the

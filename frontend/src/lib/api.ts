@@ -122,8 +122,11 @@ export const pdfPasswordsApi = {
 
 // ── Consentement à l'extraction par IA (repli de l'import de bilans)
 export const aiConsentApi = {
-  set: (consent: boolean) =>
-    api.put<{ aiExtractionConsentAt: string | null }>('/profile/ai-extraction-consent', { consent }),
+  set: (consent: boolean, always?: boolean) =>
+    api.put<{ aiExtractionConsentAt: string | null; aiExtractionAlways: boolean }>('/profile/ai-extraction-consent', {
+      consent,
+      ...(always === undefined ? {} : { always }),
+    }),
 };
 
 // ── Medications
