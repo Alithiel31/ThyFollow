@@ -11,9 +11,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const prismaMock = {
   oAuthAccount: { findUnique: vi.fn(), create: vi.fn(), deleteMany: vi.fn() },
-  user: { findUnique: vi.fn(), create: vi.fn() },
+  user: { findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
   authEvent: { create: vi.fn() },
 };
+// Transaction interactive : le callback reçoit le même client simulé
+Object.assign(prismaMock, { $transaction: vi.fn(async (fn: (tx: typeof prismaMock) => Promise<unknown>) => fn(prismaMock)) });
 
 vi.mock('../lib/prisma.js', () => ({ prisma: prismaMock }));
 
@@ -160,6 +162,53 @@ describe('googleCallback — login flow', () => {
     // Usage unique : la seconde tentative avec le même code échoue.
     const second = await request(app).post('/api/auth/oidc/exchange').send({ code });
     expect(second.status).toBe(400);
+  });
+
+  it('linking an unverified pre-existing account wipes its password and marks the email verified (pre-account hijacking)', async () => {
+    handleGoogleCallbackMock.mockResolvedValue({
+      providerAccountId: 'google-sub-victim',
+      email: 'victim@example.com',
+      emailVerified: true,
+      name: 'Victim',
+    });
+    prismaMock.oAuthAccount.findUnique.mockResolvedValue(null);
+    // Compte créé par un tiers avec l'email de la victime, jamais vérifié
+    prismaMock.user.findUnique.mockResolvedValue({ id: 'pre-created', emailVerified: false, password: 'attacker-hash' });
+
+    const app = await buildApp();
+    const flow = { state: 'test-state', nonce: 'test-nonce', codeVerifier: 'verifier' };
+    const res = await request(app)
+      .get('/api/auth/oidc/google/callback?code=abc&state=test-state')
+      .set('Cookie', [await flowCookie('thyro_oidc_google', flow)]);
+
+    expect(res.status).toBe(302);
+    expect(prismaMock.oAuthAccount.create).toHaveBeenCalledWith({
+      data: { provider: 'google', providerAccountId: 'google-sub-victim', userId: 'pre-created' },
+    });
+    expect(prismaMock.user.update).toHaveBeenCalledWith({
+      where: { id: 'pre-created' },
+      data: expect.objectContaining({ emailVerified: true, password: null, resetToken: null, verificationToken: null, tokenVersion: { increment: 1 } }),
+    });
+  });
+
+  it('linking a verified pre-existing account keeps its password', async () => {
+    handleGoogleCallbackMock.mockResolvedValue({
+      providerAccountId: 'google-sub-owner',
+      email: 'owner@example.com',
+      emailVerified: true,
+      name: 'Owner',
+    });
+    prismaMock.oAuthAccount.findUnique.mockResolvedValue(null);
+    prismaMock.user.findUnique.mockResolvedValue({ id: 'owner-id', emailVerified: true, password: 'owner-hash' });
+
+    const app = await buildApp();
+    const flow = { state: 'test-state', nonce: 'test-nonce', codeVerifier: 'verifier' };
+    await request(app)
+      .get('/api/auth/oidc/google/callback?code=abc&state=test-state')
+      .set('Cookie', [await flowCookie('thyro_oidc_google', flow)]);
+
+    expect(prismaMock.oAuthAccount.create).toHaveBeenCalled();
+    expect(prismaMock.user.update).not.toHaveBeenCalled();
   });
 
   it('does not auto-link to an existing account when Google has not verified the email', async () => {

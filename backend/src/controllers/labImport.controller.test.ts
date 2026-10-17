@@ -39,16 +39,28 @@ let seq = 0;
 const prismaMock = {
   user: {
     findUnique: vi.fn(async () => user),
-    update: vi.fn(async () => {
-      user.freeImportsUsed += 1;
-      return user;
-    }),
+    // Incrément / décrément conditionnel (reserveImport / releaseImport) : la
+    // condition et la modification sont appliquées d'un bloc, comme en base.
+    updateMany: vi.fn(
+      async ({ where, data }: { where: { freeImportsUsed: { lt?: number; gt?: number } }; data: { freeImportsUsed: { increment?: number; decrement?: number } } }) => {
+        const { lt, gt } = where.freeImportsUsed;
+        if ((lt !== undefined && !(user.freeImportsUsed < lt)) || (gt !== undefined && !(user.freeImportsUsed > gt))) return { count: 0 };
+        user.freeImportsUsed += (data.freeImportsUsed.increment ?? 0) - (data.freeImportsUsed.decrement ?? 0);
+        return { count: 1 };
+      }
+    ),
   },
   importUsage: {
     findUnique: vi.fn(async () => ({ count: monthlyCount })),
-    upsert: vi.fn(async () => {
-      monthlyCount += 1;
-    }),
+    upsert: vi.fn(async () => ({})),
+    updateMany: vi.fn(
+      async ({ where, data }: { where: { count: { lt?: number; gt?: number } }; data: { count: { increment?: number; decrement?: number } } }) => {
+        const { lt, gt } = where.count;
+        if ((lt !== undefined && !(monthlyCount < lt)) || (gt !== undefined && !(monthlyCount > gt))) return { count: 0 };
+        monthlyCount += (data.count.increment ?? 0) - (data.count.decrement ?? 0);
+        return { count: 1 };
+      }
+    ),
   },
   labDocument: {
     deleteMany: vi.fn(async ({ where }: { where: { userId: string; labResultId: null; createdAt: { lt: Date } } }) => {
@@ -525,6 +537,39 @@ describe('accès Pro et quotas', () => {
       .set('Authorization', auth())
       .attach('files', Buffer.from('pas un pdf'), 'x.pdf');
     expect(user.freeImportsUsed).toBe(0);
+  });
+
+  it('un PDF sans texte rend l’import réservé', async () => {
+    user.proUntil = null;
+    const doc = await PDFDocument.create();
+    doc.addPage();
+    const app = await buildApp();
+    const res = await request(app).post('/api/lab-results/import').set('Authorization', auth())
+      .attach('files', Buffer.from(await doc.save()), 'scan.pdf');
+    expect(res.body.results[0]).toMatchObject({ status: 'failed', reason: 'no_text' });
+    expect(user.freeImportsUsed).toBe(0);
+  });
+
+  it('requêtes simultanées : le dernier import offert n’est consommé qu’une fois', async () => {
+    user.proUntil = null;
+    user.freeImportsUsed = 2;
+    const app = await buildApp();
+    // Les deux requêtes passent le pré-contrôle (solde lu = 1) avant que l'une
+    // ou l'autre n'ait décompté quoi que ce soit.
+    const [a, b] = await Promise.all([send(app, ['I']), send(app, ['J'])]);
+    const statuses = [a, b].map((res) => res.body.results[0].status).sort();
+    expect(statuses).toEqual(['quota_exceeded', 'ready']);
+    expect(user.freeImportsUsed).toBe(3);
+    expect(docs).toHaveLength(1);
+  });
+
+  it('Pro : le plafond mensuel ne peut pas être dépassé par des requêtes simultanées', async () => {
+    monthlyCount = 24;
+    const app = await buildApp();
+    const [a, b] = await Promise.all([send(app, ['K']), send(app, ['L'])]);
+    const statuses = [a, b].map((res) => res.body.results[0].status).sort();
+    expect(statuses).toEqual(['quota_exceeded', 'ready']);
+    expect(monthlyCount).toBe(25);
   });
 });
 

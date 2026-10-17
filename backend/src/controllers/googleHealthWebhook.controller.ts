@@ -17,6 +17,7 @@
 //   ensuite).
 // - Notifications réelles : répondre immédiatement 204, traiter le payload
 //   de façon asynchrone (Google retente sinon, jusqu'à 7 jours).
+import crypto from 'crypto';
 import { Request, Response } from 'express';
 import { config } from '../config.js';
 import { syncDailyMetricsByHealthUserId } from '../lib/googleHealthSync.js';
@@ -30,6 +31,17 @@ interface WebhookBody {
     dataType?: string;
     intervals?: { civilIso8601TimeInterval?: { startTime?: string; endTime?: string } }[];
   };
+}
+
+// Comparaison à temps constant du secret reçu : un `!==` s'arrête au premier
+// caractère différent, et le temps de réponse renseignerait sur le préfixe
+// correct. timingSafeEqual exige deux valeurs de même longueur ; seule la
+// longueur du secret peut donc transparaître, ce qui ne permet pas de le deviner.
+function isAuthorized(header: string | undefined): boolean {
+  if (!config.googleHealthWebhookSecret || typeof header !== 'string') return false;
+  const received = Buffer.from(header);
+  const expected = Buffer.from(config.googleHealthWebhookSecret);
+  return received.length === expected.length && crypto.timingSafeEqual(received, expected);
 }
 
 // Déduit les dates (YYYY-MM-DD) affectées par la notification à partir des
@@ -47,7 +59,7 @@ function extractDates(body: WebhookBody): string[] {
 export const googleHealthWebhookController = {
   // POST /api/webhooks/google-health
   notify: (req: Request, res: Response): void => {
-    if (!config.googleHealthWebhookSecret || req.headers.authorization !== config.googleHealthWebhookSecret) {
+    if (!isAuthorized(req.headers.authorization)) {
       res.status(401).end();
       return;
     }

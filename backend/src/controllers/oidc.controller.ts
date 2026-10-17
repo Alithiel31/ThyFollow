@@ -128,8 +128,31 @@ async function handleGoogleLoginCallback(req: AuthRequest, res: Response, rawCoo
         : null;
 
       if (existingUser) {
-        await prisma.oAuthAccount.create({
-          data: { provider: 'google', providerAccountId: identity.providerAccountId, userId: existingUser.id },
+        await prisma.$transaction(async (tx) => {
+          await tx.oAuthAccount.create({
+            data: { provider: 'google', providerAccountId: identity.providerAccountId, userId: existingUser.id },
+          });
+          // Compte jamais vérifié : rien ne prouve qu'il a été créé par le
+          // titulaire de l'email (pré-création par un tiers qui attend que la
+          // victime se connecte avec Google). Google vient de prouver la
+          // détention de l'adresse : on marque l'email vérifié et on efface
+          // le mot de passe et les jetons posés par le créateur, sans quoi il
+          // pourrait se connecter au compte une fois rattaché. Le titulaire
+          // pourra définir son propre mot de passe via « mot de passe oublié ».
+          if (!existingUser.emailVerified) {
+            await tx.user.update({
+              where: { id: existingUser.id },
+              data: {
+                emailVerified: true,
+                password: null,
+                verificationToken: null,
+                verificationTokenExpiresAt: null,
+                resetToken: null,
+                resetTokenExpiresAt: null,
+                tokenVersion: { increment: 1 },
+              },
+            });
+          }
         });
         userId = existingUser.id;
       } else {
