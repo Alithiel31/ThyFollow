@@ -85,6 +85,8 @@ export const resolvers = {
       prisma.medication.findMany({
         where: { userId: user.id, ...(args.activeOnly === false ? {} : { active: true }) },
         orderBy: { createdAt: 'desc' },
+        // Chargées dans la même requête que les médicaments : pas de N+1.
+        include: { dosePeriods: { orderBy: { startDate: 'asc' } } },
       }),
     dailyEntries: (user: { id: string }, args: LimitArgs) =>
       prisma.dailyEntry.findMany({
@@ -112,6 +114,10 @@ export const resolvers = {
       const all = await ctx.loaders.intakesByMedicationId.load(medication.id);
       return all.slice(0, args.limit ?? 30);
     },
+  },
+
+  DosePeriod: {
+    startDate: (period: { startDate: Date }) => toISODate(period.startDate),
   },
 
   MedicationIntake: {

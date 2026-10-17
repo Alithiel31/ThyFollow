@@ -86,6 +86,39 @@ describe('POST /graphql — me { medications { intakes } }', () => {
   });
 });
 
+describe('POST /graphql — me { medications { dosePeriods } }', () => {
+  it('expose l’historique des posologies avec ses créneaux, chargé avec les médicaments', async () => {
+    prismaMock.user.findUniqueOrThrow.mockResolvedValue({ id: USER_ID, email: 'a@b.com', name: 'Alice' });
+    prismaMock.medication.findMany.mockResolvedValue([
+      {
+        id: 'm1', name: 'Levothyrox', dosage: 75, dosageUnit: 'MCG', frequency: 'DAILY', intakeTimes: ['07:00', '20:00'],
+        active: true, showOnChart: true,
+        dosePeriods: [
+          { id: 'p1', startDate: new Date('2025-01-01'), slots: [{ time: '07:00', doses: [75, 100] }] },
+          { id: 'p2', startDate: new Date('2026-03-01'), slots: [{ time: '07:00', doses: [50] }, { time: '20:00', doses: [25] }] },
+        ],
+      },
+    ]);
+
+    const app = await buildApp();
+    const res = await request(app)
+      .post('/graphql')
+      .set('Authorization', authHeader())
+      .send({ query: 'query { me { medications { showOnChart dosePeriods { startDate slots { time doses } } } } }' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.errors).toBeUndefined();
+    expect(res.body.data.me.medications[0]).toEqual({
+      showOnChart: true,
+      dosePeriods: [
+        { startDate: '2025-01-01T00:00:00.000Z', slots: [{ time: '07:00', doses: [75, 100] }] },
+        { startDate: '2026-03-01T00:00:00.000Z', slots: [{ time: '07:00', doses: [50] }, { time: '20:00', doses: [25] }] },
+      ],
+    });
+    expect(prismaMock.medication.findMany.mock.calls[0][0].include).toEqual({ dosePeriods: { orderBy: { startDate: 'asc' } } });
+  });
+});
+
 describe('POST /graphql — authentication', () => {
   it('rejects a request with no Authorization header', async () => {
     const app = await buildApp();

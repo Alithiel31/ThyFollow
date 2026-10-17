@@ -41,12 +41,32 @@ export const typeDefs = `#graphql
   type Medication {
     id: ID!
     name: String!
+    "Dose moyenne quotidienne (tous créneaux additionnés) de la période de posologie en cours."
     dosage: Float!
     dosageUnit: String!
     frequency: String!
+    "Heures des créneaux de la période de posologie en cours."
     intakeTimes: [String!]!
     active: Boolean!
+    "Affiché sur le graphique TSH (médicaments en µg uniquement)."
+    showOnChart: Boolean!
+    "Historique des posologies, de la plus ancienne à la plus récente."
+    dosePeriods: [DosePeriod!]!
     intakes(limit: Int = 30): [MedicationIntake!]!
+  }
+
+  "Une posologie, en vigueur de startDate jusqu'au début de la période suivante."
+  type DosePeriod {
+    id: ID!
+    startDate: String!
+    slots: [DoseSlot!]!
+  }
+
+  "Un créneau de prise : cycle de doses répété en boucle depuis le début de la période."
+  type DoseSlot {
+    "Heure HH:MM, ou null pour une prise sans heure fixe."
+    time: String
+    doses: [Float!]!
   }
 
   type MedicationIntake {
