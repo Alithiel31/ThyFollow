@@ -27,13 +27,29 @@
   margin-bottom: 32px;
 }
 
+/* Même écrin que le logo de l'en-tête (AppShell) */
 .logoIcon {
   width: 36px; height: 36px;
-  background: var(--accent-soft);
-  border: 1px solid var(--accent-glow);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
-  color: var(--accent);
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(20, 30, 50, 0.08);
+}
+
+:global([data-theme='dark']) .logoIcon {
+  background: linear-gradient(150deg, #111c33, #0a0d14);
+  border-color: rgba(59, 123, 246, 0.24);
+  box-shadow: 0 0 18px rgba(59, 123, 246, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme='light'])) .logoIcon {
+    background: linear-gradient(150deg, #111c33, #0a0d14);
+    border-color: rgba(59, 123, 246, 0.24);
+    box-shadow: 0 0 18px rgba(59, 123, 246, 0.2);
+  }
 }
 
 .logoText {
