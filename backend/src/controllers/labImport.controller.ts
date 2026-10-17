@@ -30,7 +30,7 @@ import {
 import { extractPdfText } from '../lib/labExtract/pdfText.js';
 import { parseLabText, type ParsedLabResult } from '../lib/labExtract/rules.js';
 import { extractWithLlm } from '../lib/labExtract/llm.js';
-import { MARKER_KEYS } from '../lib/labExtract/units.js';
+import { MARKER_KEYS, type MarkerKey } from '../lib/labExtract/units.js';
 
 // Texte minimal pour considérer qu'un PDF a une couche texte exploitable (en
 // dessous : PDF scanné, l'OCR est hors périmètre).
@@ -47,13 +47,28 @@ export type ImportStatus =
   | 'duplicate'
   | 'failed';
 
+export interface ImportConflict {
+  field: 'date' | MarkerKey;
+  // Lecture par règles ; null si elles n'ont rien trouvé
+  rules: string | number | null;
+  // Lecture par IA ; null si elle n'a rien trouvé
+  ai: string | number | null;
+}
+
 export interface ImportFileResult {
   filename: string;
   status: ImportStatus;
   documentId?: string;
   // Présent pour `duplicate` : le résultat du carnet qui porte déjà ce PDF
   duplicateOf?: { labResultId: string };
-  draft?: Omit<ParsedLabResult, 'insufficient'> & { insufficient: boolean; method: 'rules' | 'llm' };
+  draft?: Omit<ParsedLabResult, 'insufficient'> & {
+    insufficient: boolean;
+    // rules : lecture locale seule ; llm : complétée par l'IA ; both : les deux lectures
+    // ont été comparées (mode « IA à chaque import » ou « Réessayer avec l'IA »)
+    method: 'rules' | 'llm' | 'both';
+    // Champs sur lesquels les deux lectures ne s'accordent pas (à vérifier par l'utilisateur)
+    conflicts: ImportConflict[];
+  };
   // Un résultat du carnet existe déjà à cette date (et ce labo) : l'utilisateur choisit
   possibleDuplicateOf?: { labResultId: string };
   reason?: string;
@@ -135,9 +150,50 @@ async function unlock(
   return candidates.some((c) => c.source === 'provided') ? 'wrong_password' : 'password_required';
 }
 
+// Compare les deux lectures : l'IA l'emporte sur ce qu'elle a lu, les règles complètent le
+// reste, et tout désaccord est signalé (la valeur proposée n'est jamais présentée comme sûre).
+function mergeReadings(rules: ParsedLabResult, ai: ParsedLabResult): { result: ParsedLabResult; conflicts: ImportConflict[] } {
+  const conflicts: ImportConflict[] = [];
+
+  let date = rules.date;
+  let dateConfidence = rules.dateConfidence;
+  if (ai.date) {
+    if (rules.date && rules.date !== ai.date) conflicts.push({ field: 'date', rules: rules.date, ai: ai.date });
+    if (rules.date !== ai.date) dateConfidence = 'low';
+    date = ai.date;
+  }
+
+  const values: ParsedLabResult['values'] = { ...rules.values };
+  for (const marker of MARKER_KEYS) {
+    const fromRules = rules.values[marker];
+    const fromAi = ai.values[marker];
+    if (fromAi !== undefined) {
+      values[marker] = fromAi;
+      if (fromRules !== undefined && Math.abs(fromRules - fromAi) > 1e-9) {
+        conflicts.push({ field: marker, rules: fromRules, ai: fromAi });
+      }
+    } else if (fromRules !== undefined) {
+      // Lue par les règles seulement : suspect (ex. valeur tirée d'une note de bas de page)
+      conflicts.push({ field: marker, rules: fromRules, ai: null });
+    }
+  }
+
+  const flags = [...ai.flags, ...rules.flags.filter((f) => !ai.flags.some((a) => a.marker === f.marker && a.reason === f.reason))];
+  const result: ParsedLabResult = {
+    date,
+    dateConfidence,
+    lab: ai.lab ?? rules.lab,
+    orderedBy: rules.orderedBy,
+    values,
+    flags,
+    insufficient: !date || Object.keys(values).length === 0,
+  };
+  return { result, conflicts };
+}
+
 async function extract(
   data: Buffer,
-  user: { name: string; email: string; birthDate: Date | null; consent: boolean },
+  user: { name: string; email: string; birthDate: Date | null; consent: boolean; always: boolean },
   forceAi: boolean
 ): Promise<{ draft: NonNullable<ImportFileResult['draft']> } | { noText: true }> {
   const text = await extractPdfText(data);
@@ -145,26 +201,35 @@ async function extract(
 
   const rules = parseLabText(text);
   let result: ParsedLabResult = rules;
-  let method: 'rules' | 'llm' = 'rules';
+  let method: 'rules' | 'llm' | 'both' = 'rules';
+  let conflicts: ImportConflict[] = [];
 
-  if ((rules.insufficient || forceAi) && user.consent) {
-    const llm = await extractWithLlm(text, { ...user, consent: true });
+  // Mode « comparer » : IA à chaque import (réglage du profil) ou « Réessayer avec l'IA ».
+  // Sinon l'IA ne sert que de repli quand les règles ne suffisent pas.
+  const compare = user.consent && (user.always || forceAi);
+  if (user.consent && (rules.insufficient || compare)) {
+    const llm = await extractWithLlm(text, { name: user.name, email: user.email, birthDate: user.birthDate, consent: true });
     if (llm.ok) {
-      // Les règles (locales, déterministes) priment ; le LLM complète ce qui manque.
-      result = {
-        date: rules.date ?? llm.result.date,
-        dateConfidence: rules.date ? rules.dateConfidence : llm.result.dateConfidence,
-        lab: rules.lab ?? llm.result.lab,
-        orderedBy: rules.orderedBy,
-        values: { ...llm.result.values, ...rules.values },
-        flags: [...rules.flags, ...llm.result.flags.filter((f) => !(f.marker in rules.values))],
-        insufficient: false,
-      };
-      result.insufficient = !result.date || Object.keys(result.values).length === 0;
-      method = 'llm';
+      if (compare) {
+        ({ result, conflicts } = mergeReadings(rules, llm.result));
+        method = 'both';
+      } else {
+        // Repli : les règles (locales, déterministes) priment ; le LLM complète ce qui manque.
+        result = {
+          date: rules.date ?? llm.result.date,
+          dateConfidence: rules.date ? rules.dateConfidence : llm.result.dateConfidence,
+          lab: rules.lab ?? llm.result.lab,
+          orderedBy: rules.orderedBy,
+          values: { ...llm.result.values, ...rules.values },
+          flags: [...rules.flags, ...llm.result.flags.filter((f) => !(f.marker in rules.values))],
+          insufficient: false,
+        };
+        result.insufficient = !result.date || Object.keys(result.values).length === 0;
+        method = 'llm';
+      }
     }
   }
-  return { draft: { ...result, method } };
+  return { draft: { ...result, method, conflicts } };
 }
 
 // Mêmes champs que le formulaire manuel du carnet (labResults.controller.ts),
@@ -201,7 +266,7 @@ export const labImportController = {
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { name: true, email: true, birthDate: true, profile: { select: { aiExtractionConsentAt: true } } },
+      select: { name: true, email: true, birthDate: true, profile: { select: { aiExtractionConsentAt: true, aiExtractionAlways: true } } },
     });
     if (!user) throw new AppError(401, req.t('errors.tokenInvalid'));
     const aiUser = {
@@ -209,6 +274,7 @@ export const labImportController = {
       email: user.email,
       birthDate: user.birthDate,
       consent: Boolean(user.profile?.aiExtractionConsentAt),
+      always: Boolean(user.profile?.aiExtractionConsentAt) && Boolean(user.profile?.aiExtractionAlways),
     };
 
     // Brouillons abandonnés

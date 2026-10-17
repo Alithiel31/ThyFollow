@@ -370,7 +370,7 @@ GET    /api/pdf-passwords                         (labels only — never the sec
 POST   /api/pdf-passwords
 DELETE /api/pdf-passwords/:id
 DELETE /api/pdf-passwords                         (revoke all)
-PUT    /api/profile/ai-extraction-consent         (opt in / out of the AI fallback)
+PUT    /api/profile/ai-extraction-consent         (opt in / out of the AI reading; optional `always`)
 
 GET    /api/medications
 POST   /api/medications

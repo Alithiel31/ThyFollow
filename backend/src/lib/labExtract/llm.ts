@@ -135,7 +135,7 @@ function toParsedResult(data: z.infer<typeof outputSchema>): ParsedLabResult {
     }
     if (!m.unit) flags.push({ marker: m.marker, reason: 'no_unit' });
     else if (converted.converted) flags.push({ marker: m.marker, reason: 'converted' });
-    values[m.marker] = Math.round(converted.value * 100) / 100;
+    values[m.marker] = converted.converted ? Math.round(converted.value * 100) / 100 : converted.value;
   }
   const hasMarker = Object.keys(values).length > 0;
   return {

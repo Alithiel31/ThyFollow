@@ -91,6 +91,15 @@ describe('labExtract/llm', () => {
     expect(r.result.insufficient).toBe(false);
   });
 
+  it('garde la précision d’une valeur non convertie', async () => {
+    createMock.mockResolvedValue(
+      textResponse({ date: '2026-07-21', lab: null, measurements: [{ marker: 'tsh', value: 1.776, qualifier: 'none', unit: 'mUI/L' }] })
+    );
+    const { extractWithLlm } = await load();
+    const r = await extractWithLlm(REPORT, { ...USER, consent: true });
+    expect(r.ok && r.result.values.tsh).toBe(1.776);
+  });
+
   it('renvoie { ok: false } sur une sortie malformée (sans exception)', async () => {
     const { extractWithLlm } = await load();
     for (const bad of ['pas du json', { date: 'hier', lab: null, measurements: [] }, { foo: 1 }]) {
