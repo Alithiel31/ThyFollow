@@ -46,9 +46,13 @@ async function buildApp() {
   return app;
 }
 
-function signToken(userId: string): string {
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '1h' });
+function signToken(userId: string, tv?: number): string {
+  return jwt.sign({ userId, ...(tv !== undefined && { tv }) }, JWT_SECRET, { expiresIn: '1h' });
 }
+
+// Empreinte SHA-256 de 'good-token' (valeur de référence fixe : les tests ne
+// hachent rien eux-mêmes, ils vérifient l'aller-retour avec le contrôleur).
+const GOOD_TOKEN_SHA256 = '461caa80a52104436e34006189430d13aba103b2c4344d446ea3d9324b0de1c0';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -72,6 +76,26 @@ describe('register', () => {
     expect(createArgs.data.password).not.toBe('password123');
     expect(await bcrypt.compare('password123', createArgs.data.password)).toBe(true);
     expect(sendVerificationEmailMock).toHaveBeenCalledOnce();
+  });
+
+  it('stores only the SHA-256 of the verification token, and emails the raw token', async () => {
+    prismaMock.user.findUnique.mockResolvedValue(null);
+    prismaMock.user.create.mockResolvedValue({ id: 'user-1', email: 'new@example.com', name: 'New User' });
+    const app = await buildApp();
+
+    await request(app)
+      .post('/api/auth/register')
+      .send({ email: 'new@example.com', password: 'password123', name: 'New User' });
+
+    const emailedToken = sendVerificationEmailMock.mock.calls[0][2] as string;
+    const stored = prismaMock.user.create.mock.calls[0][0].data.verificationToken;
+    expect(stored).not.toBe(emailedToken);
+    expect(stored).toMatch(/^[0-9a-f]{64}$/);
+
+    // Aller-retour : le jeton reçu par email retrouve exactement l'empreinte stockée.
+    prismaMock.user.findUnique.mockResolvedValue(null);
+    await request(app).post('/api/auth/verify-email').send({ token: emailedToken });
+    expect(prismaMock.user.findUnique).toHaveBeenLastCalledWith({ where: { verificationToken: stored } });
   });
 
   it('rejects registration with a 409 when the email is already used', async () => {
@@ -155,6 +179,7 @@ describe('login', () => {
       role: 'USER',
       password: hashed,
       emailVerified: true,
+      tokenVersion: 3,
     });
     const app = await buildApp();
 
@@ -164,8 +189,8 @@ describe('login', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.user.id).toBe('user-1');
-    const decoded = jwt.verify(res.body.token, JWT_SECRET) as { userId: string };
-    expect(decoded.userId).toBe('user-1');
+    const decoded = jwt.verify(res.body.token, JWT_SECRET) as { userId: string; tv: number };
+    expect(decoded).toMatchObject({ userId: 'user-1', tv: 3 });
   });
 });
 
@@ -198,13 +223,15 @@ describe('verifyEmail', () => {
       id: 'user-1',
       verificationTokenExpiresAt: new Date(Date.now() + 60_000),
     });
-    prismaMock.user.update.mockResolvedValue({ id: 'user-1', email: 'user@example.com', name: 'User', role: 'USER' });
+    prismaMock.user.update.mockResolvedValue({ id: 'user-1', email: 'user@example.com', name: 'User', role: 'USER', tokenVersion: 0 });
     const app = await buildApp();
 
     const res = await request(app).post('/api/auth/verify-email').send({ token: 'good-token' });
 
     expect(res.status).toBe(200);
+    expect(prismaMock.user.findUnique).toHaveBeenCalledWith({ where: { verificationToken: GOOD_TOKEN_SHA256 } });
     expect(typeof res.body.token).toBe('string');
+    expect(res.body.user.tokenVersion).toBeUndefined();
     expect(prismaMock.user.update).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ emailVerified: true, verificationToken: null }) })
     );
@@ -269,6 +296,15 @@ describe('forgotPassword', () => {
 
     expect(res.status).toBe(200);
     expect(sendResetPasswordEmailMock).toHaveBeenCalledOnce();
+    const emailedToken = sendResetPasswordEmailMock.mock.calls[0][2] as string;
+    const stored = prismaMock.user.update.mock.calls[0][0].data.resetToken;
+    expect(stored).not.toBe(emailedToken);
+    expect(stored).toMatch(/^[0-9a-f]{64}$/);
+
+    // Aller-retour : le jeton reçu par email retrouve exactement l'empreinte stockée.
+    prismaMock.user.findUnique.mockResolvedValue(null);
+    await request(app).post('/api/auth/reset-password').send({ token: emailedToken, password: 'newpassword1' });
+    expect(prismaMock.user.findUnique).toHaveBeenLastCalledWith({ where: { resetToken: stored } });
   });
 });
 
@@ -298,9 +334,12 @@ describe('resetPassword', () => {
       .send({ token: 'good-token', password: 'newpassword1' });
 
     expect(res.status).toBe(200);
+    expect(prismaMock.user.findUnique).toHaveBeenCalledWith({ where: { resetToken: GOOD_TOKEN_SHA256 } });
     const updateArgs = prismaMock.user.update.mock.calls[0][0];
     expect(updateArgs.data.resetToken).toBeNull();
     expect(await bcrypt.compare('newpassword1', updateArgs.data.password)).toBe(true);
+    // Toutes les sessions ouvertes avant la réinitialisation sont révoquées.
+    expect(updateArgs.data.tokenVersion).toEqual({ increment: 1 });
   });
 });
 
@@ -322,21 +361,41 @@ describe('me', () => {
   });
 
   it('returns the current user for a valid token', async () => {
-    prismaMock.user.findUnique.mockResolvedValue({ id: 'user-1', email: 'user@example.com', name: 'User', role: 'USER' });
+    prismaMock.user.findUnique.mockResolvedValue({ id: 'user-1', email: 'user@example.com', name: 'User', role: 'USER', tokenVersion: 2 });
     const app = await buildApp();
 
-    const res = await request(app).get('/api/auth/me').set('Authorization', `Bearer ${signToken('user-1')}`);
+    const res = await request(app).get('/api/auth/me').set('Authorization', `Bearer ${signToken('user-1', 2)}`);
 
     expect(res.status).toBe(200);
     expect(res.body.id).toBe('user-1');
   });
 
-  it('returns 404 when the token is valid but the user no longer exists', async () => {
+  it('accepts a token issued before tokenVersion existed while the version is still 0', async () => {
+    prismaMock.user.findUnique.mockResolvedValue({ id: 'user-1', tokenVersion: 0 });
+    const app = await buildApp();
+
+    const res = await request(app).get('/api/auth/me').set('Authorization', `Bearer ${signToken('user-1')}`);
+
+    expect(res.status).toBe(200);
+  });
+
+  it('rejects a token revoked by a later session version bump (e.g. password reset)', async () => {
+    prismaMock.user.findUnique.mockResolvedValue({ id: 'user-1', tokenVersion: 1 });
+    const app = await buildApp();
+
+    const stale = await request(app).get('/api/auth/me').set('Authorization', `Bearer ${signToken('user-1', 0)}`);
+    const legacy = await request(app).get('/api/auth/me').set('Authorization', `Bearer ${signToken('user-1')}`);
+
+    expect(stale.status).toBe(401);
+    expect(legacy.status).toBe(401);
+  });
+
+  it('rejects the token of a deleted account', async () => {
     prismaMock.user.findUnique.mockResolvedValue(null);
     const app = await buildApp();
 
     const res = await request(app).get('/api/auth/me').set('Authorization', `Bearer ${signToken('deleted-user')}`);
 
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(401);
   });
 });

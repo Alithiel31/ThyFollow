@@ -2,12 +2,11 @@
 import crypto from 'crypto';
 import { Response } from 'express';
 import bcrypt from 'bcryptjs';
-import jwt, { type SignOptions } from 'jsonwebtoken';
 import { z } from 'zod';
 import type { TFunction } from 'i18next';
 import { prisma } from '../lib/prisma.js';
 import { AuthRequest } from '../middleware/auth.js';
-import { config } from '../config.js';
+import { signSessionToken, hashOneTimeToken } from '../lib/session.js';
 import { ConflictError, AuthenticationError, EmailNotVerifiedError, ValidationError, NotFoundError } from '../lib/errors.js';
 import { sendVerificationEmail, sendResetPasswordEmail } from '../lib/resend.js';
 
@@ -50,18 +49,11 @@ const VERIFICATION_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
 // d'exploitation si l'email venait à être intercepté).
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
 
-function generateVerificationToken() {
-  return {
-    verificationToken: crypto.randomBytes(32).toString('hex'),
-    verificationTokenExpiresAt: new Date(Date.now() + VERIFICATION_TOKEN_TTL_MS),
-  };
-}
-
-function generateResetToken() {
-  return {
-    resetToken: crypto.randomBytes(32).toString('hex'),
-    resetTokenExpiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS),
-  };
+// `token` part par email ; seule son empreinte (`tokenHash`) est stockée en
+// base (voir lib/session.ts#hashOneTimeToken).
+function generateOneTimeToken(ttlMs: number) {
+  const token = crypto.randomBytes(32).toString('hex');
+  return { token, tokenHash: hashOneTimeToken(token), expiresAt: new Date(Date.now() + ttlMs) };
 }
 
 export const authController = {
@@ -73,7 +65,7 @@ export const authController = {
     if (existing) throw new ConflictError(req.t('errors.emailInUse'));
 
     const hashedPassword = await bcrypt.hash(password, 12);
-    const { verificationToken, verificationTokenExpiresAt } = generateVerificationToken();
+    const verification = generateOneTimeToken(VERIFICATION_TOKEN_TTL_MS);
 
     const user = await prisma.user.create({
       data: {
@@ -81,8 +73,8 @@ export const authController = {
         password: hashedPassword,
         name,
         birthDate: birthDate ? new Date(birthDate) : null,
-        verificationToken,
-        verificationTokenExpiresAt,
+        verificationToken: verification.tokenHash,
+        verificationTokenExpiresAt: verification.expiresAt,
         profile: { create: {} },
         notifications: { create: {} },
       },
@@ -91,7 +83,7 @@ export const authController = {
 
     // Le compte n'est pas activé tant que l'email n'est pas confirmé : pas de
     // JWT délivré ici, l'utilisateur doit cliquer le lien reçu par email.
-    await sendVerificationEmail(user.email, user.name, verificationToken, req.language);
+    await sendVerificationEmail(user.email, user.name, verification.token, req.language);
 
     res.status(201).json({ message: req.t('auth.verificationEmailSent') });
   },
@@ -111,10 +103,9 @@ export const authController = {
 
     if (!user.emailVerified) throw new EmailNotVerifiedError(req.t('errors.emailNotVerified'));
 
-    const token = jwt.sign({ userId: user.id }, config.jwtSecret, { expiresIn: config.jwtExpiresIn as SignOptions['expiresIn'] });
     res.json({
       user: { id: user.id, email: user.email, name: user.name, role: user.role },
-      token,
+      token: signSessionToken(user),
     });
   },
 
@@ -122,21 +113,20 @@ export const authController = {
   verifyEmail: async (req: AuthRequest, res: Response): Promise<void> => {
     const { token } = verifyEmailSchema.parse(req.body);
 
-    const user = await prisma.user.findUnique({ where: { verificationToken: token } });
+    const user = await prisma.user.findUnique({ where: { verificationToken: hashOneTimeToken(token) } });
     if (!user || !user.verificationTokenExpiresAt || user.verificationTokenExpiresAt < new Date()) {
       throw new ValidationError(req.t('errors.invalidOrExpiredToken'));
     }
 
-    const updated = await prisma.user.update({
+    const { tokenVersion, ...updated } = await prisma.user.update({
       where: { id: user.id },
       data: { emailVerified: true, verificationToken: null, verificationTokenExpiresAt: null },
-      select: { id: true, email: true, name: true, role: true },
+      select: { id: true, email: true, name: true, role: true, tokenVersion: true },
     });
 
     // Compte activé : on connecte directement l'utilisateur, pas besoin de
     // repasser par l'écran de login juste après avoir cliqué le lien.
-    const jwtToken = jwt.sign({ userId: updated.id }, config.jwtSecret, { expiresIn: config.jwtExpiresIn as SignOptions['expiresIn'] });
-    res.json({ user: updated, token: jwtToken });
+    res.json({ user: updated, token: signSessionToken({ id: updated.id, tokenVersion }) });
   },
 
   // POST /api/auth/resend-verification
@@ -147,12 +137,12 @@ export const authController = {
     // Réponse identique que le compte existe ou non, pour ne pas permettre
     // à un tiers de deviner quels emails sont inscrits (énumération de comptes).
     if (user && !user.emailVerified) {
-      const { verificationToken, verificationTokenExpiresAt } = generateVerificationToken();
+      const verification = generateOneTimeToken(VERIFICATION_TOKEN_TTL_MS);
       await prisma.user.update({
         where: { id: user.id },
-        data: { verificationToken, verificationTokenExpiresAt },
+        data: { verificationToken: verification.tokenHash, verificationTokenExpiresAt: verification.expiresAt },
       });
-      await sendVerificationEmail(user.email, user.name, verificationToken, req.language);
+      await sendVerificationEmail(user.email, user.name, verification.token, req.language);
     }
 
     res.json({ message: req.t('auth.verificationEmailSent') });
@@ -166,12 +156,12 @@ export const authController = {
     // Réponse identique que le compte existe ou non, pour ne pas permettre
     // à un tiers de deviner quels emails sont inscrits (énumération de comptes).
     if (user) {
-      const { resetToken, resetTokenExpiresAt } = generateResetToken();
+      const reset = generateOneTimeToken(RESET_TOKEN_TTL_MS);
       await prisma.user.update({
         where: { id: user.id },
-        data: { resetToken, resetTokenExpiresAt },
+        data: { resetToken: reset.tokenHash, resetTokenExpiresAt: reset.expiresAt },
       });
-      await sendResetPasswordEmail(user.email, user.name, resetToken, req.language);
+      await sendResetPasswordEmail(user.email, user.name, reset.token, req.language);
     }
 
     res.json({ message: req.t('auth.passwordResetEmailSent') });
@@ -181,7 +171,7 @@ export const authController = {
   resetPassword: async (req: AuthRequest, res: Response): Promise<void> => {
     const { token, password } = resetPasswordSchema(req.t).parse(req.body);
 
-    const user = await prisma.user.findUnique({ where: { resetToken: token } });
+    const user = await prisma.user.findUnique({ where: { resetToken: hashOneTimeToken(token) } });
     if (!user || !user.resetTokenExpiresAt || user.resetTokenExpiresAt < new Date()) {
       throw new ValidationError(req.t('errors.invalidOrExpiredResetToken'));
     }
@@ -189,7 +179,9 @@ export const authController = {
     const hashedPassword = await bcrypt.hash(password, 12);
     await prisma.user.update({
       where: { id: user.id },
-      data: { password: hashedPassword, resetToken: null, resetTokenExpiresAt: null },
+      // tokenVersion + 1 : toutes les sessions ouvertes avec l'ancien mot de
+      // passe (dont celle d'un éventuel voleur de token) sont révoquées.
+      data: { password: hashedPassword, resetToken: null, resetTokenExpiresAt: null, tokenVersion: { increment: 1 } },
     });
 
     // Pas de connexion automatique ici : on renvoie vers l'écran de login pour

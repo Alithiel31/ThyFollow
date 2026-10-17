@@ -51,6 +51,13 @@ function signToken(userId: string): string {
   return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '1h' });
 }
 
+// Cookie de flux tel que le poserait le serveur : JSON signé (lib/signedCookie.ts).
+// À appeler après buildApp(), pour que config.js voie le JWT_SECRET du test.
+async function flowCookie(name: string, flow: object): Promise<string> {
+  const { signCookieValue } = await import('../lib/signedCookie.js');
+  return `${name}=${encodeURIComponent(signCookieValue(JSON.stringify(flow)))}`;
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
   process.env.GOOGLE_CLIENT_ID = 'test-client-id';
@@ -108,7 +115,7 @@ describe('googleCallback — login flow', () => {
 
     const res = await request(app)
       .get('/api/auth/oidc/google/callback?code=abc&state=wrong')
-      .set('Cookie', [`thyro_oidc_google=${encodeURIComponent(JSON.stringify(flow))}`]);
+      .set('Cookie', [await flowCookie('thyro_oidc_google', flow)]);
 
     expect(res.status).toBe(302);
     expect(res.headers.location).toBe(`${APP_URL}/login?googleError=1`);
@@ -122,7 +129,9 @@ describe('googleCallback — login flow', () => {
       name: 'New User',
     });
     prismaMock.oAuthAccount.findUnique.mockResolvedValue(null);
-    prismaMock.user.findUnique.mockResolvedValue(null);
+    // 1er appel : recherche par email (aucun compte) ; ensuite : relecture de
+    // la version de session au moment de l'échange du code.
+    prismaMock.user.findUnique.mockResolvedValueOnce(null).mockResolvedValue({ id: 'user-123', tokenVersion: 0 });
     prismaMock.user.create.mockResolvedValue({ id: 'user-123' });
 
     const app = await buildApp();
@@ -130,7 +139,7 @@ describe('googleCallback — login flow', () => {
 
     const res = await request(app)
       .get('/api/auth/oidc/google/callback?code=abc&state=test-state')
-      .set('Cookie', [`thyro_oidc_google=${encodeURIComponent(JSON.stringify(flow))}`]);
+      .set('Cookie', [await flowCookie('thyro_oidc_google', flow)]);
 
     expect(res.status).toBe(302);
     const location = new URL(res.headers.location);
@@ -145,8 +154,8 @@ describe('googleCallback — login flow', () => {
 
     const first = await request(app).post('/api/auth/oidc/exchange').send({ code });
     expect(first.status).toBe(200);
-    expect(typeof first.body.token).toBe('string');
-    expect(first.body.token.length).toBeGreaterThan(0);
+    const decoded = jwt.verify(first.body.token, JWT_SECRET) as { userId: string; tv: number };
+    expect(decoded).toMatchObject({ userId: 'user-123', tv: 0 });
 
     // Usage unique : la seconde tentative avec le même code échoue.
     const second = await request(app).post('/api/auth/oidc/exchange').send({ code });
@@ -168,7 +177,7 @@ describe('googleCallback — login flow', () => {
 
     const res = await request(app)
       .get('/api/auth/oidc/google/callback?code=abc&state=test-state')
-      .set('Cookie', [`thyro_oidc_google=${encodeURIComponent(JSON.stringify(flow))}`]);
+      .set('Cookie', [await flowCookie('thyro_oidc_google', flow)]);
 
     expect(res.status).toBe(302);
     expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
@@ -191,7 +200,7 @@ describe('googleCallback — link flow', () => {
 
     const res = await request(app)
       .get('/api/auth/oidc/google/callback?code=abc&state=test-state')
-      .set('Cookie', [`thyro_oidc_google_link=${encodeURIComponent(JSON.stringify(linkFlow))}`]);
+      .set('Cookie', [await flowCookie('thyro_oidc_google_link', linkFlow)]);
 
     expect(res.status).toBe(302);
     expect(res.headers.location).toBe(`${APP_URL}/profile?googleLinkError=conflict`);
@@ -212,16 +221,55 @@ describe('googleCallback — link flow', () => {
 
     const res = await request(app)
       .get('/api/auth/oidc/google/callback?code=abc&state=test-state')
-      .set('Cookie', [`thyro_oidc_google_link=${encodeURIComponent(JSON.stringify(linkFlow))}`]);
+      .set('Cookie', [await flowCookie('thyro_oidc_google_link', linkFlow)]);
 
     expect(res.status).toBe(302);
     expect(res.headers.location).toBe(`${APP_URL}/profile?googleLinked=1`);
+  });
+
+  it('rejects a link cookie whose userId was edited (account takeover attempt)', async () => {
+    handleGoogleCallbackMock.mockResolvedValue({
+      providerAccountId: 'google-sub-attacker',
+      email: 'attacker@example.com',
+      emailVerified: true,
+      name: 'Attacker',
+    });
+    prismaMock.oAuthAccount.findUnique.mockResolvedValue(null);
+
+    const app = await buildApp();
+    const { signCookieValue } = await import('../lib/signedCookie.js');
+    const genuine = signCookieValue(
+      JSON.stringify({ state: 'test-state', nonce: 'test-nonce', codeVerifier: 'verifier', userId: 'attacker-id' })
+    );
+    // On garde la signature d'origine mais on remplace l'id par celui de la victime.
+    const tampered = genuine.replace('attacker-id', 'victim-id');
+
+    const res = await request(app)
+      .get('/api/auth/oidc/google/callback?code=abc&state=test-state')
+      .set('Cookie', [`thyro_oidc_google_link=${encodeURIComponent(tampered)}`]);
+
+    expect(res.status).toBe(302);
+    expect(res.headers.location).toBe(`${APP_URL}/profile?googleLinkError=1`);
+    expect(handleGoogleCallbackMock).not.toHaveBeenCalled();
+    expect(prismaMock.oAuthAccount.create).not.toHaveBeenCalled();
+  });
+
+  it('rejects an unsigned link cookie', async () => {
+    const app = await buildApp();
+    const linkFlow = { state: 'test-state', nonce: 'test-nonce', codeVerifier: 'verifier', userId: 'victim-id' };
+
+    const res = await request(app)
+      .get('/api/auth/oidc/google/callback?code=abc&state=test-state')
+      .set('Cookie', [`thyro_oidc_google_link=${encodeURIComponent(JSON.stringify(linkFlow))}`]);
+
+    expect(res.headers.location).toBe(`${APP_URL}/profile?googleLinkError=1`);
+    expect(prismaMock.oAuthAccount.create).not.toHaveBeenCalled();
   });
 });
 
 describe('googleUnlink', () => {
   it('refuses to unlink when the account has no local password (anti-lockout guard)', async () => {
-    prismaMock.user.findUnique.mockResolvedValue({ password: null });
+    prismaMock.user.findUnique.mockResolvedValue({ password: null, tokenVersion: 0 });
     const app = await buildApp();
 
     const res = await request(app)
@@ -233,7 +281,7 @@ describe('googleUnlink', () => {
   });
 
   it('unlinks and records an UNLINKED event when the account has a local password', async () => {
-    prismaMock.user.findUnique.mockResolvedValue({ password: 'hashed' });
+    prismaMock.user.findUnique.mockResolvedValue({ password: 'hashed', tokenVersion: 0 });
     prismaMock.oAuthAccount.deleteMany.mockResolvedValue({ count: 1 });
     const app = await buildApp();
 

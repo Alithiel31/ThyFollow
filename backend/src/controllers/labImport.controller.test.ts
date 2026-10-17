@@ -70,6 +70,19 @@ const prismaMock = {
 };
 vi.mock('../lib/prisma.js', () => ({ prisma: prismaMock }));
 
+// La vérification de la version de session en base (lib/session.ts) est
+// couverte par auth.controller.test.ts : ici, seule la signature du JWT compte.
+vi.mock('../lib/session.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../lib/session.js')>()),
+  verifySessionToken: async (token: string) => {
+    try {
+      return (jwt.verify(token, JWT_SECRET) as { userId: string }).userId;
+    } catch {
+      return null;
+    }
+  },
+}));
+
 const llmMock = vi.fn();
 vi.mock('../lib/labExtract/llm.js', () => ({ extractWithLlm: (...args: unknown[]) => llmMock(...args) }));
 

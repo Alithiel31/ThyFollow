@@ -24,6 +24,27 @@ pas synchronisé avec ces tags.
 - Évaluer la montée de version Prisma 5 → 6 et Express 4 → 5 (aucune faille connue identifiée,
   mais l'écart grandit).
 
+### Security
+
+- **Liaison Google et Google Health : cookies de flux signés.** Le cookie qui porte l'id du compte à
+  lier était un JSON en clair, modifiable par l'utilisateur dans son navigateur : remplacer cet id
+  permettait de rattacher son propre compte Google au compte de quelqu'un d'autre, puis de s'y
+  connecter (ou d'injecter ses données Google Health dans son journal). Les cookies de flux sont
+  désormais signés par HMAC (`lib/signedCookie.ts`) ; une valeur modifiée ou non signée est rejetée.
+- **IP réelle du client derrière Cloudflare.** nginx lit `CF-Connecting-IP` (module realip, seulement
+  depuis un pair du réseau Docker) et transmet cette IP au backend. Auparavant, le backend voyait
+  l'IP du conteneur Traefik pour tous les visiteurs : un quota de limitation de débit commun à tout le
+  monde (429 en usage normal) et 20 échecs de connexion, d'où qu'ils viennent, bloquaient les connexions
+  de tous les utilisateurs pendant 15 minutes. Les IP des `AuthEvent` sont désormais justes.
+- **Sessions révocables.** Chaque JWT porte la version de session de l'utilisateur
+  (`User.tokenVersion`, migration `20261017120000_add_user_token_version`), relue en base à chaque
+  requête (REST et GraphQL). La réinitialisation du mot de passe l'incrémente : toutes les sessions
+  ouvertes auparavant sont refusées. Le token d'un compte supprimé est refusé (401). Les tokens
+  existants restent valides jusqu'au premier incrément. L'algorithme du JWT est figé à HS256.
+- **Jetons de vérification d'email et de réinitialisation stockés hachés** (SHA-256) : une fuite de la
+  base ne permet plus de réinitialiser un mot de passe. Les liens envoyés avant ce déploiement ne
+  fonctionnent plus (en redemander un).
+
 ### Added
 
 - Carnet : les cartes affichent désormais **tous les marqueurs renseignés** (ferritine, vitamines, T4/T3,

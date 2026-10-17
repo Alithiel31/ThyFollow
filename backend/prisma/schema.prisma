@@ -33,6 +33,12 @@ model User {
   // ── Réinitialisation de mot de passe (lien envoyé par email, courte durée de vie)
   resetToken          String?   @unique
   resetTokenExpiresAt DateTime?
+  // verificationToken / resetToken : empreinte SHA-256 du jeton envoyé par
+  // email, jamais le jeton lui-même (voir lib/session.ts#hashOneTimeToken).
+
+  // ── Version de session : portée par chaque JWT, incrémentée pour révoquer
+  // d'un coup toutes les sessions ouvertes (ex. réinitialisation du mot de passe).
+  tokenVersion Int @default(0)
 
   // Relations
   profile                UserProfile?
