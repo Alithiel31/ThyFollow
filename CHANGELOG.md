@@ -59,6 +59,11 @@ pas synchronisé avec ces tags.
 
 ### Added
 
+- CI : après chaque merge sur `main`, les images backend et frontend sont construites pour
+  `linux/arm64` (runner ARM natif) et publiées sur GHCR (`ghcr.io/alithiel31/thyfollow-backend`,
+  `…-frontend`), taguées `sha-<commit>` et `main`. Le build Docker des PR tourne lui aussi sur
+  ARM, pour valider l'image qui tournera sur le Pi. Les runs de `main` ne sont plus annulés par
+  un merge suivant.
 - Accès Pro à l'import de bilans PDF : la saisie manuelle et l'export restent gratuits ; l'import
   automatique (lecture du PDF + repli IA) est réservé aux comptes Pro, avec 3 imports offerts à vie
   et un plafond de 25 imports par mois en Pro (`FREE_IMPORT_LIMIT`, `PRO_MONTHLY_IMPORT_LIMIT`).

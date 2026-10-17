@@ -11,7 +11,9 @@ permissions:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # Sur main, chaque merge doit aller jusqu'à la publication de ses images :
+  # on n'annule que les runs de PR rendus obsolètes par un nouveau push.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   backend:
@@ -69,7 +71,9 @@ jobs:
 
   docker:
     name: Docker build (${{ matrix.service }})
-    runs-on: ubuntu-latest
+    # Runner ARM natif : on valide l'image arm64 qui tournera sur le Pi,
+    # et le cache GHA qu'elle remplit sert ensuite au job `publish`.
+    runs-on: ubuntu-24.04-arm
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -149,3 +153,50 @@ jobs:
 
       # Dépendances de production uniquement, échec à partir de "high".
       - run: npm audit --omit=dev --audit-level=high
+
+  # Publie les images arm64 sur GHCR après un merge sur main, une fois les
+  # vérifications passées. `audit` n'est pas bloquant ici : une nouvelle
+  # alerte sur une dépendance ne doit pas empêcher de publier son correctif.
+  publish:
+    name: Publish image (${{ matrix.service }})
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [backend, frontend, docker, migrations]
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # sha-<7 caractères> : version immuable, celle qu'on déploie.
+      # main : dernière version publiée de main.
+      - id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/alithiel31/thyfollow-${{ matrix.service }}
+          tags: |
+            type=sha,prefix=sha-,format=short
+            type=raw,value=main
+
+      - uses: docker/build-push-action@v7
+        with:
+          context: ./${{ matrix.service }}
+          platforms: linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
