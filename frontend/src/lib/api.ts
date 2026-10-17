@@ -132,11 +132,19 @@ export const aiConsentApi = {
 // ── Medications
 export const medApi = {
   list: () => api.get<import('../types').Medication[]>('/medications'),
-  create: (data: Partial<import('../types').Medication> & { name: string; dosage: number; startDate: string }) =>
-    api.post<import('../types').Medication>('/medications', data),
+  create: (data: Partial<import('../types').Medication> & {
+    name: string; startDate: string; dosage?: number; slots?: import('../types').DoseSlot[];
+  }) => api.post<import('../types').Medication>('/medications', data),
   update: (id: string, data: Partial<import('../types').Medication>) =>
     api.put<import('../types').Medication>(`/medications/${id}`, data),
   delete: (id: string) => api.delete(`/medications/${id}`),
+  // ── Historique des posologies (chaque appel renvoie le médicament à jour)
+  addDosePeriod: (id: string, data: { startDate: string; slots: import('../types').DoseSlot[] }) =>
+    api.post<import('../types').Medication>(`/medications/${id}/dose-periods`, data),
+  updateDosePeriod: (id: string, periodId: string, data: { startDate?: string; slots?: import('../types').DoseSlot[] }) =>
+    api.put<import('../types').Medication>(`/medications/${id}/dose-periods/${periodId}`, data),
+  deleteDosePeriod: (id: string, periodId: string) =>
+    api.delete<import('../types').Medication>(`/medications/${id}/dose-periods/${periodId}`),
   // ── Checklist des prises quotidiennes
   listIntakes: (date: string) =>
     api.get<import('../types').MedicationIntake[]>('/medications/intakes', { params: { date } }),

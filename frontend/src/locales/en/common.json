@@ -343,7 +343,15 @@
     "deactivate": "Deactivate",
     "reactivate": "Reactivate",
     "delete": "Delete",
-    "deleteConfirm": "Delete?"
+    "deleteConfirm": "Delete?",
+    "schedule": {
+      "dose": "{{dose, number}} {{unitLabel}}",
+      "alternating": "{{a, number}} / {{b, number}} {{unitLabel}} alternating",
+      "everyOtherDay": "{{dose, number}} {{unitLabel}} every other day",
+      "days": "{{label}} ({{count}} d)",
+      "noIntake": "no dose",
+      "atTime": "{{label}} at {{time}}"
+    }
   },
   "appointments": {
     "types": {

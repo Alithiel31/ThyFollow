@@ -202,8 +202,24 @@ export interface Medication {
   startDate: string;
   endDate?: string | null;
   active: boolean;
+  showOnChart: boolean;
+  dosePeriods: DosePeriod[];
   instructions?: string | null;
   notes?: string | null;
+}
+
+// Un créneau de prise : `doses` est un cycle répété en boucle depuis le début de la période
+// (`[75, 100]` = alternance, `[75, 0]` = un jour sur deux). `time` null = sans heure fixe.
+export interface DoseSlot {
+  time: string | null;
+  doses: number[];
+}
+
+// Une posologie, en vigueur de startDate jusqu'au début de la période suivante.
+export interface DosePeriod {
+  id: string;
+  startDate: string;
+  slots: DoseSlot[];
 }
 
 // Une prise validée (checklist) pour un médicament donné, un jour et un créneau donnés.

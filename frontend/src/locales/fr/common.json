@@ -343,7 +343,15 @@
     "deactivate": "Désactiver",
     "reactivate": "Réactiver",
     "delete": "Supprimer",
-    "deleteConfirm": "Supprimer ?"
+    "deleteConfirm": "Supprimer ?",
+    "schedule": {
+      "dose": "{{dose, number}} {{unitLabel}}",
+      "alternating": "{{a, number}} / {{b, number}} {{unitLabel}} en alternance",
+      "everyOtherDay": "{{dose, number}} {{unitLabel}} un jour sur deux",
+      "days": "{{label}} ({{count}} j)",
+      "noIntake": "aucune prise",
+      "atTime": "{{label}} à {{time}}"
+    }
   },
   "appointments": {
     "types": {
