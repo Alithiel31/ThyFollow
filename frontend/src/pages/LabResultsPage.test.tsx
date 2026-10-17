@@ -10,6 +10,7 @@ import { LabResultsPage } from './LabResultsPage';
 import type { LabResult } from '../types';
 
 const listMock = vi.fn();
+const medListMock = vi.fn();
 
 vi.mock('../lib/api', () => ({
   labApi: {
@@ -22,6 +23,7 @@ vi.mock('../lib/api', () => ({
     discardImport: vi.fn(),
     downloadDocument: vi.fn(),
   },
+  medApi: { list: (...args: unknown[]) => medListMock(...args) },
 }));
 
 const result = (extra: Partial<LabResult>): LabResult => ({ id: 'lab-1', date: '2025-04-29', lab: 'Biogroup', ...extra });
@@ -40,6 +42,7 @@ function renderPage() {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  medListMock.mockResolvedValue({ data: [] });
 });
 
 describe('LabResultsPage — cartes du carnet', () => {
@@ -85,5 +88,33 @@ describe('LabResultsPage — cartes du carnet', () => {
     for (const key of ['t4', 't3', 'thyroglobulin', 'magnesium', 'selenium', 'cholesterol', 'glucose']) {
       expect(within(dialog).getByLabelText(new RegExp(`^labResults\\.marker\\.${key} \\(`))).toBeInTheDocument();
     }
+  });
+});
+
+describe('LabResultsPage — doses superposées au graphique TSH', () => {
+  const twoTsh = [result({ id: 'a', date: '2026-03-01', tsh: 3.1 }), result({ id: 'b', date: '2026-09-01', tsh: 1.2 })];
+  const levo = (showOnChart: boolean) => ({
+    id: 'med-1', name: 'Levothyrox', dosage: 87.5, dosageUnit: 'MCG', frequency: 'DAILY', intakeTimes: ['07:00'],
+    startDate: '2026-01-01T00:00:00.000Z', active: true, showOnChart,
+    dosePeriods: [{ id: 'p-1', startDate: '2026-01-01T00:00:00.000Z', slots: [{ time: '07:00', doses: [75, 100] }] }],
+  });
+
+  it('affiche une légende avec le médicament coché « afficher sur le graphique »', async () => {
+    listMock.mockResolvedValue({ data: twoTsh });
+    medListMock.mockResolvedValue({ data: [levo(true)] });
+    renderPage();
+
+    const legend = await screen.findByRole('list', { name: 'labResults.legend' });
+    expect(within(legend).getByText(/labResults\.doseLegend.*Levothyrox/)).toBeInTheDocument();
+  });
+
+  it('sans médicament coché, pas de légende (graphique inchangé)', async () => {
+    listMock.mockResolvedValue({ data: twoTsh });
+    medListMock.mockResolvedValue({ data: [levo(false)] });
+    renderPage();
+
+    expect(await screen.findByText('labResults.tshEvolution')).toBeInTheDocument();
+    await new Promise((r) => setTimeout(r, 50)); // laisse la requête médicaments aboutir
+    expect(screen.queryByRole('list', { name: 'labResults.legend' })).not.toBeInTheDocument();
   });
 });

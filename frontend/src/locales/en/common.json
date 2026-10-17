@@ -289,7 +289,11 @@
       "1y": "1 year",
       "2y": "2 years",
       "all": "All"
-    }
+    },
+    "doseAxis": "µg/d",
+    "doseTooltip": "{{schedule}} (avg. {{average, number}} {{unitLabel}})",
+    "doseLegend": "{{name}} — average dose ({{unitLabel}})",
+    "legend": "Chart legend"
   },
   "medications": {
     "frequency": {

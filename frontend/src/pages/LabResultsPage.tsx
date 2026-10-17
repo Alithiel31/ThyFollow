@@ -5,8 +5,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { Plus, Trash2, FlaskConical, TrendingUp, FileUp } from 'lucide-react';
-import { labApi } from '../lib/api';
-import { formatDate, tshStatus, cn } from '../lib/utils';
+import { labApi, medApi } from '../lib/api';
+import { buildDoseSteps, formatSchedule, periodAtDay } from '../lib/doseCycle';
+import { formatDate, tshStatus, cn, toISODate } from '../lib/utils';
 import { LAB_RANGES, MARKER_DISPLAY, type LabMarkerKey, type LabResult } from '../types';
 import { useAuthStore } from '../lib/store';
 import {
@@ -27,6 +28,9 @@ const OTHER_MARKERS: LabMarkerKey[] = ['t4', 't3', 'thyroglobulin', 'magnesium',
 // Graduations de l'axe TSH : échelle logarithmique, l'usage en endocrinologie, pour que les
 // valeurs très hautes (hypothyroïdie non traitée) n'écrasent pas les variations dans la cible.
 const TSH_LOG_TICKS = [0.01, 0.05, 0.1, 0.5, 1, 2, 4, 10, 20, 50, 100, 200, 500, 1000];
+
+// Couleurs des séries de dose superposées (une par médicament affiché).
+const DOSE_COLORS = ['var(--chart-2)', 'var(--warn)', 'var(--lav)'];
 
 type ChartPeriod = '6m' | '1y' | '2y' | 'all';
 const CHART_PERIODS: { key: ChartPeriod; months: number | null }[] = [
@@ -55,6 +59,14 @@ export function LabResultsPage() {
   const [form, setForm] = useState<Partial<LabResult>>(EMPTY_FORM);
   const [chartPeriod, setChartPeriod] = useState<ChartPeriod | null>(null);
   const dateLocale = i18n.language?.startsWith('en') ? enUS : fr;
+
+  // Fin de la fenêtre des paliers de dose : fixée au montage (rendu pur).
+  const [now] = useState(() => Date.now());
+
+  const { data: medications = [] } = useQuery({
+    queryKey: ['medications'],
+    queryFn: () => medApi.list().then((r) => r.data),
+  });
 
   const { data: results = [], isLoading } = useQuery({
     queryKey: ['lab-results'],
@@ -132,6 +144,40 @@ export function LabResultsPage() {
   const yMax = Math.max(...tshValues, targetMax) * 1.5;
   const yTicks = TSH_LOG_TICKS.filter((v) => v >= yMin && v <= yMax);
 
+  // Médicaments superposés : dose moyenne quotidienne en paliers, sur la fenêtre affichée
+  // (de la première analyse visible à aujourd'hui, ou à la fin du traitement).
+  const chartMeds = medications.filter((m) => m.showOnChart && m.dosePeriods.length > 0).slice(0, DOSE_COLORS.length);
+  const windowFrom = visibleData[0]?.ts ?? 0;
+  const windowTo = Math.max(visibleData[visibleData.length - 1]?.ts ?? 0, now);
+  const doseSeries = chartMeds
+    .map((m, i) => ({
+      med: m,
+      key: `dose_${m.id}`,
+      color: DOSE_COLORS[i],
+      steps: buildDoseSteps(m.dosePeriods, windowFrom, m.endDate ? Math.min(windowTo, Date.parse(m.endDate)) : windowTo),
+    }))
+    .filter((d) => d.steps.length > 0);
+  // Une ligne par date (analyse ou changement de dose) ; chaque série de dose y porte la
+  // valeur en vigueur, pour que l'infobulle d'une analyse affiche aussi la dose du moment.
+  const chartRows = doseSeries.length === 0 ? visibleData : (() => {
+    const times = [...new Set([...visibleData.map((d) => d.ts), ...doseSeries.flatMap((d) => d.steps.map((s) => s.ts))])].sort((a, b) => a - b);
+    return times.map((ts) => {
+      const row: Record<string, number> = { ts };
+      const tsh = visibleData.find((d) => d.ts === ts)?.tsh;
+      if (tsh != null) row.tsh = tsh;
+      for (const d of doseSeries) {
+        const step = [...d.steps].reverse().find((s) => s.ts <= ts);
+        if (step && ts <= d.steps[d.steps.length - 1].ts) row[d.key] = step.dose;
+      }
+      return row;
+    });
+  })();
+  // Axe des doses : graduations rondes (pas multiple de 25) avec ~15 % de marge au-dessus.
+  const doseMax = Math.max(0, ...doseSeries.flatMap((d) => d.steps.map((s) => s.dose)));
+  const doseStep = Math.max(25, Math.ceil(doseMax / 4 / 25) * 25);
+  const doseTicks = Array.from({ length: Math.ceil((doseMax * 1.15) / doseStep) + 1 }, (_, i) => i * doseStep);
+  const doseUnit = t('labResults.doseAxis');
+
   const formatAxisDate = (ts: number) => format(ts, 'MMM yy', { locale: dateLocale });
   const formatTooltipDate = (ts: number) => format(ts, 'd MMMM yyyy', { locale: dateLocale });
 
@@ -201,7 +247,7 @@ export function LabResultsPage() {
             ))}
           </div>
           <ResponsiveContainer width="100%" height={260}>
-            <LineChart data={visibleData} margin={{ top: 8, right: 16, bottom: 0, left: -12 }}>
+            <LineChart data={chartRows} margin={{ top: 8, right: doseSeries.length ? 0 : 16, bottom: 0, left: -12 }}>
               <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
               <XAxis
                 dataKey="ts" type="number" scale="time" domain={['dataMin', 'dataMax']} padding={{ left: 12, right: 12 }}
@@ -209,32 +255,69 @@ export function LabResultsPage() {
                 tick={{ fontSize: 11, fill: 'var(--text-muted)' }} tickLine={false} axisLine={false}
               />
               <YAxis
-                scale="log" domain={[yMin, yMax]} ticks={yTicks} allowDataOverflow
+                yAxisId="tsh" scale="log" domain={[yMin, yMax]} ticks={yTicks} allowDataOverflow
                 tickFormatter={(v: number) => v.toLocaleString(i18n.language)}
                 tick={{ fontSize: 11, fill: 'var(--text-muted)' }} tickLine={false} axisLine={false}
               />
+              {doseSeries.length > 0 && (
+                <YAxis
+                  yAxisId="dose" orientation="right" domain={[0, doseTicks[doseTicks.length - 1]]} ticks={doseTicks}
+                  tickFormatter={(v: number) => v.toLocaleString(i18n.language)}
+                  label={{ value: doseUnit, position: 'insideTopRight', offset: 0, fontSize: 10, fill: 'var(--text-muted)' }}
+                  tick={{ fontSize: 11, fill: 'var(--text-muted)' }} tickLine={false} axisLine={false}
+                />
+              )}
               <Tooltip
                 labelFormatter={(ts) => formatTooltipDate(Number(ts))}
-                formatter={(v) => [`${Number(v).toLocaleString(i18n.language)} ${LAB_RANGES.tsh.unit}`, LAB_RANGES.tsh.label]}
+                formatter={(v, _name, item) => {
+                  const series = doseSeries.find((d) => d.key === item.dataKey);
+                  if (!series) return [`${Number(v).toLocaleString(i18n.language)} ${LAB_RANGES.tsh.unit}`, LAB_RANGES.tsh.label];
+                  // Posologie en vigueur à cette date, et sa moyenne quotidienne.
+                  const period = periodAtDay(series.med.dosePeriods, toISODate(new Date(Number(item.payload.ts))));
+                  const schedule = period ? formatSchedule(period.slots, t('medications.dosageUnits.MCG'), t) : '';
+                  return [t('labResults.doseTooltip', { schedule, average: Number(v), unitLabel: doseUnit }), series.med.name];
+                }}
                 contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, fontSize: 12, color: 'var(--text)', boxShadow: 'var(--shadow)' }}
               />
               {/* Zone cible de la maquette : bande bleutée + pointillés accent */}
-              <ReferenceArea y1={targetMin} y2={targetMax} fill="var(--accent)" fillOpacity={0.08} stroke="none" />
-              <ReferenceLine y={targetMin} stroke="var(--accent)" strokeOpacity={0.35} strokeDasharray="4 4" />
-              <ReferenceLine y={targetMax} stroke="var(--accent)" strokeOpacity={0.35} strokeDasharray="4 4" />
+              <ReferenceArea yAxisId="tsh" y1={targetMin} y2={targetMax} fill="var(--accent)" fillOpacity={0.08} stroke="none" />
+              <ReferenceLine yAxisId="tsh" y={targetMin} stroke="var(--accent)" strokeOpacity={0.35} strokeDasharray="4 4" />
+              <ReferenceLine yAxisId="tsh" y={targetMax} stroke="var(--accent)" strokeOpacity={0.35} strokeDasharray="4 4" />
+              {/* Paliers : la dose est constante entre deux changements de posologie. */}
+              {doseSeries.map((d) => (
+                <Line
+                  key={d.key} yAxisId="dose" type="stepAfter" dataKey={d.key} name={d.med.name}
+                  stroke={d.color} strokeWidth={2} strokeOpacity={0.8} dot={false} activeDot={{ r: 3 }}
+                  connectNulls isAnimationActive={false}
+                />
+              ))}
               {/* Tracé linéaire : entre deux analyses, la valeur réelle n'est pas connue. */}
               <Line
-                type="linear" dataKey="tsh" stroke="var(--chart-1)" strokeWidth={2} isAnimationActive={false}
-                dot={(props: { cx?: number; cy?: number; index?: number; payload?: { tsh: number } }) => (
-                  <circle
-                    key={props.index} cx={props.cx} cy={props.cy} r={4.5} strokeWidth={0}
-                    fill={props.payload ? tshStatus(props.payload.tsh, targetMin, targetMax).color : 'var(--chart-1)'}
-                  />
+                yAxisId="tsh" type="linear" dataKey="tsh" name={LAB_RANGES.tsh.label} stroke="var(--chart-1)" strokeWidth={2}
+                connectNulls isAnimationActive={false}
+                dot={(props: { cx?: number; cy?: number; index?: number; payload?: { tsh?: number } }) => (
+                  props.payload?.tsh == null ? <g key={props.index} /> : (
+                    <circle
+                      key={props.index} cx={props.cx} cy={props.cy} r={4.5} strokeWidth={0}
+                      fill={tshStatus(props.payload.tsh, targetMin, targetMax).color}
+                    />
+                  )
                 )}
                 activeDot={{ r: 6 }}
               />
             </LineChart>
           </ResponsiveContainer>
+          {doseSeries.length > 0 && (
+            <ul className={styles.legend} aria-label={t('labResults.legend')}>
+              <li><span className={styles.legendSwatch} style={{ background: 'var(--chart-1)' }} />{LAB_RANGES.tsh.label}</li>
+              {doseSeries.map((d) => (
+                <li key={d.key}>
+                  <span className={styles.legendSwatch} style={{ background: d.color }} />
+                  {t('labResults.doseLegend', { name: d.med.name, unitLabel: doseUnit })}
+                </li>
+              ))}
+            </ul>
+          )}
           <p className={styles.chartNote}>{t('labResults.chartNote', { min: targetMin, max: targetMax })}</p>
         </div>
       )}

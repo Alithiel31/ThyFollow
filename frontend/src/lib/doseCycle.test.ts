@@ -4,7 +4,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { createInstance, type TFunction } from 'i18next';
 import fr from '../locales/fr/common.json';
-import { dosesForDate, averageDailyDose, formatSchedule } from './doseCycle';
+import { dosesForDate, averageDailyDose, formatSchedule, buildDoseSteps } from './doseCycle';
 import { toISODate } from './utils';
 import type { DosePeriod } from '../types';
 
@@ -88,5 +88,39 @@ describe('averageDailyDose', () => {
     expect(averageDailyDose([{ time: '07:00', doses: [75, 100] }])).toBe(87.5);
     expect(averageDailyDose([{ time: '07:00', doses: [50] }, { time: '20:00', doses: [25] }])).toBe(75);
     expect(averageDailyDose([{ time: '07:00', doses: [100, 100, 100, 100, 100, 100, 50] }])).toBe(92.86);
+  });
+});
+
+describe('buildDoseSteps', () => {
+  const periods = [
+    period('2025-01-01T00:00:00.000Z', [{ time: '07:00', doses: [50] }]),
+    period('2026-03-01T00:00:00.000Z', [{ time: '07:00', doses: [75, 100] }]),
+    period('2026-06-01T00:00:00.000Z', [{ time: '07:00', doses: [50] }, { time: '20:00', doses: [25] }]),
+  ];
+  const ts = (d: string) => Date.parse(d);
+
+  it('un palier par période (50, puis 87,5, puis 75) prolongé jusqu’à la fin de la fenêtre', () => {
+    expect(buildDoseSteps(periods, ts('2024-06-01'), ts('2026-10-17'))).toEqual([
+      { ts: ts('2025-01-01'), dose: 50 },
+      { ts: ts('2026-03-01'), dose: 87.5 },
+      { ts: ts('2026-06-01'), dose: 75 },
+      { ts: ts('2026-10-17'), dose: 75 },
+    ]);
+  });
+
+  it('la fenêtre commence avec la posologie alors en vigueur', () => {
+    expect(buildDoseSteps(periods, ts('2026-04-15'), ts('2026-10-17'))).toEqual([
+      { ts: ts('2026-04-15'), dose: 87.5 },
+      { ts: ts('2026-06-01'), dose: 75 },
+      { ts: ts('2026-10-17'), dose: 75 },
+    ]);
+  });
+
+  it('ignore les périodes hors fenêtre', () => {
+    expect(buildDoseSteps(periods, ts('2025-02-01'), ts('2026-02-01'))).toEqual([
+      { ts: ts('2025-02-01'), dose: 50 },
+      { ts: ts('2026-02-01'), dose: 50 },
+    ]);
+    expect(buildDoseSteps(periods, ts('2023-01-01'), ts('2024-01-01'))).toEqual([]);
   });
 });

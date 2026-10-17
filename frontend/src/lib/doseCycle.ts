@@ -82,3 +82,23 @@ export function scheduleLabel(
   const time = period.slots.length === 1 ? period.slots[0].time : null;
   return time ? `${label} · ${time}` : label;
 }
+
+// Paliers de dose moyenne quotidienne sur [from, to] (timestamps) : un point à chaque
+// changement de posologie, un au début de la fenêtre (posologie alors en vigueur) et un à la
+// fin, pour un tracé en escalier (`stepAfter`). Vide si aucune période ne couvre la fenêtre.
+export function buildDoseSteps(
+  periods: Pick<DosePeriod, 'startDate' | 'slots'>[],
+  from: number,
+  to: number,
+): { ts: number; dose: number }[] {
+  const sorted = [...periods].sort((a, b) => a.startDate.localeCompare(b.startDate));
+  const steps: { ts: number; dose: number }[] = [];
+  sorted.forEach((p, i) => {
+    const start = Date.parse(p.startDate);
+    const next = sorted[i + 1] ? Date.parse(sorted[i + 1].startDate) : Infinity;
+    if (next <= from || start > to) return; // hors fenêtre
+    steps.push({ ts: Math.max(start, from), dose: averageDailyDose(p.slots) });
+  });
+  if (steps.length > 0 && steps[steps.length - 1].ts < to) steps.push({ ts: to, dose: steps[steps.length - 1].dose });
+  return steps;
+}
