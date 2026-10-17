@@ -568,7 +568,9 @@
       "invalid": "Fichier PDF invalide",
       "too_large": "Fichier trop volumineux",
       "duplicate": "Déjà dans le carnet",
-      "failed": "Lecture impossible"
+      "failed": "Lecture impossible",
+      "rate_limited": "Trop de requêtes",
+      "error": "Envoi échoué"
     },
     "reason": {
       "no_text": "Ce PDF ne contient pas de texte (scan ?). Saisissez les valeurs à la main."
@@ -619,6 +621,9 @@
     "download": "Télécharger le PDF",
     "downloadError": "Téléchargement impossible",
     "conflict": "À vérifier : lecture automatique {{rules}} · IA {{ai}}",
-    "conflictNone": "rien trouvé"
+    "conflictNone": "rien trouvé",
+    "rateLimited": "Vous avez envoyé beaucoup de fichiers en peu de temps. Ce n'est pas un bug ni une erreur de lecture : le serveur limite le nombre d'envois. Réessayez dans environ {{minutes}} min.",
+    "rateLimitedSoon": "Vous avez envoyé beaucoup de fichiers en peu de temps. Ce n'est pas un bug ni une erreur de lecture : le serveur limite le nombre d'envois. Réessayez dans quelques minutes.",
+    "uploadFailedHint": "L'envoi n'a pas abouti (serveur injoignable ou en erreur). Ce n'est pas un problème de lecture de votre PDF : réessayez."
   }
 }

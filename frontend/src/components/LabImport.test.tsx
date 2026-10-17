@@ -2,6 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import toast from 'react-hot-toast';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LabImport } from './LabImport';
 import { useAuthStore } from '../lib/store';
@@ -19,6 +20,10 @@ vi.mock('../lib/api', () => ({
     downloadDocument: vi.fn(),
   },
 }));
+
+// Erreur axios simulée (axios.isAxiosError ne teste que `isAxiosError: true`)
+const axiosError = (status: number, headers: Record<string, string> = {}) =>
+  Object.assign(new Error(`Request failed with status code ${status}`), { isAxiosError: true, response: { status, headers } });
 
 const pdf = (name: string) => new File(['%PDF-1.7'], name, { type: 'application/pdf' });
 
@@ -204,5 +209,70 @@ describe('LabImport', () => {
     await user.upload(dropInput(), pdf('g.pdf'));
     await user.click(await screen.findByRole('button', { name: /labImport.retryAi/ }));
     await waitFor(() => expect(importFilesMock).toHaveBeenLastCalledWith(expect.any(Array), { forceAi: true }));
+  });
+
+  describe('erreurs d’envoi : limite de débit (429) et autres', () => {
+    it('429 avec Retry-After : message « trop de requêtes » avec le délai, jamais « Lecture impossible »', async () => {
+      importFilesMock.mockRejectedValue(axiosError(429, { 'retry-after': '600' }));
+      renderImport();
+      await userEvent.setup().upload(dropInput(), pdf('r.pdf'));
+
+      expect(await screen.findByText('labImport.status.rate_limited')).toBeInTheDocument();
+      expect(screen.getByRole('status')).toHaveTextContent('labImport.rateLimited:{"minutes":10}');
+      expect(screen.queryByText('labImport.status.failed')).not.toBeInTheDocument();
+      expect(vi.mocked(toast.error)).toHaveBeenCalledWith('labImport.rateLimited:{"minutes":10}');
+    });
+
+    it('arrondit le délai au supérieur (Retry-After: 61 → 2 minutes)', async () => {
+      importFilesMock.mockRejectedValue(axiosError(429, { 'retry-after': '61' }));
+      renderImport();
+      await userEvent.setup().upload(dropInput(), pdf('r.pdf'));
+      expect(await screen.findByRole('status')).toHaveTextContent('"minutes":2');
+    });
+
+    it('429 sans Retry-After : message sans délai', async () => {
+      importFilesMock.mockRejectedValue(axiosError(429));
+      renderImport();
+      await userEvent.setup().upload(dropInput(), pdf('r.pdf'));
+      expect(await screen.findByRole('status')).toHaveTextContent('labImport.rateLimitedSoon');
+    });
+
+    it('« Réessayer » renvoie le fichier après un 429', async () => {
+      importFilesMock
+        .mockRejectedValueOnce(axiosError(429, { 'retry-after': '60' }))
+        .mockResolvedValueOnce({ data: { results: [readyResult('r.pdf')] } });
+      renderImport();
+      const user = userEvent.setup();
+      await user.upload(dropInput(), pdf('r.pdf'));
+      await user.click(await screen.findByRole('button', { name: 'labImport.retry' }));
+
+      await waitFor(() => expect(importFilesMock).toHaveBeenCalledTimes(2));
+      expect(await screen.findByText('labImport.status.ready')).toBeInTheDocument();
+    });
+
+    it('une erreur réseau donne « Envoi échoué », pas « Lecture impossible »', async () => {
+      importFilesMock.mockRejectedValue(new Error('Network Error'));
+      renderImport();
+      await userEvent.setup().upload(dropInput(), pdf('n.pdf'));
+
+      expect(await screen.findByText('labImport.status.error')).toBeInTheDocument();
+      expect(screen.getByRole('status')).toHaveTextContent('labImport.uploadFailedHint');
+      expect(screen.queryByText('labImport.status.failed')).not.toBeInTheDocument();
+      expect(vi.mocked(toast.error)).toHaveBeenCalledWith('labImport.uploadError');
+    });
+
+    it('un 429 à la confirmation affiche le message de limite, pas l’erreur générique', async () => {
+      importFilesMock.mockResolvedValue({ data: { results: [readyResult('c.pdf')] } });
+      confirmImportMock.mockRejectedValue(axiosError(429, { 'retry-after': '300' }));
+      renderImport();
+      const user = userEvent.setup();
+      await user.upload(dropInput(), pdf('c.pdf'));
+      await user.click(await screen.findByRole('button', { name: 'labImport.addToLog' }));
+
+      await waitFor(() => expect(vi.mocked(toast.error)).toHaveBeenCalledWith('labImport.rateLimited:{"minutes":5}'));
+      expect(vi.mocked(toast.error)).not.toHaveBeenCalledWith('labResults.error');
+      // le brouillon reste affiché, on peut réessayer
+      expect(screen.getByRole('button', { name: 'labImport.addToLog' })).toBeEnabled();
+    });
   });
 });
