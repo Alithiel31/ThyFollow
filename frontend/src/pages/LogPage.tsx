@@ -257,6 +257,18 @@ export function LogPage() {
                 placeholder="7.5" step="0.5"
                 synced={form.sleepHoursSource === 'GOOGLE_HEALTH'} />
             </div>
+            {(form.sleepEfficiency != null || form.deepSleepMinutes != null || form.remSleepMinutes != null) && (
+              // Mesures de la montre, en lecture seule : à lire à côté du
+              // ressenti (qualité du sommeil), pas à sa place.
+              <p className={styles.sleepDetails}>
+                <Watch size={13} aria-hidden="true" />
+                {[
+                  form.sleepEfficiency != null && t('log.sleepDetails.efficiency', { value: form.sleepEfficiency }),
+                  form.deepSleepMinutes != null && t('log.sleepDetails.deep', { value: form.deepSleepMinutes }),
+                  form.remSleepMinutes != null && t('log.sleepDetails.rem', { value: form.remSleepMinutes }),
+                ].filter(Boolean).join(' · ')}
+              </p>
+            )}
           </div>
 
           {/* ── Notes */}

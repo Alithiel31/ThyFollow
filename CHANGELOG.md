@@ -10,11 +10,11 @@ pas synchronisé avec ces tags.
 
 ### À faire
 
-- Vérifier la forme exacte du corps JSON renvoyé par `dataTypes/{type}/dataPoints`
-  (`lib/googleHealth.ts#fetchDailyMetrics`) une fois des données réelles observées — le reste
-  du modèle Google Health (scopes, host/version, abonnement webhook au niveau projet,
-  authentification, négociation de validation) a été confirmé par lecture directe de la doc
-  officielle, voir README.
+- Confirmer en production la forme des points `dataTypes/{type}/dataPoints` : le code suit
+  désormais la référence v4, et la structure du premier point reçu par type (noms de champs,
+  sans valeurs) est journalisée au démarrage de la synchro. Retirer ce log une fois la forme
+  confirmée, et vérifier que le filtre `sleep.interval.civil_end_time` est accepté (sinon un
+  avertissement « relecture sans filtre » apparaît dans les logs).
 - Documentation API structurée (OpenAPI/Swagger) — la liste d'endpoints du README est tenue à
   la main et devient difficile à maintenir à mesure que l'API grossit.
 - Étendre la couverture de tests frontend au-delà des formulaires d'auth/médicaments (LogPage,
@@ -31,6 +31,22 @@ pas synchronisé avec ces tags.
   locale, comme dans l'app Fitbit. Les siestes du jour s'y ajoutent, et les phases d'éveil sont
   retirées quand l'API les fournit. Les bornes de la journée (poids, rythme cardiaque, sommeil)
   suivent le fuseau du profil au lieu d'UTC.
+- **Synchro Google Health : poids et rythme cardiaque enfin lus.** Le code cherchait un champ
+  `value` qui n'existe pas dans l'API v4 : aucune de ces deux mesures n'était jamais remplie. Il lit
+  maintenant `weight.weightGrams` (converti en kg) et `heartRate.beatsPerMinute`, en gardant la
+  mesure la plus récente de la journée. Les heures de sommeil viennent du résumé de la nuit calculé
+  par Google (`summary.minutesAsleep`), et chaque nuit est demandée par son heure civile de réveil.
+
+### Added
+
+- **Détail des nuits mesuré par la montre** : efficacité du sommeil, minutes de sommeil profond et
+  paradoxal, en lecture seule dans le journal (à côté du ressenti « qualité du sommeil », qui reste
+  saisi à la main) et en moyennes dans le rapport et le CSV. L'API Google Health n'expose pas le
+  score de sommeil Fitbit : ce sont les éléments du résumé de nuit qu'elle fournit.
+- **« Récupérer l'historique » (Profil → Comptes liés)** : relit les 30 derniers jours depuis Google
+  Health (`POST /api/integrations/google-health/resync`, 90 jours au plus, un seul rattrapage à la
+  fois par compte, 3 par heure). Remplit les jours antérieurs à la connexion et corrige les nuits
+  comptées deux fois par l'ancien découpage.
 
 ### Security
 

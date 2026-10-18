@@ -98,6 +98,8 @@
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
 }
 
+.linkedAccountActions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+
 .linkedAccountInfo { display: flex; align-items: center; gap: 12px; font-size: 0.9rem; color: var(--text); }
 
 .linkedAccountStatus { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }

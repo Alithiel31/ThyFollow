@@ -220,6 +220,11 @@
     "heartRate": "Rythme cardiaque",
     "sleepHours": "Heures de sommeil",
     "syncedFromGoogleHealth": "Synchronisé depuis Google Health",
+    "sleepDetails": {
+      "efficiency": "Efficacité {{value}} %",
+      "deep": "Profond {{value}} min",
+      "rem": "Paradoxal {{value}} min"
+    },
     "notes": "Notes",
     "notesPlaceholder": "Comment vous sentez-vous aujourd'hui ? Quelque chose de particulier à noter ?",
     "saveButton": {
@@ -442,7 +447,11 @@
       "googleHealthLinkedSuccess": "Google Health connecté avec succès",
       "googleHealthLinkError": "Erreur lors de la connexion à Google Health",
       "googleHealthUnlinkedSuccess": "Google Health déconnecté",
-      "googleHealthUnlinkError": "Erreur lors de la déconnexion de Google Health"
+      "googleHealthUnlinkError": "Erreur lors de la déconnexion de Google Health",
+      "googleHealthResync": "Récupérer l'historique",
+      "googleHealthResyncHint": "Relit les {{days}} derniers jours depuis Google Health",
+      "googleHealthResyncStarted": "Récupération des {{days}} derniers jours lancée, le journal se remplira dans quelques minutes",
+      "googleHealthResyncError": "Impossible de lancer la récupération de l'historique"
     },
     "securityEvents": {
       "title": "Activité récente",
@@ -555,7 +564,10 @@
       "averageWeight": "Poids moyen (kg)",
       "averageTemperature": "Température moyenne (°C)",
       "averageHeartRate": "Rythme cardiaque moyen",
-      "averageSleep": "Sommeil moyen (h)"
+      "averageSleep": "Sommeil moyen (h)",
+      "averageSleepEfficiency": "Efficacité du sommeil moyenne (%)",
+      "averageDeepSleep": "Sommeil profond moyen (min)",
+      "averageRemSleep": "Sommeil paradoxal moyen (min)"
     },
     "missingPeriod": "Période manquante.",
     "loadError": "Impossible de charger le rapport.",
@@ -574,6 +586,9 @@
     "temperature": "Température",
     "heartRate": "Rythme cardiaque",
     "sleep": "Sommeil",
+    "sleepEfficiency": "Efficacité du sommeil (montre)",
+    "deepSleep": "Sommeil profond (montre)",
+    "remSleep": "Sommeil paradoxal (montre)",
     "medicationLine": "{{name}}{{brand}} — {{dose}} {{unit}}, {{freq}}{{intakeTime}}",
     "intakeTimeSuffix": " à {{time}}",
     "footer": "Généré par ThyroTrack le {{date}} — données déclaratives saisies par le patient, à interpréter avec un professionnel de santé."

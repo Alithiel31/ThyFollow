@@ -55,6 +55,8 @@ export const authApi = {
   // navigation plein-page ensuite faite par le frontend.
   linkGoogleHealth: () => api.post<{ url: string }>('/integrations/google-health/link'),
   unlinkGoogleHealth: () => api.delete<{ message: string }>('/integrations/google-health/link'),
+  // Relit les `days` derniers jours (90 au plus) en arrière-plan.
+  resyncGoogleHealth: (days: number) => api.post<{ days: number }>('/integrations/google-health/resync', { days }),
 };
 
 // ── Sécurité du compte

@@ -282,6 +282,13 @@ model DailyEntry {
   sleepHours       Float?
   sleepHoursSource DataSource @default(MANUAL)
   sleepQuality     Int? // 1-5
+  // Mesures de la montre, lecture seule (jamais saisies à la main, donc pas
+  // de colonne de provenance) : remplies uniquement par la synchro Google
+  // Health. L'API n'expose pas le score de sommeil Fitbit ; ce sont les
+  // éléments du résumé de la nuit (voir lib/googleHealth.ts#SleepDay).
+  sleepEfficiency  Int? // % du temps au lit passé endormi
+  deepSleepMinutes Int?
+  remSleepMinutes  Int?
 
   // ── Medication
   medicationTaken Boolean   @default(false)

@@ -12,6 +12,9 @@ import { ProPaywall, ProStatus } from '../components/ProPanel';
 import { DIAGNOSIS_LABEL_KEYS, THYROID_STATUS_LABEL_KEYS, type AuthEventType, type UserProfile } from '../types';
 import styles from './ProfilePage.module.css';
 
+// Jours relus par « Récupérer l'historique » (le serveur accepte jusqu'à 90).
+const GOOGLE_HEALTH_RESYNC_DAYS = 30;
+
 export function ProfilePage() {
   const { t } = useTranslation();
   const { user, token, logout, setAuth } = useAuthStore();
@@ -23,6 +26,7 @@ export function ProfilePage() {
   const [unlinking, setUnlinking] = useState(false);
   const [linkingHealth, setLinkingHealth] = useState(false);
   const [unlinkingHealth, setUnlinkingHealth] = useState(false);
+  const [resyncingHealth, setResyncingHealth] = useState(false);
   const isGoogleLinked = user?.oauthAccounts?.some((a) => a.provider === 'google') ?? false;
   const isGoogleHealthLinked = !!user?.googleHealthConnection;
 
@@ -77,6 +81,21 @@ export function ProfilePage() {
     } catch {
       toast.error(t('profile.linkedAccounts.googleHealthLinkError'));
       setLinkingHealth(false);
+    }
+  };
+
+  // Rattrapage de l'historique : le serveur répond tout de suite et relit les
+  // jours en arrière-plan (voir backend googleHealth.controller.ts#resync).
+  const handleResyncGoogleHealth = async () => {
+    setResyncingHealth(true);
+    try {
+      await authApi.resyncGoogleHealth(GOOGLE_HEALTH_RESYNC_DAYS);
+      toast.success(t('profile.linkedAccounts.googleHealthResyncStarted', { days: GOOGLE_HEALTH_RESYNC_DAYS }));
+    } catch (err) {
+      const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? t('profile.linkedAccounts.googleHealthResyncError');
+      toast.error(msg);
+    } finally {
+      setResyncingHealth(false);
     }
   };
 
@@ -384,14 +403,25 @@ export function ProfilePage() {
             </div>
           </div>
           {isGoogleHealthLinked ? (
-            <button
-              type="button"
-              className={`${styles.smallBtn} ${styles.smallBtnDanger}`}
-              onClick={handleUnlinkGoogleHealth}
-              disabled={unlinkingHealth}
-            >
-              {unlinkingHealth ? t('profile.linkedAccounts.unlinking') : t('profile.linkedAccounts.unlink')}
-            </button>
+            <div className={styles.linkedAccountActions}>
+              <button
+                type="button"
+                className={styles.smallBtn}
+                onClick={handleResyncGoogleHealth}
+                disabled={resyncingHealth}
+                title={t('profile.linkedAccounts.googleHealthResyncHint', { days: GOOGLE_HEALTH_RESYNC_DAYS })}
+              >
+                {t('profile.linkedAccounts.googleHealthResync')}
+              </button>
+              <button
+                type="button"
+                className={`${styles.smallBtn} ${styles.smallBtnDanger}`}
+                onClick={handleUnlinkGoogleHealth}
+                disabled={unlinkingHealth}
+              >
+                {unlinkingHealth ? t('profile.linkedAccounts.unlinking') : t('profile.linkedAccounts.unlink')}
+              </button>
+            </div>
           ) : (
             <button type="button" className={styles.smallBtn} onClick={handleLinkGoogleHealth} disabled={linkingHealth}>
               {linkingHealth ? t('profile.linkedAccounts.linking') : t('profile.linkedAccounts.link')}
