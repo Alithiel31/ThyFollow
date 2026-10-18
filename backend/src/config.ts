@@ -89,6 +89,9 @@ export const config = {
   // sauté (log en warn) pour ne pas bloquer le dev local sans compte Resend.
   resendApiKey: process.env.RESEND_API_KEY || '',
   resendFromEmail: process.env.RESEND_FROM_EMAIL || 'ThyroTrack <onboarding@resend.dev>',
+  // Rappels par email (voir lib/reminders.ts) : actifs dès que Resend est
+  // configuré, sauf REMINDERS_ENABLED=false (ex. une 2e instance de backend).
+  remindersEnabled: process.env.REMINDERS_ENABLED !== 'false',
   // Rate limiting global : 100 requêtes / 15 min par IP par défaut
   rateLimitWindowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || String(15 * 60 * 1000), 10),
   rateLimitMax: parseInt(process.env.RATE_LIMIT_MAX || '100', 10),

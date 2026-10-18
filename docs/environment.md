@@ -78,6 +78,7 @@ Read by `src/config.ts`, which centralises every access to `process.env`. The Co
 | ------------------- | -------- | --------------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | `RESEND_API_KEY`    | ❌       | —                                       | Resend API key. Without it, sending is skipped with a warning — handy locally, but nobody can then verify an account by email. |
 | `RESEND_FROM_EMAIL` | ❌       | `ThyroTrack <onboarding@resend.dev>`    | Sender address; use a verified domain in production.                                                 |
+| `REMINDERS_ENABLED` | ❌       | `true`                                  | Email reminders (a loop every 5 min inside the backend, active only when `RESEND_API_KEY` is set). `false` turns them off, e.g. on a second instance. |
 
 ### Sign in with Google (OIDC)
 

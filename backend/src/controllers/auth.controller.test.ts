@@ -370,6 +370,17 @@ describe('me', () => {
     expect(res.body.id).toBe('user-1');
   });
 
+  it('says whether the account has a password without ever returning its hash', async () => {
+    prismaMock.user.findUnique.mockResolvedValue({ id: 'user-1', email: 'user@example.com', name: 'User', role: 'USER', tokenVersion: 0, password: '$2a$12$hash' });
+    const app = await buildApp();
+
+    const res = await request(app).get('/api/auth/me').set('Authorization', `Bearer ${signToken('user-1')}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.hasPassword).toBe(true);
+    expect(res.body).not.toHaveProperty('password');
+  });
+
   it('accepts a token issued before tokenVersion existed while the version is still 0', async () => {
     prismaMock.user.findUnique.mockResolvedValue({ id: 'user-1', tokenVersion: 0 });
     const app = await buildApp();

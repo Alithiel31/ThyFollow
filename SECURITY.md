@@ -89,6 +89,12 @@ Before reporting something already covered, a few existing mechanisms (detailed 
   dependencies; CodeQL analyses the code on every push, pull request and weekly; Dependabot opens
   weekly pull requests (major versions are handled by hand).
 - **Health data hygiene** — the API responses are never cached by the service worker.
+- **GDPR rights** — every user can export all their data (`GET /api/account/export`, JSON, lab PDFs
+  included, with no secrets: no password, token or PDF password) and delete their account
+  (`DELETE /api/account`, password or retyped email required). Deletion cancels the Stripe subscription
+  first (nothing is deleted if cancellation fails), then erases the account, all its data by cascade and
+  its sign-in traces (IP, browser). The Stripe customer and its invoices stay at Stripe (accounting
+  obligation). Both routes are limited to 10 requests / 15 min.
 
 ## Supported versions
 

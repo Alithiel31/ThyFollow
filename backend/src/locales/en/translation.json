@@ -42,7 +42,13 @@
       "noSubscription": "No subscription to manage",
       "invalidCode": "Invalid, expired or fully used code",
       "codeAlreadyUsed": "You have already used this code"
-    }
+    },
+    "account": {
+      "invalidPassword": "Incorrect password",
+      "invalidEmailConfirmation": "The address entered doesn't match the account's",
+      "billingUnavailable": "We can't cancel your subscription automatically right now, so your account was not deleted. Try again later or cancel it from \"Manage my subscription\"."
+    },
+    "invalidTimezone": "Invalid time zone"
   },
   "auth": {
     "verificationEmailSent": "A confirmation email has been sent",
@@ -67,5 +73,41 @@
     "titleTooShort": "Title too short",
     "contentRequired": "Content required",
     "invalidDateFormat": "Invalid date format (YYYY-MM-DD)"
+  },
+  "reminders": {
+    "greeting": "Hi {{name}},",
+    "footer": "You are receiving this email because you turned this reminder on. You can turn it off at any time in your ThyroTrack profile.",
+    "settingsLink": "Manage my reminders",
+    "dailyLog": {
+      "subject": "Today's ThyroTrack log",
+      "body": "You haven't filled in your log today yet. Two minutes is enough to note your energy, mood and symptoms.",
+      "cta": "Fill in my log"
+    },
+    "medication": {
+      "subject": "Medication reminder: {{time}}",
+      "body": "It's time for your {{time}} dose:",
+      "cta": "Mark as taken"
+    },
+    "lab": {
+      "subject": "Time for your next blood test?",
+      "body": "Your last recorded blood test is from {{date}}, more than {{weeks}} weeks ago. If your doctor prescribed a check-up, now may be the time.",
+      "cta": "See my lab results"
+    },
+    "appointment": {
+      "subject": "Appointment on {{date}}",
+      "body": "Reminder: you have an appointment ({{type}}) on {{date}}.",
+      "withDoctor": "With: {{doctor}}",
+      "at": "Where: {{location}}",
+      "cta": "See my appointments"
+    },
+    "appointmentTypes": {
+      "ENDOCRINOLOGIST": "endocrinologist",
+      "GENERAL_PRACTITIONER": "general practitioner",
+      "ULTRASOUND": "ultrasound",
+      "BLOOD_TEST": "blood test",
+      "SCINTIGRAPHY": "scintigraphy",
+      "BIOPSY": "biopsy",
+      "OTHER": "other"
+    }
   }
 }

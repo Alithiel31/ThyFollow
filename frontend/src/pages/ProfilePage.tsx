@@ -9,6 +9,8 @@ import { aiConsentApi, authApi, pdfPasswordsApi, profileApi, securityApi } from 
 import { useAuthStore } from '../lib/store';
 import { GoogleIcon } from '../components/GoogleIcon';
 import { ProPaywall, ProStatus } from '../components/ProPanel';
+import { ReminderSettings } from '../components/ReminderSettings';
+import { AccountData } from '../components/AccountData';
 import { DIAGNOSIS_LABEL_KEYS, THYROID_STATUS_LABEL_KEYS, type AuthEventType, type UserProfile } from '../types';
 import styles from './ProfilePage.module.css';
 
@@ -438,6 +440,14 @@ export function ProfilePage() {
         </Section>
       )}
 
+      {/* ── Rappels par email : hors <form>, enregistrés à part. Ancre #reminders :
+          lien « Gérer mes rappels » des emails. */}
+      <div id="reminders">
+        <Section title={t('profile.reminders.title')}>
+          <ReminderSettings email={user?.email} />
+        </Section>
+      </div>
+
       {/* ── Documents et IA : hors <form> (même raison que « Comptes liés »). */}
       <Section title={t('profile.documents.title')}>
         <label className={styles.linkedAccountRow}>
@@ -543,6 +553,11 @@ export function ProfilePage() {
           ))}
         </Section>
       )}
+
+      {/* ── Mes données (RGPD) : export et suppression du compte */}
+      <Section title={t('profile.data.title')}>
+        <AccountData />
+      </Section>
 
       <button type="button" className={styles.logoutBtn} onClick={logout}>
         <LogOut size={16} />

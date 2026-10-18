@@ -204,6 +204,8 @@ export const authController = {
         proUntil: true,
         proSource: true,
         freeImportsUsed: true,
+        // Seulement pour calculer `hasPassword` (jamais renvoyé)
+        password: true,
         profile: true,
         // Comptes fédérés liés (ex: Google) — le frontend s'en sert pour
         // afficher l'état "connecté/non connecté" dans le Profil.
@@ -216,9 +218,10 @@ export const authController = {
 
     if (!user) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.user') }));
     // Les colonnes brutes servent au calcul des droits : seul le résumé
-    // `entitlements` est exposé au client.
-    const { proUntil, proSource, freeImportsUsed, ...publicUser } = user;
+    // `entitlements` est exposé au client. `hasPassword` : la suppression du
+    // compte demande le mot de passe, ou l'email pour un compte Google seul.
+    const { proUntil, proSource, freeImportsUsed, password, ...publicUser } = user;
     const entitlements = await getEntitlements({ id: user.id, role: user.role, proUntil, proSource, freeImportsUsed });
-    res.json({ ...publicUser, entitlements });
+    res.json({ ...publicUser, hasPassword: Boolean(password), entitlements });
   },
 };

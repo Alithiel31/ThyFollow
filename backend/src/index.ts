@@ -21,8 +21,10 @@ import googleHealthRouter from './routers/googleHealth.router.js';
 import googleHealthWebhookRouter from './routers/googleHealthWebhook.router.js';
 import billingRouter from './routers/billing.router.js';
 import adminPromoRouter from './routers/adminPromo.router.js';
+import accountRouter from './routers/account.router.js';
 import { stripeWebhookController } from './controllers/stripeWebhook.controller.js';
 import { ensureProjectSubscriber } from './lib/googleHealthSubscriber.js';
+import { startReminderScheduler } from './lib/reminders.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { mountGraphQL } from './graphql/index.js';
 
@@ -129,6 +131,7 @@ app.use('/api/lab-results', labResultsRouter);
 app.use('/api/medications', medicationsRouter);
 app.use('/api/appointments', appointmentsRouter);
 app.use('/api/profile', profileRouter);
+app.use('/api/account', accountRouter);
 app.use('/api/pdf-passwords', pdfPasswordsRouter);
 app.use('/api/billing', billingRouter);
 app.use('/api/admin/promo-codes', adminPromoRouter);
@@ -159,6 +162,10 @@ app.listen(config.port, () => {
       logger.error('Échec initialisation de l’abonné webhook Google Health', err);
     });
   }
+
+  // Rappels par email (journal, médicaments, bilan, rendez-vous) : boucle
+  // toutes les 5 minutes, sautée si Resend n'est pas configuré.
+  startReminderScheduler();
 });
 
 export default app;

@@ -83,6 +83,25 @@ pas synchronisé avec ces tags.
 
 ### Added
 
+- **Rappels par email** (section « Rappels par email » du profil, ancre `#reminders`) : journal du jour
+  à l'heure choisie s'il n'est pas rempli, prises de médicament à chaque horaire défini (un email par
+  créneau, sans les prises déjà validées, cadence quotidienne / un jour sur deux / hebdomadaire
+  respectée), prochain bilan sanguin quand le dernier date de plus de N semaines, et rendez-vous dans
+  les N jours qui précèdent (réglage `reminderDays` existant). Les réglages `NotificationSetting`
+  existaient sans être lus ni affichés ; ils sont désormais **désactivés par défaut** (opt-in) et
+  exposés par `GET`/`PUT /api/profile/notifications`, qui enregistre aussi le fuseau du navigateur
+  (`UserProfile.timezone`) et la langue des emails. Une boucle dans le backend (`lib/reminders.ts`,
+  toutes les 5 min, seulement si Resend est configuré, `REMINDERS_ENABLED=false` pour la couper)
+  envoie chaque rappel une seule fois grâce à la table `reminder_logs` (clé unique par utilisateur,
+  réservée avant l'envoi et rendue si l'envoi échoue). Un rappel à heure fixe part dans l'heure qui
+  suit, jamais en retard ; bilan et rendez-vous partent en journée (9 h – 21 h). Migration
+  `20261018100000_add_reminders`.
+- **Mes données (RGPD)** (section du profil) : export de toutes ses données en JSON, PDF de bilans
+  compris (`GET /api/account/export`), et suppression définitive du compte (`DELETE /api/account`,
+  mot de passe exigé, ou email recopié pour un compte Google sans mot de passe). L'abonnement Stripe
+  est résilié avant la suppression, qui est annulée si la résiliation échoue. `GET /api/auth/me`
+  renvoie `hasPassword` (jamais le hash).
+
 - Déploiement continu (déclenché à la main) : `docker-compose.yml` tire les images publiées sur
   GHCR (`IMAGE_TAG`, `sha-<commit>` ou `main`) au lieu de les construire sur le Pi ;
   `docker-compose.build.yml` garde la construction depuis les sources. `deploy.sh` déploie le

@@ -92,6 +92,12 @@ Avant de signaler un problème déjà couvert, quelques mécanismes existants (d
   dépendances de production ; CodeQL analyse le code à chaque push, pull request et chaque semaine ;
   Dependabot ouvre des pull requests hebdomadaires (les versions majeures sont traitées à la main).
 - **Hygiène des données de santé** — les réponses de l'API ne sont jamais mises en cache par le service worker.
+- **Droits RGPD** — chaque utilisateur peut exporter toutes ses données (`GET /api/account/export`, JSON, PDF
+  de bilans compris, sans aucun secret : ni mot de passe, ni jeton, ni mot de passe de PDF) et supprimer son
+  compte (`DELETE /api/account`, mot de passe ou email recopié exigé). La suppression résilie d'abord
+  l'abonnement Stripe (rien n'est supprimé si la résiliation échoue), puis efface le compte, toutes ses
+  données en cascade et ses traces de connexion (IP, navigateur). Le client Stripe et ses factures sont
+  conservés chez Stripe (obligation comptable). Ces deux routes sont limitées à 10 requêtes / 15 min.
 
 ## Versions supportées
 
