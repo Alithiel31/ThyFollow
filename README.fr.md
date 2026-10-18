@@ -48,6 +48,8 @@ Application web de suivi thyroïdien, inspirée de l'app Clue.
 | **Rendez-vous** | Agenda médical avec rappels, statuts, types spécialisés |
 | **Tableau de bord** | Streak médicament, observance, moyennes, prochain RDV, historique TSH |
 | **Profil** | Diagnostic, état thyroïde, plages TSH/FT4/FT3 personnalisées par votre médecin |
+| **Rappels par email** | Journal du jour, prises de médicament, prochain bilan sanguin, rendez-vous — tous désactivés par défaut, à l'heure locale |
+| **Mes données (RGPD)** | Export complet de ses données en JSON (PDF de bilans compris) et suppression définitive du compte (abonnement Stripe résilié) |
 
 ---
 
@@ -394,6 +396,11 @@ DELETE /api/appointments/:id
 
 GET    /api/profile
 PUT    /api/profile
+GET    /api/profile/notifications              (réglages des rappels par email)
+PUT    /api/profile/notifications
+
+GET    /api/account/export                     (export RGPD : toutes les données en JSON)
+DELETE /api/account                            (suppression définitive : { password } ou { confirmEmail })
 
 GET    /api/analytics/overview?days=90
 GET    /api/analytics/symptoms?days=30

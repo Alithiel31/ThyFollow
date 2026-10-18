@@ -174,6 +174,20 @@ export const profileApi = {
   update: (data: Partial<import('../types').UserProfile>) => api.put<import('../types').UserProfile>('/profile', data),
 };
 
+// ── Rappels par email
+export const notificationsApi = {
+  get: () => api.get<import('../types').NotificationSettings>('/profile/notifications'),
+  update: (data: Omit<import('../types').NotificationSettings, 'emailEnabled'> & { timezone?: string }) =>
+    api.put<import('../types').NotificationSettings>('/profile/notifications', data),
+};
+
+// ── Mes données (RGPD) : export complet et suppression du compte
+export const accountApi = {
+  export: () => api.get<Blob>('/account/export', { responseType: 'blob' }),
+  // { password } pour un compte avec mot de passe, { confirmEmail } pour un compte Google seul
+  remove: (data: { password?: string; confirmEmail?: string }) => api.delete('/account', { data }),
+};
+
 // ── Articles & encarts
 export const articlesApi = {
   list: (kind?: import('../types').ArticleKind) =>

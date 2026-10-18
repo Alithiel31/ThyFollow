@@ -64,6 +64,7 @@ model User {
   googleHealthConnection GoogleHealthConnection?
   importUsages           ImportUsage[]
   promoRedemptions       PromoRedemption[]
+  reminderLogs           ReminderLog[]
 
   @@map("users")
 }
@@ -491,16 +492,37 @@ model Appointment {
 model NotificationSetting {
   id                  String  @id @default(cuid())
   userId              String  @unique
-  dailyLogReminder    Boolean @default(true)
+  // Tous désactivés par défaut : les rappels sont des emails, envoyés
+  // seulement après un choix explicite dans le profil (voir lib/reminders.ts).
+  dailyLogReminder    Boolean @default(false)
   dailyLogTime        String  @default("20:00")
-  medicationReminder  Boolean @default(true)
-  labResultReminder   Boolean @default(true)
+  medicationReminder  Boolean @default(false)
+  labResultReminder   Boolean @default(false)
   labReminderWeeks    Int     @default(12) // every N weeks
-  appointmentReminder Boolean @default(true)
+  appointmentReminder Boolean @default(false)
+  // Langue des emails de rappel, reprise de la requête qui a enregistré les réglages
+  language            String  @default("fr")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("notification_settings")
+}
+
+// ─────────────────────────────────────────────
+// REMINDER LOG (rappels déjà envoyés : un rappel n'est envoyé qu'une fois par clé)
+// ─────────────────────────────────────────────
+model ReminderLog {
+  id     String   @id @default(cuid())
+  userId String
+  // Ex. "log:2026-10-18", "med:2026-10-18:08:00", "lab:2026-06-02", "appt:<id>:<date ISO>"
+  key    String
+  sentAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, key])
+  @@index([sentAt])
+  @@map("reminder_logs")
 }
 
 // ─────────────────────────────────────────────

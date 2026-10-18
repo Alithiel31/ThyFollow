@@ -479,6 +479,49 @@
       "error": "Une erreur est survenue",
       "aiAlwaysLabel": "Lecture par IA à chaque import",
       "aiAlwaysHint": "Compare la lecture automatique et celle de l'IA, et signale les écarts. Sinon, l'IA ne sert que de repli. Exige l'autorisation ci-dessus."
+    },
+    "reminders": {
+      "title": "Rappels par email",
+      "intro": "Les rappels sont envoyés à {{email}}, à l'heure de votre fuseau horaire actuel. Ils sont tous désactivés tant que vous ne les activez pas.",
+      "emailDisabled": "L'envoi d'emails n'est pas configuré sur ce serveur : les rappels ne peuvent pas être activés.",
+      "dailyLogReminder": {
+        "label": "Journal du jour",
+        "hint": "Un email à l'heure choisie si vous n'avez encore rien noté ce jour-là."
+      },
+      "dailyLogTime": "Heure du rappel",
+      "medicationReminder": {
+        "label": "Prises de médicament",
+        "hint": "Un email à chaque horaire de prise défini dans Médicaments, s'il n'est pas encore validé."
+      },
+      "labResultReminder": {
+        "label": "Prochain bilan sanguin",
+        "hint": "Un email quand votre dernier bilan enregistré date de plus de N semaines."
+      },
+      "labWeeks": "Intervalle entre deux bilans (semaines)",
+      "appointmentReminder": {
+        "label": "Rendez-vous médicaux",
+        "hint": "Un email quelques jours avant chaque rendez-vous dont le rappel est activé (délai réglé sur le rendez-vous)."
+      },
+      "save": "Enregistrer les rappels",
+      "saved": "Rappels enregistrés",
+      "error": "Erreur lors de l'enregistrement des rappels"
+    },
+    "data": {
+      "title": "Mes données",
+      "exportHint": "Téléchargez toutes vos données (journal, médicaments, analyses, PDF de bilans, rendez-vous, profil) dans un fichier JSON.",
+      "export": "Exporter mes données",
+      "exporting": "Préparation…",
+      "exportError": "Erreur lors de l'export",
+      "deleteTitle": "Supprimer mon compte",
+      "deleteHint": "Votre compte et toutes vos données sont supprimés définitivement, sans retour possible. Pensez à exporter vos données avant.",
+      "deleteSubscription": "Votre abonnement Pro sera résilié immédiatement, sans remboursement de la période en cours.",
+      "delete": "Supprimer mon compte",
+      "confirmPassword": "Saisissez votre mot de passe pour confirmer",
+      "confirmEmail": "Saisissez votre adresse email ({{email}}) pour confirmer",
+      "deleteConfirm": "Supprimer définitivement",
+      "deleting": "Suppression…",
+      "deleted": "Votre compte a été supprimé",
+      "deleteError": "Erreur lors de la suppression du compte"
     }
   },
   "diagnosis": {

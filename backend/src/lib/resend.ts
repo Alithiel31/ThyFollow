@@ -139,3 +139,59 @@ export async function sendResetPasswordEmail(to: string, name: string, token: st
     logger.error("Échec de l'envoi de l'email de réinitialisation via Resend", error);
   }
 }
+
+export function isEmailConfigured(): boolean {
+  return resend !== null;
+}
+
+export interface ReminderEmail {
+  subject: string;
+  greeting: string;
+  // Paragraphes de texte brut (échappés ici)
+  lines: string[];
+  // Liste à puces facultative (ex. médicaments à prendre)
+  items?: string[];
+  cta: string;
+  // Chemin dans l'app, ex. "/log"
+  ctaPath: string;
+  footer: string;
+  settingsLabel: string;
+}
+
+function buildReminderHtml(email: ReminderEmail): string {
+  const ctaUrl = `${config.appUrl}${email.ctaPath}`;
+  const settingsUrl = `${config.appUrl}/profile#reminders`;
+  const lines = email.lines.map((line) => `<p>${escapeHtml(line)}</p>`).join('');
+  const items = email.items?.length
+    ? `<ul>${email.items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
+    : '';
+  return `
+    <div style="font-family: -apple-system, sans-serif; max-width: 480px; margin: 0 auto; color: #1a1a1a;">
+      <p>${escapeHtml(email.greeting)}</p>
+      ${lines}
+      ${items}
+      <p style="text-align: center; margin: 32px 0;">
+        <a href="${ctaUrl}" style="background: #7b61ff; color: #fff; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">
+          ${escapeHtml(email.cta)}
+        </a>
+      </p>
+      <p style="font-size: 13px; color: #666;">${escapeHtml(email.footer)} <a href="${settingsUrl}">${escapeHtml(email.settingsLabel)}</a></p>
+    </div>
+  `;
+}
+
+// Retourne false si l'email n'est pas parti (le rappel sera retenté au passage suivant).
+export async function sendReminderEmail(to: string, email: ReminderEmail): Promise<boolean> {
+  if (!resend) return false;
+  const { error } = await resend.emails.send({
+    from: config.resendFromEmail,
+    to,
+    subject: email.subject,
+    html: buildReminderHtml(email),
+  });
+  if (error) {
+    logger.error("Échec de l'envoi d'un email de rappel via Resend", error);
+    return false;
+  }
+  return true;
+}

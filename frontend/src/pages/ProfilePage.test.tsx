@@ -14,6 +14,10 @@ const pdfListMock = vi.fn();
 const pdfRemoveMock = vi.fn();
 const pdfRemoveAllMock = vi.fn();
 const consentSetMock = vi.fn();
+const notificationsGetMock = vi.fn();
+const notificationsUpdateMock = vi.fn();
+const accountRemoveMock = vi.fn();
+const logoutMock = vi.fn();
 
 vi.mock('../lib/api', () => ({
   authApi: {},
@@ -33,7 +37,25 @@ vi.mock('../lib/api', () => ({
   aiConsentApi: {
     set: (...args: unknown[]) => consentSetMock(...args),
   },
+  notificationsApi: {
+    get: (...args: unknown[]) => notificationsGetMock(...args),
+    update: (...args: unknown[]) => notificationsUpdateMock(...args),
+  },
+  accountApi: {
+    export: vi.fn(),
+    remove: (...args: unknown[]) => accountRemoveMock(...args),
+  },
 }));
+
+const REMINDERS_OFF = {
+  dailyLogReminder: false,
+  dailyLogTime: '20:00',
+  medicationReminder: false,
+  labResultReminder: false,
+  labReminderWeeks: 12,
+  appointmentReminder: false,
+  emailEnabled: true,
+};
 
 function renderProfilePage() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -51,10 +73,12 @@ beforeEach(() => {
   eventsMock.mockResolvedValue({ data: [] });
   profileGetMock.mockResolvedValue({ data: {} });
   pdfListMock.mockResolvedValue({ data: [] });
+  notificationsGetMock.mockResolvedValue({ data: REMINDERS_OFF });
   useAuthStore.setState({
-    user: { id: 'u1', name: 'Alice Martin', email: 'alice@example.com' } as never,
+    user: { id: 'u1', name: 'Alice Martin', email: 'alice@example.com', hasPassword: true } as never,
     token: 'jwt',
     isLoading: false,
+    logout: logoutMock,
   });
 });
 
@@ -192,5 +216,71 @@ describe('ProfilePage — Documents et IA', () => {
   it('prévient que le serveur peut déchiffrer les mots de passe mémorisés', async () => {
     renderProfilePage();
     expect(await screen.findByText('profile.documents.passwordsNote')).toBeInTheDocument();
+  });
+});
+
+describe('ProfilePage — Rappels par email', () => {
+  it('active un rappel et envoie les réglages avec le fuseau du navigateur', async () => {
+    notificationsUpdateMock.mockImplementation((data: object) => Promise.resolve({ data: { ...data, emailEnabled: true } }));
+    renderProfilePage();
+    const user = userEvent.setup();
+
+    const toggle = await screen.findByRole('switch', { name: 'profile.reminders.dailyLogReminder.label' });
+    expect(toggle).not.toBeChecked();
+    expect(screen.getByRole('button', { name: 'profile.reminders.save' })).toBeDisabled();
+
+    await user.click(toggle);
+    const time = screen.getByLabelText('profile.reminders.dailyLogTime');
+    expect(time).toHaveValue('20:00');
+    await user.click(screen.getByRole('button', { name: 'profile.reminders.save' }));
+
+    await waitFor(() => expect(notificationsUpdateMock).toHaveBeenCalledTimes(1));
+    expect(notificationsUpdateMock.mock.calls[0][0]).toMatchObject({
+      dailyLogReminder: true,
+      dailyLogTime: '20:00',
+      medicationReminder: false,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
+  });
+
+  it('sans envoi d’emails configuré, les rappels sont inactifs et expliqués', async () => {
+    notificationsGetMock.mockResolvedValue({ data: { ...REMINDERS_OFF, emailEnabled: false } });
+    renderProfilePage();
+
+    expect(await screen.findByText('profile.reminders.emailDisabled')).toBeInTheDocument();
+    expect(screen.getByRole('switch', { name: 'profile.reminders.medicationReminder.label' })).toBeDisabled();
+  });
+});
+
+describe('ProfilePage — Mes données', () => {
+  it('la suppression demande le mot de passe, puis déconnecte', async () => {
+    accountRemoveMock.mockResolvedValue({});
+    renderProfilePage();
+    const user = userEvent.setup();
+
+    await user.click(await screen.findByRole('button', { name: 'profile.data.delete' }));
+    const confirmButton = screen.getByRole('button', { name: 'profile.data.deleteConfirm' });
+    expect(confirmButton).toBeDisabled();
+    await user.type(screen.getByLabelText('profile.data.confirmPassword'), 'secret-pw');
+    await user.click(confirmButton);
+
+    await waitFor(() => expect(accountRemoveMock).toHaveBeenCalledWith({ password: 'secret-pw' }));
+    await waitFor(() => expect(logoutMock).toHaveBeenCalledTimes(1));
+  });
+
+  it('compte Google sans mot de passe : demande l’email, et reste connecté si le serveur refuse', async () => {
+    useAuthStore.setState({
+      user: { id: 'u1', name: 'Alice Martin', email: 'alice@example.com', hasPassword: false } as never,
+    });
+    accountRemoveMock.mockRejectedValue({ response: { status: 403, data: { error: 'mismatch' } } });
+    renderProfilePage();
+    const user = userEvent.setup();
+
+    await user.click(await screen.findByRole('button', { name: 'profile.data.delete' }));
+    await user.type(screen.getByLabelText(/profile\.data\.confirmEmail/), 'alice@example.com');
+    await user.click(screen.getByRole('button', { name: 'profile.data.deleteConfirm' }));
+
+    await waitFor(() => expect(accountRemoveMock).toHaveBeenCalledWith({ confirmEmail: 'alice@example.com' }));
+    expect(logoutMock).not.toHaveBeenCalled();
   });
 });

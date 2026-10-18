@@ -48,6 +48,8 @@ A web app for tracking thyroid health, inspired by the Clue app.
 | **Appointments** | Medical calendar with reminders, statuses, specialized types |
 | **Dashboard** | Medication streak, adherence, averages, next appointment, TSH history |
 | **Profile** | Diagnosis, thyroid status, TSH/FT4/FT3 target ranges set by your doctor |
+| **Email reminders** | Today's log, medication doses, next blood test, appointments — all off by default, in local time |
+| **My data (GDPR)** | Full JSON export of one's data (lab PDFs included) and permanent account deletion (Stripe subscription cancelled) |
 
 ---
 
@@ -395,6 +397,11 @@ DELETE /api/appointments/:id
 
 GET    /api/profile
 PUT    /api/profile
+GET    /api/profile/notifications              (email reminder settings)
+PUT    /api/profile/notifications
+
+GET    /api/account/export                     (GDPR export: all data as JSON)
+DELETE /api/account                            (permanent deletion: { password } or { confirmEmail })
 
 GET    /api/analytics/overview?days=90
 GET    /api/analytics/symptoms?days=30

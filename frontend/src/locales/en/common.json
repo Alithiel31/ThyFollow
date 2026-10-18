@@ -479,6 +479,49 @@
       "error": "Something went wrong",
       "aiAlwaysLabel": "AI reading on every import",
       "aiAlwaysHint": "Compares the automatic reading with the AI's and flags differences. Otherwise the AI is only a fallback. Requires the permission above."
+    },
+    "reminders": {
+      "title": "Email reminders",
+      "intro": "Reminders are sent to {{email}}, using your current time zone. They are all off until you turn them on.",
+      "emailDisabled": "Email sending isn't configured on this server, so reminders can't be turned on.",
+      "dailyLogReminder": {
+        "label": "Today's log",
+        "hint": "An email at the chosen time if you haven't logged anything that day yet."
+      },
+      "dailyLogTime": "Reminder time",
+      "medicationReminder": {
+        "label": "Medication doses",
+        "hint": "An email at each dose time set in Medications, if it isn't marked as taken yet."
+      },
+      "labResultReminder": {
+        "label": "Next blood test",
+        "hint": "An email when your last recorded blood test is more than N weeks old."
+      },
+      "labWeeks": "Interval between blood tests (weeks)",
+      "appointmentReminder": {
+        "label": "Medical appointments",
+        "hint": "An email a few days before each appointment with its reminder on (delay set on the appointment)."
+      },
+      "save": "Save reminders",
+      "saved": "Reminders saved",
+      "error": "Error while saving reminders"
+    },
+    "data": {
+      "title": "My data",
+      "exportHint": "Download all your data (log, medications, lab results, lab PDFs, appointments, profile) as a JSON file.",
+      "export": "Export my data",
+      "exporting": "Preparing…",
+      "exportError": "Error while exporting",
+      "deleteTitle": "Delete my account",
+      "deleteHint": "Your account and all your data are deleted permanently. This cannot be undone. Consider exporting your data first.",
+      "deleteSubscription": "Your Pro subscription will be cancelled immediately, with no refund for the current period.",
+      "delete": "Delete my account",
+      "confirmPassword": "Enter your password to confirm",
+      "confirmEmail": "Enter your email address ({{email}}) to confirm",
+      "deleteConfirm": "Delete permanently",
+      "deleting": "Deleting…",
+      "deleted": "Your account has been deleted",
+      "deleteError": "Error while deleting the account"
     }
   },
   "diagnosis": {

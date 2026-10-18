@@ -18,6 +18,21 @@ export interface User {
   googleHealthConnection?: { connectedAt: string; lastSyncedAt: string | null } | null;
   // Accès Pro (import de bilans PDF) et solde d'imports — calculé par le serveur
   entitlements?: Entitlements;
+  // Mot de passe local défini (sinon compte Google seul) : décide de ce que
+  // demande la suppression du compte (mot de passe ou email recopié)
+  hasPassword?: boolean;
+}
+
+// Rappels par email (voir backend lib/reminders.ts)
+export interface NotificationSettings {
+  dailyLogReminder: boolean;
+  dailyLogTime: string;
+  medicationReminder: boolean;
+  labResultReminder: boolean;
+  labReminderWeeks: number;
+  appointmentReminder: boolean;
+  // L'envoi d'emails est-il configuré sur ce serveur ?
+  emailEnabled: boolean;
 }
 
 export interface Entitlements {

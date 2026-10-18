@@ -40,7 +40,13 @@
       "noSubscription": "Aucun abonnement à gérer",
       "invalidCode": "Code invalide, expiré ou épuisé",
       "codeAlreadyUsed": "Vous avez déjà utilisé ce code"
-    }
+    },
+    "account": {
+      "invalidPassword": "Mot de passe incorrect",
+      "invalidEmailConfirmation": "L'adresse saisie ne correspond pas à celle du compte",
+      "billingUnavailable": "Impossible de résilier votre abonnement automatiquement pour le moment : le compte n'a pas été supprimé. Réessayez plus tard ou résiliez-le depuis « Gérer mon abonnement »."
+    },
+    "invalidTimezone": "Fuseau horaire invalide"
   },
   "auth": {
     "verificationEmailSent": "Un email de confirmation a été envoyé",
@@ -65,5 +71,41 @@
     "titleTooShort": "Titre trop court",
     "contentRequired": "Contenu requis",
     "invalidDateFormat": "Format de date invalide (YYYY-MM-DD)"
+  },
+  "reminders": {
+    "greeting": "Bonjour {{name}},",
+    "footer": "Vous recevez cet email parce que vous avez activé ce rappel. Vous pouvez le désactiver à tout moment dans votre profil ThyroTrack.",
+    "settingsLink": "Gérer mes rappels",
+    "dailyLog": {
+      "subject": "Votre journal ThyroTrack d'aujourd'hui",
+      "body": "Vous n'avez pas encore rempli votre journal aujourd'hui. Deux minutes suffisent pour noter votre énergie, votre humeur et vos symptômes.",
+      "cta": "Remplir mon journal"
+    },
+    "medication": {
+      "subject": "Rappel de prise : {{time}}",
+      "body": "C'est l'heure de votre prise de {{time}} :",
+      "cta": "Valider ma prise"
+    },
+    "lab": {
+      "subject": "Pensez à votre prochain bilan sanguin",
+      "body": "Votre dernier bilan enregistré date du {{date}}, il y a plus de {{weeks}} semaines. Si votre médecin vous a prescrit un contrôle, c'est peut-être le moment de le faire.",
+      "cta": "Voir mes analyses"
+    },
+    "appointment": {
+      "subject": "Rendez-vous le {{date}}",
+      "body": "Rappel : vous avez un rendez-vous ({{type}}) le {{date}}.",
+      "withDoctor": "Avec : {{doctor}}",
+      "at": "Lieu : {{location}}",
+      "cta": "Voir mes rendez-vous"
+    },
+    "appointmentTypes": {
+      "ENDOCRINOLOGIST": "endocrinologue",
+      "GENERAL_PRACTITIONER": "médecin généraliste",
+      "ULTRASOUND": "échographie",
+      "BLOOD_TEST": "prise de sang",
+      "SCINTIGRAPHY": "scintigraphie",
+      "BIOPSY": "biopsie",
+      "OTHER": "autre"
+    }
   }
 }

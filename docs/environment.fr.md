@@ -79,6 +79,7 @@ Lues par `src/config.ts`, qui centralise tout accès à `process.env`. Le fichie
 | ------------------- | ----------- | --------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | `RESEND_API_KEY`    | ❌          | —                                       | Clé API Resend. Sans elle, l'envoi est sauté avec un avertissement — pratique en local, mais plus personne ne peut vérifier un compte par courriel. |
 | `RESEND_FROM_EMAIL` | ❌          | `ThyroTrack <onboarding@resend.dev>`    | Adresse d'expédition ; utiliser un domaine vérifié en production.                                         |
+| `REMINDERS_ENABLED` | ❌          | `true`                                  | Rappels par email (boucle toutes les 5 min dans le backend, active seulement si `RESEND_API_KEY` est définie). `false` pour les couper, par exemple sur une seconde instance. |
 
 ### Se connecter avec Google (OIDC)
 
