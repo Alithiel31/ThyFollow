@@ -201,6 +201,20 @@
   color: var(--teal);
 }
 
+/* Détail de la nuit mesuré par la montre (efficacité, phases), lecture seule. */
+.sleepDetails {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 0.83rem;
+  color: var(--text-muted);
+}
+.sleepDetails svg {
+  color: var(--teal);
+  flex-shrink: 0;
+}
+
 .metricInput {
   background: var(--bg-raised);
   border: 1px solid var(--border);

@@ -24,6 +24,8 @@
     "oidcNoEmail": "Google did not provide an email address for this account",
     "oidcLinkCannotUnlinkNoPassword": "Set a password first (via \"Forgot password\") before unlinking Google, otherwise you would lose access to your account",
     "googleHealthNotConfigured": "Google Health sync is not configured on this server",
+    "googleHealthNotLinked": "Google Health is not connected to this account",
+    "googleHealthResyncRunning": "A Google Health history sync is already running",
     "labImport": {
       "fileTooLarge": "File too large",
       "badUpload": "Invalid upload (maximum {{max}} PDF files)",

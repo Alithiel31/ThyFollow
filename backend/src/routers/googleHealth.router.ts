@@ -13,5 +13,6 @@ const router = Router();
 router.post('/link', authenticate, asyncHandler(googleHealthController.linkStart));
 router.get('/callback', asyncHandler(googleHealthController.callback));
 router.delete('/link', authenticate, asyncHandler(googleHealthController.unlink));
+router.post('/resync', authenticate, asyncHandler(googleHealthController.resync));
 
 export default router;

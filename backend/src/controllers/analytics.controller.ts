@@ -144,6 +144,9 @@ export const analyticsController = {
         bodyTemperature: avg('bodyTemperature'),
         heartRate: avg('heartRate'),
         sleepHours: avg('sleepHours'),
+        sleepEfficiency: avg('sleepEfficiency'),
+        deepSleepMinutes: avg('deepSleepMinutes'),
+        remSleepMinutes: avg('remSleepMinutes'),
       },
       medicationAdherence: entries.length
         ? Math.round((entries.filter((e) => e.medicationTaken).length / entries.length) * 100)

@@ -33,6 +33,9 @@ function buildCSV(report: ReportData, t: TFunction): string {
     [t('report.csv.averageTemperature'), report.physical.bodyTemperature != null ? String(report.physical.bodyTemperature) : ''],
     [t('report.csv.averageHeartRate'), report.physical.heartRate != null ? String(report.physical.heartRate) : ''],
     [t('report.csv.averageSleep'), report.physical.sleepHours != null ? String(report.physical.sleepHours) : ''],
+    [t('report.csv.averageSleepEfficiency'), report.physical.sleepEfficiency != null ? String(report.physical.sleepEfficiency) : ''],
+    [t('report.csv.averageDeepSleep'), report.physical.deepSleepMinutes != null ? String(report.physical.deepSleepMinutes) : ''],
+    [t('report.csv.averageRemSleep'), report.physical.remSleepMinutes != null ? String(report.physical.remSleepMinutes) : ''],
   );
   for (const lab of report.labResults) {
     if (lab.tsh != null) rows.push([`TSH ${lab.date.slice(0, 10)} (mUI/L)`, String(lab.tsh)]);
@@ -138,6 +141,16 @@ export function ReportPage() {
               <tr><td>{t('report.temperature')}</td><td className={styles.num}>{report.physical.bodyTemperature ?? '—'} °C</td></tr>
               <tr><td>{t('report.heartRate')}</td><td className={styles.num}>{report.physical.heartRate ?? '—'} bpm</td></tr>
               <tr><td>{t('report.sleep')}</td><td className={styles.num}>{report.physical.sleepHours ?? '—'} h</td></tr>
+              {/* Mesures de la montre : affichées seulement si une synchro en a fourni */}
+              {report.physical.sleepEfficiency != null && (
+                <tr><td>{t('report.sleepEfficiency')}</td><td className={styles.num}>{report.physical.sleepEfficiency} %</td></tr>
+              )}
+              {report.physical.deepSleepMinutes != null && (
+                <tr><td>{t('report.deepSleep')}</td><td className={styles.num}>{report.physical.deepSleepMinutes} min</td></tr>
+              )}
+              {report.physical.remSleepMinutes != null && (
+                <tr><td>{t('report.remSleep')}</td><td className={styles.num}>{report.physical.remSleepMinutes} min</td></tr>
+              )}
             </tbody>
           </table>
         </section>

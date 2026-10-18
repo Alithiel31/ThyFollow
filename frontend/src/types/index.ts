@@ -123,6 +123,10 @@ export interface DailyEntry {
   sleepHours?: number | null;
   sleepHoursSource?: DataSource;
   sleepQuality?: number | null;
+  // Lecture seule : remplis par la synchro Google Health uniquement.
+  sleepEfficiency?: number | null;
+  deepSleepMinutes?: number | null;
+  remSleepMinutes?: number | null;
   medicationTaken: boolean;
   medicationTime?: string | null;
   medicationNotes?: string | null;
@@ -329,6 +333,9 @@ export interface ReportData {
     bodyTemperature: number | null;
     heartRate: number | null;
     sleepHours: number | null;
+    sleepEfficiency: number | null;
+    deepSleepMinutes: number | null;
+    remSleepMinutes: number | null;
   };
   medicationAdherence: number | null;
   activeMedications: Pick<Medication, 'name' | 'brand' | 'dosage' | 'dosageUnit' | 'frequency' | 'intakeTimes'>[];

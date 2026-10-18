@@ -83,6 +83,17 @@ app.post(
   })
 );
 
+// ── Rattrapage Google Health : chaque appel lit jusqu'à 90 jours (3 appels
+// à l'API Google par jour), à ne pas relancer en boucle.
+app.post(
+  '/api/integrations/google-health/resync',
+  rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 3,
+    message: (req: express.Request) => ({ error: req.t('errors.tooManyRequests') }),
+  })
+);
+
 // ── Rate limiting des codes promo (anti-devinette de codes).
 app.post(
   '/api/billing/redeem',

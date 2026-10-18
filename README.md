@@ -409,6 +409,7 @@ GET    /api/analytics/symptoms?days=30
 POST   /api/integrations/google-health/link      (starts the Pixel Watch/Google Health connection)
 GET    /api/integrations/google-health/callback
 DELETE /api/integrations/google-health/link
+POST   /api/integrations/google-health/resync    (re-reads the last N days, 30 by default, 90 max)
 POST   /api/webhooks/google-health                (Google notifications + subscriber validation handshake)
 
 POST   /graphql                                   (additive to the REST API above, doesn't replace it — see backend/docs/graphql.md)
