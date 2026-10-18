@@ -21,6 +21,8 @@ import { recordAuthEvent } from '../lib/authEvents.js';
 import { signCookieValue, unsignCookieValue } from '../lib/signedCookie.js';
 import { logger } from '../lib/logger.js';
 import { AppError } from '../lib/errors.js';
+import { MAX_RESYNC_DAYS, isResyncRunning, resyncRecentDays } from '../lib/googleHealthSync.js';
+import { z } from 'zod';
 
 const GOOGLE_HEALTH_COOKIE = 'thyro_google_health_link';
 const GOOGLE_HEALTH_COOKIE_MAX_AGE_MS = 5 * 60 * 1000;
@@ -111,6 +113,29 @@ export const googleHealthController = {
     }
 
     res.redirect(profileUrl.href);
+  },
+
+  // POST /api/integrations/google-health/resync — rattrape les derniers
+  // jours (body: { days?: number }, 30 par défaut, 90 au plus). Répond 202
+  // tout de suite : la relecture prend plusieurs secondes par semaine de
+  // données, elle continue en arrière-plan (voir lib/googleHealthSync.ts).
+  resync: async (req: AuthRequest, res: Response): Promise<void> => {
+    const { days } = z
+      .object({ days: z.number().int().min(1).max(MAX_RESYNC_DAYS).optional() })
+      .parse(req.body ?? {});
+    const connection = await prisma.googleHealthConnection.findUnique({ where: { userId: req.userId } });
+    if (!connection) {
+      throw new AppError(404, req.t('errors.googleHealthNotLinked'));
+    }
+    if (isResyncRunning(req.userId!)) {
+      throw new AppError(409, req.t('errors.googleHealthResyncRunning'));
+    }
+
+    const requestedDays = days ?? 30;
+    resyncRecentDays(req.userId!, requestedDays).catch((err) => {
+      logger.error('Échec rattrapage Google Health', err);
+    });
+    res.status(202).json({ days: requestedDays });
   },
 
   // DELETE /api/integrations/google-health/link — dissocie Google Health du
