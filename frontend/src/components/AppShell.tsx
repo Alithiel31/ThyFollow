@@ -1,5 +1,5 @@
 // src/components/AppShell.tsx
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../lib/store';
@@ -30,10 +30,13 @@ function useNavItems() {
     { to: '/lab-results', icon: FlaskConical, label: t('nav.labResults'), shortLabel: t('nav.labResultsShort') },
     { to: '/medications', icon: Pill, label: t('nav.medications'), shortLabel: t('nav.medicationsShort') },
     { to: '/appointments', icon: Calendar, label: t('nav.appointments'), shortLabel: t('nav.appointmentsShort') },
-    { to: '/learn', icon: BookOpen, label: t('nav.learn'), shortLabel: t('nav.learn') },
+    { to: '/learn', icon: BookOpen, label: t('nav.learn'), shortLabel: t('nav.learnShort') },
     { to: '/profile', icon: User, label: t('nav.profile'), shortLabel: t('nav.profile') },
   ];
 }
+
+/* Barre basse mobile : 5 onglets + « Plus » (Rendez-vous et Profil dans le menu) */
+const MOBILE_BAR = ['/dashboard', '/log', '/lab-results', '/medications', '/learn'];
 
 function ThemeToggle({ className }: { className?: string }) {
   const { t } = useTranslation();
@@ -73,6 +76,9 @@ export function AppShell() {
   const navigate = useNavigate();
   const NAV = useNavItems();
   const [moreOpen, setMoreOpen] = useState(false);
+  const { pathname } = useLocation();
+  const mobileBar = NAV.filter((item) => MOBILE_BAR.includes(item.to));
+  const inMoreMenu = ['/appointments', '/profile', '/admin'].some((p) => pathname.startsWith(p));
 
   return (
     <div className={styles.shell}>
@@ -170,8 +176,8 @@ export function AppShell() {
       )}
       {moreOpen && (
         <div className={styles.mobileMore}>
-          <NavLink to="/learn" onClick={() => setMoreOpen(false)}>
-            <BookOpen size={17} /> <span>{t('nav.learn')}</span>
+          <NavLink to="/appointments" onClick={() => setMoreOpen(false)}>
+            <Calendar size={17} /> <span>{t('nav.appointments')}</span>
           </NavLink>
           <NavLink to="/profile" onClick={() => setMoreOpen(false)}>
             <User size={17} /> <span>{t('nav.profile')}</span>
@@ -184,7 +190,7 @@ export function AppShell() {
         </div>
       )}
       <nav className={styles.mobileNav} aria-label={t('nav.mobileLabel')}>
-        {NAV.slice(0, 5).map(({ to, icon: Icon, shortLabel }) => (
+        {mobileBar.map(({ to, icon: Icon, shortLabel }) => (
           <NavLink
             key={to}
             to={to}
@@ -198,7 +204,7 @@ export function AppShell() {
         ))}
         <button
           type="button"
-          className={`${styles.mobileNavItem} ${moreOpen ? styles.mobileNavItemActive : ''}`}
+          className={`${styles.mobileNavItem} ${moreOpen || inMoreMenu ? styles.mobileNavItemActive : ''}`}
           onClick={() => setMoreOpen((open) => !open)}
           aria-expanded={moreOpen}
           aria-label={t('nav.more')}

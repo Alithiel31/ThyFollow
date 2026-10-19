@@ -9,7 +9,8 @@ export default defineConfig({
     VitePWA({
       // Le service worker se met à jour tout seul au prochain chargement
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      // Illustrations de « Comprendre » précachées : les fiches sont lisibles hors ligne
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'assets/comprendre/*.webp'],
       manifest: {
         name: 'ThyroTrack — Suivi thyroïdien',
         short_name: 'ThyroTrack',

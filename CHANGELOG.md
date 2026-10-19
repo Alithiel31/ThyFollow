@@ -50,6 +50,9 @@ pas synchronisé avec ces tags.
   l'équipe ») et lisibles sur `/learn/:slug`. Nouveaux tokens `--pastel-*`, `--paper` et
   `--illustration-filter` (clair/sombre). **Les fiches sont des brouillons non relus** : chacune
   affiche « en attente de relecture » tant que `reviewedAt` n'est pas renseigné.
+  Les illustrations sont précachées par le service worker (fiches lisibles hors ligne). Sur mobile,
+  « Comprendre » (libellé court « Fiches ») remplace « Rendez-vous » dans la barre du bas ;
+  Rendez-vous passe dans le menu « Plus », qui s'allume quand on est sur une de ses pages.
 - **Détail des nuits mesuré par la montre** : efficacité du sommeil, minutes de sommeil profond et
   paradoxal, en lecture seule dans le journal (à côté du ressenti « qualité du sommeil », qui reste
   saisi à la main) et en moyennes dans le rapport et le CSV. L'API Google Health n'expose pas le
