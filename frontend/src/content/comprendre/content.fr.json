@@ -1,0 +1,317 @@
+{
+  "meta": {
+    "title": "Comprendre",
+    "subtitle": "La thyroïde, les bonnes pratiques et ce que disent vos analyses.",
+    "disclaimer": "Ces contenus sont informatifs et ne remplacent pas un avis médical. Parlez de votre situation avec votre médecin ou votre endocrinologue.",
+    "reviewStatus": "Brouillons pédagogiques — faire relire par un professionnel de santé avant publication."
+  },
+  "categories": [
+    {
+      "id": "tous",
+      "label": "Tous"
+    },
+    {
+      "id": "thyroide",
+      "label": "Thyroïde"
+    },
+    {
+      "id": "analyses",
+      "label": "Analyses"
+    },
+    {
+      "id": "traitements",
+      "label": "Traitements"
+    },
+    {
+      "id": "quotidien",
+      "label": "Quotidien"
+    },
+    {
+      "id": "suivi",
+      "label": "Suivi médical"
+    }
+  ],
+  "articles": [
+    {
+      "id": "hashimoto-hypothyroidie",
+      "category": "thyroide",
+      "categoryLabel": "Thyroïde",
+      "readMinutes": 3,
+      "featured": true,
+      "title": "Hashimoto et hypothyroïdie : quelle différence ?",
+      "summary": "Deux notions proches, mais pas identiques. Voici l’essentiel pour mieux comprendre votre parcours.",
+      "image": "/assets/comprendre/thyroide.webp",
+      "intro": "La thyroïde produit des hormones qui participent notamment à la régulation de nombreuses fonctions de l’organisme. Hashimoto et hypothyroïdie sont liés, mais ne désignent pas la même chose.",
+      "sections": [
+        {
+          "heading": "Hashimoto, une maladie auto-immune",
+          "body": "La thyroïdite de Hashimoto est une maladie dans laquelle le système immunitaire s’attaque à la thyroïde. Elle peut progressivement réduire sa capacité à produire des hormones, mais son évolution varie d’une personne à l’autre."
+        },
+        {
+          "heading": "L’hypothyroïdie, un fonctionnement insuffisant",
+          "body": "On parle d’hypothyroïdie lorsque la thyroïde ne fournit pas suffisamment d’hormones pour les besoins du corps. Elle peut avoir plusieurs causes, dont Hashimoto."
+        },
+        {
+          "heading": "Les symptômes ne suffisent pas à conclure",
+          "body": "Fatigue, frilosité ou difficultés de concentration peuvent avoir de nombreuses causes. Le diagnostic et le suivi reposent sur l’évaluation médicale et les analyses adaptées à votre situation."
+        }
+      ],
+      "takeaways": [
+        "Hashimoto est une maladie auto-immune ; l’hypothyroïdie décrit un manque d’hormones thyroïdiennes.",
+        "Hashimoto ne provoque pas systématiquement une hypothyroïdie immédiatement.",
+        "Seul un professionnel de santé peut interpréter vos résultats dans leur contexte."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie — Hypothyroïdie",
+          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
+        }
+      ]
+    },
+    {
+      "id": "tsh-t4-t3",
+      "category": "analyses",
+      "categoryLabel": "Analyses",
+      "readMinutes": 2,
+      "title": "TSH, T4L, T3L : comprendre les sigles",
+      "summary": "Ces marqueurs n’ont pas le même rôle. Découvrez à quoi ils servent et pourquoi ils se lisent ensemble.",
+      "image": "/assets/comprendre/analyses.webp",
+      "intro": "Les analyses thyroïdiennes aident les professionnels de santé à évaluer le fonctionnement de la thyroïde. Leur interprétation dépend du contexte, du traitement et des valeurs de référence du laboratoire.",
+      "sections": [
+        {
+          "heading": "La TSH",
+          "body": "Produite par l’hypophyse, la TSH aide à réguler la production d’hormones thyroïdiennes. Elle est souvent utilisée pour le dépistage et le suivi de l’hypothyroïdie."
+        },
+        {
+          "heading": "La T4 libre (T4L)",
+          "body": "La T4 est une hormone produite par la thyroïde. La fraction libre correspond à la part non liée aux protéines de transport."
+        },
+        {
+          "heading": "La T3 libre (T3L)",
+          "body": "La T3 est une hormone thyroïdienne biologiquement active. Elle n’est pas nécessaire dans toutes les situations d’évaluation d’une hypothyroïdie."
+        }
+      ],
+      "takeaways": [
+        "Un chiffre isolé ne permet pas de tirer toutes les conclusions.",
+        "Comparez les résultats avec les unités et références indiquées par le laboratoire.",
+        "Ne modifiez pas votre traitement sur la base d’une fiche ou d’un résultat seul."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie — Hypothyroïdie",
+          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
+        }
+      ]
+    },
+    {
+      "id": "levothyroxine-prise",
+      "category": "traitements",
+      "categoryLabel": "Traitements",
+      "readMinutes": 3,
+      "title": "Bien prendre sa lévothyroxine",
+      "summary": "Les conditions de prise peuvent influencer l’absorption du traitement. Quelques repères utiles au quotidien.",
+      "image": "/assets/comprendre/traitement.webp",
+      "intro": "La lévothyroxine remplace l’hormone thyroïdienne lorsque l’organisme n’en produit pas suffisamment. Une prise régulière, dans des conditions constantes, aide à stabiliser le traitement.",
+      "sections": [
+        {
+          "heading": "Garder une routine régulière",
+          "body": "Suivez la prescription et la notice de votre médicament. La lévothyroxine est généralement prise à jeun avec de l’eau, en respectant le délai recommandé avant le petit-déjeuner."
+        },
+        {
+          "heading": "Attention à certains produits",
+          "body": "Le fer, le calcium et certains antiacides peuvent réduire l’absorption s’ils sont pris trop près de la lévothyroxine. Le délai à respecter dépend du produit : demandez conseil à votre pharmacien ou médecin."
+        },
+        {
+          "heading": "En cas d’oubli ou de changement",
+          "body": "Ne doublez pas une dose de votre propre initiative. Demandez à votre pharmacien ou médecin quoi faire selon votre ordonnance et le moment de l’oubli. Signalez tout changement de spécialité ou de prise."
+        }
+      ],
+      "takeaways": [
+        "Suivez la notice et les consignes données par votre professionnel de santé.",
+        "Gardez des conditions de prise aussi constantes que possible.",
+        "En cas de doute, demandez conseil plutôt que de modifier la dose vous-même."
+      ],
+      "sources": [
+        {
+          "label": "Base de données publique des médicaments",
+          "url": "https://base-donnees-publique.medicaments.gouv.fr/"
+        }
+      ]
+    },
+    {
+      "id": "interactions-mineraux",
+      "category": "traitements",
+      "categoryLabel": "Traitements",
+      "readMinutes": 2,
+      "title": "Fer, calcium, magnésium : attention aux interactions",
+      "summary": "Certains compléments peuvent gêner l’absorption de la lévothyroxine lorsqu’ils sont pris trop près.",
+      "image": "/assets/comprendre/traitement.webp",
+      "intro": "Les compléments alimentaires et certains médicaments peuvent modifier l’absorption de la lévothyroxine. Cela ne signifie pas qu’ils sont tous interdits, mais que l’espacement et le conseil professionnel comptent.",
+      "sections": [
+        {
+          "heading": "Quels produits signaler ?",
+          "body": "Mentionnez notamment les compléments contenant du fer ou du calcium, certains antiacides et tout nouveau médicament. Les formulations varient, et le magnésium peut aussi être présent dans certains produits concernés."
+        },
+        {
+          "heading": "Quel délai respecter ?",
+          "body": "Le délai dépend du produit et de sa notice. Ne vous fiez pas à une règle unique pour tous les compléments : vérifiez la notice et demandez au pharmacien de confirmer l’espacement adapté."
+        },
+        {
+          "heading": "Une routine facile à suivre",
+          "body": "Notez les heures de prise dans votre routine et signalez tout changement lors de votre prochain rendez-vous. N’arrêtez pas un traitement prescrit sans avis médical."
+        }
+      ],
+      "takeaways": [
+        "Signalez médicaments et compléments à votre médecin ou pharmacien.",
+        "Vérifiez le délai précis dans la notice de chaque produit.",
+        "N’ajustez pas votre dose de lévothyroxine sans avis médical."
+      ],
+      "sources": [
+        {
+          "label": "Base de données publique des médicaments",
+          "url": "https://base-donnees-publique.medicaments.gouv.fr/"
+        }
+      ]
+    },
+    {
+      "id": "fatigue-symptomes",
+      "category": "quotidien",
+      "categoryLabel": "Quotidien",
+      "readMinutes": 3,
+      "title": "Fatigue, sommeil, humeur : est-ce lié ?",
+      "summary": "Ces symptômes sont fréquents, mais peuvent avoir plusieurs causes. Apprenez à les décrire et à les suivre.",
+      "image": "/assets/comprendre/consultation.webp",
+      "intro": "Vivre avec une maladie thyroïdienne peut être éprouvant, en particulier lorsque l’énergie ou la concentration fluctuent. Votre ressenti mérite d’être entendu, même lorsqu’il ne s’explique pas par un seul facteur.",
+      "sections": [
+        {
+          "heading": "Plusieurs causes sont possibles",
+          "body": "La fatigue peut être liée à la thyroïde, au sommeil, au stress, à une autre condition médicale, à un médicament ou à plusieurs facteurs réunis. Une fiche de suivi ne peut pas déterminer la cause à elle seule."
+        },
+        {
+          "heading": "Observer sans se juger",
+          "body": "Pendant quelques semaines, notez votre énergie, votre sommeil, les symptômes marquants et les changements récents. Recherchez des tendances plutôt que d’interpréter chaque mauvaise journée comme un échec."
+        },
+        {
+          "heading": "Quand en parler ?",
+          "body": "Si les symptômes persistent, s’aggravent ou perturbent votre quotidien, prenez rendez-vous pour en discuter. En cas de difficulté respiratoire importante ou soudaine, demandez une aide médicale urgente."
+        }
+      ],
+      "takeaways": [
+        "Un symptôme peut avoir plusieurs causes.",
+        "Un journal régulier aide à préparer une discussion médicale.",
+        "N’ajustez pas votre traitement sur la seule base de vos symptômes."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie — Hypothyroïdie",
+          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
+        }
+      ]
+    },
+    {
+      "id": "preparer-consultation",
+      "category": "suivi",
+      "categoryLabel": "Suivi médical",
+      "readMinutes": 2,
+      "title": "Préparer une consultation efficace",
+      "summary": "Quelques notes en amont peuvent vous aider à parler de ce qui compte vraiment pour vous.",
+      "image": "/assets/comprendre/consultation.webp",
+      "intro": "Une consultation est l’occasion de faire le point sur vos résultats, vos symptômes et votre traitement. Préparer quelques éléments peut aider à rendre l’échange plus clair.",
+      "sections": [
+        {
+          "heading": "Avant le rendez-vous",
+          "body": "Notez vos principales questions, les symptômes qui vous gênent le plus, leur évolution, ainsi que les changements de médicaments ou de compléments."
+        },
+        {
+          "heading": "Apporter les bonnes informations",
+          "body": "Si possible, rassemblez les derniers résultats avec leurs dates, la liste de vos traitements et les éventuels effets indésirables ressentis. N’interprétez pas seul les chiffres : demandez ce qu’ils signifient pour vous."
+        },
+        {
+          "heading": "À la fin de l’échange",
+          "body": "Reformulez les prochaines étapes : examens éventuels, calendrier du suivi, consignes de prise et personne à contacter en cas de question."
+        }
+      ],
+      "takeaways": [
+        "Préparez trois questions prioritaires.",
+        "Apportez les résultats datés et la liste des traitements.",
+        "Repartez avec des prochaines étapes comprises."
+      ],
+      "sources": [
+        {
+          "label": "Service-Public.fr — Santé",
+          "url": "https://www.service-public.fr/particuliers/vosdroits/N19806"
+        }
+      ]
+    },
+    {
+      "id": "suivi-tsh",
+      "category": "analyses",
+      "categoryLabel": "Analyses",
+      "readMinutes": 2,
+      "title": "Pourquoi contrôler la TSH après un changement ?",
+      "summary": "Le suivi biologique se planifie dans le temps : le bon moment dépend de votre situation et de la prescription.",
+      "image": "/assets/comprendre/analyses.webp",
+      "intro": "Après une modification de traitement, l’organisme a besoin de temps pour atteindre un nouvel équilibre. Le calendrier des contrôles est défini par le professionnel de santé selon votre situation.",
+      "sections": [
+        {
+          "heading": "Éviter les conclusions trop rapides",
+          "body": "Un dosage réalisé trop tôt peut ne pas refléter l’équilibre obtenu après le changement. Respectez la date de contrôle indiquée sur votre ordonnance."
+        },
+        {
+          "heading": "Garder une trace des changements",
+          "body": "Notez la date de modification, la dose prescrite et la date du prochain contrôle. Signalez les symptômes nouveaux ou inhabituels à votre médecin."
+        },
+        {
+          "heading": "Ne pas ajuster seul",
+          "body": "Ne changez pas la dose à partir d’un résultat isolé ou d’une cible trouvée en ligne. Votre objectif biologique et le suivi sont individualisés."
+        }
+      ],
+      "takeaways": [
+        "Respectez le calendrier prescrit pour les analyses.",
+        "Notez les changements de dose et leurs dates.",
+        "Toute adaptation du traitement doit être discutée avec le professionnel qui vous suit."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie — Hypothyroïdie",
+          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
+        }
+      ]
+    },
+    {
+      "id": "idees-recues-alimentation",
+      "category": "quotidien",
+      "categoryLabel": "Quotidien",
+      "readMinutes": 3,
+      "title": "Alimentation et thyroïde : démêler les idées reçues",
+      "summary": "Aucun aliment miracle ne remplace le suivi médical. Méfiez-vous des restrictions et compléments présentés comme indispensables.",
+      "image": "/assets/comprendre/consultation.webp",
+      "intro": "L’alimentation participe à la santé générale, mais les conseils autour de la thyroïde circulent souvent sans tenir compte des besoins individuels ni des traitements.",
+      "sections": [
+        {
+          "heading": "Pas de régime universel",
+          "body": "Il n’existe pas de régime unique adapté à toutes les personnes atteintes de Hashimoto. Une éviction alimentaire ou un régime restrictif ne devrait pas être entrepris sans raison claire et conseil adapté."
+        },
+        {
+          "heading": "Les compléments ne sont pas anodins",
+          "body": "Un complément peut être inutile, interagir avec un traitement ou apporter une quantité excessive d’un nutriment. L’iode, notamment, ne doit pas être pris à forte dose sans avis professionnel."
+        },
+        {
+          "heading": "Miser sur des habitudes durables",
+          "body": "Privilégiez une alimentation variée et des habitudes compatibles avec votre santé et votre quotidien. Pour une question précise, échangez avec votre médecin ou un diététicien qualifié."
+        }
+      ],
+      "takeaways": [
+        "Méfiez-vous des promesses de guérison et des solutions miracles.",
+        "Ne commencez pas de complément à forte dose sans avis professionnel.",
+        "Privilégiez des conseils individualisés plutôt que des interdictions générales."
+      ],
+      "sources": [
+        {
+          "label": "ANSES — Compléments alimentaires",
+          "url": "https://www.anses.fr/fr/content/les-complements-alimentaires"
+        }
+      ]
+    }
+  ]
+}

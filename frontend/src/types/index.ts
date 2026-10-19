@@ -323,6 +323,45 @@ export interface Article {
 // Liste : le contenu n'est renvoyé que pour les encarts (courts)
 export type ArticleSummary = Omit<Article, 'content'> & { content?: string };
 
+// ── Bibliothèque « Comprendre » (fiches locales, src/content/comprendre) ──
+export interface EducationCategory {
+  id: string;
+  label: string;
+}
+
+export interface EducationSection {
+  heading: string;
+  body: string;
+}
+
+export interface EducationSource {
+  label: string;
+  url: string;
+}
+
+export interface EducationArticle {
+  id: string;
+  category: string;
+  categoryLabel: string;
+  readMinutes: number;
+  featured?: boolean;
+  title: string;
+  summary: string;
+  image: string;
+  intro: string;
+  sections: EducationSection[];
+  takeaways: string[];
+  sources: EducationSource[];
+  // Date ISO de relecture par un professionnel de santé ; absente = brouillon
+  reviewedAt?: string;
+}
+
+export interface EducationLibrary {
+  meta: { title: string; subtitle: string; disclaimer: string; reviewStatus: string };
+  categories: EducationCategory[];
+  articles: EducationArticle[];
+}
+
 // ── Rapport de période ─────────────────────────
 export interface ReportData {
   period: { from: string; to: string };

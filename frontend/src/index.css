@@ -49,6 +49,20 @@
   --chart-2: #2698aa;
   --chart-grid: rgba(25, 45, 84, 0.09);
 
+  /* ── Pastels éditoriaux (onglet Comprendre) : fond de vignette + encre */
+  --pastel-lavender: #eeeafd;
+  --pastel-lavender-ink: #5a46ad;
+  --pastel-blue: #e4eefd;
+  --pastel-blue-ink: #2c5aa3;
+  --pastel-mint: #e1f2ec;
+  --pastel-mint-ink: #22705c;
+  --pastel-peach: #fce9e6;
+  --pastel-peach-ink: #a3453a;
+  --pastel-butter: #faf0d4;
+  --pastel-butter-ink: #85601a;
+  --paper: #fcfcfe;               /* surface de lecture des fiches longues */
+  --illustration-filter: none;
+
   /* ── Texte */
   --text: #20283a;
   --text-dim: #4f5c73;
@@ -107,6 +121,20 @@
   --chart-2: #51c8c2;
   --chart-grid: rgba(197, 211, 244, 0.1);
 
+  --pastel-lavender: rgba(198, 189, 244, 0.14);
+  --pastel-lavender-ink: #c6bdf4;
+  --pastel-blue: rgba(175, 205, 247, 0.14);
+  --pastel-blue-ink: #afcdf7;
+  --pastel-mint: rgba(191, 227, 216, 0.13);
+  --pastel-mint-ink: #bfe3d8;
+  --pastel-peach: rgba(245, 201, 196, 0.13);
+  --pastel-peach-ink: #f5c9c4;
+  --pastel-butter: rgba(241, 220, 164, 0.13);
+  --pastel-butter-ink: #f1dca4;
+  --paper: #15223a;
+  /* Illustrations sur fond crème : atténuées pour ne pas éblouir la nuit */
+  --illustration-filter: brightness(0.86) saturate(0.95);
+
   --text: #eef3ff;
   --text-dim: #c0cce3;
   --text-muted: #97a7c4;
@@ -147,6 +175,20 @@
     --chart-1: #ad92ef;
     --chart-2: #51c8c2;
     --chart-grid: rgba(197, 211, 244, 0.1);
+
+    --pastel-lavender: rgba(198, 189, 244, 0.14);
+    --pastel-lavender-ink: #c6bdf4;
+    --pastel-blue: rgba(175, 205, 247, 0.14);
+    --pastel-blue-ink: #afcdf7;
+    --pastel-mint: rgba(191, 227, 216, 0.13);
+    --pastel-mint-ink: #bfe3d8;
+    --pastel-peach: rgba(245, 201, 196, 0.13);
+    --pastel-peach-ink: #f5c9c4;
+    --pastel-butter: rgba(241, 220, 164, 0.13);
+    --pastel-butter-ink: #f1dca4;
+    --paper: #15223a;
+    /* Illustrations sur fond crème : atténuées pour ne pas éblouir la nuit */
+    --illustration-filter: brightness(0.86) saturate(0.95);
 
     --text: #eef3ff;
     --text-dim: #c0cce3;
