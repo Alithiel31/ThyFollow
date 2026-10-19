@@ -73,10 +73,12 @@ export default function App() {
           <Route path="/medications" element={<MedicationsPage />} />
           <Route path="/appointments" element={<AppointmentsPage />} />
           <Route path="/learn" element={<ArticlesPage />} />
-          <Route path="/learn/:slug" element={<ArticlesPage />} />
           <Route path="/admin/articles" element={<AdminArticlesPage />} />
           <Route path="/profile" element={<ProfilePage />} />
         </Route>
+
+        {/* Fiches « Comprendre » : lecteur plein écran (maquette), hors AppShell */}
+        <Route path="/learn/:slug" element={<RequireAuth><ArticlesPage /></RequireAuth>} />
 
         {/* Rapport imprimable : authentifié mais hors AppShell (pas de sidebar sur le papier) */}
         <Route path="/report" element={<RequireAuth><ReportPage /></RequireAuth>} />

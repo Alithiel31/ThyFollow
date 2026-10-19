@@ -58,15 +58,21 @@ export function filterArticles(
   });
 }
 
-export function findArticle(id: string): EducationArticle | undefined {
-  return library.articles.find((a) => a.id === id);
+/* Écran de fin du parcours (maquette) : /learn/fin */
+export const LEARN_END_SLUG = 'fin';
+
+/* Parcours de lecture : les fiches de la liste d'où l'on vient (?cat=&q=),
+   dans l'ordre affiché. Une liste vide retombe sur toute la bibliothèque. */
+export function readingSequence(fromSearch: string): EducationArticle[] {
+  const params = new URLSearchParams(fromSearch);
+  const list = filterArticles(
+    library.articles,
+    params.get('cat') ?? ALL_CATEGORIES,
+    params.get('q') ?? ''
+  );
+  return list.length > 0 ? list : library.articles;
 }
 
-/* « À lire aussi » : même catégorie d'abord, puis le reste dans l'ordre */
-export function relatedArticles(article: EducationArticle, limit = 2): EducationArticle[] {
-  const others = library.articles.filter((a) => a.id !== article.id);
-  return [
-    ...others.filter((a) => a.category === article.category),
-    ...others.filter((a) => a.category !== article.category),
-  ].slice(0, limit);
+export function findArticle(id: string): EducationArticle | undefined {
+  return library.articles.find((a) => a.id === id);
 }

@@ -50,9 +50,20 @@ pas synchronisé avec ces tags.
   l'équipe ») et lisibles sur `/learn/:slug`. Nouveaux tokens `--pastel-*`, `--paper` et
   `--illustration-filter` (clair/sombre). **Les fiches sont des brouillons non relus** : chacune
   affiche « en attente de relecture » tant que `reviewedAt` n'est pas renseigné.
-  Les illustrations sont précachées par le service worker (fiches lisibles hors ligne). Sur mobile,
-  « Comprendre » (libellé court « Fiches ») remplace « Rendez-vous » dans la barre du bas ;
-  Rendez-vous passe dans le menu « Plus », qui s'allume quand on est sur une de ses pages.
+  Les illustrations sont précachées par le service worker (fiches lisibles hors ligne).
+- **« Comprendre » aligné sur la maquette** : carte « À la une » compacte, liste « Les dernières
+  fiches » avec pictogramme de catégorie, chips sur plusieurs lignes, cartes claires même en thème
+  sombre. Les fiches s'ouvrent dans un lecteur plein écran sur fond clair (`/learn/:slug`, hors
+  AppShell) qui se parcourt comme un parcours : compteur « n / N », points de progression et
+  boutons précédent/suivant dans l'ordre de la liste d'origine (filtres compris), puis un écran de
+  fin « Mieux comprendre pour mieux vivre » (`/learn/fin`). « À retenir » devient une liste
+  numérotée ; le champ optionnel `sectionStyle` (`cards` ou `checklist`) présente les sections en
+  cartes à icône ou en check-list, sans changer le texte. La barre basse mobile revient à celle de
+  la maquette (Rendez-vous dans la barre, Comprendre dans « Plus », qui s'allume sur ses pages).
+- **Typographie éditoriale de « Comprendre »** : titres en Cormorant Garamond (600, italique
+  ponctuel) et texte en Inter, limités à cet onglet via les tokens `--font-editorial` et
+  `--font-reading` ; le reste de l'app garde Manrope et Newsreader. Polices de secours :
+  Newsreader puis Georgia pour les titres, Manrope puis police système pour le texte.
 - **Détail des nuits mesuré par la montre** : efficacité du sommeil, minutes de sommeil profond et
   paradoxal, en lecture seule dans le journal (à côté du ressenti « qualité du sommeil », qui reste
   saisi à la main) et en moyennes dans le rapport et le CSV. L'API Google Health n'expose pas le

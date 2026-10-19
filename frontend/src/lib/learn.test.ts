@@ -1,7 +1,7 @@
 // src/lib/learn.test.ts
 import { describe, it, expect } from 'vitest';
 import {
-  library, ALL_CATEGORIES, filterArticles, findArticle, normalizeSearch, relatedArticles,
+  library, ALL_CATEGORIES, filterArticles, normalizeSearch, readingSequence,
 } from './learn';
 
 // Fichiers réellement présents dans public/ (résolu par Vite, sans types Node)
@@ -46,12 +46,12 @@ describe('filterArticles', () => {
   });
 });
 
-describe('relatedArticles', () => {
-  it('excludes the current article and favours its category', () => {
-    const article = findArticle('levothyroxine-prise')!;
-    const related = relatedArticles(article);
-    expect(related).toHaveLength(2);
-    expect(related.map((a) => a.id)).not.toContain(article.id);
-    expect(related[0].category).toBe('traitements');
+describe('readingSequence', () => {
+  it('follows the list the reader came from, or the whole library', () => {
+    expect(readingSequence('').map((a) => a.id)).toEqual(library.articles.map((a) => a.id));
+    const treatments = readingSequence('?cat=traitements');
+    expect(treatments.length).toBeGreaterThan(0);
+    expect(treatments.every((a) => a.category === 'traitements')).toBe(true);
+    expect(readingSequence('?q=zzzz')).toHaveLength(library.articles.length);
   });
 });

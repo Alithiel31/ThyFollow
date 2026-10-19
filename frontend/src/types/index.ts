@@ -349,6 +349,8 @@ export interface EducationArticle {
   summary: string;
   image: string;
   intro: string;
+  // Présentation des sections (maquette) : texte, cartes à icône ou check-list
+  sectionStyle?: 'prose' | 'cards' | 'checklist';
   sections: EducationSection[];
   takeaways: string[];
   sources: EducationSource[];

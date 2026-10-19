@@ -30,13 +30,10 @@ function useNavItems() {
     { to: '/lab-results', icon: FlaskConical, label: t('nav.labResults'), shortLabel: t('nav.labResultsShort') },
     { to: '/medications', icon: Pill, label: t('nav.medications'), shortLabel: t('nav.medicationsShort') },
     { to: '/appointments', icon: Calendar, label: t('nav.appointments'), shortLabel: t('nav.appointmentsShort') },
-    { to: '/learn', icon: BookOpen, label: t('nav.learn'), shortLabel: t('nav.learnShort') },
+    { to: '/learn', icon: BookOpen, label: t('nav.learn'), shortLabel: t('nav.learn') },
     { to: '/profile', icon: User, label: t('nav.profile'), shortLabel: t('nav.profile') },
   ];
 }
-
-/* Barre basse mobile : 5 onglets + « Plus » (Rendez-vous et Profil dans le menu) */
-const MOBILE_BAR = ['/dashboard', '/log', '/lab-results', '/medications', '/learn'];
 
 function ThemeToggle({ className }: { className?: string }) {
   const { t } = useTranslation();
@@ -77,8 +74,8 @@ export function AppShell() {
   const NAV = useNavItems();
   const [moreOpen, setMoreOpen] = useState(false);
   const { pathname } = useLocation();
-  const mobileBar = NAV.filter((item) => MOBILE_BAR.includes(item.to));
-  const inMoreMenu = ['/appointments', '/profile', '/admin'].some((p) => pathname.startsWith(p));
+  // « Plus » s'allume sur les pages rangées dans son menu (maquette : 5 onglets + Plus)
+  const inMoreMenu = ['/learn', '/profile', '/admin'].some((p) => pathname.startsWith(p));
 
   return (
     <div className={styles.shell}>
@@ -176,8 +173,8 @@ export function AppShell() {
       )}
       {moreOpen && (
         <div className={styles.mobileMore}>
-          <NavLink to="/appointments" onClick={() => setMoreOpen(false)}>
-            <Calendar size={17} /> <span>{t('nav.appointments')}</span>
+          <NavLink to="/learn" onClick={() => setMoreOpen(false)}>
+            <BookOpen size={17} /> <span>{t('nav.learn')}</span>
           </NavLink>
           <NavLink to="/profile" onClick={() => setMoreOpen(false)}>
             <User size={17} /> <span>{t('nav.profile')}</span>
@@ -190,7 +187,7 @@ export function AppShell() {
         </div>
       )}
       <nav className={styles.mobileNav} aria-label={t('nav.mobileLabel')}>
-        {mobileBar.map(({ to, icon: Icon, shortLabel }) => (
+        {NAV.slice(0, 5).map(({ to, icon: Icon, shortLabel }) => (
           <NavLink
             key={to}
             to={to}

@@ -24,6 +24,7 @@ function renderAt(path: string) {
         <Routes>
           <Route path="/learn" element={<ArticlesPage />} />
           <Route path="/learn/:slug" element={<ArticlesPage />} />
+          <Route path="/dashboard" element={<div>DASHBOARD</div>} />
         </Routes>
       </MemoryRouter>
     </QueryClientProvider>
@@ -37,14 +38,15 @@ beforeEach(() => {
 });
 
 describe('ArticlesPage — library', () => {
-  it('shows the featured guide and the full library instead of an empty state', () => {
+  it('shows the featured guide and the latest guides instead of an empty state', () => {
     renderAt('/learn');
 
-    const featured = screen.getByRole('region', { name: /articles.featured/ });
+    const featured = screen.getByRole('region', { name: 'articles.featured' });
     expect(within(featured).getByRole('link', { name: /Hashimoto et hypothyroïdie/ }))
       .toHaveAttribute('href', '/learn/hashimoto-hypothyroidie');
+    const latest = screen.getByRole('region', { name: 'articles.latest' });
+    expect(within(latest).getAllByRole('link')).toHaveLength(7);
     expect(screen.getByText('articles.resultCount:{"count":8}')).toBeInTheDocument();
-    expect(screen.getAllByText('articles.readMinutes:{"count":3}').length).toBeGreaterThan(0);
   });
 
   it('filters by category', async () => {
@@ -55,10 +57,10 @@ describe('ArticlesPage — library', () => {
     await user.click(chip);
 
     expect(chip).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.queryByRole('region', { name: /articles.featured/ })).not.toBeInTheDocument();
-    const library = screen.getByRole('region', { name: 'articles.library' });
-    expect(within(library).getAllByRole('link')).toHaveLength(2);
-    expect(within(library).getByRole('link', { name: /Bien prendre sa lévothyroxine/ })).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'articles.featured' })).not.toBeInTheDocument();
+    const results = screen.getByRole('region', { name: 'articles.results' });
+    expect(within(results).getAllByRole('link')).toHaveLength(2);
+    expect(within(results).getByRole('link', { name: /Bien prendre sa lévothyroxine/ })).toBeInTheDocument();
   });
 
   it('searches without accents and offers a reset when nothing matches', async () => {
@@ -90,7 +92,7 @@ describe('ArticlesPage — library', () => {
   });
 });
 
-describe('ArticlesPage — guide view', () => {
+describe('ArticlesPage — reader', () => {
   it('opens a guide with takeaways, sources and review status, and returns to the filtered list', async () => {
     renderAt('/learn?cat=traitements');
     const user = userEvent.setup();
@@ -108,6 +110,32 @@ describe('ArticlesPage — guide view', () => {
 
     expect(screen.getByRole('link', { name: 'articles.backToLibrary' }))
       .toHaveAttribute('href', '/learn?cat=traitements');
+  });
+
+  it('pages through the list the reader came from, then shows the end screen', async () => {
+    renderAt('/learn?cat=traitements');
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('link', { name: /Bien prendre sa lévothyroxine/ }));
+
+    expect(screen.getByText('articles.progress:{"current":1,"total":2}')).toBeInTheDocument();
+    expect(screen.getByText('1 / 2')).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'articles.pagination' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'articles.previous' })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('link', { name: 'articles.next' }));
+    expect(screen.getByRole('heading', { level: 1, name: /Fer, calcium, magnésium/ })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'articles.previous' })).toHaveAttribute('href', '/learn/levothyroxine-prise');
+
+    await user.click(screen.getByRole('link', { name: 'articles.finish' }));
+    expect(screen.getByRole('heading', { level: 1, name: 'articles.endTitle' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'articles.backHome' })).toHaveAttribute('href', '/dashboard');
+    expect(screen.getByRole('link', { name: 'articles.backToLibrary' })).toHaveAttribute('href', '/learn?cat=traitements');
+  });
+
+  it('renders sections as icon cards when the guide asks for it', () => {
+    renderAt('/learn/tsh-t4-t3');
+    expect(screen.getByRole('heading', { level: 2, name: 'La TSH' }).closest('li')).not.toBeNull();
+    expect(screen.getByText('articles.progress:{"current":2,"total":8}')).toBeInTheDocument();
   });
 
   it('falls back to the API for slugs that are not local guides', async () => {

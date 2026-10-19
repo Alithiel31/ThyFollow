@@ -259,8 +259,9 @@ worker précache la coquille applicative, met les polices Google en cache à l'e
 - **API** — `lib/api.ts` est l'unique client axios typé.
 - **Routes** — publiques : `/login`, `/register`, `/verify-email`, `/forgot-password`, `/reset-password`,
   `/oauth/callback`. Derrière `RequireAuth`, dans `AppShell` : `/dashboard`, `/log[/:date]`,
-  `/lab-results`, `/medications`, `/appointments`, `/learn[/:slug]`, `/admin/articles`, `/profile`.
-  Le `/report` imprimable est authentifié mais rendu hors de la coquille (pas de barre latérale sur papier).
+  `/lab-results`, `/medications`, `/appointments`, `/learn`, `/admin/articles`, `/profile`.
+  Le `/report` imprimable et le lecteur de fiches `/learn/:slug` (plein écran, écran de fin `/learn/fin`)
+  sont authentifiés mais rendus hors de la coquille.
 - **i18n** — i18next avec dictionnaires `fr`/`en` (`src/locales/`).
 - **Style** — CSS Modules, palette sombre à accents violet/turquoise/rose, DM Serif Display + DM Sans,
   navigation basse sur mobile.
