@@ -172,8 +172,19 @@ if [ "$STATUS" != "healthy" ]; then
   [ -n "$ROLLBACK_HINT" ] && echo "   $ROLLBACK_HINT" >&2
   exit 1
 fi
-if ! curl -fsS --max-time 15 -o /dev/null "$HEALTH_URL"; then
-  echo "❌ $HEALTH_URL ne répond pas (Traefik / tunnel Cloudflare ?)." >&2
+# Traefik et nginx ont besoin de quelques secondes après le démarrage du
+# frontend : on réessaie (12 x 5 s) avant de conclure à un échec.
+echo "⏳ Attente de $HEALTH_URL…"
+PUBLIC_OK=0
+for _ in $(seq 1 12); do
+  if curl -fsS --max-time 10 -o /dev/null "$HEALTH_URL" 2>/dev/null; then
+    PUBLIC_OK=1
+    break
+  fi
+  sleep 5
+done
+if [ "$PUBLIC_OK" != "1" ]; then
+  echo "❌ $HEALTH_URL ne répond pas après 1 min (Traefik / tunnel Cloudflare ?)." >&2
   [ -n "$ROLLBACK_HINT" ] && echo "   $ROLLBACK_HINT" >&2
   exit 1
 fi
