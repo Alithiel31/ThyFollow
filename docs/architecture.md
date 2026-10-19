@@ -256,8 +256,9 @@ worker precaches the app shell, caches the Google fonts at runtime (cache-first)
 - **API** — `lib/api.ts` is the single typed axios client.
 - **Routes** — public: `/login`, `/register`, `/verify-email`, `/forgot-password`, `/reset-password`,
   `/oauth/callback`. Behind `RequireAuth`, inside `AppShell`: `/dashboard`, `/log[/:date]`,
-  `/lab-results`, `/medications`, `/appointments`, `/learn[/:slug]`, `/admin/articles`, `/profile`.
-  The printable `/report` is authenticated but rendered outside the shell (no sidebar on paper).
+  `/lab-results`, `/medications`, `/appointments`, `/learn`, `/admin/articles`, `/profile`.
+  The printable `/report` and the full-screen guide reader `/learn/:slug` (end screen `/learn/fin`)
+  are authenticated but rendered outside the shell.
 - **i18n** — i18next with `fr`/`en` dictionaries (`src/locales/`).
 - **Style** — CSS Modules, dark palette with a purple/teal/pink accent, DM Serif Display + DM Sans,
   bottom navigation on mobile.

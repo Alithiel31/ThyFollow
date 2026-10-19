@@ -249,6 +249,10 @@
   text-decoration: none;
   font-size: 0.66rem;
   transition: color 0.15s ease;
+  /* Le bouton « Plus » ne doit pas garder le fond gris par défaut du navigateur */
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 .navLabel {

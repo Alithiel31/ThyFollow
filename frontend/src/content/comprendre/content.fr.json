@@ -70,6 +70,7 @@
     },
     {
       "id": "tsh-t4-t3",
+      "sectionStyle": "cards",
       "category": "analyses",
       "categoryLabel": "Analyses",
       "readMinutes": 2,
@@ -105,6 +106,7 @@
     },
     {
       "id": "levothyroxine-prise",
+      "sectionStyle": "checklist",
       "category": "traitements",
       "categoryLabel": "Traitements",
       "readMinutes": 3,
@@ -175,6 +177,7 @@
     },
     {
       "id": "fatigue-symptomes",
+      "sectionStyle": "cards",
       "category": "quotidien",
       "categoryLabel": "Quotidien",
       "readMinutes": 3,
@@ -210,6 +213,7 @@
     },
     {
       "id": "preparer-consultation",
+      "sectionStyle": "checklist",
       "category": "suivi",
       "categoryLabel": "Suivi médical",
       "readMinutes": 2,

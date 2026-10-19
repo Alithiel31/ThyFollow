@@ -17,22 +17,22 @@ function renderAt(path: string) {
   );
 }
 
-describe('AppShell — mobile navigation', () => {
-  it('gives « Comprendre » a direct tab and moves appointments to the More menu', async () => {
+describe('AppShell — mobile navigation (maquette)', () => {
+  it('keeps appointments in the bar and « Comprendre » in the More menu', async () => {
     renderAt('/dashboard');
     const user = userEvent.setup();
     const bar = screen.getByRole('navigation', { name: 'nav.mobileLabel' });
 
-    expect(within(bar).getByRole('link', { name: 'nav.learnShort' })).toHaveAttribute('href', '/learn');
-    expect(within(bar).queryByRole('link', { name: 'nav.appointmentsShort' })).not.toBeInTheDocument();
+    expect(within(bar).getByRole('link', { name: 'nav.appointmentsShort' })).toHaveAttribute('href', '/appointments');
+    expect(within(bar).queryByRole('link', { name: 'nav.learn' })).not.toBeInTheDocument();
 
     await user.click(within(bar).getByRole('button', { name: 'nav.more' }));
-    expect(screen.getAllByRole('link', { name: 'nav.appointments' })
-      .some((link) => link.getAttribute('href') === '/appointments')).toBe(true);
+    expect(screen.getAllByRole('link', { name: 'nav.learn' })
+      .some((link) => link.getAttribute('href') === '/learn')).toBe(true);
   });
 
   it('highlights « Plus » on a page that lives in the More menu', () => {
-    renderAt('/appointments');
+    renderAt('/learn');
     const bar = screen.getByRole('navigation', { name: 'nav.mobileLabel' });
     expect(within(bar).getByRole('button', { name: 'nav.more' }).className).toMatch(/mobileNavItemActive/);
   });

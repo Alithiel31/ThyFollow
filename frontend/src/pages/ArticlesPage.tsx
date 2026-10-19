@@ -1,21 +1,27 @@
-// src/pages/ArticlesPage.tsx -- section "Comprendre" : bibliotheque de fiches
-// pedagogiques (donnees locales, src/content/comprendre) + articles publies
-// depuis l'admin (API, markdown). Une seule page pour toutes les vues :
-// le parametre :slug decide, une fiche locale passe avant un article API.
-import { useEffect, useRef, type FormEvent } from 'react';
+// src/pages/ArticlesPage.tsx -- section "Comprendre" (maquette) : bibliotheque
+// de fiches pedagogiques (donnees locales, src/content/comprendre) + articles
+// publies depuis l'admin (API, markdown).
+// - /learn         : liste (dans l'AppShell)
+// - /learn/:slug   : lecteur plein ecran ; fiche locale, sinon article API
+// - /learn/fin     : ecran de fin du parcours
+import { useEffect, useRef, type FormEvent, type ReactNode } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import {
-  ArrowLeft, ChevronRight, Clock, ExternalLink, Search, X, Sparkles, CircleCheck, ShieldAlert,
+  ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Clock, ExternalLink, Search, X,
+  Lightbulb, ShieldAlert, TestTube, Pill, Moon, Stethoscope, FlaskConical, Droplet, Activity,
+  NotebookPen, MessageCircle, Sparkles, Leaf,
+  type LucideIcon,
 } from 'lucide-react';
 import { articlesApi } from '../lib/api';
 import { formatDate } from '../lib/utils';
 import {
-  library, ALL_CATEGORIES, categoryTone, filterArticles, findArticle, normalizeSearch,
-  relatedArticles, type PastelTone,
+  library, ALL_CATEGORIES, LEARN_END_SLUG, categoryTone, filterArticles, findArticle,
+  normalizeSearch, readingSequence, type PastelTone,
 } from '../lib/learn';
+import { LogoMark } from '../components/LogoMark';
 import type { EducationArticle } from '../types';
 import styles from './ArticlesPage.module.css';
 
@@ -27,14 +33,38 @@ const TONE_CLASS: Record<PastelTone, string> = {
   butter: styles.toneButter,
 };
 
-// Recherche de la liste conservée au retour d'une fiche (?cat=…&q=…)
+const toneOf = (category: string) => TONE_CLASS[categoryTone(category)];
+
+/* Pictogramme de catégorie (liste « Les dernières fiches ») ; la thyroïde
+   a la forme d'un papillon, comme le logo */
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  analyses: TestTube,
+  traitements: Pill,
+  quotidien: Moon,
+  suivi: Stethoscope,
+};
+
+function CategoryIcon({ category, size = 20 }: { category: string; size?: number }) {
+  const Icon = CATEGORY_ICONS[category];
+  return Icon ? <Icon size={size} strokeWidth={1.7} aria-hidden="true" /> : <LogoMark size={size + 6} />;
+}
+
+/* Icônes des sections affichées en cartes (maquette « TSH, T4, T3 ») */
+const SECTION_ICONS: Record<string, LucideIcon[]> = {
+  analyses: [FlaskConical, Droplet, Activity],
+  quotidien: [Activity, NotebookPen, MessageCircle],
+};
+const SECTION_TONES = [styles.toneLavender, styles.toneBlue, styles.toneMint];
+
+// Recherche de la liste conservée pendant la lecture (?cat=…&q=…)
 type LearnLocationState = { from?: string } | null;
 
 export function ArticlesPage() {
   const { slug } = useParams();
   if (!slug) return <Library />;
+  if (slug === LEARN_END_SLUG) return <LearnEnd />;
   const local = findArticle(slug);
-  return local ? <EducationArticleView article={local} /> : <ArticleView slug={slug} />;
+  return local ? <EducationReader article={local} /> : <ArticleView slug={slug} />;
 }
 
 /* ── Bibliothèque ─────────────────────────────── */
@@ -63,7 +93,7 @@ function Library() {
   const filtering = category !== ALL_CATEGORIES || search.trim() !== '';
   const results = filterArticles(library.articles, category, search);
   const featured = filtering ? undefined : results.find((a) => a.featured);
-  const grid = featured ? results.filter((a) => a !== featured) : results;
+  const rest = featured ? results.filter((a) => a !== featured) : results;
 
   const query = normalizeSearch(search);
   const visibleTeamArticles = category === ALL_CATEGORIES
@@ -73,7 +103,7 @@ function Library() {
   const from = location.search;
 
   return (
-    <div className={`${styles.page} ${styles.libraryPage}`}>
+    <div className={styles.page}>
       <header className={styles.header}>
         <h1 className={styles.title}>{t('articles.title')}</h1>
         <p className={styles.sub}>{t('articles.subtitle')}</p>
@@ -88,7 +118,7 @@ function Library() {
         onSubmit={(e: FormEvent) => e.preventDefault()}
       >
         <label htmlFor="learn-search" className="sr-only">{t('articles.searchLabel')}</label>
-        <Search size={18} className={styles.searchIcon} aria-hidden="true" />
+        <Search size={17} className={styles.searchIcon} aria-hidden="true" />
         <input
           id="learn-search"
           type="search"
@@ -126,17 +156,16 @@ function Library() {
       </div>
 
       {featured && (
-        <section className={styles.section} aria-labelledby="learn-featured">
-          <h2 id="learn-featured" className={styles.sectionTitle}>
-            <Sparkles size={15} aria-hidden="true" /> {t('articles.featured')}
-          </h2>
-          <ArticleCard article={featured} from={from} variant="featured" />
+        <section className={styles.section} aria-label={t('articles.featured')}>
+          <FeaturedCard article={featured} from={from} />
         </section>
       )}
 
-      <section className={styles.section} aria-labelledby="learn-library">
+      <section className={styles.section} aria-labelledby="learn-latest">
         <div className={styles.sectionHead}>
-          <h2 id="learn-library" className={styles.sectionTitle}>{t('articles.library')}</h2>
+          <h2 id="learn-latest" className={styles.sectionTitle}>
+            {filtering ? t('articles.results') : t('articles.latest')}
+          </h2>
           <p className={styles.count} aria-live="polite">
             {t('articles.resultCount', { count: results.length })}
           </p>
@@ -155,10 +184,10 @@ function Library() {
             </button>
           </div>
         ) : (
-          <ul className={styles.grid}>
-            {grid.map((a) => (
+          <ul className={styles.rows}>
+            {rest.map((a) => (
               <li key={a.id}>
-                <ArticleCard article={a} from={from} />
+                <ArticleRow article={a} from={from} />
               </li>
             ))}
           </ul>
@@ -168,18 +197,18 @@ function Library() {
       {visibleTeamArticles.length > 0 && (
         <section className={styles.section} aria-labelledby="learn-team">
           <h2 id="learn-team" className={styles.sectionTitle}>{t('articles.teamArticles')}</h2>
-          <ul className={styles.list}>
+          <ul className={styles.rows}>
             {visibleTeamArticles.map((a) => (
               <li key={a.id}>
-                <Link to={`/learn/${a.slug}`} className={styles.card}>
-                  <div className={styles.cardBody}>
-                    <h3 className={styles.cardTitle}>{a.title}</h3>
-                    {a.excerpt && <p className={styles.cardExcerpt}>{a.excerpt}</p>}
+                <Link to={`/learn/${a.slug}`} className={styles.row}>
+                  <div className={styles.rowBody}>
+                    <h3 className={styles.rowTitle}>{a.title}</h3>
+                    {a.excerpt && <p className={styles.rowExcerpt}>{a.excerpt}</p>}
                     {a.publishedAt && (
-                      <p className={styles.cardDate}>{formatDate(a.publishedAt)}</p>
+                      <p className={styles.meta}>{formatDate(a.publishedAt)}</p>
                     )}
                   </div>
-                  <ChevronRight size={18} className={styles.cardChevron} aria-hidden="true" />
+                  <ChevronRight size={18} className={styles.rowArrow} aria-hidden="true" />
                 </Link>
               </li>
             ))}
@@ -192,41 +221,74 @@ function Library() {
   );
 }
 
-function ArticleCard({
-  article, from, variant = 'default',
-}: { article: EducationArticle; from: string; variant?: 'default' | 'featured' | 'compact' }) {
+function ReadTime({ minutes, short = false }: { minutes: number; short?: boolean }) {
   const { t } = useTranslation();
-  const variantClass = variant === 'featured' ? styles.edCardFeatured
-    : variant === 'compact' ? styles.edCardCompact : '';
   return (
-    <Link
-      to={`/learn/${article.id}`}
-      state={{ from }}
-      className={`${styles.edCard} ${variantClass} ${TONE_CLASS[categoryTone(article.category)]}`}
-    >
-      <div className={styles.edMedia}>
-        <img src={article.image} alt="" loading="lazy" decoding="async" width={758} height={500} />
+    <span className={styles.meta}>
+      <Clock size={13} aria-hidden="true" />
+      {short ? `${minutes} min` : t('articles.readMinutes', { count: minutes })}
+    </span>
+  );
+}
+
+/* « À la une » compacte : texte à gauche, illustration à droite */
+function FeaturedCard({ article, from }: { article: EducationArticle; from: string }) {
+  const { t } = useTranslation();
+  return (
+    <Link to={`/learn/${article.id}`} state={{ from }} className={`${styles.featured} ${toneOf(article.category)}`}>
+      <div className={styles.featuredBody}>
+        <span className={styles.featuredBadge}>{t('articles.featured')}</span>
+        <h2 className={styles.featuredTitle}>{article.title}</h2>
+        <p className={styles.featuredSummary}>{article.summary}</p>
+        <div className={styles.featuredFoot}>
+          <ReadTime minutes={article.readMinutes} short />
+          <ArrowRight size={17} aria-hidden="true" />
+        </div>
       </div>
-      <div className={styles.edBody}>
-        <span className={styles.badge}>{article.categoryLabel}</span>
-        <h3 className={styles.edTitle}>{article.title}</h3>
-        {variant !== 'compact' && <p className={styles.edSummary}>{article.summary}</p>}
-        <p className={styles.meta}>
-          <Clock size={13} aria-hidden="true" />
-          {t('articles.readMinutes', { count: article.readMinutes })}
-        </p>
+      <div className={styles.featuredMedia}>
+        <img src={article.image} alt="" decoding="async" width={758} height={500} />
       </div>
     </Link>
   );
 }
 
-/* ── Fiche détaillée (contenu local) ──────────── */
+/* Ligne compacte : pictogramme, titre, durée, flèche */
+function ArticleRow({ article, from }: { article: EducationArticle; from: string }) {
+  return (
+    <Link to={`/learn/${article.id}`} state={{ from }} className={`${styles.row} ${toneOf(article.category)}`}>
+      <span className={styles.rowIcon}><CategoryIcon category={article.category} /></span>
+      <div className={styles.rowBody}>
+        <h3 className={styles.rowTitle}>{article.title}</h3>
+        <ReadTime minutes={article.readMinutes} short />
+      </div>
+      <ChevronRight size={18} className={styles.rowArrow} aria-hidden="true" />
+    </Link>
+  );
+}
 
-function EducationArticleView({ article }: { article: EducationArticle }) {
+/* ── Lecteur plein écran ──────────────────────── */
+
+function ReaderScreen({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return (
+    <div className={`${styles.readerScreen} ${className}`}>
+      <div className={styles.readerColumn}>{children}</div>
+    </div>
+  );
+}
+
+function EducationReader({ article }: { article: EducationArticle }) {
   const { t } = useTranslation();
   const location = useLocation();
   const from = (location.state as LearnLocationState)?.from ?? '';
   const titleRef = useRef<HTMLHeadingElement>(null);
+
+  const sequence = readingSequence(from);
+  const found = sequence.findIndex((a) => a.id === article.id);
+  // Fiche ouverte hors de la liste filtrée (lien direct) : parcours complet
+  const list = found >= 0 ? sequence : library.articles;
+  const index = found >= 0 ? found : list.findIndex((a) => a.id === article.id);
+  const prev = list[index - 1];
+  const next = list[index + 1];
 
   // Navigation SPA : repartir du haut et annoncer la nouvelle fiche.
   // Pas de focus forcé sur un chargement direct (location.key 'default').
@@ -236,20 +298,31 @@ function EducationArticleView({ article }: { article: EducationArticle }) {
     if (navigatedInApp) titleRef.current?.focus({ preventScroll: true });
   }, [article.id, navigatedInApp]);
 
+  const progress = t('articles.progress', { current: index + 1, total: list.length });
+  const style = article.sectionStyle ?? 'prose';
+  const sectionIcons = SECTION_ICONS[article.category] ?? [Sparkles, Leaf, MessageCircle];
+
   return (
-    <div className={`${styles.page} ${styles.readerPage} ${TONE_CLASS[categoryTone(article.category)]}`}>
-      <Link to={{ pathname: '/learn', search: from }} className={styles.backBtn}>
-        <ArrowLeft size={16} aria-hidden="true" /> {t('articles.backToLibrary')}
-      </Link>
+    <ReaderScreen className={toneOf(article.category)}>
+      <div className={styles.readerTop}>
+        <Link
+          to={{ pathname: '/learn', search: from }}
+          className={styles.iconBtn}
+          aria-label={t('articles.backToLibrary')}
+        >
+          <ArrowLeft size={20} aria-hidden="true" />
+        </Link>
+        <span className={styles.counter}>
+          <span aria-hidden="true">{index + 1} / {list.length}</span>
+          <span className="sr-only">{progress}</span>
+        </span>
+      </div>
 
       <article className={styles.reader}>
         <header className={styles.readerHeader}>
           <div className={styles.readerMeta}>
             <span className={styles.badge}>{article.categoryLabel}</span>
-            <span className={styles.meta}>
-              <Clock size={13} aria-hidden="true" />
-              {t('articles.readMinutes', { count: article.readMinutes })}
-            </span>
+            <ReadTime minutes={article.readMinutes} />
           </div>
           <h1 ref={titleRef} tabIndex={-1} className={styles.readerTitle}>{article.title}</h1>
           <p className={styles.lead}>{article.summary}</p>
@@ -259,26 +332,59 @@ function EducationArticleView({ article }: { article: EducationArticle }) {
           <img src={article.image} alt="" decoding="async" width={758} height={500} />
         </div>
 
-        <div className={styles.prose}>
-          <p className={styles.intro}>{article.intro}</p>
-          {article.sections.map((s) => (
-            <section key={s.heading}>
-              <h2>{s.heading}</h2>
-              <p>{s.body}</p>
-            </section>
-          ))}
-        </div>
+        <p className={styles.intro}>{article.intro}</p>
 
-        <aside className={styles.takeaways} aria-labelledby="learn-takeaways">
-          <h2 id="learn-takeaways" className={styles.takeawaysTitle}>{t('articles.takeaways')}</h2>
-          <ul>
-            {article.takeaways.map((item) => (
-              <li key={item}>
-                <CircleCheck size={17} aria-hidden="true" />
-                <span>{item}</span>
+        {style === 'cards' ? (
+          <ul className={styles.infoCards}>
+            {article.sections.map((s, i) => {
+              const Icon = sectionIcons[i % sectionIcons.length];
+              return (
+                <li key={s.heading} className={`${styles.infoCard} ${SECTION_TONES[i % SECTION_TONES.length]}`}>
+                  <span className={styles.infoIcon}><Icon size={22} strokeWidth={1.7} aria-hidden="true" /></span>
+                  <div>
+                    <h2 className={styles.infoTitle}>{s.heading}</h2>
+                    <p className={styles.infoBody}>{s.body}</p>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        ) : style === 'checklist' ? (
+          <ul className={styles.checklist}>
+            {article.sections.map((s) => (
+              <li key={s.heading}>
+                <span className={styles.checkMark}><Check size={14} strokeWidth={2.6} aria-hidden="true" /></span>
+                <div>
+                  <h2 className={styles.checkTitle}>{s.heading}</h2>
+                  <p className={styles.checkBody}>{s.body}</p>
+                </div>
               </li>
             ))}
           </ul>
+        ) : (
+          <div className={styles.prose}>
+            {article.sections.map((s) => (
+              <section key={s.heading}>
+                <h2>{s.heading}</h2>
+                <p>{s.body}</p>
+              </section>
+            ))}
+          </div>
+        )}
+
+        <aside className={styles.takeaways} aria-labelledby="learn-takeaways">
+          <h2 id="learn-takeaways" className={styles.takeawaysTitle}>
+            <Lightbulb size={20} strokeWidth={1.7} aria-hidden="true" />
+            {t('articles.takeaways')}
+          </h2>
+          <ol>
+            {article.takeaways.map((item, i) => (
+              <li key={item}>
+                <span className={styles.stepNum} aria-hidden="true">{i + 1}</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ol>
         </aside>
 
         {article.sources.length > 0 && (
@@ -304,21 +410,106 @@ function EducationArticleView({ article }: { article: EducationArticle }) {
             ? t('articles.reviewedOn', { date: formatDate(article.reviewedAt) })
             : t('articles.reviewPending')}
         </p>
+        <p className={styles.readerDisclaimer}>{library.meta.disclaimer}</p>
       </article>
 
-      <p className={styles.disclaimer}>{library.meta.disclaimer}</p>
-
-      <section className={styles.section} aria-labelledby="learn-related">
-        <h2 id="learn-related" className={styles.sectionTitle}>{t('articles.related')}</h2>
-        <ul className={styles.relatedGrid}>
-          {relatedArticles(article).map((a) => (
-            <li key={a.id}>
-              <ArticleCard article={a} from={from} variant="compact" />
-            </li>
+      <nav className={styles.pager} aria-label={t('articles.pagination')}>
+        {prev ? (
+          <Link to={`/learn/${prev.id}`} state={{ from }} className={styles.pagerBtn} aria-label={t('articles.previous')}>
+            <ChevronLeft size={20} aria-hidden="true" />
+          </Link>
+        ) : (
+          <span className={`${styles.pagerBtn} ${styles.pagerBtnOff}`} aria-hidden="true">
+            <ChevronLeft size={20} />
+          </span>
+        )}
+        <span className={styles.dots} aria-hidden="true">
+          {list.map((a, i) => (
+            <span key={a.id} className={`${styles.dot} ${i === index ? styles.dotActive : ''}`} />
           ))}
-        </ul>
-      </section>
+        </span>
+        <Link
+          to={next ? `/learn/${next.id}` : `/learn/${LEARN_END_SLUG}`}
+          state={{ from }}
+          className={`${styles.pagerBtn} ${styles.pagerBtnPrimary}`}
+          aria-label={next ? t('articles.next') : t('articles.finish')}
+        >
+          <ChevronRight size={20} aria-hidden="true" />
+        </Link>
+      </nav>
+    </ReaderScreen>
+  );
+}
+
+/* ── Écran de fin du parcours ─────────────────── */
+
+function LearnEnd() {
+  const { t } = useTranslation();
+  const location = useLocation();
+  const from = (location.state as LearnLocationState)?.from ?? '';
+  return (
+    <div className={styles.endScreen}>
+      <div className={styles.endContent}>
+        <p className={styles.endBrand}>
+          <LogoMark size={22} />
+          <span>{t('app.name')}</span>
+        </p>
+        <h1 className={styles.endTitle}>{t('articles.endTitle')}</h1>
+        <p className={styles.endSub}>{t('articles.endSubtitle')}</p>
+      </div>
+      <Landscape />
+      <div className={styles.endActions}>
+        <Link to="/dashboard" className={styles.endBtn}>{t('articles.backHome')}</Link>
+        <Link to={{ pathname: '/learn', search: from }} className={styles.endLink}>
+          {t('articles.backToLibrary')}
+        </Link>
+        <p className={styles.endDisclaimer}>{t('articles.disclaimerView')}</p>
+      </div>
     </div>
+  );
+}
+
+/* Paysage décoratif (montagnes, forêt, lac et reflets) dessiné en SVG */
+const PINES: [number, number, number][] = [
+  [6, 214, 46], [24, 216, 58], [44, 214, 40], [62, 217, 50], [80, 215, 34],
+  [318, 216, 36], [336, 214, 52], [356, 217, 44], [374, 214, 60], [394, 216, 42],
+];
+
+function pine(x: number, base: number, h: number) {
+  const w = h / 3.4;
+  return `M${x} ${base - h} L${x - w * 0.55} ${base - h * 0.55} H${x - w * 0.3} `
+    + `L${x - w} ${base} H${x + w} L${x + w * 0.3} ${base - h * 0.55} H${x + w * 0.55} Z`;
+}
+
+function Landscape() {
+  return (
+    <svg className={styles.landscape} viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="learn-lake" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#b9b4ea" stopOpacity="0.7" />
+          <stop offset="1" stopColor="#14243f" stopOpacity="0.95" />
+        </linearGradient>
+        <radialGradient id="learn-sun">
+          <stop offset="0" stopColor="#fde3d6" />
+          <stop offset="0.45" stopColor="#f5c9c4" stopOpacity="0.8" />
+          <stop offset="1" stopColor="#f5c9c4" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <circle cx="292" cy="112" r="44" fill="url(#learn-sun)" />
+      <circle cx="292" cy="112" r="13" fill="#fde7dc" />
+      <path d="M0 176 L48 128 L86 152 L142 96 L196 150 L238 118 L292 160 L340 120 L400 158 V214 H0 Z" fill="#9fa3dc" opacity="0.55" />
+      <path d="M0 196 L40 166 L92 188 L150 146 L214 194 L268 162 L326 196 L400 170 V214 H0 Z" fill="#6670ad" opacity="0.85" />
+      <rect x="0" y="212" width="400" height="88" fill="url(#learn-lake)" />
+      {/* Reflets : montagnes inversées et éclat du soleil sur l'eau */}
+      <path d="M0 212 L40 236 L92 220 L150 250 L214 216 L268 240 L326 214 L400 232 V212 Z" fill="#6670ad" opacity="0.28" />
+      <path d="M262 222 H322 M272 232 H312 M282 242 H302" stroke="#fde3d6" strokeOpacity="0.55" strokeWidth="2" strokeLinecap="round" />
+      {PINES.map(([x, base, h]) => (
+        <g key={x}>
+          <path d={pine(x, base, h)} fill="#26355d" />
+          <path d={pine(x, base, h)} fill="#26355d" opacity="0.22" transform={`translate(0 ${2 * base}) scale(1 -1)`} />
+        </g>
+      ))}
+    </svg>
   );
 }
 
@@ -332,37 +523,40 @@ function ArticleView({ slug }: { slug: string }) {
     queryFn: () => articlesApi.get(slug).then((r) => r.data),
   });
 
-  if (isLoading) return <div className={styles.loader}><div className="spinner" /></div>;
+  if (isLoading) {
+    return <ReaderScreen><div className={styles.loader}><div className="spinner" /></div></ReaderScreen>;
+  }
   if (isError || !article) {
     return (
-      <div className={styles.empty}>
-        <p>{t('articles.notFound')}</p>
-        <button className={styles.backBtn} onClick={() => navigate('/learn')}>
-          <ArrowLeft size={16} /> {t('articles.backToList')}
-        </button>
-      </div>
+      <ReaderScreen>
+        <div className={styles.empty}>
+          <p>{t('articles.notFound')}</p>
+          <button className={styles.resetBtn} onClick={() => navigate('/learn')}>
+            {t('articles.backToList')}
+          </button>
+        </div>
+      </ReaderScreen>
     );
   }
 
   return (
-    <div className={`${styles.page} ${styles.readerPage}`}>
-      <button className={styles.backBtn} onClick={() => navigate('/learn')}>
-        <ArrowLeft size={16} /> {t('articles.allArticles')}
-      </button>
+    <ReaderScreen>
+      <div className={styles.readerTop}>
+        <Link to="/learn" className={styles.iconBtn} aria-label={t('articles.allArticles')}>
+          <ArrowLeft size={20} aria-hidden="true" />
+        </Link>
+      </div>
 
-      <article className={styles.article}>
-        <h1 className={styles.articleTitle}>{article.title}</h1>
+      <article className={styles.reader}>
+        <h1 className={styles.readerTitle}>{article.title}</h1>
         {article.publishedAt && (
           <p className={styles.articleDate}>{formatDate(article.publishedAt)}</p>
         )}
         <div className={styles.markdown}>
           <ReactMarkdown>{article.content}</ReactMarkdown>
         </div>
+        <p className={styles.readerDisclaimer}>{t('articles.disclaimerView')}</p>
       </article>
-
-      <p className={styles.disclaimer}>
-        {t('articles.disclaimerView')}
-      </p>
-    </div>
+    </ReaderScreen>
   );
 }

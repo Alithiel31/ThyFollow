@@ -8,8 +8,13 @@ backend et apparaissent en plus, dans la section « Articles de l'équipe ».
   et la logique de filtrage se trouve dans `src/lib/learn.ts`.
 - Illustrations : `frontend/public/assets/comprendre/*.webp`, référencées par `image`
   (`/assets/comprendre/…`). `src/lib/learn.test.ts` vérifie que chaque chemin existe.
-- L'`id` d'une fiche sert d'URL (`/learn/<id>`) et passe avant un article API qui aurait le même slug.
+- L'`id` d'une fiche sert d'URL (`/learn/<id>`) et passe avant un article API qui aurait le même slug
+  (`fin` est réservé à l'écran de fin).
 - La teinte pastel d'une catégorie est définie dans `CATEGORY_TONES` (`src/lib/learn.ts`).
+- `sectionStyle` (optionnel) choisit la présentation des sections dans le lecteur : `prose` (par
+  défaut), `cards` (cartes à icône ronde) ou `checklist`. Il ne change pas le texte.
+- Le lecteur (`/learn/<id>`) enchaîne les fiches dans l'ordre de ce fichier, filtré comme la liste
+  d'origine ; après la dernière, il ouvre l'écran de fin `/learn/fin` (slug réservé).
 
 ## Relecture médicale — obligatoire avant publication
 
