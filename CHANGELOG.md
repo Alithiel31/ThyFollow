@@ -17,6 +17,9 @@ pas synchronisé avec ces tags.
   avertissement « relecture sans filtre » apparaît dans les logs).
 - Documentation API structurée (OpenAPI/Swagger) — la liste d'endpoints du README est tenue à
   la main et devient difficile à maintenir à mesure que l'API grossit.
+- Faire relire les fiches « Comprendre » par un médecin ou un pharmacien, vérifier leurs sources,
+  puis renseigner `reviewedAt` (voir `frontend/src/content/comprendre/README.md`). Le contenu
+  n'existe qu'en français ; l'interface anglaise l'indique.
 - Étendre la couverture de tests frontend au-delà des formulaires d'auth/médicaments (LogPage,
   LabResultsPage, AppointmentsPage, ProfilePage).
 - Suivi d'erreurs en production (Sentry ou équivalent) — aujourd'hui, un crash en prod ne
@@ -39,6 +42,14 @@ pas synchronisé avec ces tags.
 
 ### Added
 
+- **Onglet « Comprendre » : bibliothèque de fiches pédagogiques.** L'état vide « Les premiers
+  articles arrivent bientôt » est remplacé par 8 fiches locales (`frontend/src/content/comprendre`)
+  avec illustrations, catégories, recherche sans accents, carte « À la une », durée de lecture,
+  encart « À retenir », sources et « À lire aussi ». Filtres conservés dans l'URL (`?cat=&q=`) au
+  retour d'une fiche. Les articles publiés depuis `/admin/articles` restent affichés (« Articles de
+  l'équipe ») et lisibles sur `/learn/:slug`. Nouveaux tokens `--pastel-*`, `--paper` et
+  `--illustration-filter` (clair/sombre). **Les fiches sont des brouillons non relus** : chacune
+  affiche « en attente de relecture » tant que `reviewedAt` n'est pas renseigné.
 - **Détail des nuits mesuré par la montre** : efficacité du sommeil, minutes de sommeil profond et
   paradoxal, en lecture seule dans le journal (à côté du ressenti « qualité du sommeil », qui reste
   saisi à la main) et en moyennes dans le rapport et le CSV. L'API Google Health n'expose pas le
