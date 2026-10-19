@@ -53,6 +53,10 @@ pas synchronisé avec ces tags.
   Les illustrations sont précachées par le service worker (fiches lisibles hors ligne). Sur mobile,
   « Comprendre » (libellé court « Fiches ») remplace « Rendez-vous » dans la barre du bas ;
   Rendez-vous passe dans le menu « Plus », qui s'allume quand on est sur une de ses pages.
+- **Typographie éditoriale de « Comprendre »** : titres en Cormorant Garamond (600, italique
+  ponctuel) et texte en Inter, limités à cet onglet via les tokens `--font-editorial` et
+  `--font-reading` ; le reste de l'app garde Manrope et Newsreader. Polices de secours :
+  Newsreader puis Georgia pour les titres, Manrope puis police système pour le texte.
 - **Détail des nuits mesuré par la montre** : efficacité du sommeil, minutes de sommeil profond et
   paradoxal, en lecture seule dans le journal (à côté du ressenti « qualité du sommeil », qui reste
   saisi à la main) et en moyennes dans le rapport et le CSV. L'API Google Health n'expose pas le

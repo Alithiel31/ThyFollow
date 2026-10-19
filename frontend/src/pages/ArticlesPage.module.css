@@ -1,6 +1,7 @@
 /* src/pages/ArticlesPage.module.css */
 
-.page { max-width: 720px; animation: fadeIn 0.25s ease both; }
+/* Typographie du pack « Comprendre » : Inter pour l'interface, Cormorant Garamond pour les titres */
+.page { max-width: 720px; font-family: var(--font-reading); animation: fadeIn 0.25s ease both; }
 .libraryPage { max-width: 1080px; }
 .readerPage { max-width: 780px; }
 
@@ -17,8 +18,8 @@
 .toneButter { --tone-bg: var(--pastel-butter); --tone-ink: var(--pastel-butter-ink); }
 
 .header { margin-bottom: 28px; }
-.title { font-family: var(--font-display); font-style: italic; font-weight: 500; font-size: 1.5rem; color: var(--text); letter-spacing: -0.02em; }
-.libraryPage .title { font-size: 2.1rem; line-height: 1.1; }
+.title { font-family: var(--font-editorial); font-style: italic; font-weight: 600; font-size: 1.75rem; color: var(--text); letter-spacing: -0.025em; }
+.libraryPage .title { font-size: 2.6rem; line-height: 1.02; }
 .sub { font-size: 0.875rem; color: var(--text-dim); margin-top: 4px; }
 .libraryPage .sub { font-size: 0.95rem; max-width: 52ch; }
 .langNote {
@@ -126,8 +127,8 @@
   font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em;
 }
 .edTitle {
-  font-family: var(--font-display); font-style: italic; font-weight: 500;
-  font-size: 1.3rem; line-height: 1.2; letter-spacing: -0.01em; color: var(--text);
+  font-family: var(--font-editorial); font-weight: 600;
+  font-size: 1.5rem; line-height: 1.1; letter-spacing: -0.015em; color: var(--text);
 }
 .edSummary { font-size: 0.875rem; line-height: 1.55; color: var(--text-dim); }
 .meta {
@@ -140,7 +141,7 @@
 .edCardFeatured { flex-direction: row; }
 .edCardFeatured .edMedia { flex: 0 0 48%; aspect-ratio: auto; min-height: 280px; }
 .edCardFeatured .edBody { justify-content: center; padding: 32px 36px; gap: 12px; }
-.edCardFeatured .edTitle { font-size: 1.85rem; line-height: 1.12; }
+.edCardFeatured .edTitle { font-size: 2.2rem; line-height: 1.04; letter-spacing: -0.025em; }
 .edCardFeatured .edSummary { font-size: 0.95rem; max-width: 42ch; }
 .edCardFeatured .meta { margin-top: 4px; }
 
@@ -148,7 +149,7 @@
 .edCardCompact { flex-direction: row; align-items: stretch; }
 .edCardCompact .edMedia { flex: 0 0 96px; aspect-ratio: auto; }
 .edCardCompact .edBody { padding: 14px 16px; gap: 6px; }
-.edCardCompact .edTitle { font-size: 1.05rem; }
+.edCardCompact .edTitle { font-size: 1.22rem; }
 
 /* ── Articles de l'équipe (API) */
 .list { display: flex; flex-direction: column; gap: 12px; }
@@ -197,8 +198,8 @@
 .readerMeta { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
 .readerMeta .meta { margin-top: 0; padding-top: 0; }
 .readerTitle {
-  font-family: var(--font-display); font-style: italic; font-weight: 500;
-  font-size: 2.3rem; line-height: 1.08; letter-spacing: -0.02em; color: var(--text);
+  font-family: var(--font-editorial); font-weight: 600;
+  font-size: 2.75rem; line-height: 1.02; letter-spacing: -0.025em; color: var(--text);
 }
 .readerTitle:focus { outline: none; }
 .readerTitle:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
@@ -221,8 +222,8 @@
   border: 1px solid var(--lav-soft);
 }
 .takeawaysTitle {
-  font-family: var(--font-display); font-style: italic; font-weight: 500;
-  font-size: 1.35rem; color: var(--pastel-lavender-ink); margin-bottom: 12px;
+  font-family: var(--font-editorial); font-style: italic; font-weight: 600;
+  font-size: 1.6rem; line-height: 1.1; color: var(--pastel-lavender-ink); margin-bottom: 12px;
 }
 .takeaways ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
 .takeaways li { display: flex; gap: 10px; align-items: flex-start; line-height: 1.55; color: var(--text); font-size: 0.95rem; }
@@ -231,13 +232,14 @@
 .sources { margin-top: 8px; }
 .sourcesTitle { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px; }
 .sources ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.sources li { padding: 4px 0; }
+/* Lien en ligne : sur deux lignes, l'icône suit le dernier mot */
 .sources a {
-  display: inline-flex; align-items: center; gap: 6px;
-  min-height: 32px;
   color: var(--accent); font-size: 0.9rem; font-weight: 500;
   text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px;
 }
 .sources a:hover { color: var(--accent-strong); }
+.sources a svg { display: inline; vertical-align: -2px; margin-left: 5px; }
 
 .review {
   display: flex; align-items: flex-start; gap: 8px;
@@ -253,8 +255,8 @@
 }
 
 .articleTitle {
-  font-family: var(--font-display); font-style: italic; font-weight: 500;
-  font-size: 1.4rem; letter-spacing: -0.02em; margin-bottom: 6px;
+  font-family: var(--font-editorial); font-weight: 600;
+  font-size: 1.85rem; line-height: 1.05; letter-spacing: -0.025em; margin-bottom: 6px;
 }
 .articleDate { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 24px; }
 
@@ -287,11 +289,11 @@
 @media (max-width: 900px) {
   .edCardFeatured .edMedia { flex-basis: 42%; min-height: 240px; }
   .edCardFeatured .edBody { padding: 24px; }
-  .edCardFeatured .edTitle { font-size: 1.5rem; }
+  .edCardFeatured .edTitle { font-size: 1.8rem; }
 }
 
 @media (max-width: 640px) {
-  .libraryPage .title { font-size: 1.75rem; }
+  .libraryPage .title { font-size: 2.15rem; }
   .header { margin-bottom: 20px; }
 
   /* Chips : une ligne qui défile horizontalement, jusqu'aux bords de l'écran */
@@ -306,14 +308,14 @@
   .edCardFeatured { flex-direction: column; }
   .edCardFeatured .edMedia { flex-basis: auto; aspect-ratio: 16 / 10; min-height: 0; }
   .edCardFeatured .edBody { padding: 18px 20px 20px; gap: 8px; }
-  .edCardFeatured .edTitle { font-size: 1.45rem; }
+  .edCardFeatured .edTitle { font-size: 1.7rem; }
 
   /* Liste : une colonne, vignette latérale */
   .grid { grid-template-columns: 1fr; gap: 12px; }
   .grid .edCard { flex-direction: row; border-radius: var(--radius-lg); }
   .grid .edMedia { flex: 0 0 104px; aspect-ratio: auto; }
   .grid .edBody { padding: 14px 16px; gap: 6px; }
-  .grid .edTitle { font-size: 1.1rem; }
+  .grid .edTitle { font-size: 1.28rem; }
   .grid .edSummary {
     font-size: 0.82rem;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
@@ -322,7 +324,7 @@
   .relatedGrid { grid-template-columns: 1fr; }
 
   .reader { padding: 24px 18px; border-radius: var(--radius-lg); }
-  .readerTitle { font-size: 1.85rem; }
+  .readerTitle { font-size: 2.2rem; }
   .lead { font-size: 1rem; }
   .readerMedia { margin-bottom: 22px; height: auto; aspect-ratio: 3 / 2; }
   .takeaways { padding: 18px; }

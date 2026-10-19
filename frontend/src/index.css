@@ -71,6 +71,9 @@
   /* ── Typographie */
   --font-body: 'Manrope', system-ui, sans-serif;
   --font-display: 'Newsreader', Georgia, serif;
+  /* Onglet « Comprendre » (pack éditorial) : titres serif + texte de lecture */
+  --font-editorial: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
+  --font-reading: 'Inter', 'Manrope', system-ui, sans-serif;
 
   /* ── Rayons */
   --radius-sm: 10px;
