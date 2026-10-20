@@ -34,6 +34,8 @@
   --pastel-peach-ink: #a3453a;
   --pastel-butter: #faf0d4;
   --pastel-butter-ink: #85601a;
+  --pastel-rose: #f8e1e3;
+  --pastel-rose-ink: #9c4a5f;
   --illustration-filter: none;
   color: var(--text);
 }
@@ -44,6 +46,7 @@
 .toneLavender { --tone-bg: var(--pastel-lavender); --tone-ink: var(--pastel-lavender-ink); }
 .toneMint { --tone-bg: var(--pastel-mint); --tone-ink: var(--pastel-mint-ink); }
 .toneButter { --tone-bg: var(--pastel-butter); --tone-ink: var(--pastel-butter-ink); }
+.toneRose { --tone-bg: var(--pastel-rose); --tone-ink: var(--pastel-rose-ink); }
 
 /* ── En-tête de la bibliothèque */
 .header { margin-bottom: 22px; }
@@ -112,6 +115,10 @@
 .sectionTitle { font-size: 1.02rem; font-weight: 600; color: var(--text); margin-bottom: 12px; }
 .sectionHead .sectionTitle { margin-bottom: 0; }
 .count { font-size: 0.8rem; color: var(--text-dim); }
+.categoryNote { margin: -4px 0 14px; font-size: 0.86rem; line-height: 1.5; color: var(--text-dim); }
+
+/* « À la une » : une carte par maladie (Hashimoto, Basedow) */
+.featuredList { list-style: none; display: grid; gap: 12px; }
 
 /* ── « À la une » compacte */
 .featured {
@@ -334,7 +341,7 @@
 .pagerBtnPrimary { background: #2b3a67; border-color: #2b3a67; color: #ffffff; box-shadow: 0 6px 16px rgba(20, 40, 77, 0.25); }
 .pagerBtnOff { opacity: 0.35; }
 .pagerBtnOff:hover { transform: none; }
-.dots { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.dots { display: flex; align-items: center; gap: 6px; justify-content: center; min-width: 0; overflow: hidden; }
 .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(20, 40, 77, 0.22); transition: background-color 0.2s ease, transform 0.2s ease; }
 .dotActive { background: #2b3a67; transform: scale(1.35); }
 

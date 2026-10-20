@@ -60,6 +60,8 @@
   --pastel-peach-ink: #a3453a;
   --pastel-butter: #faf0d4;
   --pastel-butter-ink: #85601a;
+  --pastel-rose: #f8e1e3;      /* corail du pack Basedow, foncé pour 4.5:1 */
+  --pastel-rose-ink: #9c4a5f;
   --paper: #fcfcfe;               /* surface de lecture des fiches longues */
   --illustration-filter: none;
 
@@ -134,6 +136,8 @@
   --pastel-peach-ink: #f5c9c4;
   --pastel-butter: rgba(241, 220, 164, 0.13);
   --pastel-butter-ink: #f1dca4;
+  --pastel-rose: rgba(240, 179, 192, 0.13);
+  --pastel-rose-ink: #f0b3c0;
   --paper: #15223a;
   /* Illustrations sur fond crème : atténuées pour ne pas éblouir la nuit */
   --illustration-filter: brightness(0.86) saturate(0.95);
@@ -189,6 +193,8 @@
     --pastel-peach-ink: #f5c9c4;
     --pastel-butter: rgba(241, 220, 164, 0.13);
     --pastel-butter-ink: #f1dca4;
+    --pastel-rose: rgba(240, 179, 192, 0.13);
+    --pastel-rose-ink: #f0b3c0;
     --paper: #15223a;
     /* Illustrations sur fond crème : atténuées pour ne pas éblouir la nuit */
     --illustration-filter: brightness(0.86) saturate(0.95);

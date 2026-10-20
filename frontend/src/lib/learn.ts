@@ -11,14 +11,16 @@ export const library = content as EducationLibrary;
 export const ALL_CATEGORIES = 'tous';
 
 /* Teinte pastel de chaque catégorie (tokens --pastel-* de index.css) */
-export type PastelTone = 'peach' | 'blue' | 'lavender' | 'mint' | 'butter';
+export type PastelTone = 'peach' | 'blue' | 'lavender' | 'mint' | 'butter' | 'rose';
 
 const CATEGORY_TONES: Record<string, PastelTone> = {
   thyroide: 'peach',
+  basedow: 'rose',
   analyses: 'blue',
   traitements: 'lavender',
   quotidien: 'mint',
   suivi: 'butter',
+  securite: 'butter',
 };
 
 export function categoryTone(category: string): PastelTone {
@@ -40,7 +42,9 @@ function haystack(article: EducationArticle): string {
       article.title,
       article.summary,
       article.categoryLabel,
-      ...article.sections.map((s) => s.heading),
+      ...(article.tags ?? []),
+      article.intro,
+      ...article.sections.flatMap((s) => [s.heading, s.body]),
       ...article.takeaways,
     ].join(' ')
   );
@@ -71,6 +75,12 @@ export function readingSequence(fromSearch: string): EducationArticle[] {
     params.get('q') ?? ''
   );
   return list.length > 0 ? list : library.articles;
+}
+
+/* Une fiche n'est présentée comme relue que si elle a une date de relecture
+   et que le drapeau éditorial a été levé */
+export function isMedicallyReviewed(article: EducationArticle): boolean {
+  return Boolean(article.reviewedAt) && article.medicalReviewRequired !== true;
 }
 
 export function findArticle(id: string): EducationArticle | undefined {

@@ -327,6 +327,7 @@ export type ArticleSummary = Omit<Article, 'content'> & { content?: string };
 export interface EducationCategory {
   id: string;
   label: string;
+  description?: string;
 }
 
 export interface EducationSection {
@@ -348,6 +349,8 @@ export interface EducationArticle {
   title: string;
   summary: string;
   image: string;
+  // Mots-clés pris en compte par la recherche
+  tags?: string[];
   intro: string;
   // Présentation des sections (maquette) : texte, cartes à icône ou check-list
   sectionStyle?: 'prose' | 'cards' | 'checklist';
@@ -356,6 +359,8 @@ export interface EducationArticle {
   sources: EducationSource[];
   // Date ISO de relecture par un professionnel de santé ; absente = brouillon
   reviewedAt?: string;
+  // Drapeau éditorial : true tant que la relecture médicale n'est pas faite
+  medicalReviewRequired?: boolean;
 }
 
 export interface EducationLibrary {

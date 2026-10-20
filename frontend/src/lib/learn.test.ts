@@ -1,8 +1,9 @@
 // src/lib/learn.test.ts
 import { describe, it, expect } from 'vitest';
 import {
-  library, ALL_CATEGORIES, filterArticles, normalizeSearch, readingSequence,
+  library, ALL_CATEGORIES, filterArticles, isMedicallyReviewed, normalizeSearch, readingSequence,
 } from './learn';
+import type { EducationArticle } from '../types';
 
 // Fichiers réellement présents dans public/ (résolu par Vite, sans types Node)
 const shipped = Object.keys(import.meta.glob('../../public/assets/comprendre/*.webp'))
@@ -29,6 +30,33 @@ describe('Comprendre library content', () => {
     }
     expect(library.categories[0].id).toBe(ALL_CATEGORIES);
   });
+
+  it('keeps the Hashimoto guides next to the Basedow ones', () => {
+    const ids = library.articles.map((a) => a.id);
+    expect(ids).toContain('hashimoto-hypothyroidie');
+    expect(ids).toContain('basedow-comprendre');
+    for (const id of ['thyroide', 'basedow', 'analyses', 'traitements', 'quotidien', 'suivi', 'securite']) {
+      expect(library.articles.some((a) => a.category === id), id).toBe(true);
+    }
+  });
+
+  it('never presents a draft as medically reviewed', () => {
+    for (const article of library.articles) {
+      // Tant qu'aucune relecture n'est faite, chaque fiche garde son drapeau
+      expect(article.medicalReviewRequired, article.id).toBe(true);
+      expect(isMedicallyReviewed(article), article.id).toBe(false);
+    }
+  });
+});
+
+describe('isMedicallyReviewed', () => {
+  const base = library.articles[0];
+  it('needs a review date and the editorial flag lifted', () => {
+    const variant = (patch: Partial<EducationArticle>) => ({ ...base, ...patch });
+    expect(isMedicallyReviewed(variant({ reviewedAt: undefined, medicalReviewRequired: false }))).toBe(false);
+    expect(isMedicallyReviewed(variant({ reviewedAt: '2026-11-02', medicalReviewRequired: true }))).toBe(false);
+    expect(isMedicallyReviewed(variant({ reviewedAt: '2026-11-02', medicalReviewRequired: false }))).toBe(true);
+  });
 });
 
 describe('filterArticles', () => {
@@ -43,6 +71,12 @@ describe('filterArticles', () => {
     expect(treatments.length).toBeGreaterThan(0);
     expect(treatments.every((a) => a.category === 'traitements')).toBe(true);
     expect(filterArticles(library.articles, 'traitements', 'tsh')).toEqual([]);
+  });
+
+  it('searches tags and section text', () => {
+    expect(filterArticles(library.articles, ALL_CATEGORIES, 'trab').map((a) => a.id)).toContain('basedow-trab');
+    expect(filterArticles(library.articles, ALL_CATEGORIES, 'orbitopathie').map((a) => a.id))
+      .toEqual(['basedow-yeux']);
   });
 });
 

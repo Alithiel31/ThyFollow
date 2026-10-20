@@ -1,6 +1,6 @@
 // src/pages/ArticlesPage.test.tsx
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -38,15 +38,33 @@ beforeEach(() => {
 });
 
 describe('ArticlesPage — library', () => {
-  it('shows the featured guide and the latest guides instead of an empty state', () => {
+  it('shows the featured guides and the latest guides instead of an empty state', () => {
     renderAt('/learn');
 
     const featured = screen.getByRole('region', { name: 'articles.featured' });
     expect(within(featured).getByRole('link', { name: /Hashimoto et hypothyroïdie/ }))
       .toHaveAttribute('href', '/learn/hashimoto-hypothyroidie');
+    expect(within(featured).getByRole('link', { name: /La maladie de Basedow, c’est quoi/ }))
+      .toHaveAttribute('href', '/learn/basedow-comprendre');
     const latest = screen.getByRole('region', { name: 'articles.latest' });
-    expect(within(latest).getAllByRole('link')).toHaveLength(7);
-    expect(screen.getByText('articles.resultCount:{"count":8}')).toBeInTheDocument();
+    expect(within(latest).getAllByRole('link')).toHaveLength(16);
+    expect(screen.getByText('articles.resultCount:{"count":18}')).toBeInTheDocument();
+  });
+
+  it('offers the Basedow and safety categories with their description', async () => {
+    renderAt('/learn');
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Basedow' }));
+    expect(screen.getByText('Comprendre la maladie, ses symptômes et son suivi')).toBeInTheDocument();
+    const results = screen.getByRole('region', { name: 'articles.results' });
+    expect(within(results).getAllByRole('link')).toHaveLength(5);
+    expect(within(results).getByRole('link', { name: /Basedow et yeux/ })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Sécurité' }));
+    expect(within(screen.getByRole('region', { name: 'articles.results' })).getByRole('link', {
+      name: /Quand une gêne respiratoire est-elle urgente/,
+    })).toBeInTheDocument();
   });
 
   it('filters by category', async () => {
@@ -59,8 +77,9 @@ describe('ArticlesPage — library', () => {
     expect(chip).toHaveAttribute('aria-pressed', 'true');
     expect(screen.queryByRole('region', { name: 'articles.featured' })).not.toBeInTheDocument();
     const results = screen.getByRole('region', { name: 'articles.results' });
-    expect(within(results).getAllByRole('link')).toHaveLength(2);
+    expect(within(results).getAllByRole('link')).toHaveLength(3);
     expect(within(results).getByRole('link', { name: /Bien prendre sa lévothyroxine/ })).toBeInTheDocument();
+    expect(within(results).getByRole('link', { name: /antithyroïdiens de synthèse/ })).toBeInTheDocument();
   });
 
   it('searches without accents and offers a reset when nothing matches', async () => {
@@ -77,7 +96,18 @@ describe('ArticlesPage — library', () => {
 
     await user.click(screen.getByRole('button', { name: 'articles.resetFilters' }));
     expect(input).toHaveValue('');
-    expect(screen.getByText('articles.resultCount:{"count":8}')).toBeInTheDocument();
+    expect(screen.getByText('articles.resultCount:{"count":18}')).toBeInTheDocument();
+  });
+
+  it('searches tags and section text', async () => {
+    renderAt('/learn');
+    const user = userEvent.setup();
+    const input = screen.getByRole('searchbox', { name: 'articles.searchLabel' });
+
+    // « orbitopathie » n'apparaît que dans le texte de la fiche « yeux »
+    await user.type(input, 'orbitopathie');
+    expect(screen.getByRole('link', { name: /Basedow et yeux/ })).toBeInTheDocument();
+    expect(screen.getByText('articles.resultCount:{"count":1}')).toBeInTheDocument();
   });
 
   it('keeps articles published from the admin', async () => {
@@ -117,14 +147,17 @@ describe('ArticlesPage — reader', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('link', { name: /Bien prendre sa lévothyroxine/ }));
 
-    expect(screen.getByText('articles.progress:{"current":1,"total":2}')).toBeInTheDocument();
-    expect(screen.getByText('1 / 2')).toBeInTheDocument();
+    expect(screen.getByText('articles.progress:{"current":1,"total":3}')).toBeInTheDocument();
+    expect(screen.getByText('1 / 3')).toBeInTheDocument();
     expect(screen.getByRole('navigation', { name: 'articles.pagination' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'articles.previous' })).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('link', { name: 'articles.next' }));
     expect(screen.getByRole('heading', { level: 1, name: /Fer, calcium, magnésium/ })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'articles.previous' })).toHaveAttribute('href', '/learn/levothyroxine-prise');
+
+    await user.click(screen.getByRole('link', { name: 'articles.next' }));
+    expect(screen.getByRole('heading', { level: 1, name: /antithyroïdiens de synthèse/ })).toBeInTheDocument();
 
     await user.click(screen.getByRole('link', { name: 'articles.finish' }));
     expect(screen.getByRole('heading', { level: 1, name: 'articles.endTitle' })).toBeInTheDocument();
@@ -135,7 +168,28 @@ describe('ArticlesPage — reader', () => {
   it('renders sections as icon cards when the guide asks for it', () => {
     renderAt('/learn/tsh-t4-t3');
     expect(screen.getByRole('heading', { level: 2, name: 'La TSH' }).closest('li')).not.toBeNull();
-    expect(screen.getByText('articles.progress:{"current":2,"total":8}')).toBeInTheDocument();
+    expect(screen.getByText('articles.progress:{"current":2,"total":18}')).toBeInTheDocument();
+  });
+
+  it('opens a Basedow guide as a draft pending medical review, with safe source links', () => {
+    renderAt('/learn/basedow-antithyroidiens');
+
+    expect(screen.getByRole('heading', { level: 1, name: /antithyroïdiens de synthèse/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Fièvre ou mal de gorge sous traitement' })).toBeInTheDocument();
+    const source = screen.getByRole('link', { name: /NHS — Carbimazole/ });
+    expect(source).toHaveAttribute('target', '_blank');
+    expect(source).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(screen.getByText('articles.reviewPending')).toBeInTheDocument();
+    expect(screen.queryByText(/articles\.reviewedOn/)).not.toBeInTheDocument();
+  });
+
+  it('drops a missing illustration instead of showing a broken image', () => {
+    const { container } = renderAt('/learn/basedow-yeux');
+    const img = container.querySelector('img');
+    expect(img).toHaveAttribute('src', '/assets/comprendre/consultation.webp');
+    fireEvent.error(img as HTMLImageElement);
+    expect(container.querySelector('img')).toBeNull();
+    expect(screen.getByRole('heading', { level: 1, name: /Basedow et yeux/ })).toBeInTheDocument();
   });
 
   it('falls back to the API for slugs that are not local guides', async () => {

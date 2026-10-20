@@ -4,7 +4,7 @@
 // - /learn         : liste (dans l'AppShell)
 // - /learn/:slug   : lecteur plein ecran ; fiche locale, sinon article API
 // - /learn/fin     : ecran de fin du parcours
-import { useEffect, useRef, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -12,14 +12,14 @@ import ReactMarkdown from 'react-markdown';
 import {
   ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Clock, ExternalLink, Search, X,
   Lightbulb, ShieldAlert, TestTube, Pill, Moon, Stethoscope, FlaskConical, Droplet, Activity,
-  NotebookPen, MessageCircle, Sparkles, Leaf,
+  NotebookPen, MessageCircle, Sparkles, Leaf, HeartPulse,
   type LucideIcon,
 } from 'lucide-react';
 import { articlesApi } from '../lib/api';
 import { formatDate } from '../lib/utils';
 import {
   library, ALL_CATEGORIES, LEARN_END_SLUG, categoryTone, filterArticles, findArticle,
-  normalizeSearch, readingSequence, type PastelTone,
+  isMedicallyReviewed, normalizeSearch, readingSequence, type PastelTone,
 } from '../lib/learn';
 import { LogoMark } from '../components/LogoMark';
 import type { EducationArticle } from '../types';
@@ -31,6 +31,7 @@ const TONE_CLASS: Record<PastelTone, string> = {
   lavender: styles.toneLavender,
   mint: styles.toneMint,
   butter: styles.toneButter,
+  rose: styles.toneRose,
 };
 
 const toneOf = (category: string) => TONE_CLASS[categoryTone(category)];
@@ -38,10 +39,12 @@ const toneOf = (category: string) => TONE_CLASS[categoryTone(category)];
 /* Pictogramme de catégorie (liste « Les dernières fiches ») ; la thyroïde
    a la forme d'un papillon, comme le logo */
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  basedow: HeartPulse,
   analyses: TestTube,
   traitements: Pill,
   quotidien: Moon,
   suivi: Stethoscope,
+  securite: ShieldAlert,
 };
 
 function CategoryIcon({ category, size = 20 }: { category: string; size?: number }) {
@@ -55,6 +58,9 @@ const SECTION_ICONS: Record<string, LucideIcon[]> = {
   quotidien: [Activity, NotebookPen, MessageCircle],
 };
 const SECTION_TONES = [styles.toneLavender, styles.toneBlue, styles.toneMint];
+
+// Au-delà, les points ne tiennent plus sur une ligne mobile : le compteur suffit
+const MAX_PAGER_DOTS = 20;
 
 // Recherche de la liste conservée pendant la lecture (?cat=…&q=…)
 type LearnLocationState = { from?: string } | null;
@@ -92,8 +98,10 @@ function Library() {
 
   const filtering = category !== ALL_CATEGORIES || search.trim() !== '';
   const results = filterArticles(library.articles, category, search);
-  const featured = filtering ? undefined : results.find((a) => a.featured);
-  const rest = featured ? results.filter((a) => a !== featured) : results;
+  // Une carte « À la une » par maladie (Hashimoto, Basedow) hors filtrage
+  const featured = filtering ? [] : results.filter((a) => a.featured);
+  const rest = results.filter((a) => !featured.includes(a));
+  const categoryInfo = library.categories.find((c) => c.id === category);
 
   const query = normalizeSearch(search);
   const visibleTeamArticles = category === ALL_CATEGORIES
@@ -155,9 +163,15 @@ function Library() {
         ))}
       </div>
 
-      {featured && (
+      {featured.length > 0 && (
         <section className={styles.section} aria-label={t('articles.featured')}>
-          <FeaturedCard article={featured} from={from} />
+          <ul className={styles.featuredList}>
+            {featured.map((a) => (
+              <li key={a.id}>
+                <FeaturedCard article={a} from={from} />
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 
@@ -170,6 +184,9 @@ function Library() {
             {t('articles.resultCount', { count: results.length })}
           </p>
         </div>
+        {category !== ALL_CATEGORIES && categoryInfo?.description && (
+          <p className={styles.categoryNote}>{categoryInfo.description}</p>
+        )}
 
         {results.length === 0 ? (
           <div className={styles.empty}>
@@ -245,10 +262,20 @@ function FeaturedCard({ article, from }: { article: EducationArticle; from: stri
           <ArrowRight size={17} aria-hidden="true" />
         </div>
       </div>
-      <div className={styles.featuredMedia}>
-        <img src={article.image} alt="" decoding="async" width={758} height={500} />
-      </div>
+      <Illustration key={article.image} src={article.image} className={styles.featuredMedia} />
     </Link>
+  );
+}
+
+/* Illustration décorative (alt vide) : si le fichier manque, on retire le
+   cadre plutôt que d'afficher une image cassée */
+function Illustration({ src, className }: { src: string; className: string }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return null;
+  return (
+    <div className={className}>
+      <img src={src} alt="" decoding="async" width={758} height={500} onError={() => setFailed(true)} />
+    </div>
   );
 }
 
@@ -328,9 +355,7 @@ function EducationReader({ article }: { article: EducationArticle }) {
           <p className={styles.lead}>{article.summary}</p>
         </header>
 
-        <div className={styles.readerMedia}>
-          <img src={article.image} alt="" decoding="async" width={758} height={500} />
-        </div>
+        <Illustration key={article.image} src={article.image} className={styles.readerMedia} />
 
         <p className={styles.intro}>{article.intro}</p>
 
@@ -406,7 +431,7 @@ function EducationReader({ article }: { article: EducationArticle }) {
 
         <p className={styles.review}>
           <ShieldAlert size={15} aria-hidden="true" />
-          {article.reviewedAt
+          {isMedicallyReviewed(article) && article.reviewedAt
             ? t('articles.reviewedOn', { date: formatDate(article.reviewedAt) })
             : t('articles.reviewPending')}
         </p>
@@ -424,7 +449,7 @@ function EducationReader({ article }: { article: EducationArticle }) {
           </span>
         )}
         <span className={styles.dots} aria-hidden="true">
-          {list.map((a, i) => (
+          {list.length <= MAX_PAGER_DOTS && list.map((a, i) => (
             <span key={a.id} className={`${styles.dot} ${i === index ? styles.dotActive : ''}`} />
           ))}
         </span>
