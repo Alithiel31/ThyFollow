@@ -575,7 +575,6 @@
     "reviewedOn": "Reviewed by a healthcare professional on {{date}}.",
     "teamArticles": "Articles from the team",
     "backToLibrary": "Back to the library",
-    "frenchOnly": "These guides are currently available in French only.",
     "latest": "Latest guides",
     "results": "Results",
     "progress": "Guide {{current}} of {{total}}",
@@ -585,7 +584,42 @@
     "endTitle": "Understand better to live better",
     "endSubtitle": "Clear, accessible information suited to your daily life.",
     "backHome": "Back to home",
-    "pagination": "Guide navigation"
+    "pagination": "Guide navigation",
+    "disclaimerReader": "This content is for information only and does not replace medical advice: it cannot be used to make a diagnosis or adjust a treatment. Discuss your situation with your doctor or endocrinologist.",
+    "frenchOnlyGuide": "This guide has not been translated yet and is shown in French.",
+    "categories": {
+      "tous": {
+        "label": "All"
+      },
+      "thyroide": {
+        "label": "Thyroid basics",
+        "description": "The basics shared by thyroid conditions"
+      },
+      "basedow": {
+        "label": "Graves’ disease",
+        "description": "Understanding the condition, its symptoms and follow-up"
+      },
+      "analyses": {
+        "label": "Tests and results",
+        "description": "Understanding results in context"
+      },
+      "traitements": {
+        "label": "Treatments",
+        "description": "Treatments and good habits"
+      },
+      "quotidien": {
+        "label": "Daily life",
+        "description": "Living better with a thyroid condition"
+      },
+      "suivi": {
+        "label": "Medical follow-up",
+        "description": "Preparing appointments and following treatment over time"
+      },
+      "securite": {
+        "label": "Safety",
+        "description": "Recognising situations that need medical advice"
+      }
+    }
   },
   "adminArticles": {
     "title": "Writing",

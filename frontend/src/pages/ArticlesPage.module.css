@@ -231,6 +231,7 @@
   font-size: 0.78rem; font-weight: 600;
   box-shadow: inset 0 0 0 1px rgba(20, 40, 77, 0.05);
 }
+.readerHeader .langNote { margin: 0 0 12px; }
 .readerTitle {
   font-family: var(--font-editorial); font-style: italic; font-weight: 600;
   font-size: 2.9rem; line-height: 1.02; letter-spacing: -0.025em; color: var(--text);

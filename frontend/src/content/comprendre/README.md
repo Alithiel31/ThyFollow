@@ -4,14 +4,24 @@ Contenu de la bibliothèque de l'onglet **Comprendre** (`/learn`). Il est livré
 s'affiche sans appel à l'API. Les articles rédigés depuis `/admin/articles` restent servis par le
 backend et apparaissent en plus, dans la section « Articles de l'équipe ».
 
-- `content.fr.json` : catégories et fiches. Le type est `EducationLibrary` dans `src/types/index.ts`,
-  et la logique de filtrage se trouve dans `src/lib/learn.ts`.
+- `content.fr.json` : la **base** — structure de chaque fiche (catégorie, image, durée, style,
+  « À la une ») et son texte français. Type `EducationLibrary` (`src/types/index.ts`).
+- `content.en.json` : les **traductions anglaises**, par `id`, sans la structure (titre, résumé,
+  intro, sections, « À retenir », sources, `tags`, statut de relecture). Type
+  `EducationTranslations`. La fusion se fait dans `localize` / `getLibrary` (`src/lib/learn.ts`),
+  selon la langue de l'interface.
+- Une fiche absente de `content.en.json` s'affiche en français dans l'interface anglaise, avec la
+  note `articles.frenchOnlyGuide` et `lang="fr"` pour les lecteurs d'écran. `learn.test.ts` exige
+  aujourd'hui une traduction pour chaque fiche, avec le même nombre de sections et les mêmes URL de
+  sources : ajouter une fiche, c'est l'ajouter aux deux fichiers.
+- Catégories : ordre et teinte dans `CATEGORIES` / `CATEGORY_TONES` (`src/lib/learn.ts`) ; libellé
+  et description dans les fichiers de traduction (`articles.categories.<id>` de
+  `src/locales/{fr,en}/common.json`). La description s'affiche sous la liste quand le filtre est
+  actif. L'avertissement du lecteur est `articles.disclaimerReader`.
 - Illustrations : `frontend/public/assets/comprendre/*.webp`, référencées par `image`
   (`/assets/comprendre/…`). `src/lib/learn.test.ts` vérifie que chaque chemin existe.
 - L'`id` d'une fiche sert d'URL (`/learn/<id>`) et passe avant un article API qui aurait le même slug
   (`fin` est réservé à l'écran de fin).
-- La teinte pastel d'une catégorie est définie dans `CATEGORY_TONES` (`src/lib/learn.ts`) ; une
-  catégorie peut avoir une `description`, affichée sous la liste quand le filtre est actif.
 - `tags` (optionnel) : mots-clés pris en compte par la recherche, qui couvre aussi le titre, le
   résumé, l'introduction, les sections et « À retenir ».
 - Les fiches marquées `featured` apparaissent toutes dans « À la une » (une par maladie).
@@ -28,6 +38,19 @@ Les 18 fiches actuelles sont des **brouillons pédagogiques** : les 8 fiches d'o
 Chaque fiche porte `"medicalReviewRequired": true`. Tant que ce drapeau est vrai ou que `reviewedAt`
 manque, l'app affiche « Fiche pédagogique en attente de relecture par un professionnel de santé »
 (`isMedicallyReviewed` dans `src/lib/learn.ts`, vérifié par `learn.test.ts`).
+
+**Les traductions anglaises se relisent comme des originaux.** Elles ont été rédigées par Claude
+Code à partir des brouillons français : chacune porte son propre `medicalReviewRequired: true` et
+son propre `reviewedAt`. La relecture du français ne valide jamais l'anglais (`localize` ne recopie
+pas le statut). Points d'attention propres à l'anglais :
+
+- les sources Ameli, ANSES, Service-Public et base des médicaments sont en français (libellé
+  « (in French) ») : une source anglophone équivalente serait préférable ;
+- les numéros d'urgence (`urgence-difficulte-respiratoire`) citent le 112 (Union européenne) et le
+  15 (France) ; un public britannique ou nord-américain attend le 999 ou le 911 : à décider selon le
+  public visé, puis à relire ;
+- la terminologie (« Graves’ disease », « antithyroid medicines », FT4/FT3, « thyroid eye
+  disease ») est à confirmer par le relecteur.
 
 Lors de l'intégration du pack Basedow, le tutoiement a été remplacé par le vouvoiement des fiches
 existantes, sans autre changement de texte. Les champs du pack ont été renommés (`subtitle` →
@@ -57,7 +80,8 @@ Pour chaque fiche :
    Ces sources sont en anglais (sauf Service-Public) : une source française équivalente (HAS,
    Assurance Maladie, ANSM) serait plus adaptée.
 3. Une fois la fiche validée, ajouter `"reviewedAt": "AAAA-MM-JJ"` et passer
-   `"medicalReviewRequired"` à `false`. L'app affiche alors « Relue par un professionnel de santé
+   `"medicalReviewRequired"` à `false` — dans `content.fr.json` pour le français, dans
+   `content.en.json` pour l'anglais, chacun après sa propre relecture. L'app affiche alors « Relue par un professionnel de santé
    le … ». Le test `never presents a draft as medically reviewed` de `learn.test.ts` devra alors
    être adapté.
 

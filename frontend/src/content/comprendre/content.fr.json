@@ -1,56 +1,12 @@
 {
   "meta": {
-    "title": "Comprendre",
-    "subtitle": "La thyroïde, Hashimoto, Basedow, les bonnes pratiques et ce que disent vos analyses.",
-    "disclaimer": "Ces contenus sont informatifs et ne remplacent pas un avis médical : ils ne permettent pas de poser un diagnostic ni d’adapter un traitement. Parlez de votre situation avec votre médecin ou votre endocrinologue.",
+    "locale": "fr",
     "reviewStatus": "Brouillons pédagogiques — faire relire par un professionnel de santé avant publication."
   },
-  "categories": [
-    {
-      "id": "tous",
-      "label": "Tous"
-    },
-    {
-      "id": "thyroide",
-      "label": "Comprendre la thyroïde",
-      "description": "Les bases communes aux maladies thyroïdiennes"
-    },
-    {
-      "id": "basedow",
-      "label": "Basedow",
-      "description": "Comprendre la maladie, ses symptômes et son suivi"
-    },
-    {
-      "id": "analyses",
-      "label": "Analyses et examens",
-      "description": "Comprendre les résultats dans leur contexte"
-    },
-    {
-      "id": "traitements",
-      "label": "Traitements",
-      "description": "Les traitements et les bons réflexes"
-    },
-    {
-      "id": "quotidien",
-      "label": "Au quotidien",
-      "description": "Mieux vivre avec une maladie thyroïdienne"
-    },
-    {
-      "id": "suivi",
-      "label": "Suivi médical",
-      "description": "Préparer ses rendez-vous et suivre son traitement dans le temps"
-    },
-    {
-      "id": "securite",
-      "label": "Sécurité",
-      "description": "Reconnaître les situations nécessitant un avis médical"
-    }
-  ],
   "articles": [
     {
       "id": "hashimoto-hypothyroidie",
       "category": "thyroide",
-      "categoryLabel": "Comprendre la thyroïde",
       "readMinutes": 3,
       "featured": true,
       "title": "Hashimoto et hypothyroïdie : quelle différence ?",
@@ -88,7 +44,6 @@
       "id": "tsh-t4-t3",
       "sectionStyle": "cards",
       "category": "analyses",
-      "categoryLabel": "Analyses et examens",
       "readMinutes": 2,
       "title": "TSH, T4L, T3L : comprendre les sigles",
       "summary": "Ces marqueurs n’ont pas le même rôle. Découvrez à quoi ils servent et pourquoi ils se lisent ensemble.",
@@ -125,7 +80,6 @@
       "id": "levothyroxine-prise",
       "sectionStyle": "checklist",
       "category": "traitements",
-      "categoryLabel": "Traitements",
       "readMinutes": 3,
       "title": "Bien prendre sa lévothyroxine",
       "summary": "Les conditions de prise peuvent influencer l’absorption du traitement. Quelques repères utiles au quotidien.",
@@ -161,7 +115,6 @@
     {
       "id": "interactions-mineraux",
       "category": "traitements",
-      "categoryLabel": "Traitements",
       "readMinutes": 2,
       "title": "Fer, calcium, magnésium : attention aux interactions",
       "summary": "Certains compléments peuvent gêner l’absorption de la lévothyroxine lorsqu’ils sont pris trop près.",
@@ -198,7 +151,6 @@
       "id": "fatigue-symptomes",
       "sectionStyle": "cards",
       "category": "quotidien",
-      "categoryLabel": "Au quotidien",
       "readMinutes": 3,
       "title": "Fatigue, sommeil, humeur : est-ce lié ?",
       "summary": "Ces symptômes sont fréquents, mais peuvent avoir plusieurs causes. Apprenez à les décrire et à les suivre.",
@@ -235,7 +187,6 @@
       "id": "preparer-consultation",
       "sectionStyle": "checklist",
       "category": "suivi",
-      "categoryLabel": "Suivi médical",
       "readMinutes": 2,
       "title": "Préparer une consultation efficace",
       "summary": "Quelques notes en amont peuvent vous aider à parler de ce qui compte vraiment pour vous.",
@@ -271,7 +222,6 @@
     {
       "id": "suivi-tsh",
       "category": "analyses",
-      "categoryLabel": "Analyses et examens",
       "readMinutes": 2,
       "title": "Pourquoi contrôler la TSH après un changement ?",
       "summary": "Le suivi biologique se planifie dans le temps : le bon moment dépend de votre situation et de la prescription.",
@@ -307,7 +257,6 @@
     {
       "id": "idees-recues-alimentation",
       "category": "quotidien",
-      "categoryLabel": "Au quotidien",
       "readMinutes": 3,
       "title": "Alimentation et thyroïde : démêler les idées reçues",
       "summary": "Aucun aliment miracle ne remplace le suivi médical. Méfiez-vous des restrictions et compléments présentés comme indispensables.",
@@ -343,7 +292,6 @@
     {
       "id": "basedow-comprendre",
       "category": "basedow",
-      "categoryLabel": "Basedow",
       "readMinutes": 3,
       "featured": true,
       "title": "La maladie de Basedow, c’est quoi ?",
@@ -389,7 +337,6 @@
     {
       "id": "basedow-hashimoto-differences",
       "category": "basedow",
-      "categoryLabel": "Basedow",
       "readMinutes": 3,
       "title": "Basedow et Hashimoto : quelles différences ?",
       "summary": "Deux maladies auto-immunes, avec des effets possibles différents sur la thyroïde.",
@@ -434,7 +381,6 @@
     {
       "id": "basedow-trab",
       "category": "analyses",
-      "categoryLabel": "Analyses et examens",
       "readMinutes": 2,
       "title": "À quoi servent les anticorps TRAb ?",
       "summary": "Un repère biologique important dans l’exploration de Basedow.",
@@ -475,7 +421,6 @@
     {
       "id": "basedow-symptomes",
       "category": "basedow",
-      "categoryLabel": "Basedow",
       "readMinutes": 3,
       "title": "Reconnaître les signes possibles de l’hyperthyroïdie",
       "summary": "Les symptômes peuvent toucher le corps, le sommeil et l’humeur.",
@@ -516,7 +461,6 @@
     {
       "id": "basedow-yeux",
       "category": "basedow",
-      "categoryLabel": "Basedow",
       "readMinutes": 3,
       "title": "Basedow et yeux : quels signes surveiller ?",
       "summary": "L’atteinte oculaire thyroïdienne mérite une attention particulière.",
@@ -557,7 +501,6 @@
     {
       "id": "basedow-antithyroidiens",
       "category": "traitements",
-      "categoryLabel": "Traitements",
       "readMinutes": 3,
       "title": "Comprendre les antithyroïdiens de synthèse",
       "summary": "À quoi servent-ils et pourquoi le suivi est-il important ?",
@@ -598,7 +541,6 @@
     {
       "id": "basedow-remission-rechute",
       "category": "basedow",
-      "categoryLabel": "Basedow",
       "readMinutes": 3,
       "title": "Rémission et rechute : comprendre le suivi de Basedow",
       "summary": "L’évolution varie d’une personne à l’autre et demande un suivi adapté.",
@@ -639,7 +581,6 @@
     {
       "id": "hyperthyroidie-analyses",
       "category": "analyses",
-      "categoryLabel": "Analyses et examens",
       "readMinutes": 3,
       "title": "TSH, T4L et T3L : comprendre le bilan d’hyperthyroïdie",
       "summary": "Les résultats se comprennent ensemble, jamais isolément.",
@@ -682,7 +623,6 @@
       "id": "basedow-preparer-consultation",
       "sectionStyle": "checklist",
       "category": "quotidien",
-      "categoryLabel": "Au quotidien",
       "readMinutes": 2,
       "title": "Préparer son rendez-vous quand on a Basedow",
       "summary": "Quelques notes simples pour rendre la consultation plus utile.",
@@ -723,7 +663,6 @@
     {
       "id": "urgence-difficulte-respiratoire",
       "category": "securite",
-      "categoryLabel": "Sécurité",
       "readMinutes": 1,
       "title": "Quand une gêne respiratoire est-elle urgente ?",
       "summary": "Ne pas attendre une fiche ou un rendez-vous si la respiration devient difficile.",

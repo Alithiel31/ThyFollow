@@ -575,7 +575,6 @@
     "reviewedOn": "Relue par un professionnel de santé le {{date}}.",
     "teamArticles": "Articles de l’équipe",
     "backToLibrary": "Retour à la bibliothèque",
-    "frenchOnly": "Ces fiches sont pour l’instant disponibles en français uniquement.",
     "latest": "Les dernières fiches",
     "results": "Résultats",
     "progress": "Fiche {{current}} sur {{total}}",
@@ -585,7 +584,42 @@
     "endTitle": "Mieux comprendre pour mieux vivre",
     "endSubtitle": "Des informations claires et accessibles, adaptées à votre quotidien.",
     "backHome": "Retour à l’accueil",
-    "pagination": "Navigation entre les fiches"
+    "pagination": "Navigation entre les fiches",
+    "disclaimerReader": "Ces contenus sont informatifs et ne remplacent pas un avis médical : ils ne permettent pas de poser un diagnostic ni d’adapter un traitement. Parlez de votre situation avec votre médecin ou votre endocrinologue.",
+    "frenchOnlyGuide": "Cette fiche n’est pas encore traduite : elle s’affiche en français.",
+    "categories": {
+      "tous": {
+        "label": "Tous"
+      },
+      "thyroide": {
+        "label": "Comprendre la thyroïde",
+        "description": "Les bases communes aux maladies thyroïdiennes"
+      },
+      "basedow": {
+        "label": "Basedow",
+        "description": "Comprendre la maladie, ses symptômes et son suivi"
+      },
+      "analyses": {
+        "label": "Analyses et examens",
+        "description": "Comprendre les résultats dans leur contexte"
+      },
+      "traitements": {
+        "label": "Traitements",
+        "description": "Les traitements et les bons réflexes"
+      },
+      "quotidien": {
+        "label": "Au quotidien",
+        "description": "Mieux vivre avec une maladie thyroïdienne"
+      },
+      "suivi": {
+        "label": "Suivi médical",
+        "description": "Préparer ses rendez-vous et suivre son traitement dans le temps"
+      },
+      "securite": {
+        "label": "Sécurité",
+        "description": "Reconnaître les situations nécessitant un avis médical"
+      }
+    }
   },
   "adminArticles": {
     "title": "Rédaction",

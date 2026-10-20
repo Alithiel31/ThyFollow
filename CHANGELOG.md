@@ -20,8 +20,9 @@ pas synchronisé avec ces tags.
 - Faire relire les fiches « Comprendre » par un médecin ou un pharmacien, vérifier leurs sources,
   puis renseigner `reviewedAt` et passer `medicalReviewRequired` à `false` (voir
   `frontend/src/content/comprendre/README.md`). Priorité aux 10 fiches Basedow (consignes
-  d'urgence, antithyroïdiens) et aux liens à confirmer listés dans ce README. Le contenu
-  n'existe qu'en français ; l'interface anglaise l'indique.
+  d'urgence, antithyroïdiens) et aux liens à confirmer listés dans ce README. Les traductions
+  anglaises (`content.en.json`) demandent leur propre relecture, notamment les numéros d'urgence
+  et des sources anglophones à la place des sources françaises.
 - Étendre la couverture de tests frontend au-delà des formulaires d'auth/médicaments (LogPage,
   LabResultsPage, AppointmentsPage, ProfilePage).
 - Suivi d'erreurs en production (Sentry ou équivalent) — aujourd'hui, un crash en prod ne
@@ -44,6 +45,13 @@ pas synchronisé avec ces tags.
 
 ### Added
 
+- **« Comprendre » en anglais.** Les 18 fiches sont traduites (`content.en.json`, textes seuls,
+  par `id` ; la structure reste dans `content.fr.json`) et s'affichent selon la langue de
+  l'interface. Une fiche non traduite retombe sur le français avec une note et `lang="fr"`.
+  Libellés et descriptions des catégories et avertissement du lecteur passent dans les fichiers
+  de traduction (`articles.categories.*`, `articles.disclaimerReader`) ; le champ `categoryLabel`
+  disparaît des fiches. La note « disponible en français uniquement » de la liste est retirée.
+  **Les traductions sont des brouillons non relus**, avec leur propre statut de relecture.
 - **« Comprendre » couvre la maladie de Basedow.** 10 nouvelles fiches (brouillons pédagogiques
   du pack éditorial Basedow) : la maladie, différences avec Hashimoto, signes possibles, yeux,
   anticorps TRAb, bilan TSH/T4L/T3L, antithyroïdiens, rémission et rechute, préparer son
