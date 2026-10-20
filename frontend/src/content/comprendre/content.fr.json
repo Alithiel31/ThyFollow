@@ -1,41 +1,12 @@
 {
   "meta": {
-    "title": "Comprendre",
-    "subtitle": "La thyroïde, les bonnes pratiques et ce que disent vos analyses.",
-    "disclaimer": "Ces contenus sont informatifs et ne remplacent pas un avis médical. Parlez de votre situation avec votre médecin ou votre endocrinologue.",
+    "locale": "fr",
     "reviewStatus": "Brouillons pédagogiques — faire relire par un professionnel de santé avant publication."
   },
-  "categories": [
-    {
-      "id": "tous",
-      "label": "Tous"
-    },
-    {
-      "id": "thyroide",
-      "label": "Thyroïde"
-    },
-    {
-      "id": "analyses",
-      "label": "Analyses"
-    },
-    {
-      "id": "traitements",
-      "label": "Traitements"
-    },
-    {
-      "id": "quotidien",
-      "label": "Quotidien"
-    },
-    {
-      "id": "suivi",
-      "label": "Suivi médical"
-    }
-  ],
   "articles": [
     {
       "id": "hashimoto-hypothyroidie",
       "category": "thyroide",
-      "categoryLabel": "Thyroïde",
       "readMinutes": 3,
       "featured": true,
       "title": "Hashimoto et hypothyroïdie : quelle différence ?",
@@ -66,13 +37,13 @@
           "label": "Assurance Maladie — Hypothyroïdie",
           "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
         }
-      ]
+      ],
+      "medicalReviewRequired": true
     },
     {
       "id": "tsh-t4-t3",
       "sectionStyle": "cards",
       "category": "analyses",
-      "categoryLabel": "Analyses",
       "readMinutes": 2,
       "title": "TSH, T4L, T3L : comprendre les sigles",
       "summary": "Ces marqueurs n’ont pas le même rôle. Découvrez à quoi ils servent et pourquoi ils se lisent ensemble.",
@@ -102,13 +73,13 @@
           "label": "Assurance Maladie — Hypothyroïdie",
           "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
         }
-      ]
+      ],
+      "medicalReviewRequired": true
     },
     {
       "id": "levothyroxine-prise",
       "sectionStyle": "checklist",
       "category": "traitements",
-      "categoryLabel": "Traitements",
       "readMinutes": 3,
       "title": "Bien prendre sa lévothyroxine",
       "summary": "Les conditions de prise peuvent influencer l’absorption du traitement. Quelques repères utiles au quotidien.",
@@ -138,12 +109,12 @@
           "label": "Base de données publique des médicaments",
           "url": "https://base-donnees-publique.medicaments.gouv.fr/"
         }
-      ]
+      ],
+      "medicalReviewRequired": true
     },
     {
       "id": "interactions-mineraux",
       "category": "traitements",
-      "categoryLabel": "Traitements",
       "readMinutes": 2,
       "title": "Fer, calcium, magnésium : attention aux interactions",
       "summary": "Certains compléments peuvent gêner l’absorption de la lévothyroxine lorsqu’ils sont pris trop près.",
@@ -173,13 +144,13 @@
           "label": "Base de données publique des médicaments",
           "url": "https://base-donnees-publique.medicaments.gouv.fr/"
         }
-      ]
+      ],
+      "medicalReviewRequired": true
     },
     {
       "id": "fatigue-symptomes",
       "sectionStyle": "cards",
       "category": "quotidien",
-      "categoryLabel": "Quotidien",
       "readMinutes": 3,
       "title": "Fatigue, sommeil, humeur : est-ce lié ?",
       "summary": "Ces symptômes sont fréquents, mais peuvent avoir plusieurs causes. Apprenez à les décrire et à les suivre.",
@@ -209,13 +180,13 @@
           "label": "Assurance Maladie — Hypothyroïdie",
           "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
         }
-      ]
+      ],
+      "medicalReviewRequired": true
     },
     {
       "id": "preparer-consultation",
       "sectionStyle": "checklist",
       "category": "suivi",
-      "categoryLabel": "Suivi médical",
       "readMinutes": 2,
       "title": "Préparer une consultation efficace",
       "summary": "Quelques notes en amont peuvent vous aider à parler de ce qui compte vraiment pour vous.",
@@ -245,12 +216,12 @@
           "label": "Service-Public.fr — Santé",
           "url": "https://www.service-public.fr/particuliers/vosdroits/N19806"
         }
-      ]
+      ],
+      "medicalReviewRequired": true
     },
     {
       "id": "suivi-tsh",
       "category": "analyses",
-      "categoryLabel": "Analyses",
       "readMinutes": 2,
       "title": "Pourquoi contrôler la TSH après un changement ?",
       "summary": "Le suivi biologique se planifie dans le temps : le bon moment dépend de votre situation et de la prescription.",
@@ -280,12 +251,12 @@
           "label": "Assurance Maladie — Hypothyroïdie",
           "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
         }
-      ]
+      ],
+      "medicalReviewRequired": true
     },
     {
       "id": "idees-recues-alimentation",
       "category": "quotidien",
-      "categoryLabel": "Quotidien",
       "readMinutes": 3,
       "title": "Alimentation et thyroïde : démêler les idées reçues",
       "summary": "Aucun aliment miracle ne remplace le suivi médical. Méfiez-vous des restrictions et compléments présentés comme indispensables.",
@@ -315,7 +286,415 @@
           "label": "ANSES — Compléments alimentaires",
           "url": "https://www.anses.fr/fr/content/les-complements-alimentaires"
         }
-      ]
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "basedow-comprendre",
+      "category": "basedow",
+      "readMinutes": 3,
+      "featured": true,
+      "title": "La maladie de Basedow, c’est quoi ?",
+      "summary": "Comprendre une maladie auto-immune qui peut provoquer une hyperthyroïdie.",
+      "image": "/assets/comprendre/thyroide.webp",
+      "tags": [
+        "Basedow",
+        "auto-immunité",
+        "hyperthyroïdie"
+      ],
+      "intro": "La maladie de Basedow est une maladie auto-immune. Le système immunitaire produit notamment des anticorps qui stimulent le récepteur de la TSH et peuvent pousser la thyroïde à fabriquer trop d’hormones.",
+      "sections": [
+        {
+          "heading": "Que se passe-t-il dans le corps ?",
+          "body": "La stimulation de la thyroïde peut entraîner une hyperthyroïdie. Les manifestations et leur intensité varient d’une personne à l’autre."
+        },
+        {
+          "heading": "Quels signes peuvent apparaître ?",
+          "body": "Palpitations, tremblements, intolérance à la chaleur, transpiration, nervosité, fatigue, transit accéléré ou perte de poids peuvent survenir. Ces signes ne suffisent pas à eux seuls à établir un diagnostic."
+        },
+        {
+          "heading": "Comment le diagnostic est-il exploré ?",
+          "body": "Le médecin s’appuie sur les symptômes, l’examen clinique et des analyses sanguines, notamment TSH et hormones thyroïdiennes. Les anticorps anti-récepteur de la TSH (TRAb) peuvent aider à confirmer Basedow."
+        }
+      ],
+      "takeaways": [
+        "Basedow est une maladie auto-immune, mais toutes les hyperthyroïdies ne sont pas dues à Basedow.",
+        "Les symptômes et les résultats doivent être interprétés ensemble.",
+        "Le suivi et le traitement sont individualisés avec l’équipe médicale."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Overactive thyroid (hyperthyroidism)",
+          "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/"
+        },
+        {
+          "label": "NIDDK — Graves’ Disease",
+          "url": "https://www.niddk.nih.gov/health-information/endocrine-diseases/graves-disease"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "basedow-hashimoto-differences",
+      "category": "basedow",
+      "readMinutes": 3,
+      "title": "Basedow et Hashimoto : quelles différences ?",
+      "summary": "Deux maladies auto-immunes, avec des effets possibles différents sur la thyroïde.",
+      "image": "/assets/comprendre/thyroide.webp",
+      "tags": [
+        "Basedow",
+        "Hashimoto",
+        "comparaison"
+      ],
+      "intro": "Basedow et Hashimoto sont deux maladies auto-immunes de la thyroïde. Elles ne sont pas interchangeables et leur évolution peut être différente.",
+      "sections": [
+        {
+          "heading": "Basedow",
+          "body": "Les anticorps stimulants du récepteur de la TSH peuvent conduire à une production excessive d’hormones thyroïdiennes : une hyperthyroïdie."
+        },
+        {
+          "heading": "Hashimoto",
+          "body": "L’inflammation auto-immune peut progressivement réduire la capacité de la thyroïde à produire suffisamment d’hormones, conduisant à une hypothyroïdie. Des variations existent et le contexte médical compte."
+        },
+        {
+          "heading": "Pourquoi cette distinction est-elle importante ?",
+          "body": "Les examens, les traitements et la surveillance dépendent de la cause et de l’état hormonal. Seul un professionnel peut interpréter la situation individuelle."
+        }
+      ],
+      "takeaways": [
+        "Les deux maladies impliquent le système immunitaire.",
+        "Basedow est fréquemment associée à l’hyperthyroïdie ; Hashimoto à l’hypothyroïdie.",
+        "Il ne faut pas déduire la maladie d’un seul symptôme ou d’une seule valeur biologique."
+      ],
+      "sources": [
+        {
+          "label": "NIDDK — Graves’ Disease",
+          "url": "https://www.niddk.nih.gov/health-information/endocrine-diseases/graves-disease"
+        },
+        {
+          "label": "NIDDK — Hashimoto’s Disease",
+          "url": "https://www.niddk.nih.gov/health-information/endocrine-diseases/hashimotos-disease"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "basedow-trab",
+      "category": "analyses",
+      "readMinutes": 2,
+      "title": "À quoi servent les anticorps TRAb ?",
+      "summary": "Un repère biologique important dans l’exploration de Basedow.",
+      "image": "/assets/comprendre/analyses.webp",
+      "tags": [
+        "TRAb",
+        "anticorps",
+        "analyses"
+      ],
+      "intro": "Les TRAb sont des anticorps dirigés contre le récepteur de la TSH. Certains peuvent stimuler ce récepteur et contribuer à l’hyperthyroïdie de Basedow.",
+      "sections": [
+        {
+          "heading": "Pourquoi les doser ?",
+          "body": "Dans un contexte compatible, le dosage peut aider le médecin à identifier la cause d’une hyperthyroïdie et contribuer au suivi selon la situation."
+        },
+        {
+          "heading": "Un résultat positif suffit-il ?",
+          "body": "Non : il s’interprète avec les symptômes, l’examen clinique, la TSH, les hormones thyroïdiennes et les méthodes du laboratoire."
+        },
+        {
+          "heading": "Et si le résultat est négatif ?",
+          "body": "Un résultat négatif ne doit pas être interprété seul pour exclure toutes les causes possibles. Le médecin décide si d’autres examens sont utiles."
+        }
+      ],
+      "takeaways": [
+        "TRAb signifie anticorps anti-récepteur de la TSH.",
+        "Le résultat se lit avec le reste du bilan.",
+        "Demandez au professionnel de santé ce que ce résultat change concrètement pour votre suivi."
+      ],
+      "sources": [
+        {
+          "label": "NIDDK — Graves’ Disease",
+          "url": "https://www.niddk.nih.gov/health-information/endocrine-diseases/graves-disease"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "basedow-symptomes",
+      "category": "basedow",
+      "readMinutes": 3,
+      "title": "Reconnaître les signes possibles de l’hyperthyroïdie",
+      "summary": "Les symptômes peuvent toucher le corps, le sommeil et l’humeur.",
+      "image": "/assets/comprendre/thyroide.webp",
+      "tags": [
+        "symptômes",
+        "hyperthyroïdie",
+        "Basedow"
+      ],
+      "intro": "Quand la thyroïde produit trop d’hormones, plusieurs fonctions du corps peuvent être accélérées. Les manifestations varient et peuvent avoir d’autres causes.",
+      "sections": [
+        {
+          "heading": "Signes physiques possibles",
+          "body": "Palpitations, tremblements, chaleur inhabituelle, transpiration, perte de poids involontaire ou transit plus rapide peuvent apparaître."
+        },
+        {
+          "heading": "Énergie et humeur",
+          "body": "Certaines personnes ressentent nervosité, irritabilité, anxiété ou difficultés de sommeil, tout en étant très fatiguées."
+        },
+        {
+          "heading": "Que noter dans ThyroTrack ?",
+          "body": "Notez la date, les symptômes, leur intensité, les circonstances et les changements récents. Ces observations peuvent aider à préparer une consultation, sans remplacer l’évaluation médicale."
+        }
+      ],
+      "takeaways": [
+        "Un symptôme isolé ne permet pas de diagnostiquer une hyperthyroïdie.",
+        "Des symptômes nouveaux, persistants ou qui s’aggravent méritent un avis médical.",
+        "Une douleur thoracique, un malaise important ou un essoufflement sévère justifient une prise en charge urgente."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Overactive thyroid (hyperthyroidism)",
+          "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "basedow-yeux",
+      "category": "basedow",
+      "readMinutes": 3,
+      "title": "Basedow et yeux : quels signes surveiller ?",
+      "summary": "L’atteinte oculaire thyroïdienne mérite une attention particulière.",
+      "image": "/assets/comprendre/consultation.webp",
+      "tags": [
+        "yeux",
+        "ophtalmologie",
+        "Basedow"
+      ],
+      "intro": "La maladie de Basedow peut être associée à une atteinte inflammatoire des tissus autour des yeux, appelée orbitopathie thyroïdienne. Elle ne concerne pas toutes les personnes atteintes.",
+      "sections": [
+        {
+          "heading": "Quels signes peuvent apparaître ?",
+          "body": "Sécheresse, sensation de sable, rougeur, gonflement des paupières, yeux plus saillants ou vision double peuvent notamment survenir."
+        },
+        {
+          "heading": "Quand demander un avis ?",
+          "body": "Signalez rapidement tout symptôme oculaire nouveau à un professionnel de santé. Une baisse de vision, une modification de la perception des couleurs ou une douleur oculaire importante nécessite une évaluation urgente."
+        },
+        {
+          "heading": "Pourquoi le signaler ?",
+          "body": "Le suivi peut nécessiter une coordination entre le médecin qui suit la thyroïde et un ophtalmologiste."
+        }
+      ],
+      "takeaways": [
+        "Les symptômes oculaires doivent être signalés.",
+        "Ne supposez pas qu’un problème de vision vient forcément de Basedow.",
+        "Une baisse de vision soudaine ou importante est une urgence."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Thyroid eye disease",
+          "url": "https://www.nhs.uk/conditions/thyroid-eye-disease/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "basedow-antithyroidiens",
+      "category": "traitements",
+      "readMinutes": 3,
+      "title": "Comprendre les antithyroïdiens de synthèse",
+      "summary": "À quoi servent-ils et pourquoi le suivi est-il important ?",
+      "image": "/assets/comprendre/traitement.webp",
+      "tags": [
+        "traitement",
+        "antithyroïdiens",
+        "sécurité"
+      ],
+      "intro": "Les antithyroïdiens de synthèse, prescrits dans certaines situations d’hyperthyroïdie, diminuent la fabrication des hormones thyroïdiennes. Le choix et la durée du traitement dépendent de la situation individuelle.",
+      "sections": [
+        {
+          "heading": "Un suivi est nécessaire",
+          "body": "Des prises de sang et des consultations permettent au professionnel de santé de surveiller l’évolution et d’adapter la prise en charge."
+        },
+        {
+          "heading": "Fièvre ou mal de gorge sous traitement",
+          "body": "Certains antithyroïdiens peuvent rarement provoquer une baisse importante des globules blancs. En cas de fièvre, de mal de gorge ou de signes d’infection pendant le traitement, demandez immédiatement un avis médical le jour même afin de connaître la conduite à tenir. Ne prenez pas de décision de traitement sur la seule base de cette fiche."
+        },
+        {
+          "heading": "Autres signes inhabituels",
+          "body": "Une coloration jaune de la peau ou des yeux, des urines foncées ou une douleur abdominale importante nécessitent également un avis médical rapide."
+        }
+      ],
+      "takeaways": [
+        "Respectez l’ordonnance et le suivi prescrit.",
+        "Gardez les coordonnées de votre équipe médicale à portée de main.",
+        "Cette fiche ne remplace pas les consignes personnalisées de votre prescripteur."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Carbimazole",
+          "url": "https://www.nhs.uk/medicines/carbimazole/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "basedow-remission-rechute",
+      "category": "basedow",
+      "readMinutes": 3,
+      "title": "Rémission et rechute : comprendre le suivi de Basedow",
+      "summary": "L’évolution varie d’une personne à l’autre et demande un suivi adapté.",
+      "image": "/assets/comprendre/consultation.webp",
+      "tags": [
+        "rémission",
+        "rechute",
+        "suivi"
+      ],
+      "intro": "Après un traitement, certaines personnes connaissent une rémission durable, tandis que d’autres peuvent présenter une récidive. L’évolution ne peut pas être prédite à partir d’un seul résultat.",
+      "sections": [
+        {
+          "heading": "Qu’appelle-t-on rémission ?",
+          "body": "Le terme désigne une période pendant laquelle la maladie est contrôlée sans signe biologique ou clinique d’hyperthyroïdie selon les critères retenus par l’équipe médicale."
+        },
+        {
+          "heading": "Pourquoi continuer le suivi ?",
+          "body": "L’évolution peut changer dans le temps. Le médecin définit le rythme des consultations et des analyses, y compris après une modification ou un arrêt encadré du traitement."
+        },
+        {
+          "heading": "Que peut-on faire ?",
+          "body": "Gardez une trace des résultats, des traitements et des symptômes. N’arrêtez pas et ne modifiez pas un traitement sans consigne médicale."
+        }
+      ],
+      "takeaways": [
+        "Le parcours varie selon les personnes.",
+        "Le suivi reste important même lorsque l’on se sent mieux.",
+        "En cas de symptômes qui réapparaissent, contactez votre professionnel de santé."
+      ],
+      "sources": [
+        {
+          "label": "NIDDK — Graves’ Disease",
+          "url": "https://www.niddk.nih.gov/health-information/endocrine-diseases/graves-disease"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "hyperthyroidie-analyses",
+      "category": "analyses",
+      "readMinutes": 3,
+      "title": "TSH, T4L et T3L : comprendre le bilan d’hyperthyroïdie",
+      "summary": "Les résultats se comprennent ensemble, jamais isolément.",
+      "image": "/assets/comprendre/analyses.webp",
+      "tags": [
+        "TSH",
+        "T4L",
+        "T3L",
+        "analyses"
+      ],
+      "intro": "La TSH est un signal de régulation produit par l’hypophyse. La T4 libre et la T3 libre sont des hormones thyroïdiennes mesurées dans certaines situations pour préciser l’état hormonal.",
+      "sections": [
+        {
+          "heading": "Un profil souvent observé",
+          "body": "Dans une hyperthyroïdie manifeste, la TSH est souvent basse et la T4L et/ou la T3L élevées. Il existe toutefois des situations particulières et des limites d’interprétation."
+        },
+        {
+          "heading": "Pourquoi le contexte compte",
+          "body": "Les résultats dépendent notamment des symptômes, des traitements, des antécédents, du moment du prélèvement et des références du laboratoire."
+        },
+        {
+          "heading": "Comment préparer ses questions",
+          "body": "Demandez au médecin ce que les résultats indiquent dans votre cas, si d’autres examens sont nécessaires et quand le contrôle est prévu."
+        }
+      ],
+      "takeaways": [
+        "Évitez de comparer des résultats sans regarder les unités et références du laboratoire.",
+        "Une seule valeur ne suffit pas à identifier la cause.",
+        "Ne changez pas votre traitement sur la base d’une fiche ou d’un résultat isolé."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Overactive thyroid (hyperthyroidism)",
+          "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "basedow-preparer-consultation",
+      "sectionStyle": "checklist",
+      "category": "quotidien",
+      "readMinutes": 2,
+      "title": "Préparer son rendez-vous quand on a Basedow",
+      "summary": "Quelques notes simples pour rendre la consultation plus utile.",
+      "image": "/assets/comprendre/consultation.webp",
+      "tags": [
+        "consultation",
+        "suivi",
+        "journal"
+      ],
+      "intro": "Préparer quelques informations à l’avance peut aider à expliquer ce qui a changé depuis le dernier rendez-vous.",
+      "sections": [
+        {
+          "heading": "À rassembler",
+          "body": "Vos résultats récents, la liste de vos médicaments et doses prescrites, les dates de changements et les éventuels effets indésirables."
+        },
+        {
+          "heading": "À noter",
+          "body": "Les symptômes, leur fréquence, leur intensité, les difficultés du quotidien et les questions que vous souhaitez aborder."
+        },
+        {
+          "heading": "À demander",
+          "body": "Quel est le plan de suivi ? Quand refaire les analyses ? Quels signes doivent faire appeler rapidement ? Qui contacter en cas de problème sous traitement ?"
+        }
+      ],
+      "takeaways": [
+        "Apportez les résultats avec leurs dates et références.",
+        "Signalez tout symptôme nouveau, notamment oculaire ou cardiaque.",
+        "Demandez des consignes claires pour les situations imprévues."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Overactive thyroid (hyperthyroidism)",
+          "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "urgence-difficulte-respiratoire",
+      "category": "securite",
+      "readMinutes": 1,
+      "title": "Quand une gêne respiratoire est-elle urgente ?",
+      "summary": "Ne pas attendre une fiche ou un rendez-vous si la respiration devient difficile.",
+      "image": "/assets/comprendre/consultation.webp",
+      "tags": [
+        "urgence",
+        "sécurité",
+        "respiration"
+      ],
+      "intro": "Une gêne respiratoire importante, soudaine ou qui s’aggrave ne doit pas être attribuée automatiquement à la thyroïde ou à l’anxiété.",
+      "sections": [
+        {
+          "heading": "Que faire ?",
+          "body": "En France, en cas de difficulté respiratoire importante, d’étouffement, de gonflement rapide du cou avec gêne respiratoire, de douleur thoracique ou de malaise sévère, appelez les services d’urgence (15 ou 112). Ailleurs, utilisez le numéro d’urgence local."
+        },
+        {
+          "heading": "Ne pas attendre",
+          "body": "Ne vous fiez pas à une fiche d’information pour décider si un symptôme grave peut attendre. Demandez une aide urgente."
+        }
+      ],
+      "takeaways": [
+        "Les difficultés respiratoires importantes sont une urgence.",
+        "Une fiche éducative ne permet pas d’évaluer la gravité à distance.",
+        "En cas de doute face à une gêne respiratoire importante, demandez de l’aide immédiatement."
+      ],
+      "sources": [
+        {
+          "label": "Service-Public.fr — Urgences médicales",
+          "url": "https://www.service-public.fr/"
+        }
+      ],
+      "medicalReviewRequired": true
     }
   ]
 }

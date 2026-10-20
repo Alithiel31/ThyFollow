@@ -324,10 +324,10 @@ export interface Article {
 export type ArticleSummary = Omit<Article, 'content'> & { content?: string };
 
 // ── Bibliothèque « Comprendre » (fiches locales, src/content/comprendre) ──
-export interface EducationCategory {
-  id: string;
-  label: string;
-}
+// Libellés et descriptions des catégories : clés articles.categories.<id>.*
+// des fichiers de traduction.
+
+export type ContentLanguage = 'fr' | 'en';
 
 export interface EducationSection {
   heading: string;
@@ -339,29 +339,48 @@ export interface EducationSource {
   url: string;
 }
 
-export interface EducationArticle {
-  id: string;
-  category: string;
-  categoryLabel: string;
-  readMinutes: number;
-  featured?: boolean;
+/* Texte d'une fiche dans une langue, avec son propre statut de relecture :
+   une traduction se relit comme un original. */
+export interface EducationText {
   title: string;
   summary: string;
-  image: string;
+  // Mots-clés pris en compte par la recherche
+  tags?: string[];
   intro: string;
-  // Présentation des sections (maquette) : texte, cartes à icône ou check-list
-  sectionStyle?: 'prose' | 'cards' | 'checklist';
   sections: EducationSection[];
   takeaways: string[];
   sources: EducationSource[];
   // Date ISO de relecture par un professionnel de santé ; absente = brouillon
   reviewedAt?: string;
+  // Drapeau éditorial : true tant que la relecture médicale n'est pas faite
+  medicalReviewRequired?: boolean;
+}
+
+/* Fiche de base (content.fr.json) : structure + texte français */
+export interface EducationArticle extends EducationText {
+  id: string;
+  category: string;
+  readMinutes: number;
+  featured?: boolean;
+  image: string;
+  // Présentation des sections (maquette) : texte, cartes à icône ou check-list
+  sectionStyle?: 'prose' | 'cards' | 'checklist';
+}
+
+/* Fiche prête à afficher : `lang` est la langue réelle du texte (le français
+   quand la traduction manque) */
+export interface LocalizedArticle extends EducationArticle {
+  lang: ContentLanguage;
 }
 
 export interface EducationLibrary {
-  meta: { title: string; subtitle: string; disclaimer: string; reviewStatus: string };
-  categories: EducationCategory[];
+  meta: { locale: string; reviewStatus: string };
   articles: EducationArticle[];
+}
+
+export interface EducationTranslations {
+  meta: { locale: string; reviewStatus: string };
+  translations: (EducationText & { id: string })[];
 }
 
 // ── Rapport de période ─────────────────────────

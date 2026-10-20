@@ -1,0 +1,598 @@
+{
+  "meta": {
+    "locale": "en",
+    "reviewStatus": "Draft translations of draft educational guides — have them reviewed by a healthcare professional before publication."
+  },
+  "translations": [
+    {
+      "id": "hashimoto-hypothyroidie",
+      "title": "Hashimoto’s and hypothyroidism: what’s the difference?",
+      "summary": "Two closely related ideas that are not the same thing. Here are the essentials to better understand your journey.",
+      "intro": "The thyroid produces hormones that help regulate many of the body’s functions. Hashimoto’s and hypothyroidism are linked, but they do not mean the same thing.",
+      "sections": [
+        {
+          "heading": "Hashimoto’s, an autoimmune disease",
+          "body": "Hashimoto’s thyroiditis is a condition in which the immune system attacks the thyroid. It can gradually reduce the thyroid’s ability to produce hormones, but how it evolves varies from person to person."
+        },
+        {
+          "heading": "Hypothyroidism, an underactive thyroid",
+          "body": "Hypothyroidism means the thyroid does not provide enough hormones for the body’s needs. It can have several causes, Hashimoto’s being one of them."
+        },
+        {
+          "heading": "Symptoms alone are not enough to conclude",
+          "body": "Tiredness, feeling cold or difficulty concentrating can have many causes. Diagnosis and follow-up rely on a medical assessment and on tests suited to your situation."
+        }
+      ],
+      "takeaways": [
+        "Hashimoto’s is an autoimmune disease; hypothyroidism describes a lack of thyroid hormones.",
+        "Hashimoto’s does not always cause hypothyroidism straight away.",
+        "Only a healthcare professional can interpret your results in context."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie (French national health insurance) — Hypothyroidism (in French)",
+          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "tsh-t4-t3",
+      "title": "TSH, FT4, FT3: what the abbreviations mean",
+      "summary": "These markers have different roles. Find out what they are for and why they are read together.",
+      "intro": "Thyroid tests help healthcare professionals assess how the thyroid is working. How they are interpreted depends on the context, the treatment and the laboratory’s reference ranges.",
+      "sections": [
+        {
+          "heading": "TSH",
+          "body": "Produced by the pituitary gland, TSH helps regulate the production of thyroid hormones. It is often used to screen for and monitor hypothyroidism."
+        },
+        {
+          "heading": "Free T4 (FT4)",
+          "body": "T4 is a hormone produced by the thyroid. The free fraction is the part that is not bound to transport proteins."
+        },
+        {
+          "heading": "Free T3 (FT3)",
+          "body": "T3 is a biologically active thyroid hormone. It is not needed in every assessment of hypothyroidism."
+        }
+      ],
+      "takeaways": [
+        "A single figure does not allow you to draw every conclusion.",
+        "Compare results using the units and reference ranges given by the laboratory.",
+        "Do not change your treatment based on a guide or on a single result."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie (French national health insurance) — Hypothyroidism (in French)",
+          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "levothyroxine-prise",
+      "title": "Taking levothyroxine properly",
+      "summary": "How you take your treatment can affect how well it is absorbed. A few useful everyday pointers.",
+      "intro": "Levothyroxine replaces thyroid hormone when the body does not make enough of it. Taking it regularly, under consistent conditions, helps keep the treatment stable.",
+      "sections": [
+        {
+          "heading": "Keep a regular routine",
+          "body": "Follow your prescription and your medicine’s leaflet. Levothyroxine is usually taken on an empty stomach with water, leaving the recommended gap before breakfast."
+        },
+        {
+          "heading": "Be careful with some products",
+          "body": "Iron, calcium and some antacids can reduce absorption if taken too close to levothyroxine. The gap to leave depends on the product: ask your pharmacist or doctor for advice."
+        },
+        {
+          "heading": "If you miss a dose or something changes",
+          "body": "Do not double a dose on your own initiative. Ask your pharmacist or doctor what to do based on your prescription and when the dose was missed. Report any change of brand or in how you take it."
+        }
+      ],
+      "takeaways": [
+        "Follow the leaflet and the instructions given by your healthcare professional.",
+        "Keep the conditions in which you take it as consistent as possible.",
+        "If in doubt, ask for advice rather than changing the dose yourself."
+      ],
+      "sources": [
+        {
+          "label": "French public medicines database (in French)",
+          "url": "https://base-donnees-publique.medicaments.gouv.fr/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "interactions-mineraux",
+      "title": "Iron, calcium, magnesium: watch out for interactions",
+      "summary": "Some supplements can interfere with the absorption of levothyroxine when taken too close to it.",
+      "intro": "Dietary supplements and some medicines can change how levothyroxine is absorbed. This does not mean they are all forbidden, but spacing them out and professional advice matter.",
+      "sections": [
+        {
+          "heading": "Which products should you mention?",
+          "body": "Mention in particular supplements containing iron or calcium, some antacids and any new medicine. Formulations vary, and magnesium may also be present in some of the products concerned."
+        },
+        {
+          "heading": "How long a gap should you leave?",
+          "body": "The gap depends on the product and its leaflet. Do not rely on a single rule for every supplement: check the leaflet and ask your pharmacist to confirm the right spacing."
+        },
+        {
+          "heading": "An easy routine to follow",
+          "body": "Note the times you take each product in your routine and mention any change at your next appointment. Do not stop a prescribed treatment without medical advice."
+        }
+      ],
+      "takeaways": [
+        "Tell your doctor or pharmacist about your medicines and supplements.",
+        "Check the exact gap in each product’s leaflet.",
+        "Do not adjust your levothyroxine dose without medical advice."
+      ],
+      "sources": [
+        {
+          "label": "French public medicines database (in French)",
+          "url": "https://base-donnees-publique.medicaments.gouv.fr/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "fatigue-symptomes",
+      "title": "Tiredness, sleep, mood: are they related?",
+      "summary": "These symptoms are common but can have several causes. Learn how to describe and track them.",
+      "intro": "Living with a thyroid condition can be draining, especially when energy or concentration fluctuate. How you feel deserves to be heard, even when it cannot be explained by a single factor.",
+      "sections": [
+        {
+          "heading": "Several causes are possible",
+          "body": "Tiredness may be linked to the thyroid, sleep, stress, another medical condition, a medicine or several factors combined. A tracking log cannot determine the cause on its own."
+        },
+        {
+          "heading": "Observe without judging yourself",
+          "body": "For a few weeks, note your energy, your sleep, notable symptoms and recent changes. Look for trends rather than treating each bad day as a failure."
+        },
+        {
+          "heading": "When should you bring it up?",
+          "body": "If symptoms persist, get worse or disrupt your daily life, book an appointment to discuss them. If you have significant or sudden difficulty breathing, seek urgent medical help."
+        }
+      ],
+      "takeaways": [
+        "A symptom can have several causes.",
+        "Keeping a regular log helps prepare a medical discussion.",
+        "Do not adjust your treatment based on your symptoms alone."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie (French national health insurance) — Hypothyroidism (in French)",
+          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "preparer-consultation",
+      "title": "Preparing for a useful appointment",
+      "summary": "A few notes beforehand can help you talk about what really matters to you.",
+      "intro": "An appointment is a chance to review your results, symptoms and treatment. Preparing a few things can help make the conversation clearer.",
+      "sections": [
+        {
+          "heading": "Before the appointment",
+          "body": "Write down your main questions, the symptoms that bother you most and how they have changed, as well as any changes in medicines or supplements."
+        },
+        {
+          "heading": "Bring the right information",
+          "body": "If possible, gather your latest results with their dates, the list of your treatments and any side effects you have noticed. Do not interpret the figures on your own: ask what they mean for you."
+        },
+        {
+          "heading": "At the end of the appointment",
+          "body": "Go over the next steps in your own words: any tests, the follow-up schedule, how to take your treatment and who to contact if you have a question."
+        }
+      ],
+      "takeaways": [
+        "Prepare three priority questions.",
+        "Bring dated results and the list of your treatments.",
+        "Leave with next steps you understand."
+      ],
+      "sources": [
+        {
+          "label": "Service-Public.fr (French government) — Health (in French)",
+          "url": "https://www.service-public.fr/particuliers/vosdroits/N19806"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "suivi-tsh",
+      "title": "Why check TSH after a change?",
+      "summary": "Lab follow-up is planned over time: the right moment depends on your situation and your prescription.",
+      "intro": "After a change in treatment, the body needs time to reach a new balance. The schedule of checks is set by your healthcare professional according to your situation.",
+      "sections": [
+        {
+          "heading": "Avoid drawing conclusions too quickly",
+          "body": "A test done too early may not reflect the balance reached after the change. Stick to the test date shown on your prescription."
+        },
+        {
+          "heading": "Keep a record of changes",
+          "body": "Note the date of the change, the prescribed dose and the date of the next check. Tell your doctor about any new or unusual symptoms."
+        },
+        {
+          "heading": "Do not adjust on your own",
+          "body": "Do not change the dose based on a single result or on a target found online. Your lab target and follow-up are tailored to you."
+        }
+      ],
+      "takeaways": [
+        "Follow the prescribed schedule for tests.",
+        "Note dose changes and their dates.",
+        "Any change to your treatment must be discussed with the professional who follows you."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie (French national health insurance) — Hypothyroidism (in French)",
+          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "idees-recues-alimentation",
+      "title": "Diet and the thyroid: sorting out the myths",
+      "summary": "No miracle food replaces medical follow-up. Be wary of restrictions and supplements presented as essential.",
+      "intro": "Diet contributes to overall health, but advice about the thyroid often circulates without taking individual needs or treatments into account.",
+      "sections": [
+        {
+          "heading": "No one-size-fits-all diet",
+          "body": "There is no single diet suited to everyone with Hashimoto’s. Cutting out foods or following a restrictive diet should not be undertaken without a clear reason and appropriate advice."
+        },
+        {
+          "heading": "Supplements are not harmless",
+          "body": "A supplement may be useless, interact with a treatment or provide too much of a nutrient. Iodine, in particular, should not be taken in high doses without professional advice."
+        },
+        {
+          "heading": "Focus on lasting habits",
+          "body": "Favour a varied diet and habits that suit your health and your daily life. For a specific question, talk to your doctor or a qualified dietitian."
+        }
+      ],
+      "takeaways": [
+        "Be wary of promises of a cure and miracle solutions.",
+        "Do not start a high-dose supplement without professional advice.",
+        "Favour personalised advice over blanket bans."
+      ],
+      "sources": [
+        {
+          "label": "ANSES (French food safety agency) — Dietary supplements (in French)",
+          "url": "https://www.anses.fr/fr/content/les-complements-alimentaires"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "basedow-comprendre",
+      "title": "What is Graves’ disease?",
+      "summary": "Understanding an autoimmune disease that can cause hyperthyroidism.",
+      "tags": ["Graves’ disease", "Basedow", "autoimmunity", "hyperthyroidism"],
+      "intro": "Graves’ disease (also called Basedow’s disease) is an autoimmune disease. The immune system produces antibodies that stimulate the TSH receptor and can push the thyroid to make too much hormone.",
+      "sections": [
+        {
+          "heading": "What happens in the body?",
+          "body": "Stimulation of the thyroid can lead to hyperthyroidism. The signs and how intense they are vary from person to person."
+        },
+        {
+          "heading": "What signs can appear?",
+          "body": "Palpitations, tremor, heat intolerance, sweating, nervousness, tiredness, more frequent bowel movements or weight loss may occur. These signs are not enough on their own to make a diagnosis."
+        },
+        {
+          "heading": "How is the diagnosis investigated?",
+          "body": "The doctor relies on symptoms, a clinical examination and blood tests, including TSH and thyroid hormones. TSH receptor antibodies (TRAb) can help confirm Graves’ disease."
+        }
+      ],
+      "takeaways": [
+        "Graves’ disease is autoimmune, but not all hyperthyroidism is caused by Graves’ disease.",
+        "Symptoms and results must be interpreted together.",
+        "Follow-up and treatment are tailored with your medical team."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Overactive thyroid (hyperthyroidism)",
+          "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/"
+        },
+        {
+          "label": "NIDDK — Graves’ Disease",
+          "url": "https://www.niddk.nih.gov/health-information/endocrine-diseases/graves-disease"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "basedow-hashimoto-differences",
+      "title": "Graves’ disease and Hashimoto’s: what are the differences?",
+      "summary": "Two autoimmune diseases that can affect the thyroid in different ways.",
+      "tags": ["Graves’ disease", "Hashimoto’s", "comparison"],
+      "intro": "Graves’ disease and Hashimoto’s are two autoimmune thyroid diseases. They are not interchangeable and may evolve differently.",
+      "sections": [
+        {
+          "heading": "Graves’ disease",
+          "body": "Antibodies that stimulate the TSH receptor can lead to excessive production of thyroid hormones: hyperthyroidism."
+        },
+        {
+          "heading": "Hashimoto’s",
+          "body": "Autoimmune inflammation can gradually reduce the thyroid’s ability to produce enough hormones, leading to hypothyroidism. Variations exist and the medical context matters."
+        },
+        {
+          "heading": "Why does this distinction matter?",
+          "body": "Tests, treatments and monitoring depend on the cause and on hormone levels. Only a professional can interpret an individual situation."
+        }
+      ],
+      "takeaways": [
+        "Both diseases involve the immune system.",
+        "Graves’ disease is often associated with hyperthyroidism; Hashimoto’s with hypothyroidism.",
+        "The disease should not be inferred from a single symptom or a single lab value."
+      ],
+      "sources": [
+        {
+          "label": "NIDDK — Graves’ Disease",
+          "url": "https://www.niddk.nih.gov/health-information/endocrine-diseases/graves-disease"
+        },
+        {
+          "label": "NIDDK — Hashimoto’s Disease",
+          "url": "https://www.niddk.nih.gov/health-information/endocrine-diseases/hashimotos-disease"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "basedow-trab",
+      "title": "What are TRAb antibodies for?",
+      "summary": "An important lab marker when investigating Graves’ disease.",
+      "tags": ["TRAb", "antibodies", "tests"],
+      "intro": "TRAb are antibodies directed against the TSH receptor. Some can stimulate this receptor and contribute to the hyperthyroidism of Graves’ disease.",
+      "sections": [
+        {
+          "heading": "Why measure them?",
+          "body": "In a suggestive context, the test can help the doctor identify the cause of hyperthyroidism and contribute to follow-up depending on the situation."
+        },
+        {
+          "heading": "Is a positive result enough?",
+          "body": "No: it is interpreted alongside symptoms, the clinical examination, TSH, thyroid hormones and the laboratory’s methods."
+        },
+        {
+          "heading": "What if the result is negative?",
+          "body": "A negative result should not be interpreted on its own to rule out every possible cause. The doctor decides whether other tests are useful."
+        }
+      ],
+      "takeaways": [
+        "TRAb stands for TSH receptor antibodies.",
+        "The result is read together with the rest of your tests.",
+        "Ask your healthcare professional what this result actually changes for your follow-up."
+      ],
+      "sources": [
+        {
+          "label": "NIDDK — Graves’ Disease",
+          "url": "https://www.niddk.nih.gov/health-information/endocrine-diseases/graves-disease"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "basedow-symptomes",
+      "title": "Recognising the possible signs of hyperthyroidism",
+      "summary": "Symptoms can affect the body, sleep and mood.",
+      "tags": ["symptoms", "hyperthyroidism", "Graves’ disease"],
+      "intro": "When the thyroid produces too much hormone, several body functions can speed up. The signs vary and can have other causes.",
+      "sections": [
+        {
+          "heading": "Possible physical signs",
+          "body": "Palpitations, tremor, feeling unusually hot, sweating, unintended weight loss or more frequent bowel movements may appear."
+        },
+        {
+          "heading": "Energy and mood",
+          "body": "Some people feel nervous, irritable, anxious or have trouble sleeping, while also feeling very tired."
+        },
+        {
+          "heading": "What to log in ThyroTrack?",
+          "body": "Note the date, the symptoms, how intense they are, the circumstances and any recent changes. These observations can help you prepare for an appointment, without replacing a medical assessment."
+        }
+      ],
+      "takeaways": [
+        "A single symptom is not enough to diagnose hyperthyroidism.",
+        "New, persistent or worsening symptoms deserve medical advice.",
+        "Chest pain, feeling seriously unwell or severe shortness of breath call for urgent care."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Overactive thyroid (hyperthyroidism)",
+          "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "basedow-yeux",
+      "title": "Graves’ disease and the eyes: which signs to watch for?",
+      "summary": "Thyroid eye disease deserves particular attention.",
+      "tags": ["eyes", "ophthalmology", "Graves’ disease"],
+      "intro": "Graves’ disease can be associated with inflammation of the tissues around the eyes, known as thyroid eye disease (Graves’ orbitopathy). It does not affect everyone with the disease.",
+      "sections": [
+        {
+          "heading": "What signs can appear?",
+          "body": "Dryness, a gritty feeling, redness, swollen eyelids, more prominent eyes or double vision may occur."
+        },
+        {
+          "heading": "When should you seek advice?",
+          "body": "Report any new eye symptom to a healthcare professional promptly. Reduced vision, a change in how you see colours or significant eye pain needs urgent assessment."
+        },
+        {
+          "heading": "Why report it?",
+          "body": "Follow-up may require coordination between the doctor who manages your thyroid and an ophthalmologist."
+        }
+      ],
+      "takeaways": [
+        "Eye symptoms should be reported.",
+        "Do not assume that a vision problem is necessarily caused by Graves’ disease.",
+        "Sudden or significant loss of vision is an emergency."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Thyroid eye disease",
+          "url": "https://www.nhs.uk/conditions/thyroid-eye-disease/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "basedow-antithyroidiens",
+      "title": "Understanding antithyroid medicines",
+      "summary": "What are they for, and why does follow-up matter?",
+      "tags": ["treatment", "antithyroid drugs", "safety"],
+      "intro": "Antithyroid medicines, prescribed in some cases of hyperthyroidism, reduce the production of thyroid hormones. The choice and length of treatment depend on the individual situation.",
+      "sections": [
+        {
+          "heading": "Follow-up is necessary",
+          "body": "Blood tests and appointments allow your healthcare professional to monitor how things are going and adjust your care."
+        },
+        {
+          "heading": "Fever or sore throat during treatment",
+          "body": "Some antithyroid medicines can, rarely, cause a sharp drop in white blood cells. If you have a fever, a sore throat or signs of infection during treatment, seek medical advice immediately, the same day, to find out what to do. Do not make treatment decisions based on this guide alone."
+        },
+        {
+          "heading": "Other unusual signs",
+          "body": "Yellowing of the skin or eyes, dark urine or significant abdominal pain also need prompt medical advice."
+        }
+      ],
+      "takeaways": [
+        "Follow your prescription and the prescribed follow-up.",
+        "Keep your medical team’s contact details close at hand.",
+        "This guide does not replace your prescriber’s personalised instructions."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Carbimazole",
+          "url": "https://www.nhs.uk/medicines/carbimazole/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "basedow-remission-rechute",
+      "title": "Remission and relapse: understanding Graves’ disease follow-up",
+      "summary": "The course of the disease varies from person to person and calls for tailored follow-up.",
+      "tags": ["remission", "relapse", "follow-up"],
+      "intro": "After treatment, some people experience lasting remission, while others may have a relapse. How things will evolve cannot be predicted from a single result.",
+      "sections": [
+        {
+          "heading": "What is remission?",
+          "body": "The term refers to a period during which the disease is controlled, without clinical or lab signs of hyperthyroidism, according to the criteria used by the medical team."
+        },
+        {
+          "heading": "Why continue follow-up?",
+          "body": "Things can change over time. The doctor sets how often appointments and tests take place, including after a supervised change or stop of treatment."
+        },
+        {
+          "heading": "What can you do?",
+          "body": "Keep a record of results, treatments and symptoms. Do not stop or change a treatment without medical instructions."
+        }
+      ],
+      "takeaways": [
+        "The journey varies from person to person.",
+        "Follow-up remains important even when you feel better.",
+        "If symptoms come back, contact your healthcare professional."
+      ],
+      "sources": [
+        {
+          "label": "NIDDK — Graves’ Disease",
+          "url": "https://www.niddk.nih.gov/health-information/endocrine-diseases/graves-disease"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "hyperthyroidie-analyses",
+      "title": "TSH, FT4 and FT3: understanding hyperthyroidism tests",
+      "summary": "Results are understood together, never in isolation.",
+      "tags": ["TSH", "FT4", "FT3", "tests"],
+      "intro": "TSH is a regulating signal produced by the pituitary gland. Free T4 and free T3 are thyroid hormones measured in some situations to clarify hormone status.",
+      "sections": [
+        {
+          "heading": "A commonly seen pattern",
+          "body": "In overt hyperthyroidism, TSH is often low and FT4 and/or FT3 are high. However, there are special situations and limits to interpretation."
+        },
+        {
+          "heading": "Why context matters",
+          "body": "Results depend in particular on symptoms, treatments, medical history, when the sample was taken and the laboratory’s reference ranges."
+        },
+        {
+          "heading": "How to prepare your questions",
+          "body": "Ask your doctor what the results mean in your case, whether other tests are needed and when the next check is planned."
+        }
+      ],
+      "takeaways": [
+        "Avoid comparing results without looking at the laboratory’s units and reference ranges.",
+        "A single value is not enough to identify the cause.",
+        "Do not change your treatment based on a guide or a single result."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Overactive thyroid (hyperthyroidism)",
+          "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "basedow-preparer-consultation",
+      "title": "Preparing your appointment when you have Graves’ disease",
+      "summary": "A few simple notes to make the appointment more useful.",
+      "tags": ["appointment", "follow-up", "log"],
+      "intro": "Preparing some information in advance can help explain what has changed since your last appointment.",
+      "sections": [
+        {
+          "heading": "What to gather",
+          "body": "Your recent results, the list of your medicines and prescribed doses, the dates of any changes and any side effects."
+        },
+        {
+          "heading": "What to note",
+          "body": "Your symptoms, how often they occur, how intense they are, difficulties in daily life and the questions you would like to raise."
+        },
+        {
+          "heading": "What to ask",
+          "body": "What is the follow-up plan? When should the tests be repeated? Which signs mean you should call promptly? Who should you contact if there is a problem with your treatment?"
+        }
+      ],
+      "takeaways": [
+        "Bring your results with their dates and reference ranges.",
+        "Report any new symptom, especially affecting the eyes or the heart.",
+        "Ask for clear instructions for unexpected situations."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Overactive thyroid (hyperthyroidism)",
+          "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "urgence-difficulte-respiratoire",
+      "title": "When is difficulty breathing an emergency?",
+      "summary": "Do not wait for a guide or an appointment if breathing becomes difficult.",
+      "tags": ["emergency", "safety", "breathing"],
+      "intro": "Significant, sudden or worsening difficulty breathing should not automatically be put down to the thyroid or to anxiety.",
+      "sections": [
+        {
+          "heading": "What should you do?",
+          "body": "If you have significant difficulty breathing, are choking, have rapid swelling of the neck with breathing difficulty, chest pain or feel seriously unwell, call the emergency services: 112 in the European Union (or 15 in France). Elsewhere, use your local emergency number."
+        },
+        {
+          "heading": "Do not wait",
+          "body": "Do not rely on an information guide to decide whether a serious symptom can wait. Seek urgent help."
+        }
+      ],
+      "takeaways": [
+        "Significant breathing difficulties are an emergency.",
+        "An educational guide cannot assess severity remotely.",
+        "If in doubt about significant breathing difficulty, seek help immediately."
+      ],
+      "sources": [
+        {
+          "label": "Service-Public.fr (French government) — Medical emergencies (in French)",
+          "url": "https://www.service-public.fr/"
+        }
+      ],
+      "medicalReviewRequired": true
+    }
+  ]
+}

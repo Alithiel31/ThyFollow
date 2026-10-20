@@ -4,7 +4,7 @@
 // - /learn         : liste (dans l'AppShell)
 // - /learn/:slug   : lecteur plein ecran ; fiche locale, sinon article API
 // - /learn/fin     : ecran de fin du parcours
-import { useEffect, useRef, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -12,17 +12,17 @@ import ReactMarkdown from 'react-markdown';
 import {
   ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Clock, ExternalLink, Search, X,
   Lightbulb, ShieldAlert, TestTube, Pill, Moon, Stethoscope, FlaskConical, Droplet, Activity,
-  NotebookPen, MessageCircle, Sparkles, Leaf,
+  NotebookPen, MessageCircle, Sparkles, Leaf, HeartPulse,
   type LucideIcon,
 } from 'lucide-react';
 import { articlesApi } from '../lib/api';
 import { formatDate } from '../lib/utils';
 import {
-  library, ALL_CATEGORIES, LEARN_END_SLUG, categoryTone, filterArticles, findArticle,
-  normalizeSearch, readingSequence, type PastelTone,
+  ALL_CATEGORIES, CATEGORIES, LEARN_END_SLUG, categoryTone, contentLanguage, filterArticles,
+  findArticle, getLibrary, isMedicallyReviewed, normalizeSearch, readingSequence, type PastelTone,
 } from '../lib/learn';
 import { LogoMark } from '../components/LogoMark';
-import type { EducationArticle } from '../types';
+import type { LocalizedArticle } from '../types';
 import styles from './ArticlesPage.module.css';
 
 const TONE_CLASS: Record<PastelTone, string> = {
@@ -31,6 +31,7 @@ const TONE_CLASS: Record<PastelTone, string> = {
   lavender: styles.toneLavender,
   mint: styles.toneMint,
   butter: styles.toneButter,
+  rose: styles.toneRose,
 };
 
 const toneOf = (category: string) => TONE_CLASS[categoryTone(category)];
@@ -38,10 +39,12 @@ const toneOf = (category: string) => TONE_CLASS[categoryTone(category)];
 /* Pictogramme de catégorie (liste « Les dernières fiches ») ; la thyroïde
    a la forme d'un papillon, comme le logo */
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  basedow: HeartPulse,
   analyses: TestTube,
   traitements: Pill,
   quotidien: Moon,
   suivi: Stethoscope,
+  securite: ShieldAlert,
 };
 
 function CategoryIcon({ category, size = 20 }: { category: string; size?: number }) {
@@ -56,21 +59,35 @@ const SECTION_ICONS: Record<string, LucideIcon[]> = {
 };
 const SECTION_TONES = [styles.toneLavender, styles.toneBlue, styles.toneMint];
 
+// Au-delà, les points ne tiennent plus sur une ligne mobile : le compteur suffit
+const MAX_PAGER_DOTS = 20;
+
 // Recherche de la liste conservée pendant la lecture (?cat=…&q=…)
 type LearnLocationState = { from?: string } | null;
 
+/* Fiches dans la langue de l'interface + libellés de catégorie traduits */
+function useLearnLibrary() {
+  const { t, i18n } = useTranslation();
+  const language = contentLanguage(i18n.language);
+  const articles = getLibrary(language);
+  const labelOf = (category: string) => t(`articles.categories.${category}.label`);
+  return { articles, labelOf, language };
+}
+
 export function ArticlesPage() {
   const { slug } = useParams();
+  const { articles } = useLearnLibrary();
   if (!slug) return <Library />;
   if (slug === LEARN_END_SLUG) return <LearnEnd />;
-  const local = findArticle(slug);
+  const local = findArticle(articles, slug);
   return local ? <EducationReader article={local} /> : <ArticleView slug={slug} />;
 }
 
 /* ── Bibliothèque ─────────────────────────────── */
 
 function Library() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const { articles, labelOf } = useLearnLibrary();
   const location = useLocation();
   const [params, setParams] = useSearchParams();
   const category = params.get('cat') ?? ALL_CATEGORIES;
@@ -91,9 +108,11 @@ function Library() {
   };
 
   const filtering = category !== ALL_CATEGORIES || search.trim() !== '';
-  const results = filterArticles(library.articles, category, search);
-  const featured = filtering ? undefined : results.find((a) => a.featured);
-  const rest = featured ? results.filter((a) => a !== featured) : results;
+  const results = filterArticles(articles, category, search, labelOf);
+  // Une carte « À la une » par maladie (Hashimoto, Basedow) hors filtrage
+  const featured = filtering ? [] : results.filter((a) => a.featured);
+  const rest = results.filter((a) => !featured.includes(a));
+  const knownCategory = (CATEGORIES as readonly string[]).includes(category);
 
   const query = normalizeSearch(search);
   const visibleTeamArticles = category === ALL_CATEGORIES
@@ -107,9 +126,6 @@ function Library() {
       <header className={styles.header}>
         <h1 className={styles.title}>{t('articles.title')}</h1>
         <p className={styles.sub}>{t('articles.subtitle')}</p>
-        {i18n.language?.startsWith('en') && (
-          <p className={styles.langNote}>{t('articles.frenchOnly')}</p>
-        )}
       </header>
 
       <form
@@ -142,22 +158,28 @@ function Library() {
       </form>
 
       <div className={styles.chips} role="group" aria-label={t('articles.categoriesLabel')}>
-        {library.categories.map((c) => (
+        {CATEGORIES.map((id) => (
           <button
-            key={c.id}
+            key={id}
             type="button"
-            className={`${styles.chip} ${category === c.id ? styles.chipActive : ''}`}
-            aria-pressed={category === c.id}
-            onClick={() => updateParams({ cat: c.id })}
+            className={`${styles.chip} ${category === id ? styles.chipActive : ''}`}
+            aria-pressed={category === id}
+            onClick={() => updateParams({ cat: id })}
           >
-            {c.label}
+            {labelOf(id)}
           </button>
         ))}
       </div>
 
-      {featured && (
+      {featured.length > 0 && (
         <section className={styles.section} aria-label={t('articles.featured')}>
-          <FeaturedCard article={featured} from={from} />
+          <ul className={styles.featuredList}>
+            {featured.map((a) => (
+              <li key={a.id}>
+                <FeaturedCard article={a} from={from} />
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 
@@ -170,6 +192,9 @@ function Library() {
             {t('articles.resultCount', { count: results.length })}
           </p>
         </div>
+        {category !== ALL_CATEGORIES && knownCategory && (
+          <p className={styles.categoryNote}>{t(`articles.categories.${category}.description`)}</p>
+        )}
 
         {results.length === 0 ? (
           <div className={styles.empty}>
@@ -232,33 +257,43 @@ function ReadTime({ minutes, short = false }: { minutes: number; short?: boolean
 }
 
 /* « À la une » compacte : texte à gauche, illustration à droite */
-function FeaturedCard({ article, from }: { article: EducationArticle; from: string }) {
+function FeaturedCard({ article, from }: { article: LocalizedArticle; from: string }) {
   const { t } = useTranslation();
   return (
     <Link to={`/learn/${article.id}`} state={{ from }} className={`${styles.featured} ${toneOf(article.category)}`}>
       <div className={styles.featuredBody}>
         <span className={styles.featuredBadge}>{t('articles.featured')}</span>
-        <h2 className={styles.featuredTitle}>{article.title}</h2>
-        <p className={styles.featuredSummary}>{article.summary}</p>
+        <h2 className={styles.featuredTitle} lang={article.lang}>{article.title}</h2>
+        <p className={styles.featuredSummary} lang={article.lang}>{article.summary}</p>
         <div className={styles.featuredFoot}>
           <ReadTime minutes={article.readMinutes} short />
           <ArrowRight size={17} aria-hidden="true" />
         </div>
       </div>
-      <div className={styles.featuredMedia}>
-        <img src={article.image} alt="" decoding="async" width={758} height={500} />
-      </div>
+      <Illustration key={article.image} src={article.image} className={styles.featuredMedia} />
     </Link>
   );
 }
 
+/* Illustration décorative (alt vide) : si le fichier manque, on retire le
+   cadre plutôt que d'afficher une image cassée */
+function Illustration({ src, className }: { src: string; className: string }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return null;
+  return (
+    <div className={className}>
+      <img src={src} alt="" decoding="async" width={758} height={500} onError={() => setFailed(true)} />
+    </div>
+  );
+}
+
 /* Ligne compacte : pictogramme, titre, durée, flèche */
-function ArticleRow({ article, from }: { article: EducationArticle; from: string }) {
+function ArticleRow({ article, from }: { article: LocalizedArticle; from: string }) {
   return (
     <Link to={`/learn/${article.id}`} state={{ from }} className={`${styles.row} ${toneOf(article.category)}`}>
       <span className={styles.rowIcon}><CategoryIcon category={article.category} /></span>
       <div className={styles.rowBody}>
-        <h3 className={styles.rowTitle}>{article.title}</h3>
+        <h3 className={styles.rowTitle} lang={article.lang}>{article.title}</h3>
         <ReadTime minutes={article.readMinutes} short />
       </div>
       <ChevronRight size={18} className={styles.rowArrow} aria-hidden="true" />
@@ -276,16 +311,17 @@ function ReaderScreen({ children, className = '' }: { children: ReactNode; class
   );
 }
 
-function EducationReader({ article }: { article: EducationArticle }) {
+function EducationReader({ article }: { article: LocalizedArticle }) {
   const { t } = useTranslation();
+  const { articles, labelOf, language } = useLearnLibrary();
   const location = useLocation();
   const from = (location.state as LearnLocationState)?.from ?? '';
   const titleRef = useRef<HTMLHeadingElement>(null);
 
-  const sequence = readingSequence(from);
+  const sequence = readingSequence(articles, from, labelOf);
   const found = sequence.findIndex((a) => a.id === article.id);
   // Fiche ouverte hors de la liste filtrée (lien direct) : parcours complet
-  const list = found >= 0 ? sequence : library.articles;
+  const list = found >= 0 ? sequence : articles;
   const index = found >= 0 ? found : list.findIndex((a) => a.id === article.id);
   const prev = list[index - 1];
   const next = list[index + 1];
@@ -318,19 +354,20 @@ function EducationReader({ article }: { article: EducationArticle }) {
         </span>
       </div>
 
-      <article className={styles.reader}>
+      <article className={styles.reader} lang={article.lang}>
         <header className={styles.readerHeader}>
-          <div className={styles.readerMeta}>
-            <span className={styles.badge}>{article.categoryLabel}</span>
+          <div className={styles.readerMeta} lang={language}>
+            <span className={styles.badge}>{labelOf(article.category)}</span>
             <ReadTime minutes={article.readMinutes} />
           </div>
+          {article.lang !== language && (
+            <p className={styles.langNote} lang={language}>{t('articles.frenchOnlyGuide')}</p>
+          )}
           <h1 ref={titleRef} tabIndex={-1} className={styles.readerTitle}>{article.title}</h1>
           <p className={styles.lead}>{article.summary}</p>
         </header>
 
-        <div className={styles.readerMedia}>
-          <img src={article.image} alt="" decoding="async" width={758} height={500} />
-        </div>
+        <Illustration key={article.image} src={article.image} className={styles.readerMedia} />
 
         <p className={styles.intro}>{article.intro}</p>
 
@@ -373,7 +410,7 @@ function EducationReader({ article }: { article: EducationArticle }) {
         )}
 
         <aside className={styles.takeaways} aria-labelledby="learn-takeaways">
-          <h2 id="learn-takeaways" className={styles.takeawaysTitle}>
+          <h2 id="learn-takeaways" className={styles.takeawaysTitle} lang={language}>
             <Lightbulb size={20} strokeWidth={1.7} aria-hidden="true" />
             {t('articles.takeaways')}
           </h2>
@@ -389,14 +426,14 @@ function EducationReader({ article }: { article: EducationArticle }) {
 
         {article.sources.length > 0 && (
           <section className={styles.sources} aria-labelledby="learn-sources">
-            <h2 id="learn-sources" className={styles.sourcesTitle}>{t('articles.sources')}</h2>
+            <h2 id="learn-sources" className={styles.sourcesTitle} lang={language}>{t('articles.sources')}</h2>
             <ul>
               {article.sources.map((src) => (
                 <li key={src.url}>
                   <a href={src.url} target="_blank" rel="noopener noreferrer">
                     {src.label}
                     <ExternalLink size={13} aria-hidden="true" />
-                    <span className="sr-only"> {t('articles.opensInNewTab')}</span>
+                    <span className="sr-only" lang={language}> {t('articles.opensInNewTab')}</span>
                   </a>
                 </li>
               ))}
@@ -404,13 +441,13 @@ function EducationReader({ article }: { article: EducationArticle }) {
           </section>
         )}
 
-        <p className={styles.review}>
+        <p className={styles.review} lang={language}>
           <ShieldAlert size={15} aria-hidden="true" />
-          {article.reviewedAt
+          {isMedicallyReviewed(article) && article.reviewedAt
             ? t('articles.reviewedOn', { date: formatDate(article.reviewedAt) })
             : t('articles.reviewPending')}
         </p>
-        <p className={styles.readerDisclaimer}>{library.meta.disclaimer}</p>
+        <p className={styles.readerDisclaimer} lang={language}>{t('articles.disclaimerReader')}</p>
       </article>
 
       <nav className={styles.pager} aria-label={t('articles.pagination')}>
@@ -424,7 +461,7 @@ function EducationReader({ article }: { article: EducationArticle }) {
           </span>
         )}
         <span className={styles.dots} aria-hidden="true">
-          {list.map((a, i) => (
+          {list.length <= MAX_PAGER_DOTS && list.map((a, i) => (
             <span key={a.id} className={`${styles.dot} ${i === index ? styles.dotActive : ''}`} />
           ))}
         </span>

@@ -18,8 +18,11 @@ pas synchronisé avec ces tags.
 - Documentation API structurée (OpenAPI/Swagger) — la liste d'endpoints du README est tenue à
   la main et devient difficile à maintenir à mesure que l'API grossit.
 - Faire relire les fiches « Comprendre » par un médecin ou un pharmacien, vérifier leurs sources,
-  puis renseigner `reviewedAt` (voir `frontend/src/content/comprendre/README.md`). Le contenu
-  n'existe qu'en français ; l'interface anglaise l'indique.
+  puis renseigner `reviewedAt` et passer `medicalReviewRequired` à `false` (voir
+  `frontend/src/content/comprendre/README.md`). Priorité aux 10 fiches Basedow (consignes
+  d'urgence, antithyroïdiens) et aux liens à confirmer listés dans ce README. Les traductions
+  anglaises (`content.en.json`) demandent leur propre relecture, notamment les numéros d'urgence
+  et des sources anglophones à la place des sources françaises.
 - Étendre la couverture de tests frontend au-delà des formulaires d'auth/médicaments (LogPage,
   LabResultsPage, AppointmentsPage, ProfilePage).
 - Suivi d'erreurs en production (Sentry ou équivalent) — aujourd'hui, un crash en prod ne
@@ -29,6 +32,8 @@ pas synchronisé avec ces tags.
 
 ### Fixed
 
+- **`<html lang>` suit la langue de l'interface.** Il restait à `fr` en anglais : les lecteurs
+  d'écran lisaient l'interface anglaise avec une voix française.
 - **Synchro Google Health : nuits mieux découpées.** Une nuit qui traversait minuit était comptée
   en entier sur les deux jours. Chaque nuit est maintenant rangée au jour du réveil, en heure
   locale, comme dans l'app Fitbit. Les siestes du jour s'y ajoutent, et les phases d'éveil sont
@@ -42,6 +47,24 @@ pas synchronisé avec ces tags.
 
 ### Added
 
+- **« Comprendre » en anglais.** Les 18 fiches sont traduites (`content.en.json`, textes seuls,
+  par `id` ; la structure reste dans `content.fr.json`) et s'affichent selon la langue de
+  l'interface. Une fiche non traduite retombe sur le français avec une note et `lang="fr"`.
+  Libellés et descriptions des catégories et avertissement du lecteur passent dans les fichiers
+  de traduction (`articles.categories.*`, `articles.disclaimerReader`) ; le champ `categoryLabel`
+  disparaît des fiches. La note « disponible en français uniquement » de la liste est retirée.
+  **Les traductions sont des brouillons non relus**, avec leur propre statut de relecture.
+- **« Comprendre » couvre la maladie de Basedow.** 10 nouvelles fiches (brouillons pédagogiques
+  du pack éditorial Basedow) : la maladie, différences avec Hashimoto, signes possibles, yeux,
+  anticorps TRAb, bilan TSH/T4L/T3L, antithyroïdiens, rémission et rechute, préparer son
+  rendez-vous, gêne respiratoire urgente. Les 8 fiches existantes sont conservées. Nouvelles
+  catégories « Basedow » et « Sécurité » ; libellés alignés sur le pack (« Comprendre la
+  thyroïde », « Analyses et examens », « Au quotidien ») avec une description affichée sous le
+  filtre actif. Une carte « À la une » par maladie. La recherche couvre aussi les mots-clés
+  (`tags`), l'introduction et le texte des sections. Teinte `--pastel-rose` (corail du pack,
+  assombri pour un contraste AA). Une illustration manquante est retirée au lieu d'apparaître
+  cassée. Chaque fiche porte `medicalReviewRequired: true` : l'app n'affiche « Relue par un
+  professionnel de santé » qu'avec `reviewedAt` **et** ce drapeau levé.
 - **Onglet « Comprendre » : bibliothèque de fiches pédagogiques.** L'état vide « Les premiers
   articles arrivent bientôt » est remplacé par 8 fiches locales (`frontend/src/content/comprendre`)
   avec illustrations, catégories, recherche sans accents, carte « À la une », durée de lecture,
