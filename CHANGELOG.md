@@ -32,6 +32,8 @@ pas synchronisé avec ces tags.
 
 ### Fixed
 
+- **`<html lang>` suit la langue de l'interface.** Il restait à `fr` en anglais : les lecteurs
+  d'écran lisaient l'interface anglaise avec une voix française.
 - **Synchro Google Health : nuits mieux découpées.** Une nuit qui traversait minuit était comptée
   en entier sur les deux jours. Chaque nuit est maintenant rangée au jour du réveil, en heure
   locale, comme dans l'app Fitbit. Les siestes du jour s'y ajoutent, et les phases d'éveil sont

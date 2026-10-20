@@ -25,4 +25,12 @@ i18n
     interpolation: { escapeValue: false },
   });
 
+// <html lang> suit la langue de l'interface (index.html part de « fr ») :
+// les lecteurs d'écran choisissent leur voix d'après cet attribut.
+function syncDocumentLanguage() {
+  document.documentElement.lang = i18n.resolvedLanguage ?? 'fr';
+}
+syncDocumentLanguage();
+i18n.on('languageChanged', syncDocumentLanguage);
+
 export default i18n;
