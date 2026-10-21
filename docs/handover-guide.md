@@ -39,6 +39,21 @@ backup questions below more than formalities.
 | Email             | **Resend**                                                     | Account holding the API key and the verified sending domain                                                  |
 | Google            | A Google Cloud project                                         | OAuth client (login), OAuth client (Google Health), service account (webhook subscriber), consent screen     |
 
+
+**Deploying and rolling back.** Every merge to `main` makes CI build and publish the arm64 images
+(`ghcr.io/alithiel31/thyfollow-{backend,frontend}:sha-<commit>`). `./deploy.sh`, run from the
+workstation with Docker pointed at the Pi, deploys the latest `main`; `./deploy.sh --tag sha-<commit>`
+deploys any published version, which is also the rollback (the script prints the previous tag). It
+takes a database dump before migrating, so a rollback across a destructive migration also needs that
+dump restored (`/mnt/storage/backups/pre-deploy/` on the Pi). Details:
+[environment.md](./environment.md#production-secrets-with-infisical-deploysh).
+
+**Protection of `main`.** A GitHub ruleset requires a pull request, blocks force pushes and
+deletion, and requires the checks `Backend`, `Frontend`, `Docker build` (both images) and
+`Migrations` to pass with a branch up to date. `Audit` and `Publish image` are deliberately not
+required: a new dependency advisory must not block the very pull request that fixes it, and
+`Publish` only runs on `main`.
+
 ---
 
 ## 3. Secrets and access needed to act
@@ -89,13 +104,19 @@ If the Raspberry Pi is lost or replaced but the code and the secrets above are a
 
 - **Single maintainer** — this document reduces the risk without removing it; consider eventually
   sharing read access to the list of secrets with a second trusted person.
-- **Backups are not documented.** PostgreSQL is shared and outside Docker, and nothing in this
-  repository says how or how often it is backed up, or that a restore was ever tested. For health
-  data this is the first thing to settle (see "To be completed" below).
-- **A database dump went through git history.** `thyrotrack_backup_20260822.dump` was committed
-  (commit `1911941`) and only untracked afterwards (commit `4f63ba7`); it is still retrievable from
-  history. Check what it contained and, if it held real data, treat it as disclosed to everybody who
-  can read the repository, rotate what needs rotating, and decide whether to purge the history.
+- **Backups.** PostgreSQL is shared and outside Docker. On the Pi, systemd timers run a nightly
+  dump (a custom-format `pg_dump` per database plus the roles), copy it to a Telegram bot the
+  maintainer owns, keep 14 days locally, and raise an alert when a run fails or no recent success
+  exists. `deploy.sh` also takes its own dump before each deployment. A restore test is still to be
+  dated (see "To be completed" below); for health data, an untested backup is not a backup.
+- **A test database dump is in the public git history.** `thyrotrack_backup_20260822.dump` was
+  committed (commit `1911941`) and untracked afterwards (commit `4f63ba7`). It dates from
+  2026-08-22 and holds only test data entered by the maintainer, before any personal data was
+  loaded (real use started in mid-October 2026). Decision: the history is **not** rewritten. Only
+  the password hash of the test account(s) is concerned; change that password anywhere it was reused.
+  Any future dump that holds real data must never be committed: if one is, treat it as disclosed
+  to everybody who can read the repository, rotate what needs rotating and purge the history
+  (including the pull-request refs, through GitHub support).
 - **Session tokens in `localStorage`** with a 30-day lifetime (`JWT_EXPIRES_IN`) — a cross-site
   scripting flaw would expose them; the CSP in `frontend/nginx.conf` (`script-src 'self'`) is the mitigation.
   They can be revoked: incrementing `User.tokenVersion` (done automatically on password reset)
@@ -120,8 +141,8 @@ These fields are deliberately left empty — they concern personal information o
 not belong in a repository:
 
 - [ ] Where the secrets listed in section 3 are stored (password manager, digital vault…) and who else can reach them
-- [ ] **Backup policy of the PostgreSQL instance**: tool, frequency, location, retention, date of the last restore test
-- [ ] Contents of `thyrotrack_backup_20260822.dump` and the decision taken about the git history
+- [ ] Date of the last **restore test** of a PostgreSQL backup (restore a recent dump into a scratch database and check it)
+- [x] Contents of `thyrotrack_backup_20260822.dump` and the decision taken about the git history (test data only, history kept — see section 5)
 - [ ] Registrar of the domain `alithiel31.dev` and the account credentials
 - [ ] Trusted person(s) to contact if the maintainer is unavailable for a long time
 - [ ] Physical location of the Raspberry Pi and how to access it in an emergency

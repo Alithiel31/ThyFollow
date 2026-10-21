@@ -35,7 +35,10 @@ exist only in the process environment:
 3. `docker compose pull` then `docker compose up -d`: the `migrate` service runs first, and the
    backend is only recreated if the migrations succeeded;
 4. waits for the backend healthcheck, then queries the public `/health`, and prints the rollback
-   command (`./deploy.sh --tag <previous version>`).
+   command (`./deploy.sh --tag <previous version>`);
+5. removes the old `thyfollow` images, keeping the running version and the previous one so that a
+   rollback needs no download (`--no-prune` to keep everything). A failure here never fails the
+   deployment.
 
 Optional variables: `DEPLOY_SSH` (ssh target of the Pi, otherwise derived from the Docker host),
 `DEPLOY_BACKUP_DIR`, `DEPLOY_HEALTH_URL`.

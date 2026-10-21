@@ -150,6 +150,9 @@ pas synchronisé avec ces tags.
   est résilié avant la suppression, qui est annulée si la résiliation échoue. `GET /api/auth/me`
   renvoie `hasPassword` (jamais le hash).
 
+- `deploy.sh` supprime, après un déploiement réussi, les anciennes images `thyfollow` en gardant la
+  version en ligne et la précédente (retour arrière sans téléchargement) ; `--no-prune` pour tout
+  garder. Un échec du nettoyage ne fait jamais échouer le déploiement.
 - Déploiement continu (déclenché à la main) : `docker-compose.yml` tire les images publiées sur
   GHCR (`IMAGE_TAG`, `sha-<commit>` ou `main`) au lieu de les construire sur le Pi ;
   `docker-compose.build.yml` garde la construction depuis les sources. `deploy.sh` déploie le
