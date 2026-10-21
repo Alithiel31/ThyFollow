@@ -32,6 +32,10 @@ pas synchronisé avec ces tags.
 
 ### Fixed
 
+- **Polices auto-hébergées.** Le service worker relançait les requêtes Google Fonts, bloquées
+  par la CSP (`connect-src 'self'`) : les polices ne se chargeaient plus. Elles sont désormais
+  servies par l'application (`@fontsource`), disponibles hors ligne, sans appel à Google ; la CSP
+  ne contient plus que `'self'`.
 - **`<html lang>` suit la langue de l'interface.** Il restait à `fr` en anglais : les lecteurs
   d'écran lisaient l'interface anglaise avec une voix française.
 - **Synchro Google Health : nuits mieux découpées.** Une nuit qui traversait minuit était comptée
