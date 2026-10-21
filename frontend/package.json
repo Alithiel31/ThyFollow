@@ -16,6 +16,10 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@fontsource/cormorant-garamond": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/manrope": "^5.3.0",
+    "@fontsource/newsreader": "^5.3.0",
     "@tanstack/react-query": "^5.104.1",
     "axios": "^1.6.7",
     "date-fns": "^4.4.0",

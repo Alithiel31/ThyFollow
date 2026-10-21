@@ -37,18 +37,8 @@ export default defineConfig({
         // Les appels /api ne sont JAMAIS servis depuis le cache :
         // les données de santé doivent toujours être fraîches.
         navigateFallbackDenylist: [/^\/api\//],
-        runtimeCaching: [
-          {
-            // Les polices Google changent rarement : cache d'abord
-            urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts',
-              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-        ],
+        // Polices auto-hébergées incluses dans le précache
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
       },
     }),
   ],
