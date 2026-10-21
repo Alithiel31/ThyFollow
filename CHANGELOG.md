@@ -98,6 +98,12 @@ pas synchronisé avec ces tags.
 
 ### Security
 
+- **`follow-redirects` 1.16.0 → 1.16.1 (frontend).** Dépendance transitive d'`axios` visée par deux
+  avis de sécurité de sévérité haute (GHSA-q3jh-wrc6-jgq8, GHSA-8r9p-f939-6h3c : en-têtes
+  d'identification transmis lors d'une redirection vers une autre origine). Mise à jour du seul
+  lockfile, sans changement de `package.json` ; l'audit CI (`--audit-level=high`) repasse au vert.
+  Reste une alerte de sévérité modérée sur `react-router` (6.x), dont le correctif impose la
+  version majeure 7 : à traiter à la main, à part.
 - **Quota d'imports PDF non contournable par requêtes simultanées.** Le solde lu en début de requête
   n'était décompté qu'après chaque fichier : plusieurs envois simultanés passaient tous le contrôle
   (au-delà des 3 imports offerts, ou du plafond mensuel Pro, avec autant d'appels IA payants). Chaque
