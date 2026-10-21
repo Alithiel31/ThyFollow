@@ -5,10 +5,13 @@
 #   ./deploy.sh                      # dernière version de main (sha-<commit>)
 #   ./deploy.sh --tag sha-ab12cd3    # version précise (retour arrière)
 #   ./deploy.sh --skip-backup        # sans dump de la base avant migration
+#   ./deploy.sh --no-prune           # garde toutes les anciennes images
 #
 # Lancé depuis le poste de travail : Docker vise le Pi via DOCKER_HOST ou le
 # context actif (ssh://…). Étapes : sauvegarde de la base sur le Pi (ssh),
-# pull des images, migrations (service `migrate`), redémarrage, vérification.
+# pull des images, migrations (service `migrate`), redémarrage, vérification,
+# puis suppression des anciennes images (on garde la version en ligne et la
+# précédente, pour un retour arrière immédiat).
 #
 # Prérequis : la CLI `infisical`, `docker compose`, `git`, `ssh`, `curl`, et un
 # fichier .infisical-identity.env (voir .infisical-identity.env.example).
@@ -34,11 +37,13 @@ HEALTH_URL="${DEPLOY_HEALTH_URL:-https://thyrotrack.alithiel31.dev/health}"
 
 IMAGE_TAG=""
 SKIP_BACKUP=0
+PRUNE_IMAGES=1
 while [ $# -gt 0 ]; do
   case "$1" in
     --tag) IMAGE_TAG="${2:?--tag attend une valeur, ex. sha-ab12cd3}"; shift 2 ;;
     --skip-backup) SKIP_BACKUP=1; shift ;;
-    -h|--help) sed -n '2,12p' "$0"; exit 0 ;;
+    --no-prune) PRUNE_IMAGES=0; shift ;;
+    -h|--help) sed -n '2,15p' "$0"; exit 0 ;;
     *) echo "❌ Option inconnue : $1 (voir ./deploy.sh --help)" >&2; exit 1 ;;
   esac
 done
@@ -189,5 +194,20 @@ if [ "$PUBLIC_OK" != "1" ]; then
   exit 1
 fi
 echo "✅ $IMAGE_TAG en ligne ($HEALTH_URL répond)."
+
+# Les images s'accumulent sur la carte SD du Pi (~1,4 Go par version) : on ne
+# garde que la version en ligne et la précédente. Un échec ici n'est jamais
+# fatal (une image encore utilisée est simplement ignorée par `docker rmi`).
+if [ "$PRUNE_IMAGES" -eq 1 ]; then
+  KEEP=" $IMAGE_TAG ${PREVIOUS_TAG} "
+  REMOVED=0
+  for svc in backend frontend; do
+    while IFS= read -r ref; do
+      case "$KEEP" in *" ${ref##*:} "*) continue ;; esac
+      if docker rmi "$ref" >/dev/null 2>&1; then REMOVED=$((REMOVED + 1)); fi
+    done < <(docker image ls "$IMAGE_REPO-$svc" --format '{{.Repository}}:{{.Tag}}' 2>/dev/null || true)
+  done
+  echo "🧹 $REMOVED ancienne(s) image(s) supprimée(s) (conservées : $IMAGE_TAG${PREVIOUS_TAG:+, $PREVIOUS_TAG})."
+fi
 [ -n "$ROLLBACK_HINT" ] && echo "   $ROLLBACK_HINT"
 exit 0

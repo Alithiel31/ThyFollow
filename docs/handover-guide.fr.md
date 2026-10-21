@@ -39,6 +39,22 @@ sauvegarde ci-dessous sont plus que des formalités.
 | Courriel          | **Resend**                                                      | Compte qui détient la clé API et le domaine d'envoi vérifié                                                    |
 | Google            | Un projet Google Cloud                                          | Client OAuth (login), client OAuth (Google Health), compte de service (abonné webhook), écran de consentement   |
 
+
+**Déployer et revenir en arrière.** Chaque merge sur `main` fait construire et publier les images
+arm64 par la CI (`ghcr.io/alithiel31/thyfollow-{backend,frontend}:sha-<commit>`). `./deploy.sh`,
+lancé depuis le poste de travail avec Docker pointé sur le Pi, déploie le dernier `main` ;
+`./deploy.sh --tag sha-<commit>` déploie n'importe quelle version publiée, ce qui sert aussi de
+retour arrière (le script affiche le tag précédent). Il fait un dump de la base avant de migrer :
+un retour arrière au-delà d'une migration destructive demande donc aussi de restaurer ce dump
+(`/mnt/storage/backups/pre-deploy/` sur le Pi). Détails :
+[environment.fr.md](./environment.fr.md#secrets-de-production-avec-infisical-deploysh).
+
+**Protection de `main`.** Un ruleset GitHub exige une pull request, interdit le force-push et la
+suppression, et exige que les checks `Backend`, `Frontend`, `Docker build` (les deux images) et
+`Migrations` passent, sur une branche à jour. `Audit` et `Publish image` ne sont volontairement pas
+exigés : une nouvelle alerte de dépendance ne doit pas bloquer la PR qui la corrige, et `Publish`
+ne tourne que sur `main`.
+
 ---
 
 ## 3. Secrets et accès nécessaires pour agir
@@ -90,14 +106,21 @@ Si le Raspberry Pi est perdu ou remplacé mais que le code et les secrets ci-des
 
 - **Mainteneur unique** — ce document réduit le risque mais ne le supprime pas ; envisager, à terme,
   de donner un accès en lecture à la liste des secrets à une seconde personne de confiance.
-- **Les sauvegardes ne sont pas documentées.** PostgreSQL est partagé et hors Docker, et rien dans ce
-  dépôt ne dit comment ni à quelle fréquence il est sauvegardé, ni qu'une restauration ait jamais été
-  testée. Pour des données de santé, c'est la première chose à régler (voir « À compléter » plus bas).
-- **Un dump de base est passé par l'historique git.** `thyrotrack_backup_20260822.dump` a été commité
-  (commit `1911941`) puis seulement retiré du suivi (commit `4f63ba7`) ; il reste récupérable dans
-  l'historique. Vérifier ce qu'il contenait et, s'il portait des données réelles, le considérer comme
-  divulgué à toute personne pouvant lire le dépôt, renouveler ce qui doit l'être et décider s'il faut
-  purger l'historique.
+- **Sauvegardes.** PostgreSQL est partagé et hors Docker. Sur le Pi, des timers systemd lancent chaque
+  nuit un dump (un `pg_dump` au format custom par base, plus les rôles), l'envoient à un bot Telegram
+  dont le mainteneur est propriétaire, en gardent 14 jours en local et déclenchent une alerte si un
+  passage échoue ou si aucun succès récent n'existe. `deploy.sh` fait aussi son propre dump avant
+  chaque déploiement. Un test de restauration reste à dater (voir « À compléter » plus bas) : pour des
+  données de santé, une sauvegarde non testée n'est pas une sauvegarde.
+- **Un dump de test est dans l'historique git public.** `thyrotrack_backup_20260822.dump` a été
+  commité (commit `1911941`) puis retiré du suivi (commit `4f63ba7`). Il date du 22 août 2026 et ne
+  contient que des données de test saisies par le mainteneur, avant tout chargement de données
+  personnelles (l'usage réel a commencé mi-octobre 2026). Décision : l'historique n'est **pas**
+  réécrit. Seul le hash du mot de passe du ou des comptes de test est concerné ; changer ce mot de
+  passe partout où il aurait été réutilisé. Un futur dump contenant des données réelles ne doit
+  jamais être commité : si c'est le cas, le considérer comme divulgué à toute personne pouvant lire
+  le dépôt, renouveler ce qui doit l'être et purger l'historique (y compris les références des
+  pull requests, via le support GitHub).
 - **Jetons de session dans `localStorage`**, valables 30 jours (`JWT_EXPIRES_IN`) — une faille XSS les
   exposerait ; la CSP de `frontend/nginx.conf` (`script-src 'self'`) est la parade. Ils sont révocables :
   incrémenter `User.tokenVersion` (fait automatiquement à la réinitialisation du mot de passe) invalide
@@ -123,8 +146,8 @@ Les champs suivants sont volontairement laissés vides — ils touchent à des i
 ou à des identifiants qui n'ont pas leur place dans un dépôt :
 
 - [ ] Où sont stockés les secrets listés en section 3 (gestionnaire de mots de passe, coffre-fort numérique…) et qui d'autre y a accès
-- [ ] **Politique de sauvegarde de l'instance PostgreSQL** : outil, fréquence, emplacement, rétention, date du dernier test de restauration
-- [ ] Contenu de `thyrotrack_backup_20260822.dump` et décision prise pour l'historique git
+- [ ] Date du dernier **test de restauration** d'une sauvegarde PostgreSQL (restaurer un dump récent dans une base temporaire et la vérifier)
+- [x] Contenu de `thyrotrack_backup_20260822.dump` et décision prise pour l'historique git (données de test seulement, historique conservé — voir section 5)
 - [ ] Registrar du domaine `alithiel31.dev` et identifiants du compte
 - [ ] Personne(s) de confiance à contacter en cas d'indisponibilité prolongée du mainteneur
 - [ ] Emplacement physique du Raspberry Pi et modalités d'accès en cas d'urgence

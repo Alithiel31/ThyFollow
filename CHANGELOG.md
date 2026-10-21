@@ -98,6 +98,12 @@ pas synchronisé avec ces tags.
 
 ### Security
 
+- **`follow-redirects` 1.16.0 → 1.16.1 (frontend).** Dépendance transitive d'`axios` visée par deux
+  avis de sécurité de sévérité haute (GHSA-q3jh-wrc6-jgq8, GHSA-8r9p-f939-6h3c : en-têtes
+  d'identification transmis lors d'une redirection vers une autre origine). Mise à jour du seul
+  lockfile, sans changement de `package.json` ; l'audit CI (`--audit-level=high`) repasse au vert.
+  Reste une alerte de sévérité modérée sur `react-router` (6.x), dont le correctif impose la
+  version majeure 7 : à traiter à la main, à part.
 - **Quota d'imports PDF non contournable par requêtes simultanées.** Le solde lu en début de requête
   n'était décompté qu'après chaque fichier : plusieurs envois simultanés passaient tous le contrôle
   (au-delà des 3 imports offerts, ou du plafond mensuel Pro, avec autant d'appels IA payants). Chaque
@@ -150,6 +156,9 @@ pas synchronisé avec ces tags.
   est résilié avant la suppression, qui est annulée si la résiliation échoue. `GET /api/auth/me`
   renvoie `hasPassword` (jamais le hash).
 
+- `deploy.sh` supprime, après un déploiement réussi, les anciennes images `thyfollow` en gardant la
+  version en ligne et la précédente (retour arrière sans téléchargement) ; `--no-prune` pour tout
+  garder. Un échec du nettoyage ne fait jamais échouer le déploiement.
 - Déploiement continu (déclenché à la main) : `docker-compose.yml` tire les images publiées sur
   GHCR (`IMAGE_TAG`, `sha-<commit>` ou `main`) au lieu de les construire sur le Pi ;
   `docker-compose.build.yml` garde la construction depuis les sources. `deploy.sh` déploie le

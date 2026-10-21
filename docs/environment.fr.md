@@ -35,7 +35,10 @@ actif), se connecte à Infisical (Machine Identity, Universal Auth) et lance le 
 3. `docker compose pull` puis `docker compose up -d` : le service `migrate` passe en premier, et
    le backend n'est recréé que si les migrations ont réussi ;
 4. attend le healthcheck du backend, puis interroge le `/health` public, et affiche la commande de
-   retour arrière (`./deploy.sh --tag <version précédente>`).
+   retour arrière (`./deploy.sh --tag <version précédente>`) ;
+5. supprime les anciennes images `thyfollow` en gardant la version en ligne et la précédente, pour
+   qu'un retour arrière ne demande aucun téléchargement (`--no-prune` pour tout garder). Un échec à
+   cette étape ne fait jamais échouer le déploiement.
 
 Variables facultatives : `DEPLOY_SSH` (cible ssh du Pi, déduite sinon de l'hôte Docker),
 `DEPLOY_BACKUP_DIR`, `DEPLOY_HEALTH_URL`.
