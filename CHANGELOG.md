@@ -30,6 +30,14 @@ pas synchronisé avec ces tags.
 - Évaluer la montée de version Prisma 5 → 6 et Express 4 → 5 (aucune faille connue identifiée,
   mais l'écart grandit).
 
+### Security
+
+- **Dépendances du backend : `npm audit` repasse à zéro faille.** `body-parser` et `multer`
+  (déni de service, GHSA-27r3-jxmh-p828, GHSA-q7qp-rjg7-q26m) et `zod` (épuisement mémoire,
+  GHSA-mrhx-c7xc-m3w5) sont mis à jour. `sanitize-html` est forcé en `^2.18.1` par un `overrides` :
+  `express-xss-sanitizer@2.0.2`, la dernière version publiée, l'épingle en `~2.13` (contournements
+  XSS corrigés depuis). À retirer dès que ce paquet relève sa dépendance.
+
 ### Fixed
 
 - **Polices auto-hébergées.** Le service worker relançait les requêtes Google Fonts, bloquées
