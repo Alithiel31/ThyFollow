@@ -43,7 +43,7 @@ jobs:
       - name: Diagnostic qpdf
         working-directory: ${{ runner.temp }}
         run: |
-          set -x
+          set -x +e
           head -3 /etc/os-release
           qpdf --version
           dpkg -l | grep -E 'qpdf|gnutls|nettle|libssl' || true
@@ -61,6 +61,7 @@ jobs:
           mkdir -p /tmp/diag && cp b.pdf pw.txt /tmp/diag/
           qpdf --password-file=/tmp/diag/pw.txt --decrypt /tmp/diag/b.pdf /tmp/diag/o.pdf; echo "decrypt-tmp=$?"
           qpdf --password-file=pw.txt --show-encryption b.pdf; echo "show=$?"
+          printf '%s' 's3cret-Pa$$ w0rd' | qpdf --password-file=- --decrypt b.pdf o4.pdf; echo "decrypt-stdin=$?"
 
       - run: npm run lint
 

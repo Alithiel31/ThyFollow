@@ -88,7 +88,9 @@ describe('lib/pdfDecrypt', () => {
     for (const args of spawnCalls) {
       expect(args.join(' ')).not.toContain(PASSWORD);
     }
-    expect(spawnCalls.some((args) => args.some((a) => a.startsWith('--password-file=')))).toBe(true);
+    // Mot de passe sur l'entrée standard : aucun fichier que le profil
+    // AppArmor de qpdf pourrait refuser d'ouvrir
+    expect(spawnCalls.some((args) => args.includes('--password-file=-'))).toBe(true);
   });
 
   it('leaves no temporary file behind (success and failure)', async () => {

@@ -5,9 +5,11 @@
 // (installé dans l'image Docker) : les bibliothèques JS sachant seulement
 // LIRE un PDF protégé (pdfjs) ne produisent pas de copie déchiffrée.
 //
-// Le mot de passe est transmis à qpdf par fichier temporaire (--password-file,
-// mode 0600, supprimé dans un `finally`) et jamais en argument de ligne de
-// commande, où il serait visible dans la liste des processus.
+// Le mot de passe est transmis à qpdf sur son entrée standard
+// (--password-file=-) et jamais en argument de ligne de commande, où il serait
+// visible dans la liste des processus. Pas de fichier de mot de passe : le
+// profil AppArmor de qpdf (Ubuntu 26.04) ne l'autorise à ouvrir que des
+// .pdf/.json/.qdf/.in/.out et refusait le `pw.txt` qu'on utilisait.
 import { spawn } from 'node:child_process';
 import { mkdtemp, writeFile, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -40,9 +42,13 @@ interface QpdfResult {
   stderr: string;
 }
 
-function runQpdf(args: string[]): Promise<QpdfResult> {
+function runQpdf(args: string[], stdin = ''): Promise<QpdfResult> {
   return new Promise((resolve, reject) => {
-    const child = spawn('qpdf', args, { stdio: ['ignore', 'ignore', 'pipe'] });
+    const child = spawn('qpdf', args, { stdio: ['pipe', 'ignore', 'pipe'] });
+    // qpdf peut se terminer sans lire son entrée (fichier illisible) : on
+    // ignore alors l'EPIPE, le code de sortie suffit à décider.
+    child.stdin.on('error', () => {});
+    child.stdin.end(stdin);
     let stderr = '';
     const timer = setTimeout(() => child.kill('SIGKILL'), QPDF_TIMEOUT_MS);
     child.stderr.on('data', (chunk) => {
@@ -83,15 +89,10 @@ export async function decryptPdf(data: Buffer, password?: string): Promise<Buffe
     if (probe.code !== 0) return data;
 
     const output = path.join(dir, 'out.pdf');
-    const args: string[] = [];
-    if (password) {
-      const passwordFile = path.join(dir, 'pw.txt');
-      await writeFile(passwordFile, password, { mode: 0o600 });
-      args.push(`--password-file=${passwordFile}`);
-    }
+    const args = password ? ['--password-file=-'] : [];
     args.push('--decrypt', input, output);
 
-    const result = await runQpdf(args);
+    const result = await runQpdf(args, password);
     // 0 = succès ; 3 = succès avec avertissements (le fichier est écrit).
     if (result.code === 0 || result.code === 3) return await readFile(output);
     if (/invalid password/i.test(result.stderr)) {
