@@ -12,7 +12,7 @@ bug, améliore la fiabilité ou clarifie la documentation est bienvenue.
   discuter avant de coder.
 - Pour un correctif évident (typo, lien mort, faute de traduction), une PR directe suffit.
 - Vérifiez que le point n'est pas déjà listé dans la section `[Unreleased] > À faire` du
-  [`CHANGELOG.md`](./CHANGELOG.md).
+  [`CHANGELOG.md`](../CHANGELOG.md).
 
 ## Environnement de développement
 
@@ -44,12 +44,12 @@ cd backend && npm run dev   # http://localhost:3001
 cd frontend && npm run dev  # http://localhost:5173
 ```
 
-Voir le [`README.fr.md`](./README.fr.md) pour le détail (Google OAuth optionnel, déploiement
+Voir le [`README.fr.md`](../README.fr.md) pour le détail (Google OAuth optionnel, déploiement
 Docker Compose).
 
 ## Reproduire la CI en local
 
-Le workflow [`ci.yml`](./.github/workflows/ci.yml) lance, sur chaque PR vers `main`, lint +
+Le workflow [`ci.yml`](./workflows/ci.yml) lance, sur chaque PR vers `main`, lint +
 typecheck/build + tests pour le backend et pour le frontend. Reproduction locale :
 
 ```bash
@@ -69,7 +69,7 @@ npm test        # vitest run
 Node 20 est requis (`.nvmrc` à la racine) : les deux `package.json` pinnent volontairement
 `jsdom`/`@testing-library/jest-dom` sur des versions compatibles Node 20 (les dernières majeures
 de ces deux paquets exigent Node ≥22) — ne les mettez pas à jour sans revérifier cette
-contrainte, voir [`TROUBLESHOOTING.fr.md`](./TROUBLESHOOTING.fr.md).
+contrainte, voir [`docs/troubleshooting.fr.md`](../docs/troubleshooting.fr.md).
 
 ## Ouvrir une Pull Request
 
@@ -79,7 +79,7 @@ contrainte, voir [`TROUBLESHOOTING.fr.md`](./TROUBLESHOOTING.fr.md).
    larges ; les deux sont acceptés, mais le message doit expliquer le **pourquoi**, pas
    seulement le quoi.
 3. Si le changement est notable pour un utilisateur ou un contributeur, ajoutez une entrée dans
-   la section `[Unreleased]` de [`CHANGELOG.md`](./CHANGELOG.md).
+   la section `[Unreleased]` de [`CHANGELOG.md`](../CHANGELOG.md).
 4. Vérifiez que la CI passe (voir ci-dessus pour la reproduire en local avant de pousser).
 5. Ouvrez la PR contre `main`.
 
@@ -93,7 +93,7 @@ Pour un bug, précisez :
 - Les logs pertinents (`docker compose logs backend`, console navigateur) — **en retirant tout
   token, email réel, ou donnée de santé.**
 
-Avant d'ouvrir l'issue, jetez un œil à [`TROUBLESHOOTING.fr.md`](./TROUBLESHOOTING.fr.md) : les
+Avant d'ouvrir l'issue, jetez un œil à [`docs/troubleshooting.fr.md`](../docs/troubleshooting.fr.md) : les
 incidents déjà rencontrés et leur diagnostic y sont documentés.
 
 ## Secrets et données de santé

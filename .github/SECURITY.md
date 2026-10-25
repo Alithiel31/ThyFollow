@@ -27,7 +27,7 @@ the seed script is enough to illustrate a problem.
 - Acknowledgement within **72 hours**.
 - One maintainer, spare time: no formal SLA beyond the acknowledgement, but a confirmed flaw with
   real impact — above all one that exposes another user's data — goes before everything else.
-- Credit in the [`CHANGELOG.md`](./CHANGELOG.md) once the fix is released, unless you prefer
+- Credit in the [`CHANGELOG.md`](../CHANGELOG.md) once the fix is released, unless you prefer
   otherwise.
 - No bug bounty — this is a personal project, not a company.
 
@@ -48,14 +48,14 @@ Out of scope:
   privileged access to the infrastructure (Tailscale, Cloudflare tunnel, the shared PostgreSQL
   instance).
 - Pure volumetric attacks (flooding): the rate limiting described in
-  [architecture.md](./docs/architecture.md) is a mitigation, not a guarantee of absorbing hostile
+  [architecture.md](../docs/architecture.md) is a mitigation, not a guarantee of absorbing hostile
   traffic — an endpoint that escapes it, however, is in scope.
 - Social engineering aimed at the maintainer or third parties.
 
 ## What is already in place
 
 Before reporting something already covered, a few existing mechanisms (detailed in
-[architecture.md](./docs/architecture.md) and [environment.md](./docs/environment.md)):
+[architecture.md](../docs/architecture.md) and [environment.md](../docs/environment.md)):
 
 - **Authentication** — passwords hashed with bcrypt (cost 12); signed JWTs, and the server refuses to
   start in production with a `JWT_SECRET` shorter than 32 characters; email verification before the

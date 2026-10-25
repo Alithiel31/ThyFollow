@@ -21,7 +21,7 @@ backup questions below more than formalities.
 3. [environment.md](./environment.md) — every environment variable
 4. [development.md](./development.md) — run it locally, routes, tests, CI
 5. [`backend/docs/graphql.md`](../backend/docs/graphql.md) — why the GraphQL layer exists and how it works
-6. [TROUBLESHOOTING.md](../TROUBLESHOOTING.md), [SECURITY.md](../SECURITY.md), [CONTRIBUTING.md](../CONTRIBUTING.md)
+6. [troubleshooting.md](./troubleshooting.md), [SECURITY.md](../.github/SECURITY.md), [CONTRIBUTING.md](../.github/CONTRIBUTING.md)
 7. [CHANGELOG.md](../CHANGELOG.md) — detailed history of the decisions (in French)
 
 ---
@@ -58,7 +58,7 @@ required: a new dependency advisory must not block the very pull request that fi
 
 ## 3. Secrets and access needed to act
 
-No real secret is stored in this repository (see `.gitignore`, [SECURITY.md](../SECURITY.md)). To
+No real secret is stored in this repository (see `.gitignore`, [SECURITY.md](../.github/SECURITY.md)). To
 take the project over in practice you need access to the following — **to be completed by the
 current maintainer** (password manager in use, or any other secure way of handing them over):
 

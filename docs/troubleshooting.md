@@ -1,6 +1,6 @@
 # Troubleshooting
 
-🇫🇷 [Version française](./TROUBLESHOOTING.fr.md)
+🇫🇷 [Version française](./troubleshooting.fr.md)
 
 This document walks through the incidents encountered while setting up CI and the frontend test
 suite, including the diagnostic process followed — not just the final fix. Goal: the next

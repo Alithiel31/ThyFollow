@@ -456,8 +456,8 @@ POST   /graphql                                   (additive to the REST API abov
 | [`docs/development.md`](./docs/development.md) | Run it locally, database migrations, full route list, tests, CI |
 | [`backend/docs/graphql.md`](./backend/docs/graphql.md) | The additive GraphQL layer (in French) |
 | [`docs/handover-guide.md`](./docs/handover-guide.md) | What runs where, which accesses are needed, how to rebuild from scratch, known risks |
-| [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md) | Incidents already encountered, with the diagnostic process |
-| [`CONTRIBUTING.md`](./CONTRIBUTING.md) · [`SECURITY.md`](./SECURITY.md) · [`SUPPORT.md`](./SUPPORT.md) · [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md) | Community files |
+| [`docs/troubleshooting.md`](./docs/troubleshooting.md) | Incidents already encountered, with the diagnostic process |
+| [`CONTRIBUTING.md`](./.github/CONTRIBUTING.md) · [`SECURITY.md`](./.github/SECURITY.md) · [`SUPPORT.md`](./.github/SUPPORT.md) · [`CODE_OF_CONDUCT.md`](./.github/CODE_OF_CONDUCT.md) | Community files |
 
 Each guide has a French version (`*.fr.md`).
 
@@ -490,8 +490,8 @@ account's email, never any health data. Details: [`docs/environment.md`](./docs/
 
 ## 🤝 Contributing
 
-See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the development setup, how to reproduce CI
-locally, and the PR format. If you hit an issue, [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md)
+See [`CONTRIBUTING.md`](./.github/CONTRIBUTING.md) for the development setup, how to reproduce CI
+locally, and the PR format. If you hit an issue, [`docs/troubleshooting.md`](./docs/troubleshooting.md)
 documents incidents already encountered on this project (and their diagnosis).
 
 ## 📝 Changelog

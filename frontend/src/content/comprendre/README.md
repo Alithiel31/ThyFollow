@@ -25,7 +25,7 @@ backend et apparaissent en plus, dans la section « Articles de l'équipe ».
   Seul le WebP est accepté (test et cache PWA de `vite.config.ts`). Les illustrations sont
   recadrées (`object-fit: cover`, hauteur limitée) et estompées sur les bords, et partagées entre
   les langues : un schéma contenant du texte y perd son titre et reste en français. Les schémas du
-  pack 04 n'ont donc pas été branchés (voir `docs/comprendre-pack-04/README.md`).
+  pack 04 n'ont donc pas été branchés (voir `conception/comprendre-pack-04/README.md`, hors dépôt).
 - L'`id` d'une fiche sert d'URL (`/learn/<id>`) et passe avant un article API qui aurait le même slug
   (`fin` est réservé à l'écran de fin).
 - `tags` (optionnel) : mots-clés pris en compte par la recherche, qui couvre aussi le titre, le
@@ -47,7 +47,7 @@ thyroïdite du post-partum, thyroïdite subaiguë, produit de contraste iodé). 
 « Comprendre » 03 a ajouté `medicaments-et-thyroide` et `hypothyroidie-fruste` ; sa fiche « Basedow,
 tabac et santé des yeux » est devenue la 4e section de `basedow-yeux`, et son complément sur le café
 et le petit-déjeuner a été ajouté à la première section de `levothyroxine-prise`. Le pack
-« Comprendre » 04 (livraison et schémas sources dans `docs/comprendre-pack-04/`) a ajouté
+« Comprendre » 04 (livraison et schémas sources dans `conception/comprendre-pack-04/`, hors dépôt) a ajouté
 `cytoponction-nodule-thyroidien`, `cancer-thyroide-parcours`, `basedow-choix-traitement` et
 `equipe-suivi-thyroide`. Aucune n'a été relue par un professionnel de santé.
 

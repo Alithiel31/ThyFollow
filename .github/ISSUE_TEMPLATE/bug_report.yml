@@ -8,13 +8,13 @@ body:
         Thanks for taking the time to report this.
 
         Some incidents are already documented in
-        [`TROUBLESHOOTING.md`](https://github.com/Alithiel31/ThyFollow/blob/main/TROUBLESHOOTING.md)
-        ([version française](https://github.com/Alithiel31/ThyFollow/blob/main/TROUBLESHOOTING.fr.md)).
+        [`docs/troubleshooting.md`](https://github.com/Alithiel31/ThyFollow/blob/main/docs/troubleshooting.md)
+        ([version française](https://github.com/Alithiel31/ThyFollow/blob/main/docs/troubleshooting.fr.md)).
         Worth a look before filling this in.
 
         ⚠️ **Never paste real health data, a token or a password.** Strip them from any log or
         screenshot you attach. For a security flaw, do not use this form — see
-        [`SECURITY.md`](https://github.com/Alithiel31/ThyFollow/blob/main/SECURITY.md).
+        [`SECURITY.md`](https://github.com/Alithiel31/ThyFollow/blob/main/.github/SECURITY.md).
 
         Issues in English or French are both fine.
 

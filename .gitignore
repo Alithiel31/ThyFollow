@@ -19,4 +19,5 @@ prisma/migrations/*.sql.bak
 
 .claude/
 
-Docs/
+conception/
+*.dump

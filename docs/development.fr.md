@@ -161,4 +161,4 @@ s'arrête ; `backend` ne démarre que s'il a réussi, et `frontend` attend le he
 Le script de seed a besoin de `ts-node`, une dépendance de développement que l'image de production
 n'embarque pas (`npm ci --omit=dev`) : lancer `npm run db:seed` depuis une copie de développement
 pointée vers la base visée plutôt que dans le conteneur. En cas de problème, commencer par
-[TROUBLESHOOTING.fr.md](../TROUBLESHOOTING.fr.md).
+[troubleshooting.fr.md](./troubleshooting.fr.md).

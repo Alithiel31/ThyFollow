@@ -29,7 +29,7 @@ de démo créé par le script de seed suffit pour illustrer un problème.
 - Un mainteneur, sur son temps libre : pas de SLA formel au-delà de l'accusé de réception, mais une faille
   confirmée à impact réel — surtout si elle expose les données d'un autre utilisateur — passe devant
   tout le reste.
-- Crédit dans le [`CHANGELOG.md`](./CHANGELOG.md) une fois le correctif publié, sauf préférence contraire.
+- Crédit dans le [`CHANGELOG.md`](../CHANGELOG.md) une fois le correctif publié, sauf préférence contraire.
 - Pas de programme de bug bounty — c'est un projet personnel, pas une entreprise.
 
 ## Périmètre
@@ -48,14 +48,14 @@ Hors périmètre :
 - Une faille nécessitant un accès physique au Raspberry Pi qui héberge le service, ou un accès déjà
   privilégié à l'infrastructure (Tailscale, tunnel Cloudflare, instance PostgreSQL partagée).
 - Le volumétrique pur (déni de service par submersion) : la limitation de débit décrite dans
-  [architecture.fr.md](./docs/architecture.fr.md) est une atténuation, pas une garantie d'absorber un
+  [architecture.fr.md](../docs/architecture.fr.md) est une atténuation, pas une garantie d'absorber un
   trafic hostile — un endpoint qui y échappe, en revanche, est bien dans le périmètre.
 - L'ingénierie sociale visant le mainteneur ou des tiers.
 
 ## Ce qui est déjà en place
 
 Avant de signaler un problème déjà couvert, quelques mécanismes existants (détaillés dans
-[architecture.fr.md](./docs/architecture.fr.md) et [environment.fr.md](./docs/environment.fr.md)) :
+[architecture.fr.md](../docs/architecture.fr.md) et [environment.fr.md](../docs/environment.fr.md)) :
 
 - **Authentification** — mots de passe hachés avec bcrypt (coût 12) ; JWT signés, et le serveur refuse de
   démarrer en production avec un `JWT_SECRET` de moins de 32 caractères ; vérification du courriel avant

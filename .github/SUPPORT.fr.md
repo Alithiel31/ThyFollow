@@ -6,7 +6,7 @@ ThyroTrack est un projet personnel, maintenu par une seule personne sur son temp
 
 ## Avant de demander de l'aide
 
-1. Vérifier [TROUBLESHOOTING.fr.md](./TROUBLESHOOTING.fr.md) — les cas déjà rencontrés (CI, lockfile, exécuteur de tests et versions de Node) y sont documentés avec la démarche de diagnostic suivie.
+1. Vérifier [docs/troubleshooting.fr.md](../docs/troubleshooting.fr.md) — les cas déjà rencontrés (CI, lockfile, exécuteur de tests et versions de Node) y sont documentés avec la démarche de diagnostic suivie.
 2. Vérifier `GET /health` sur le service ([thyrotrack.alithiel31.dev/health](https://thyrotrack.alithiel31.dev/health)) — confirme si le backend répond avant de signaler une panne.
 3. Chercher dans les [issues existantes](https://github.com/Alithiel31/ThyFollow/issues), ouvertes et fermées.
 
