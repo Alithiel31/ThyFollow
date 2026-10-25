@@ -20,7 +20,7 @@ jobs:
     name: Backend (lint, typecheck, test)
     # Épinglé : sur ubuntu-latest (Ubuntu 26.04, qpdf 12.3.2), les tests de
     # lib/pdfDecrypt échouent sans que l'échec se reproduise en local.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
       run:
@@ -38,6 +38,29 @@ jobs:
 
       # qpdf : requis par les tests de lib/pdfDecrypt (fabrication de PDF protégés)
       - run: sudo apt-get update && sudo apt-get install -y qpdf
+
+      # DIAGNOSTIC TEMPORAIRE (ne pas fusionner) : comportement de qpdf sur ce runner
+      - name: Diagnostic qpdf
+        working-directory: ${{ runner.temp }}
+        run: |
+          set -x
+          head -3 /etc/os-release
+          qpdf --version
+          dpkg -l | grep -E 'qpdf|gnutls|nettle|libssl' || true
+          echo "TMPDIR=${TMPDIR:-unset}"; df -hT /tmp "$PWD" || true
+          ls -ld /tmp "$PWD"
+          cat /proc/self/attr/current 2>/dev/null || true
+          ls /etc/apparmor.d | grep -i qpdf || true
+          qpdf --empty a.pdf
+          qpdf --encrypt 's3cret-Pa$$ w0rd' owner-pw 256 -- a.pdf b.pdf; echo "encrypt=$?"
+          qpdf --is-encrypted b.pdf; echo "is-encrypted=$?"
+          printf '%s' 's3cret-Pa$$ w0rd' > pw.txt; chmod 600 pw.txt
+          qpdf --password-file=pw.txt --decrypt b.pdf o.pdf; echo "decrypt-file=$?"
+          qpdf --password-file="$PWD/pw.txt" --decrypt b.pdf o2.pdf; echo "decrypt-file-abs=$?"
+          qpdf --password='s3cret-Pa$$ w0rd' --decrypt b.pdf o3.pdf; echo "decrypt-arg=$?"
+          mkdir -p /tmp/diag && cp b.pdf pw.txt /tmp/diag/
+          qpdf --password-file=/tmp/diag/pw.txt --decrypt /tmp/diag/b.pdf /tmp/diag/o.pdf; echo "decrypt-tmp=$?"
+          qpdf --password-file=pw.txt --show-encryption b.pdf; echo "show=$?"
 
       - run: npm run lint
 
