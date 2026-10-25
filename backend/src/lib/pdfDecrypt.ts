@@ -12,6 +12,7 @@ import { spawn } from 'node:child_process';
 import { mkdtemp, writeFile, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { logger } from './logger.js';
 
 export class InvalidPdfError extends Error {
   constructor(message = 'Fichier PDF invalide') {
@@ -96,6 +97,9 @@ export async function decryptPdf(data: Buffer, password?: string): Promise<Buffe
     if (/invalid password/i.test(result.stderr)) {
       throw password ? new PdfWrongPasswordError() : new PdfPasswordRequiredError();
     }
+    // Échec inattendu de qpdf : on garde son diagnostic (jamais le mot de
+    // passe, transmis par fichier) pour pouvoir l'analyser.
+    logger.warn(`qpdf --decrypt a échoué (code ${result.code})`, result.stderr.trim());
     throw new InvalidPdfError();
   } finally {
     await rm(dir, { recursive: true, force: true });
