@@ -110,6 +110,39 @@
       "medicalReviewRequired": true
     },
     {
+      "id": "hypothyroidie-fruste",
+      "title": "Subclinical hypothyroidism: understanding a borderline result",
+      "summary": "A TSH above the reference range with FT4 within its range is not always enough to decide on treatment.",
+      "tags": ["subclinical hypothyroidism", "mild hypothyroidism", "TSH", "FT4", "blood tests"],
+      "intro": "“Subclinical hypothyroidism” describes a particular pattern of blood test results. How it is interpreted depends on the results, how they change over time, your symptoms and your medical situation. This guide cannot be used to diagnose anything from your own result.",
+      "sections": [
+        {
+          "heading": "What does “subclinical” mean?",
+          "body": "The term usually describes a TSH above the reference range while free T4 (FT4) stays within the laboratory’s range. Your doctor checks the context and may suggest a repeat test before drawing a conclusion."
+        },
+        {
+          "heading": "Treatment is not automatic",
+          "body": "The decision takes several things into account: repeated results, symptoms, age, medical history and other health factors. A single value cannot show whether treatment is needed."
+        },
+        {
+          "heading": "Questions to ask",
+          "body": "Ask whether the result should be repeated, what is being taken into account and when to get back in touch. Do not try to correct a result yourself by changing a medicine or taking a supplement."
+        }
+      ],
+      "takeaways": [
+        "A TSH above the range with a normal FT4 does not, on its own, tell the whole story.",
+        "The context, and repeated results where needed, matter.",
+        "The decision to treat or to monitor is made with your healthcare professional."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Underactive thyroid (hypothyroidism)",
+          "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
       "id": "tsh-et-age",
       "title": "TSH and age: why context matters",
       "summary": "How a TSH result is read depends on your age, your symptoms and your medical situation.",
@@ -220,11 +253,12 @@
       "id": "levothyroxine-prise",
       "title": "Taking levothyroxine properly",
       "summary": "How you take your treatment can affect how well it is absorbed. A few useful everyday pointers.",
+      "tags": ["levothyroxine", "empty stomach", "coffee", "breakfast", "routine"],
       "intro": "Levothyroxine replaces thyroid hormone when the body does not make enough of it. Taking it regularly, under consistent conditions, helps keep the treatment stable.",
       "sections": [
         {
           "heading": "Keep a regular routine",
-          "body": "Follow your prescription and your medicine’s leaflet. Levothyroxine is usually taken on an empty stomach with water, leaving the recommended gap before breakfast."
+          "body": "Follow your prescription and your medicine’s leaflet. Levothyroxine is usually taken on an empty stomach with water, leaving the recommended gap before breakfast. Coffee, tea and meals can also affect absorption: if your morning routine changes or becomes hard to stick to, ask for advice before changing how you take it."
         },
         {
           "heading": "Be careful with some products",
@@ -241,6 +275,10 @@
         "If in doubt, ask for advice rather than changing the dose yourself."
       ],
       "sources": [
+        {
+          "label": "NHS — Levothyroxine",
+          "url": "https://www.nhs.uk/medicines/levothyroxine/"
+        },
         {
           "label": "French public medicines database (in French)",
           "url": "https://base-donnees-publique.medicaments.gouv.fr/"
@@ -276,6 +314,43 @@
         {
           "label": "French public medicines database (in French)",
           "url": "https://base-donnees-publique.medicaments.gouv.fr/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "medicaments-et-thyroide",
+      "title": "Can some medicines affect the thyroid?",
+      "summary": "Some treatments can affect how the thyroid works or how it is monitored: always tell your care team about your medicines.",
+      "tags": ["medicines", "lithium", "amiodarone", "side effects", "follow-up"],
+      "intro": "Some medicines can change how the thyroid works, or lead your doctor to plan regular checks. This does not mean you should stop the treatment: any decision is made with the professional who prescribes it.",
+      "sections": [
+        {
+          "heading": "Which treatments to mention",
+          "body": "Lithium and amiodarone are among the medicines that can affect the thyroid. Other treatments may also matter depending on your situation. Give your doctor and pharmacist an up-to-date list of your medicines, including those you take only now and then."
+        },
+        {
+          "heading": "Why monitoring may be offered",
+          "body": "Your doctor considers the treatment, your medical history and your symptoms to decide whether thyroid blood tests or a check-up are useful. How often depends on the medicine and your situation."
+        },
+        {
+          "heading": "Do not change a treatment yourself",
+          "body": "Do not stop a prescribed medicine or change its dose based on a guide or a single result. If you notice a change in your health or have a question about your treatment, contact the prescriber or your pharmacist."
+        }
+      ],
+      "takeaways": [
+        "Some medicines can affect how the thyroid works.",
+        "Tell the professional who follows you about your treatments and medical history.",
+        "Do not stop or change a treatment without medical advice."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Lithium",
+          "url": "https://www.nhs.uk/medicines/lithium/"
+        },
+        {
+          "label": "NHS — Amiodarone",
+          "url": "https://www.nhs.uk/medicines/amiodarone/"
         }
       ],
       "medicalReviewRequired": true
@@ -766,7 +841,7 @@
       "id": "basedow-yeux",
       "title": "Graves’ disease and the eyes: which signs to watch for?",
       "summary": "Thyroid eye disease deserves particular attention.",
-      "tags": ["eyes", "ophthalmology", "Graves’ disease"],
+      "tags": ["eyes", "ophthalmology", "Graves’ disease", "smoking", "thyroid eye disease"],
       "intro": "Graves’ disease can be associated with inflammation of the tissues around the eyes, known as thyroid eye disease (Graves’ orbitopathy). It does not affect everyone with the disease.",
       "sections": [
         {
@@ -780,17 +855,26 @@
         {
           "heading": "Why report it?",
           "body": "Follow-up may require coordination between the doctor who manages your thyroid and an ophthalmologist."
+        },
+        {
+          "heading": "Smoking: talking about it without judgement",
+          "body": "Smoking, including exposure to other people’s smoke, is linked to thyroid eye disease being more common or more severe in Graves’ disease. This does not mean that everyone who smokes will develop it. If you would like to cut down or stop smoking, a healthcare professional can offer support suited to you."
         }
       ],
       "takeaways": [
         "Eye symptoms should be reported.",
         "Do not assume that a vision problem is necessarily caused by Graves’ disease.",
-        "Sudden or significant loss of vision is an emergency."
+        "Sudden or significant loss of vision is an emergency.",
+        "You can ask for support to cut down or stop smoking, without judgement."
       ],
       "sources": [
         {
           "label": "NHS — Thyroid eye disease",
           "url": "https://www.nhs.uk/conditions/thyroid-eye-disease/"
+        },
+        {
+          "label": "American Thyroid Association — Thyroid eye disease",
+          "url": "https://www.thyroid.org/thyroid-eye-disease/"
         }
       ],
       "medicalReviewRequired": true

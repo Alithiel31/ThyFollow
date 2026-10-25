@@ -34,13 +34,16 @@ backend et apparaissent en plus, dans la section « Articles de l'équipe ».
 
 ## Relecture médicale — obligatoire avant publication
 
-Les 30 fiches actuelles sont des **brouillons pédagogiques** : les 8 fiches d'origine
+Les 32 fiches actuelles sont des **brouillons pédagogiques** : les 8 fiches d'origine
 (hypothyroïdie, Hashimoto, lévothyroxine…), les 10 fiches Basedow issues du pack éditorial
 « ThyroTrack-Comprendre-Extension-Basedow », 7 fiches du pack « Comprendre — nouvelles fiches »
 (anti-TPO/anti-Tg, prise de sang, grossesse, nodule, échographie, iode radioactif, suivi après
 thyroïdectomie) et les 5 fiches du pack « Comprendre — pack suivant » (TSH et âge, biotine,
-thyroïdite du post-partum, thyroïdite subaiguë, produit de contraste iodé). Aucune n'a été relue
-par un professionnel de santé.
+thyroïdite du post-partum, thyroïdite subaiguë, produit de contraste iodé). Le pack
+« Comprendre » 03 a ajouté `medicaments-et-thyroide` et `hypothyroidie-fruste` ; sa fiche « Basedow,
+tabac et santé des yeux » est devenue la 4e section de `basedow-yeux`, et son complément sur le café
+et le petit-déjeuner a été ajouté à la première section de `levothyroxine-prise`. Aucune n'a été
+relue par un professionnel de santé.
 
 Sur les 10 fiches de ce dernier pack, « Préparer une prise de sang » et « Valeurs de référence » ont
 été fusionnées (`preparer-prise-sang-thyroide`) ; « Hashimoto sans hypothyroïdie » est devenue la
@@ -121,6 +124,11 @@ Pour chaque fiche :
    - American Thyroid Association : `…/ata-statement-on-the-potential-risks-of-excess-iodine-ingestion-and-exposure/`
      et `…/patient-thyroid-information/ct-for-patients/april-2025/vol-18-issue-4-p-11-12/`
      (sous `https://www.thyroid.org`), cités tels quels dans les deux langues.
+   Liens du pack « Comprendre » 03 **non vérifiés** (même raison) : Assurance Maladie
+   `…/themes/trouble-bipolaire/traitement`, NHS `/medicines/lithium/`, `/medicines/amiodarone/`,
+   `/medicines/levothyroxine/`, American Thyroid Association `https://www.thyroid.org/thyroid-eye-disease/`.
+   La notice française de la lévothyroxine n'a pas pu être consultée : le passage sur le café, le
+   thé et les repas reste volontairement sans délai chiffré, à confirmer par le relecteur.
    Relecture attentive : l'interférence de la biotine selon les méthodes (`biotine-analyses-thyroide`),
    la lecture de la TSH avec l'âge (`tsh-et-age`, sans seuil chiffré), et l'évolution en phases des
    thyroïdites (`thyroidite-post-partum`, `thyroidite-subaigue`).

@@ -131,6 +131,52 @@
       "medicalReviewRequired": true
     },
     {
+      "id": "hypothyroidie-fruste",
+      "category": "analyses",
+      "readMinutes": 3,
+      "title": "Hypothyroïdie fruste : comprendre un bilan parfois limite",
+      "summary": "Une TSH au-dessus de l’intervalle de référence avec une T4L dans le sien ne suffit pas toujours à décider d’un traitement.",
+      "tags": [
+        "hypothyroïdie fruste",
+        "infraclinique",
+        "TSH",
+        "T4L",
+        "bilan"
+      ],
+      "image": "/assets/comprendre/analyses.webp",
+      "intro": "Le terme « hypothyroïdie fruste » désigne une situation biologique particulière. Son interprétation dépend des résultats, de leur évolution, des symptômes et du contexte médical. Cette fiche ne permet pas de poser un diagnostic à partir d’un résultat personnel.",
+      "sections": [
+        {
+          "heading": "Que signifie « fruste » ?",
+          "body": "En général, ce terme décrit une TSH supérieure à l’intervalle de référence alors que la T4L reste dans l’intervalle du laboratoire. On parle aussi d’hypothyroïdie infraclinique. Le professionnel vérifie le contexte et peut proposer un contrôle avant de conclure."
+        },
+        {
+          "heading": "Le traitement n’est pas automatique",
+          "body": "La décision tient compte de plusieurs éléments : résultats répétés, symptômes, âge, antécédents et autres facteurs médicaux. Une valeur isolée ne permet pas de déterminer si un traitement est nécessaire."
+        },
+        {
+          "heading": "Quelles questions poser ?",
+          "body": "Demandez si le résultat doit être contrôlé, quels éléments sont pris en compte et à quel moment reprendre contact. N’essayez pas de corriger vous-même un résultat en modifiant un médicament ou en prenant un complément."
+        }
+      ],
+      "takeaways": [
+        "Une TSH au-dessus de la référence avec une T4L normale ne donne pas, seule, toute l’interprétation.",
+        "Le contexte et la répétition éventuelle des résultats comptent.",
+        "La décision de traiter ou de surveiller se prend avec le professionnel de santé."
+      ],
+      "sources": [
+        {
+          "label": "HAS — Prise en charge des dysthyroïdies chez l’adulte",
+          "url": "https://www.has-sante.fr/jcms/p_3216305/fr/prise-en-charge-des-dysthyroidies-chez-l-adulte"
+        },
+        {
+          "label": "Assurance Maladie — Diagnostic de l’hypothyroïdie",
+          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie/symptomes-diagnostic-evolution"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
       "id": "tsh-et-age",
       "category": "analyses",
       "readMinutes": 2,
@@ -279,12 +325,19 @@
       "readMinutes": 3,
       "title": "Bien prendre sa lévothyroxine",
       "summary": "Les conditions de prise peuvent influencer l’absorption du traitement. Quelques repères utiles au quotidien.",
+      "tags": [
+        "lévothyroxine",
+        "à jeun",
+        "café",
+        "petit-déjeuner",
+        "routine"
+      ],
       "image": "/assets/comprendre/traitement.webp",
       "intro": "La lévothyroxine remplace l’hormone thyroïdienne lorsque l’organisme n’en produit pas suffisamment. Une prise régulière, dans des conditions constantes, aide à stabiliser le traitement.",
       "sections": [
         {
           "heading": "Garder une routine régulière",
-          "body": "Suivez la prescription et la notice de votre médicament. La lévothyroxine est généralement prise à jeun avec de l’eau, en respectant le délai recommandé avant le petit-déjeuner."
+          "body": "Suivez la prescription et la notice de votre médicament. La lévothyroxine est généralement prise à jeun avec de l’eau, en respectant le délai recommandé avant le petit-déjeuner. Le café, le thé et les repas peuvent aussi influencer l’absorption : si votre routine du matin change ou devient difficile à respecter, demandez conseil avant de modifier la prise."
         },
         {
           "heading": "Attention à certains produits",
@@ -304,6 +357,10 @@
         {
           "label": "Base de données publique des médicaments",
           "url": "https://base-donnees-publique.medicaments.gouv.fr/"
+        },
+        {
+          "label": "NHS — Levothyroxine (en anglais)",
+          "url": "https://www.nhs.uk/medicines/levothyroxine/"
         }
       ],
       "medicalReviewRequired": true
@@ -339,6 +396,52 @@
         {
           "label": "Base de données publique des médicaments",
           "url": "https://base-donnees-publique.medicaments.gouv.fr/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "medicaments-et-thyroide",
+      "category": "traitements",
+      "readMinutes": 3,
+      "title": "Certains médicaments peuvent-ils modifier la thyroïde ?",
+      "summary": "Certains traitements peuvent influencer le fonctionnement de la thyroïde ou son suivi : signalez toujours vos médicaments à l’équipe médicale.",
+      "tags": [
+        "médicaments",
+        "lithium",
+        "amiodarone",
+        "effets indésirables",
+        "suivi"
+      ],
+      "image": "/assets/comprendre/traitement.webp",
+      "intro": "Certains médicaments peuvent modifier le fonctionnement de la thyroïde ou conduire le médecin à prévoir une surveillance. Cela ne signifie pas qu’il faut interrompre le traitement : toute décision se prend avec le professionnel qui le prescrit.",
+      "sections": [
+        {
+          "heading": "Quels traitements mentionner ?",
+          "body": "Le lithium et l’amiodarone font partie des médicaments susceptibles d’influencer la thyroïde. D’autres traitements peuvent aussi compter selon votre situation. Donnez au médecin et au pharmacien une liste à jour de vos médicaments, y compris ceux pris ponctuellement."
+        },
+        {
+          "heading": "Pourquoi un suivi peut-il être proposé ?",
+          "body": "Le professionnel tient compte du traitement, de vos antécédents et de vos symptômes pour décider si un bilan thyroïdien ou un contrôle est utile. Le calendrier dépend du médicament et de votre situation."
+        },
+        {
+          "heading": "Ne pas modifier un traitement de vous-même",
+          "body": "N’arrêtez pas et ne changez pas la dose d’un médicament prescrit sur la base d’une fiche ou d’un résultat isolé. Si vous remarquez un changement de votre état de santé ou avez une question sur votre traitement, contactez le prescripteur ou votre pharmacien."
+        }
+      ],
+      "takeaways": [
+        "Certains médicaments peuvent influencer le fonctionnement de la thyroïde.",
+        "Signalez vos traitements et vos antécédents au professionnel qui vous suit.",
+        "N’interrompez ni ne modifiez un traitement sans avis médical."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie — Comprendre l’hypothyroïdie et ses causes",
+          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie/comprendre-hypothyroidie"
+        },
+        {
+          "label": "Assurance Maladie — Traitement du trouble bipolaire",
+          "url": "https://www.ameli.fr/assure/sante/themes/trouble-bipolaire/traitement"
         }
       ],
       "medicalReviewRequired": true
@@ -931,7 +1034,9 @@
       "tags": [
         "yeux",
         "ophtalmologie",
-        "Basedow"
+        "Basedow",
+        "tabac",
+        "orbitopathie"
       ],
       "intro": "La maladie de Basedow peut être associée à une atteinte inflammatoire des tissus autour des yeux, appelée orbitopathie thyroïdienne. Elle ne concerne pas toutes les personnes atteintes.",
       "sections": [
@@ -946,17 +1051,26 @@
         {
           "heading": "Pourquoi le signaler ?",
           "body": "Le suivi peut nécessiter une coordination entre le médecin qui suit la thyroïde et un ophtalmologiste."
+        },
+        {
+          "heading": "Tabac et fumée : en parler sans jugement",
+          "body": "Le tabac, y compris l’exposition à la fumée des autres, est associé à une atteinte oculaire plus fréquente ou plus sévère dans Basedow. Cela ne signifie pas que chaque personne qui fume en développera une. Si vous souhaitez réduire ou arrêter le tabac, un professionnel de santé peut vous proposer un accompagnement adapté."
         }
       ],
       "takeaways": [
         "Les symptômes oculaires doivent être signalés.",
         "Ne supposez pas qu’un problème de vision vient forcément de Basedow.",
-        "Une baisse de vision soudaine ou importante est une urgence."
+        "Une baisse de vision soudaine ou importante est une urgence.",
+        "Un accompagnement pour réduire ou arrêter le tabac peut être demandé, sans jugement."
       ],
       "sources": [
         {
           "label": "NHS — Thyroid eye disease",
           "url": "https://www.nhs.uk/conditions/thyroid-eye-disease/"
+        },
+        {
+          "label": "American Thyroid Association — Thyroid eye disease (en anglais)",
+          "url": "https://www.thyroid.org/thyroid-eye-disease/"
         }
       ],
       "medicalReviewRequired": true

@@ -60,6 +60,10 @@ pas synchronisé avec ces tags.
 
 ### Added
 
+- **« Comprendre » : médicaments et thyroïde, hypothyroïdie fruste**, en français et en anglais
+  (brouillons pédagogiques). `basedow-yeux` gagne une section sur le tabac, et
+  `levothyroxine-prise` une phrase sur le café, le thé et les repas, sans délai chiffré. Toutes
+  portent `medicalReviewRequired: true`.
 - **« Comprendre » : 5 fiches de plus, en français et en anglais** (brouillons pédagogiques) :
   TSH et âge, biotine et prise de sang, thyroïdite du post-partum, thyroïdite subaiguë, produit de
   contraste iodé. Elles réutilisent les illustrations existantes et sont placées à côté des fiches
