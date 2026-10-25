@@ -76,7 +76,9 @@ describe('English translations', () => {
       // Même nombre de sections : les icônes des cartes suivent leur rang
       expect(text.sections.length, text.id).toBe(original.sections.length);
       expect(text.takeaways.length, text.id).toBe(original.takeaways.length);
-      expect(text.sources.map((s) => s.url), text.id).toEqual(original.sources.map((s) => s.url));
+      // Les sources peuvent différer (équivalents anglophones), jamais manquer
+      expect(text.sources.length, text.id).toBeGreaterThan(0);
+      for (const source of text.sources) expect(source.url, text.id).toMatch(/^https:\/\//);
     }
   });
 

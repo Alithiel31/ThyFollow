@@ -7,7 +7,7 @@
     {
       "id": "hashimoto-hypothyroidie",
       "category": "thyroide",
-      "readMinutes": 3,
+      "readMinutes": 4,
       "featured": true,
       "title": "Hashimoto et hypothyroïdie : quelle différence ?",
       "summary": "Deux notions proches, mais pas identiques. Voici l’essentiel pour mieux comprendre votre parcours.",
@@ -25,6 +25,10 @@
         {
           "heading": "Les symptômes ne suffisent pas à conclure",
           "body": "Fatigue, frilosité ou difficultés de concentration peuvent avoir de nombreuses causes. Le diagnostic et le suivi reposent sur l’évaluation médicale et les analyses adaptées à votre situation."
+        },
+        {
+          "heading": "Une surveillance adaptée",
+          "body": "Hashimoto peut être présent alors que la thyroïde produit encore assez d’hormones. Le médecin peut alors suivre son fonctionnement avec des analyses choisies selon le contexte. Demandez quels résultats sont suivis, quand refaire les analyses et quels changements justifient de reprendre contact."
         }
       ],
       "takeaways": [
@@ -36,6 +40,56 @@
         {
           "label": "Assurance Maladie — Hypothyroïdie",
           "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
+        },
+        {
+          "label": "Assurance Maladie — Diagnostic de l’hypothyroïdie",
+          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie/symptomes-diagnostic-evolution"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "anticorps-anti-tpo-anti-tg",
+      "category": "analyses",
+      "readMinutes": 3,
+      "title": "Anti-TPO et anti-thyroglobuline : que recherchent ces anticorps ?",
+      "summary": "Ces anticorps peuvent aider à rechercher une origine auto-immune ; leur présence ne résume pas à elle seule l’état de la thyroïde.",
+      "tags": [
+        "anti-TPO",
+        "anti-Tg",
+        "anticorps",
+        "Hashimoto",
+        "auto-immunité"
+      ],
+      "image": "/assets/comprendre/analyses.webp",
+      "intro": "Les anticorps anti-TPO et anti-thyroglobuline (anti-Tg) sont des marqueurs que le médecin peut demander dans certaines situations. Ils sont différents des TRAb, présentés dans la fiche consacrée à Basedow.",
+      "sections": [
+        {
+          "heading": "Que signifient les sigles ?",
+          "body": "Les anti-TPO ciblent la thyroperoxydase et les anti-Tg la thyroglobuline, deux éléments liés à la thyroïde. Le médecin peut les rechercher lorsqu’il cherche une cause auto-immune à une anomalie thyroïdienne."
+        },
+        {
+          "heading": "Un résultat positif donne-t-il toute la réponse ?",
+          "body": "Non. Le résultat s’interprète avec la TSH, éventuellement la T4L, les symptômes et les autres éléments du dossier. La présence d’anticorps ne dit pas à elle seule si un traitement est nécessaire."
+        },
+        {
+          "heading": "Pourquoi ces dosages ne sont-ils pas systématiques ?",
+          "body": "Le choix du dosage dépend de la question médicale. Le médecin peut demander les anti-TPO en première intention puis, dans certaines situations, les anti-Tg. Demandez ce que le résultat doit éclairer dans votre cas."
+        }
+      ],
+      "takeaways": [
+        "Les anti-TPO et anti-Tg sont différents des TRAb.",
+        "Un résultat d’anticorps ne s’interprète pas isolément.",
+        "Le médecin choisit les dosages en fonction du contexte."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie — Diagnostic de l’hypothyroïdie",
+          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie/symptomes-diagnostic-evolution"
+        },
+        {
+          "label": "HAS — Prise en charge des dysthyroïdies chez l’adulte",
+          "url": "https://www.has-sante.fr/jcms/p_3216305/fr/prise-en-charge-des-dysthyroidies-chez-l-adulte"
         }
       ],
       "medicalReviewRequired": true
@@ -77,18 +131,213 @@
       "medicalReviewRequired": true
     },
     {
+      "id": "hypothyroidie-fruste",
+      "category": "analyses",
+      "readMinutes": 3,
+      "title": "Hypothyroïdie fruste : comprendre un bilan parfois limite",
+      "summary": "Une TSH au-dessus de l’intervalle de référence avec une T4L dans le sien ne suffit pas toujours à décider d’un traitement.",
+      "tags": [
+        "hypothyroïdie fruste",
+        "infraclinique",
+        "TSH",
+        "T4L",
+        "bilan"
+      ],
+      "image": "/assets/comprendre/analyses.webp",
+      "intro": "Le terme « hypothyroïdie fruste » désigne une situation biologique particulière. Son interprétation dépend des résultats, de leur évolution, des symptômes et du contexte médical. Cette fiche ne permet pas de poser un diagnostic à partir d’un résultat personnel.",
+      "sections": [
+        {
+          "heading": "Que signifie « fruste » ?",
+          "body": "En général, ce terme décrit une TSH supérieure à l’intervalle de référence alors que la T4L reste dans l’intervalle du laboratoire. On parle aussi d’hypothyroïdie infraclinique. Le professionnel vérifie le contexte et peut proposer un contrôle avant de conclure."
+        },
+        {
+          "heading": "Le traitement n’est pas automatique",
+          "body": "La décision tient compte de plusieurs éléments : résultats répétés, symptômes, âge, antécédents et autres facteurs médicaux. Une valeur isolée ne permet pas de déterminer si un traitement est nécessaire."
+        },
+        {
+          "heading": "Quelles questions poser ?",
+          "body": "Demandez si le résultat doit être contrôlé, quels éléments sont pris en compte et à quel moment reprendre contact. N’essayez pas de corriger vous-même un résultat en modifiant un médicament ou en prenant un complément."
+        }
+      ],
+      "takeaways": [
+        "Une TSH au-dessus de la référence avec une T4L normale ne donne pas, seule, toute l’interprétation.",
+        "Le contexte et la répétition éventuelle des résultats comptent.",
+        "La décision de traiter ou de surveiller se prend avec le professionnel de santé."
+      ],
+      "sources": [
+        {
+          "label": "HAS — Prise en charge des dysthyroïdies chez l’adulte",
+          "url": "https://www.has-sante.fr/jcms/p_3216305/fr/prise-en-charge-des-dysthyroidies-chez-l-adulte"
+        },
+        {
+          "label": "Assurance Maladie — Diagnostic de l’hypothyroïdie",
+          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie/symptomes-diagnostic-evolution"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "tsh-et-age",
+      "category": "analyses",
+      "readMinutes": 2,
+      "title": "TSH et âge : pourquoi le contexte compte",
+      "summary": "L’interprétation d’un résultat de TSH tient compte de l’âge, des symptômes et de la situation médicale.",
+      "tags": [
+        "TSH",
+        "âge",
+        "personnes âgées",
+        "seniors",
+        "analyses"
+      ],
+      "image": "/assets/comprendre/consultation.webp",
+      "intro": "La TSH est un marqueur utilisé pour évaluer la thyroïde. Chez les personnes âgées, son interprétation demande une attention particulière. Un résultat isolé ne permet pas de décider seul qu’un traitement est nécessaire.",
+      "sections": [
+        {
+          "heading": "Des symptômes moins spécifiques",
+          "body": "Fatigue, ralentissement ou troubles de la concentration peuvent avoir plusieurs explications, en particulier avec l’âge. Le médecin tient compte de l’ensemble des symptômes, des antécédents et des traitements."
+        },
+        {
+          "heading": "Un résultat qui se lit avec l’âge",
+          "body": "Avec l’âge, la lecture d’une TSH peut différer de celle retenue chez un adulte plus jeune. Le médecin la rapproche des autres résultats, des maladies associées et de certains médicaments : la décision ne se résume pas à comparer un chiffre à un intervalle trouvé en ligne."
+        },
+        {
+          "heading": "Quelles questions poser ?",
+          "body": "Demandez ce que le résultat signifie dans votre situation, si un contrôle est utile et quels changements doivent être signalés. Ne commencez, n’arrêtez ni ne modifiez un traitement sans avis médical."
+        }
+      ],
+      "takeaways": [
+        "L’âge fait partie du contexte d’interprétation de la TSH.",
+        "Un symptôme isolé ou une valeur seule ne suffit pas à conclure.",
+        "La décision de suivi ou de traitement revient au professionnel de santé."
+      ],
+      "sources": [
+        {
+          "label": "HAS — Dysthyroïdies : cas des personnes de plus de 65 ans",
+          "url": "https://www.has-sante.fr/jcms/p_3420835/fr/"
+        },
+        {
+          "label": "HAS — Prise en charge des hypothyroïdies chez l’adulte",
+          "url": "https://www.has-sante.fr/jcms/p_3418924/fr/prise-en-charge-des-hypothyroidies-chez-l-adulte-recommandations"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "preparer-prise-sang-thyroide",
+      "category": "analyses",
+      "readMinutes": 3,
+      "title": "Prise de sang thyroïdienne : avant et après",
+      "summary": "Quelques vérifications avant le prélèvement, puis une lecture prudente du compte rendu, aident à mieux en parler avec votre médecin.",
+      "tags": [
+        "prise de sang",
+        "laboratoire",
+        "valeurs de référence",
+        "unités",
+        "à jeun"
+      ],
+      "image": "/assets/comprendre/analyses.webp",
+      "intro": "Les consignes peuvent varier selon les examens prescrits et votre situation. Avant le prélèvement, vérifiez les indications du laboratoire ; après, lisez le résultat avec son unité et les valeurs de référence, sans en tirer seul de conclusion.",
+      "sections": [
+        {
+          "heading": "Vérifier les consignes",
+          "body": "Regardez l’ordonnance et les informations du laboratoire. Il ne faut pas supposer qu’un jeûne est nécessaire : suivez la consigne donnée pour les analyses réellement prescrites, et demandez au prescripteur quoi faire de vos médicaments le jour du prélèvement."
+        },
+        {
+          "heading": "Signaler traitements et compléments",
+          "body": "Mentionnez vos médicaments, vitamines et compléments au professionnel qui prescrit l’examen et à l’équipe du prélèvement. N’interrompez pas un traitement de votre propre initiative."
+        },
+        {
+          "heading": "Lire le compte rendu",
+          "body": "Repérez le nom du dosage, le résultat, l’unité et l’intervalle de référence indiqués par le laboratoire. Ces repères facilitent la lecture, mais ne suffisent pas à établir un diagnostic. Des méthodes différentes peuvent produire de légères variations."
+        },
+        {
+          "heading": "Comparer avec prudence",
+          "body": "Pour suivre une évolution, tenez compte des dates, des traitements et des changements de laboratoire. Une valeur dans l’intervalle ne répond pas toujours à toutes les questions ; une valeur en dehors n’en donne pas seule la cause. Demandez au médecin ce que le résultat signifie pour vous."
+        }
+      ],
+      "takeaways": [
+        "Suivez les consignes du laboratoire et du prescripteur, sans supposer qu’il faut être à jeun.",
+        "Lisez ensemble le résultat, son unité et les valeurs de référence du laboratoire.",
+        "Ne modifiez pas un traitement à partir d’un chiffre isolé."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie — Comment lire les résultats d’une prise de sang ?",
+          "url": "https://www.ameli.fr/assure/sante/examen/analyse/lire-resultats-prise-sang"
+        },
+        {
+          "label": "Assurance Maladie — Diagnostic de l’hypothyroïdie",
+          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie/symptomes-diagnostic-evolution"
+        },
+        {
+          "label": "HAS — Prise en charge des dysthyroïdies chez l’adulte",
+          "url": "https://www.has-sante.fr/jcms/p_3216305/fr/prise-en-charge-des-dysthyroidies-chez-l-adulte"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "biotine-analyses-thyroide",
+      "category": "analyses",
+      "readMinutes": 2,
+      "title": "Biotine et prise de sang : pensez à signaler vos compléments",
+      "summary": "La biotine peut perturber certains tests de laboratoire : signalez vos compléments au médecin et au laboratoire.",
+      "tags": [
+        "biotine",
+        "vitamine B7",
+        "compléments",
+        "prise de sang",
+        "interférence"
+      ],
+      "image": "/assets/comprendre/analyses.webp",
+      "intro": "La biotine, aussi appelée vitamine B7 ou B8, se trouve dans certains compléments, notamment ceux vendus pour les cheveux ou les ongles. Selon la méthode utilisée, elle peut interférer avec certains tests de laboratoire. Ne modifiez pas votre prise de complément sans demander conseil.",
+      "sections": [
+        {
+          "heading": "Pourquoi la signaler ?",
+          "body": "La biotine peut fausser certains résultats de laboratoire, à la hausse ou à la baisse. L’effet dépend du test et de la méthode de dosage : il ne concerne pas toutes les analyses ni tous les laboratoires."
+        },
+        {
+          "heading": "Que faire avant un prélèvement ?",
+          "body": "Indiquez au médecin prescripteur et à l’équipe du laboratoire tous les compléments et médicaments que vous prenez, y compris ceux achetés sans ordonnance. Suivez leurs consignes pour votre prélèvement."
+        },
+        {
+          "heading": "Faut-il arrêter la biotine ?",
+          "body": "Ne l’arrêtez pas et ne changez pas l’horaire de prise de votre propre initiative. Le médecin ou le laboratoire vous dira si une précaution est nécessaire pour l’analyse prévue."
+        }
+      ],
+      "takeaways": [
+        "Signalez les compléments contenant de la biotine avant une prise de sang.",
+        "L’interférence dépend du test et de la méthode du laboratoire.",
+        "Ne suspendez pas un complément sans consigne d’un professionnel."
+      ],
+      "sources": [
+        {
+          "label": "FDA — Biotin interference with laboratory tests (in English)",
+          "url": "https://www.fda.gov/medical-devices/in-vitro-diagnostics/biotin-interference-troponin-lab-tests-assays-subject-biotin-interference"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
       "id": "levothyroxine-prise",
       "sectionStyle": "checklist",
       "category": "traitements",
       "readMinutes": 3,
       "title": "Bien prendre sa lévothyroxine",
       "summary": "Les conditions de prise peuvent influencer l’absorption du traitement. Quelques repères utiles au quotidien.",
+      "tags": [
+        "lévothyroxine",
+        "à jeun",
+        "café",
+        "petit-déjeuner",
+        "routine"
+      ],
       "image": "/assets/comprendre/traitement.webp",
       "intro": "La lévothyroxine remplace l’hormone thyroïdienne lorsque l’organisme n’en produit pas suffisamment. Une prise régulière, dans des conditions constantes, aide à stabiliser le traitement.",
       "sections": [
         {
           "heading": "Garder une routine régulière",
-          "body": "Suivez la prescription et la notice de votre médicament. La lévothyroxine est généralement prise à jeun avec de l’eau, en respectant le délai recommandé avant le petit-déjeuner."
+          "body": "Suivez la prescription et la notice de votre médicament. La lévothyroxine est généralement prise à jeun avec de l’eau, en respectant le délai recommandé avant le petit-déjeuner. Le café, le thé et les repas peuvent aussi influencer l’absorption : si votre routine du matin change ou devient difficile à respecter, demandez conseil avant de modifier la prise."
         },
         {
           "heading": "Attention à certains produits",
@@ -108,6 +357,10 @@
         {
           "label": "Base de données publique des médicaments",
           "url": "https://base-donnees-publique.medicaments.gouv.fr/"
+        },
+        {
+          "label": "NHS — Levothyroxine (en anglais)",
+          "url": "https://www.nhs.uk/medicines/levothyroxine/"
         }
       ],
       "medicalReviewRequired": true
@@ -143,6 +396,52 @@
         {
           "label": "Base de données publique des médicaments",
           "url": "https://base-donnees-publique.medicaments.gouv.fr/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "medicaments-et-thyroide",
+      "category": "traitements",
+      "readMinutes": 3,
+      "title": "Certains médicaments peuvent-ils modifier la thyroïde ?",
+      "summary": "Certains traitements peuvent influencer le fonctionnement de la thyroïde ou son suivi : signalez toujours vos médicaments à l’équipe médicale.",
+      "tags": [
+        "médicaments",
+        "lithium",
+        "amiodarone",
+        "effets indésirables",
+        "suivi"
+      ],
+      "image": "/assets/comprendre/traitement.webp",
+      "intro": "Certains médicaments peuvent modifier le fonctionnement de la thyroïde ou conduire le médecin à prévoir une surveillance. Cela ne signifie pas qu’il faut interrompre le traitement : toute décision se prend avec le professionnel qui le prescrit.",
+      "sections": [
+        {
+          "heading": "Quels traitements mentionner ?",
+          "body": "Le lithium et l’amiodarone font partie des médicaments susceptibles d’influencer la thyroïde. D’autres traitements peuvent aussi compter selon votre situation. Donnez au médecin et au pharmacien une liste à jour de vos médicaments, y compris ceux pris ponctuellement."
+        },
+        {
+          "heading": "Pourquoi un suivi peut-il être proposé ?",
+          "body": "Le professionnel tient compte du traitement, de vos antécédents et de vos symptômes pour décider si un bilan thyroïdien ou un contrôle est utile. Le calendrier dépend du médicament et de votre situation."
+        },
+        {
+          "heading": "Ne pas modifier un traitement de vous-même",
+          "body": "N’arrêtez pas et ne changez pas la dose d’un médicament prescrit sur la base d’une fiche ou d’un résultat isolé. Si vous remarquez un changement de votre état de santé ou avez une question sur votre traitement, contactez le prescripteur ou votre pharmacien."
+        }
+      ],
+      "takeaways": [
+        "Certains médicaments peuvent influencer le fonctionnement de la thyroïde.",
+        "Signalez vos traitements et vos antécédents au professionnel qui vous suit.",
+        "N’interrompez ni ne modifiez un traitement sans avis médical."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie — Comprendre l’hypothyroïdie et ses causes",
+          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie/comprendre-hypothyroidie"
+        },
+        {
+          "label": "Assurance Maladie — Traitement du trouble bipolaire",
+          "url": "https://www.ameli.fr/assure/sante/themes/trouble-bipolaire/traitement"
         }
       ],
       "medicalReviewRequired": true
@@ -285,6 +584,273 @@
         {
           "label": "ANSES — Compléments alimentaires",
           "url": "https://www.anses.fr/fr/content/les-complements-alimentaires"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "thyroide-grossesse-suivi",
+      "category": "suivi",
+      "readMinutes": 3,
+      "title": "Projet de grossesse ou grossesse : parler du suivi thyroïdien",
+      "summary": "Un projet de grossesse ou une grossesse peut modifier le suivi thyroïdien : anticipez un échange avec votre médecin ou votre endocrinologue.",
+      "tags": [
+        "grossesse",
+        "projet de grossesse",
+        "enceinte",
+        "post-partum",
+        "suivi"
+      ],
+      "image": "/assets/comprendre/consultation.webp",
+      "intro": "Les besoins de l’organisme évoluent pendant la grossesse, et le suivi thyroïdien peut devoir être adapté. Si vous avez une maladie de la thyroïde ou prenez un traitement, parlez-en à votre équipe médicale dès que vous envisagez une grossesse ou dès que vous apprenez que vous êtes enceinte.",
+      "sections": [
+        {
+          "heading": "Préparer l’échange médical",
+          "body": "Indiquez votre diagnostic, vos traitements, vos derniers résultats et tout changement récent. N’attendez pas une consultation de routine pour signaler une grossesse à votre équipe soignante."
+        },
+        {
+          "heading": "Un suivi adapté à votre situation",
+          "body": "Le professionnel décide quels dosages sont nécessaires et à quel rythme, selon le diagnostic, le stade de la grossesse et le traitement. Les valeurs de référence peuvent différer de celles utilisées en dehors de la grossesse."
+        },
+        {
+          "heading": "Ne pas modifier son traitement de soi-même",
+          "body": "Ne commencez, n’arrêtez ni ne modifiez un médicament sur la base de cette fiche. Demandez des consignes personnalisées, y compris pour la période qui suit l’accouchement."
+        }
+      ],
+      "takeaways": [
+        "Signalez un projet de grossesse ou une grossesse à votre équipe médicale.",
+        "Le rythme des contrôles et les objectifs sont individualisés.",
+        "Demandez des consignes précises avant toute modification de traitement."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie — Hypothyroïdie et grossesse",
+          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie/grossesse"
+        },
+        {
+          "label": "HAS — Prise en charge des dysthyroïdies chez l’adulte",
+          "url": "https://www.has-sante.fr/jcms/p_3216305/fr/prise-en-charge-des-dysthyroidies-chez-l-adulte"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "thyroidite-post-partum",
+      "category": "suivi",
+      "readMinutes": 3,
+      "title": "Après l’accouchement, la thyroïde peut-elle changer ?",
+      "summary": "La thyroïdite du post-partum peut modifier temporairement le fonctionnement de la thyroïde et passer inaperçue.",
+      "tags": [
+        "post-partum",
+        "accouchement",
+        "grossesse",
+        "thyroïdite",
+        "suivi"
+      ],
+      "image": "/assets/comprendre/consultation.webp",
+      "intro": "Dans les mois qui suivent un accouchement, le fonctionnement de la thyroïde peut changer. Certains symptômes peuvent être confondus avec la fatigue ou les bouleversements du post-partum. Cette fiche donne des repères généraux ; seul un professionnel peut évaluer votre situation.",
+      "sections": [
+        {
+          "heading": "Qu’appelle-t-on thyroïdite du post-partum ?",
+          "body": "C’est une inflammation de la thyroïde, d’origine auto-immune, qui peut apparaître après une grossesse. Son évolution varie : certaines personnes traversent une phase d’hyperthyroïdie, d’hypothyroïdie, ou les deux successivement ; d’autres ont peu de symptômes."
+        },
+        {
+          "heading": "Quels signes peuvent motiver un échange ?",
+          "body": "Fatigue inhabituelle, palpitations, nervosité ou sensation de ralentissement peuvent avoir de nombreuses causes après une naissance. S’ils persistent, vous inquiètent ou s’aggravent, parlez-en à un professionnel de santé plutôt que d’en attribuer vous-même la cause à la thyroïde."
+        },
+        {
+          "heading": "Comment en parler à l’équipe médicale ?",
+          "body": "Mentionnez vos antécédents thyroïdiens, vos traitements, la date de l’accouchement et les changements ressentis. Le professionnel décidera si un examen ou un suivi est utile. N’interrompez pas un traitement sans consigne médicale."
+        }
+      ],
+      "takeaways": [
+        "Le fonctionnement de la thyroïde peut évoluer après une grossesse.",
+        "Les symptômes du post-partum ne permettent pas, seuls, d’en identifier la cause.",
+        "Un professionnel peut décider si un bilan est indiqué."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie — Comprendre l’hypothyroïdie et ses causes",
+          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie/comprendre-hypothyroidie"
+        },
+        {
+          "label": "Assurance Maladie — Comprendre l’hyperthyroïdie et ses causes",
+          "url": "https://www.ameli.fr/assure/sante/themes/hyperthyroidie/comprendre-hyperthyroidie"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "thyroidite-subaigue",
+      "category": "thyroide",
+      "readMinutes": 3,
+      "title": "Thyroïdite subaiguë : une inflammation parfois temporaire",
+      "summary": "Certaines inflammations de la thyroïde évoluent dans le temps ; les symptômes seuls ne suffisent pas à en déterminer la cause.",
+      "tags": [
+        "thyroïdite",
+        "De Quervain",
+        "inflammation",
+        "douleur du cou",
+        "suivi"
+      ],
+      "image": "/assets/comprendre/thyroide.webp",
+      "intro": "Une thyroïdite est une inflammation de la glande thyroïde. Certaines formes, comme la thyroïdite subaiguë (dite de De Quervain), peuvent modifier temporairement les hormones thyroïdiennes. Leur diagnostic et leur suivi nécessitent une évaluation médicale.",
+      "sections": [
+        {
+          "heading": "Une évolution parfois en plusieurs phases",
+          "body": "L’inflammation peut d’abord s’accompagner de signes d’hyperthyroïdie, puis d’une période d’hypothyroïdie avant une amélioration. Cette évolution n’est pas la même chez tout le monde et ne peut pas être confirmée par les symptômes seuls."
+        },
+        {
+          "heading": "Quels éléments signaler ?",
+          "body": "Parlez au médecin d’une douleur ou d’une sensibilité au niveau du cou, d’un épisode infectieux récent, de palpitations, de fièvre ou d’autres symptômes. Ces signes peuvent avoir plusieurs causes et doivent être interprétés dans leur contexte."
+        },
+        {
+          "heading": "Pourquoi un suivi peut-il être proposé ?",
+          "body": "Le professionnel peut demander des analyses ou d’autres examens selon l’évaluation clinique. Des contrôles aident à suivre l’évolution de la fonction thyroïdienne. Ne commencez ni n’arrêtez de traitement sans avis médical."
+        }
+      ],
+      "takeaways": [
+        "Toutes les thyroïdites n’ont pas la même cause ni la même évolution.",
+        "Une douleur du cou ou des symptômes ne suffisent pas à établir un diagnostic.",
+        "Le professionnel décide des examens et du suivi utiles."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie — Comprendre l’hyperthyroïdie et ses causes",
+          "url": "https://www.ameli.fr/assure/sante/themes/hyperthyroidie/comprendre-hyperthyroidie"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "nodule-thyroidien-comprendre",
+      "category": "thyroide",
+      "readMinutes": 3,
+      "title": "Nodule thyroïdien : que signifie sa découverte ?",
+      "summary": "Un nodule est une zone localisée de la thyroïde. Sa découverte conduit parfois à un bilan, mais ne signifie pas à elle seule qu’il s’agit d’un cancer.",
+      "tags": [
+        "nodule",
+        "cou",
+        "cytoponction",
+        "bilan"
+      ],
+      "image": "/assets/comprendre/thyroide.webp",
+      "intro": "Un nodule thyroïdien peut être découvert à la palpation ou lors d’un examen réalisé pour une autre raison. Son évaluation dépend de plusieurs éléments, notamment son aspect à l’échographie et le fonctionnement de la thyroïde. Seul le professionnel qui connaît votre situation peut expliquer le bilan utile.",
+      "sections": [
+        {
+          "heading": "Un nodule, c’est quoi ?",
+          "body": "C’est une anomalie localisée de la structure de la glande. Il peut être unique ou accompagné d’autres nodules. Sa découverte ne permet pas à elle seule d’en connaître la nature."
+        },
+        {
+          "heading": "Quel bilan peut être proposé ?",
+          "body": "Le médecin peut demander un dosage de la TSH et une échographie. Selon les résultats, il peut proposer une surveillance, un avis spécialisé ou un examen complémentaire comme une cytoponction. Tous les nodules ne nécessitent pas les mêmes examens."
+        },
+        {
+          "heading": "Quelles informations apporter ?",
+          "body": "Apportez les résultats déjà disponibles, les comptes rendus d’imagerie, la liste de vos traitements et vos questions. Signalez au médecin tout changement récent ou toute gêne au niveau du cou."
+        }
+      ],
+      "takeaways": [
+        "La découverte d’un nodule ne permet pas d’en déduire la nature.",
+        "Le bilan dépend de l’examen clinique, des analyses et de l’échographie.",
+        "Le médecin vous expliquera si une surveillance ou un examen complémentaire est adapté."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie — Nodule thyroïdien : le bilan",
+          "url": "https://www.ameli.fr/assure/sante/themes/nodule-thyroidien/cas-faut-consulter-examens-realises"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "echographie-thyroide",
+      "category": "analyses",
+      "readMinutes": 2,
+      "title": "Échographie de la thyroïde : à quoi sert-elle ?",
+      "summary": "L’échographie décrit la structure de la thyroïde et peut aider à caractériser un nodule ou un goitre.",
+      "tags": [
+        "échographie",
+        "imagerie",
+        "nodule",
+        "goitre",
+        "compte rendu"
+      ],
+      "image": "/assets/comprendre/analyses.webp",
+      "intro": "L’échographie utilise des ultrasons pour observer la thyroïde et les structures voisines. Elle ne mesure pas la quantité d’hormones produites. Le médecin la prescrit lorsqu’elle peut répondre à une question précise ; elle n’est pas nécessaire dans toutes les maladies de la thyroïde.",
+      "sections": [
+        {
+          "heading": "Ce que l’examen peut montrer",
+          "body": "L’échographie décrit notamment la taille et l’aspect de la glande, la présence de nodules et certains ganglions du cou. Le compte rendu rassemble des éléments qui seront interprétés avec votre situation et les autres examens."
+        },
+        {
+          "heading": "Comment se déroule le rendez-vous ?",
+          "body": "L’examen se fait avec une sonde déplacée sur la peau du cou, généralement avec du gel. Il est indolore et n’utilise pas de rayons X. Suivez les indications données par le centre d’imagerie."
+        },
+        {
+          "heading": "Après l’examen",
+          "body": "Le compte rendu ne constitue pas toujours à lui seul un diagnostic. Demandez au médecin prescripteur ce que les observations changent pour votre suivi et si d’autres examens sont utiles."
+        }
+      ],
+      "takeaways": [
+        "L’échographie étudie la structure de la thyroïde, pas son fonctionnement hormonal.",
+        "Sa prescription dépend de l’indication médicale.",
+        "Le compte rendu se lit avec les autres éléments du dossier."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie — Nodule thyroïdien : le bilan",
+          "url": "https://www.ameli.fr/assure/sante/themes/nodule-thyroidien/cas-faut-consulter-examens-realises"
+        },
+        {
+          "label": "Assurance Maladie — Hyperthyroïdie : diagnostic et examens",
+          "url": "https://www.ameli.fr/assure/sante/themes/hyperthyroidie/symptomes-diagnostic-evolution"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "contraste-iode-thyroide",
+      "category": "analyses",
+      "readMinutes": 2,
+      "title": "Produit de contraste iodé : que signaler avant un examen ?",
+      "summary": "Certains examens utilisent un produit de contraste iodé : signalez vos antécédents thyroïdiens et suivez les consignes de l’équipe.",
+      "tags": [
+        "iode",
+        "produit de contraste",
+        "scanner",
+        "imagerie",
+        "examens"
+      ],
+      "image": "/assets/comprendre/analyses.webp",
+      "intro": "Certains examens d’imagerie, comme des scanners, peuvent utiliser un produit de contraste contenant de l’iode. Si vous avez une maladie de la thyroïde ou un traitement lié à la thyroïde, signalez-le à l’équipe médicale avant l’examen.",
+      "sections": [
+        {
+          "heading": "Pourquoi poser la question ?",
+          "body": "Une quantité importante d’iode peut modifier le fonctionnement de la thyroïde chez certaines personnes. Le risque dépend du contexte médical ; cela ne signifie pas qu’un examen avec contraste est contre-indiqué."
+        },
+        {
+          "heading": "Quelles informations communiquer ?",
+          "body": "Mentionnez vos antécédents de maladie thyroïdienne, vos traitements et, si l’équipe vous le demande, vos examens récents. Si vous ne savez pas si un produit de contraste est prévu, posez la question au centre d’imagerie ou au médecin prescripteur."
+        },
+        {
+          "heading": "Ne pas modifier le rendez-vous de vous-même",
+          "body": "Ne refusez pas et ne reportez pas un examen sur la base de cette fiche. L’équipe évaluera les bénéfices, les précautions et la nécessité éventuelle d’un suivi selon votre situation."
+        }
+      ],
+      "takeaways": [
+        "Signalez une maladie thyroïdienne et ses traitements à l’équipe.",
+        "La présence d’iode dans un produit de contraste ne signifie pas qu’il faut annuler l’examen.",
+        "Les précautions éventuelles sont décidées par l’équipe médicale."
+      ],
+      "sources": [
+        {
+          "label": "American Thyroid Association — Risques d’un excès d’iode (en anglais)",
+          "url": "https://www.thyroid.org/ata-statement-on-the-potential-risks-of-excess-iodine-ingestion-and-exposure/"
+        },
+        {
+          "label": "American Thyroid Association — Hyperthyroïdie après produit de contraste iodé (en anglais)",
+          "url": "https://www.thyroid.org/patient-thyroid-information/ct-for-patients/april-2025/vol-18-issue-4-p-11-12/"
         }
       ],
       "medicalReviewRequired": true
@@ -468,7 +1034,9 @@
       "tags": [
         "yeux",
         "ophtalmologie",
-        "Basedow"
+        "Basedow",
+        "tabac",
+        "orbitopathie"
       ],
       "intro": "La maladie de Basedow peut être associée à une atteinte inflammatoire des tissus autour des yeux, appelée orbitopathie thyroïdienne. Elle ne concerne pas toutes les personnes atteintes.",
       "sections": [
@@ -483,17 +1051,26 @@
         {
           "heading": "Pourquoi le signaler ?",
           "body": "Le suivi peut nécessiter une coordination entre le médecin qui suit la thyroïde et un ophtalmologiste."
+        },
+        {
+          "heading": "Tabac et fumée : en parler sans jugement",
+          "body": "Le tabac, y compris l’exposition à la fumée des autres, est associé à une atteinte oculaire plus fréquente ou plus sévère dans Basedow. Cela ne signifie pas que chaque personne qui fume en développera une. Si vous souhaitez réduire ou arrêter le tabac, un professionnel de santé peut vous proposer un accompagnement adapté."
         }
       ],
       "takeaways": [
         "Les symptômes oculaires doivent être signalés.",
         "Ne supposez pas qu’un problème de vision vient forcément de Basedow.",
-        "Une baisse de vision soudaine ou importante est une urgence."
+        "Une baisse de vision soudaine ou importante est une urgence.",
+        "Un accompagnement pour réduire ou arrêter le tabac peut être demandé, sans jugement."
       ],
       "sources": [
         {
           "label": "NHS — Thyroid eye disease",
           "url": "https://www.nhs.uk/conditions/thyroid-eye-disease/"
+        },
+        {
+          "label": "American Thyroid Association — Thyroid eye disease (en anglais)",
+          "url": "https://www.thyroid.org/thyroid-eye-disease/"
         }
       ],
       "medicalReviewRequired": true
@@ -534,6 +1111,47 @@
         {
           "label": "NHS — Carbimazole",
           "url": "https://www.nhs.uk/medicines/carbimazole/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "iode-radioactif-comprendre",
+      "category": "traitements",
+      "readMinutes": 3,
+      "title": "Iode radioactif : comprendre le principe du traitement",
+      "summary": "L’iode radioactif est une option proposée dans certaines situations d’hyperthyroïdie, avec des précautions et un suivi définis par l’équipe spécialisée.",
+      "tags": [
+        "iode radioactif",
+        "irathérapie",
+        "médecine nucléaire",
+        "hyperthyroïdie"
+      ],
+      "image": "/assets/comprendre/traitement.webp",
+      "intro": "L’iode radioactif, aussi appelé irathérapie, peut être proposé pour certaines causes d’hyperthyroïdie. La décision dépend de la maladie, des autres traitements possibles et de votre situation. Le traitement est organisé par une équipe spécialisée.",
+      "sections": [
+        {
+          "heading": "Quel est son principe ?",
+          "body": "La thyroïde capte l’iode. Le traitement vise à réduire l’activité d’une partie des cellules thyroïdiennes. Son effet n’est pas immédiat et le résultat varie selon les situations."
+        },
+        {
+          "heading": "Quelles précautions demander ?",
+          "body": "L’indication, les contre-indications et les consignes de radioprotection doivent être expliquées par l’équipe de médecine nucléaire. Signalez une grossesse possible, un allaitement, un projet de grossesse et tous vos traitements avant la prise en charge."
+        },
+        {
+          "heading": "Pourquoi le suivi continue-t-il ?",
+          "body": "Le fonctionnement de la thyroïde peut évoluer après le traitement. Des contrôles sont prévus, et un traitement substitutif peut devenir nécessaire si la thyroïde ne produit plus assez d’hormones. N’interrompez ni ne modifiez un traitement sans consigne médicale."
+        }
+      ],
+      "takeaways": [
+        "L’irathérapie n’est pas indiquée dans toutes les maladies thyroïdiennes.",
+        "Les précautions sont personnalisées et doivent venir de l’équipe spécialisée.",
+        "Un suivi biologique reste nécessaire après le traitement."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie — Traitement de l’hyperthyroïdie",
+          "url": "https://www.ameli.fr/assure/sante/themes/hyperthyroidie/traitement"
         }
       ],
       "medicalReviewRequired": true
@@ -656,6 +1274,52 @@
         {
           "label": "NHS — Overactive thyroid (hyperthyroidism)",
           "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "suivi-apres-thyroidectomie",
+      "category": "suivi",
+      "readMinutes": 3,
+      "title": "Après une opération de la thyroïde : comprendre le suivi",
+      "summary": "Après une chirurgie thyroïdienne, le suivi dépend de l’intervention et de sa raison ; l’équipe explique les traitements et contrôles nécessaires.",
+      "tags": [
+        "thyroïdectomie",
+        "chirurgie",
+        "opération",
+        "lévothyroxine",
+        "sortie"
+      ],
+      "image": "/assets/comprendre/consultation.webp",
+      "intro": "Une intervention peut retirer une partie ou la totalité de la thyroïde. Les suites et le suivi dépendent de l’opération, de sa raison et des résultats. Votre équipe soignante vous précisera les consignes adaptées à votre situation.",
+      "sections": [
+        {
+          "heading": "Le traitement hormonal après l’intervention",
+          "body": "Après l’ablation complète de la thyroïde, un traitement substitutif par hormone thyroïdienne est généralement nécessaire. Après une intervention partielle, il dépend de la production hormonale restante et des résultats du suivi."
+        },
+        {
+          "heading": "Les contrôles et les symptômes à signaler",
+          "body": "Le calendrier des consultations et des analyses est individualisé. Suivez les consignes de sortie et contactez l’équipe en cas de symptôme qui vous inquiète. Une gêne respiratoire importante ou qui s’aggrave nécessite une aide urgente."
+        },
+        {
+          "heading": "Préparer le retour à la maison",
+          "body": "Avant la sortie, vérifiez qui contacter, quand reprendre vos médicaments, quels rendez-vous sont prévus et quelles activités sont momentanément déconseillées. Demandez une explication si une consigne n’est pas claire."
+        }
+      ],
+      "takeaways": [
+        "Les suites dépendent du type d’intervention et de sa raison.",
+        "Le traitement hormonal n’est pas le même pour tout le monde.",
+        "Gardez les consignes de sortie et les coordonnées de l’équipe."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie — Traitement de l’hyperthyroïdie",
+          "url": "https://www.ameli.fr/assure/sante/themes/hyperthyroidie/traitement"
+        },
+        {
+          "label": "Assurance Maladie — Surveillance après un cancer de la thyroïde",
+          "url": "https://www.ameli.fr/assure/sante/themes/cancer-thyroide/surveillance-medicale-vie-quotidienne"
         }
       ],
       "medicalReviewRequired": true

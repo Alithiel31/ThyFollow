@@ -58,8 +58,8 @@ describe('ArticlesPage — library', () => {
     expect(within(featured).getByRole('link', { name: /La maladie de Basedow, c’est quoi/ }))
       .toHaveAttribute('href', '/learn/basedow-comprendre');
     const latest = screen.getByRole('region', { name: 'articles.latest' });
-    expect(within(latest).getAllByRole('link')).toHaveLength(16);
-    expect(screen.getByText('articles.resultCount:{"count":18}')).toBeInTheDocument();
+    expect(within(latest).getAllByRole('link')).toHaveLength(30);
+    expect(screen.getByText('articles.resultCount:{"count":32}')).toBeInTheDocument();
   });
 
   it('offers the Basedow and safety categories with their description', async () => {
@@ -88,9 +88,10 @@ describe('ArticlesPage — library', () => {
     expect(chip).toHaveAttribute('aria-pressed', 'true');
     expect(screen.queryByRole('region', { name: 'articles.featured' })).not.toBeInTheDocument();
     const results = screen.getByRole('region', { name: 'articles.results' });
-    expect(within(results).getAllByRole('link')).toHaveLength(3);
+    expect(within(results).getAllByRole('link')).toHaveLength(5);
     expect(within(results).getByRole('link', { name: /Bien prendre sa lévothyroxine/ })).toBeInTheDocument();
     expect(within(results).getByRole('link', { name: /antithyroïdiens de synthèse/ })).toBeInTheDocument();
+    expect(within(results).getByRole('link', { name: /Iode radioactif/ })).toBeInTheDocument();
   });
 
   it('searches without accents and offers a reset when nothing matches', async () => {
@@ -107,7 +108,7 @@ describe('ArticlesPage — library', () => {
 
     await user.click(screen.getByRole('button', { name: 'articles.resetFilters' }));
     expect(input).toHaveValue('');
-    expect(screen.getByText('articles.resultCount:{"count":18}')).toBeInTheDocument();
+    expect(screen.getByText('articles.resultCount:{"count":32}')).toBeInTheDocument();
   });
 
   it('searches tags and section text', async () => {
@@ -158,8 +159,8 @@ describe('ArticlesPage — reader', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('link', { name: /Bien prendre sa lévothyroxine/ }));
 
-    expect(screen.getByText('articles.progress:{"current":1,"total":3}')).toBeInTheDocument();
-    expect(screen.getByText('1 / 3')).toBeInTheDocument();
+    expect(screen.getByText('articles.progress:{"current":1,"total":5}')).toBeInTheDocument();
+    expect(screen.getByText('1 / 5')).toBeInTheDocument();
     expect(screen.getByRole('navigation', { name: 'articles.pagination' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'articles.previous' })).not.toBeInTheDocument();
 
@@ -168,7 +169,13 @@ describe('ArticlesPage — reader', () => {
     expect(screen.getByRole('link', { name: 'articles.previous' })).toHaveAttribute('href', '/learn/levothyroxine-prise');
 
     await user.click(screen.getByRole('link', { name: 'articles.next' }));
+    expect(screen.getByRole('heading', { level: 1, name: /Certains médicaments peuvent-ils modifier/ })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('link', { name: 'articles.next' }));
     expect(screen.getByRole('heading', { level: 1, name: /antithyroïdiens de synthèse/ })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('link', { name: 'articles.next' }));
+    expect(screen.getByRole('heading', { level: 1, name: /Iode radioactif/ })).toBeInTheDocument();
 
     await user.click(screen.getByRole('link', { name: 'articles.finish' }));
     expect(screen.getByRole('heading', { level: 1, name: 'articles.endTitle' })).toBeInTheDocument();
@@ -179,7 +186,7 @@ describe('ArticlesPage — reader', () => {
   it('renders sections as icon cards when the guide asks for it', () => {
     renderAt('/learn/tsh-t4-t3');
     expect(screen.getByRole('heading', { level: 2, name: 'La TSH' }).closest('li')).not.toBeNull();
-    expect(screen.getByText('articles.progress:{"current":2,"total":18}')).toBeInTheDocument();
+    expect(screen.getByText('articles.progress:{"current":3,"total":32}')).toBeInTheDocument();
   });
 
   it('opens a Basedow guide as a draft pending medical review, with safe source links', () => {

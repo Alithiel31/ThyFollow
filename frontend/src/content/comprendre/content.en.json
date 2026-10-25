@@ -21,6 +21,10 @@
         {
           "heading": "Symptoms alone are not enough to conclude",
           "body": "Tiredness, feeling cold or difficulty concentrating can have many causes. Diagnosis and follow-up rely on a medical assessment and on tests suited to your situation."
+        },
+        {
+          "heading": "Monitoring suited to you",
+          "body": "You can have Hashimoto’s while your thyroid still makes enough hormones. Your doctor may then monitor how it works with tests chosen for your situation. Ask which results are followed, when to repeat the tests and which changes mean you should get back in touch."
         }
       ],
       "takeaways": [
@@ -30,8 +34,41 @@
       ],
       "sources": [
         {
-          "label": "Assurance Maladie (French national health insurance) — Hypothyroidism (in French)",
-          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
+          "label": "NHS — Underactive thyroid (hypothyroidism)",
+          "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "anticorps-anti-tpo-anti-tg",
+      "title": "TPO and thyroglobulin antibodies: what are these tests looking for?",
+      "summary": "These antibodies can help look for an autoimmune cause; on their own, they do not tell the whole story about your thyroid.",
+      "tags": ["anti-TPO", "anti-Tg", "TPOAb", "antibodies", "Hashimoto’s", "autoimmunity"],
+      "intro": "Thyroid peroxidase (TPO) antibodies and thyroglobulin (Tg) antibodies are markers your doctor may request in some situations. They are not the same as TRAb, covered in the guide on Graves’ disease.",
+      "sections": [
+        {
+          "heading": "What do the abbreviations mean?",
+          "body": "Anti-TPO antibodies target thyroid peroxidase, and anti-Tg antibodies target thyroglobulin, two components involved in how the thyroid works. A doctor may test for them when looking for an autoimmune cause of a thyroid problem."
+        },
+        {
+          "heading": "Does a positive result give the full answer?",
+          "body": "No. The result is read alongside TSH, sometimes free T4 (FT4), your symptoms and the rest of your medical history. Having antibodies does not, on its own, show whether treatment is needed."
+        },
+        {
+          "heading": "Why are these tests not always done?",
+          "body": "Which test is ordered depends on the medical question. A doctor may check TPO antibodies first and, in some situations, thyroglobulin antibodies. Ask what the result is meant to clarify in your case."
+        }
+      ],
+      "takeaways": [
+        "TPO and thyroglobulin antibodies are different from TRAb.",
+        "An antibody result is not interpreted on its own.",
+        "Your doctor chooses which tests to order based on the context."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Underactive thyroid (hypothyroidism)",
+          "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
         }
       ],
       "medicalReviewRequired": true
@@ -62,8 +99,148 @@
       ],
       "sources": [
         {
-          "label": "Assurance Maladie (French national health insurance) — Hypothyroidism (in French)",
-          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
+          "label": "NHS — Underactive thyroid (hypothyroidism)",
+          "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "hypothyroidie-fruste",
+      "title": "Subclinical hypothyroidism: understanding a borderline result",
+      "summary": "A TSH above the reference range with FT4 within its range is not always enough to decide on treatment.",
+      "tags": ["subclinical hypothyroidism", "mild hypothyroidism", "TSH", "FT4", "blood tests"],
+      "intro": "“Subclinical hypothyroidism” describes a particular pattern of blood test results. How it is interpreted depends on the results, how they change over time, your symptoms and your medical situation. This guide cannot be used to diagnose anything from your own result.",
+      "sections": [
+        {
+          "heading": "What does “subclinical” mean?",
+          "body": "The term usually describes a TSH above the reference range while free T4 (FT4) stays within the laboratory’s range. Your doctor checks the context and may suggest a repeat test before drawing a conclusion."
+        },
+        {
+          "heading": "Treatment is not automatic",
+          "body": "The decision takes several things into account: repeated results, symptoms, age, medical history and other health factors. A single value cannot show whether treatment is needed."
+        },
+        {
+          "heading": "Questions to ask",
+          "body": "Ask whether the result should be repeated, what is being taken into account and when to get back in touch. Do not try to correct a result yourself by changing a medicine or taking a supplement."
+        }
+      ],
+      "takeaways": [
+        "A TSH above the range with a normal FT4 does not, on its own, tell the whole story.",
+        "The context, and repeated results where needed, matter.",
+        "The decision to treat or to monitor is made with your healthcare professional."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Underactive thyroid (hypothyroidism)",
+          "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "tsh-et-age",
+      "title": "TSH and age: why context matters",
+      "summary": "How a TSH result is read depends on your age, your symptoms and your medical situation.",
+      "tags": ["TSH", "age", "older adults", "elderly", "blood tests"],
+      "intro": "TSH is a marker used to assess the thyroid. In older people, reading it calls for particular care. A single result is not enough, on its own, to decide that treatment is needed.",
+      "sections": [
+        {
+          "heading": "Symptoms that are less specific",
+          "body": "Tiredness, slowing down or difficulty concentrating can have several explanations, especially with age. Your doctor takes into account all your symptoms, your medical history and your treatments."
+        },
+        {
+          "heading": "A result read with age in mind",
+          "body": "With age, a TSH result may be read differently than in a younger adult. Your doctor considers it alongside your other results, other health conditions and some medicines: the decision is not simply a matter of comparing a number with a range found online."
+        },
+        {
+          "heading": "Questions to ask",
+          "body": "Ask what the result means in your situation, whether a repeat test is useful and which changes you should report. Do not start, stop or change a treatment without medical advice."
+        }
+      ],
+      "takeaways": [
+        "Age is part of the context for interpreting TSH.",
+        "A single symptom or a single value is not enough to draw a conclusion.",
+        "Decisions about follow-up or treatment are for your healthcare professional."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Underactive thyroid (hypothyroidism)",
+          "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "preparer-prise-sang-thyroide",
+      "title": "Thyroid blood tests: before and after",
+      "summary": "A few checks before the test, then a careful look at the report, make it easier to discuss the results with your doctor.",
+      "tags": ["blood test", "laboratory", "reference range", "units", "fasting"],
+      "intro": "Instructions can vary depending on the tests ordered and your situation. Before the test, check what the laboratory asks of you; afterwards, read each result with its unit and reference range, without drawing conclusions on your own.",
+      "sections": [
+        {
+          "heading": "Check the instructions",
+          "body": "Look at the request form and the laboratory’s information. Do not assume you need to fast: follow the instructions given for the tests actually ordered, and ask the person who ordered them what to do with your medicines on the day."
+        },
+        {
+          "heading": "Mention your medicines and supplements",
+          "body": "Tell the professional who orders the test, and the team taking the sample, about your medicines, vitamins and supplements. Do not stop a treatment on your own initiative."
+        },
+        {
+          "heading": "Reading the report",
+          "body": "Find the name of the test, the result, its unit and the reference range given by the laboratory. These help you read the report, but they are not enough to make a diagnosis. Different methods can give slightly different values."
+        },
+        {
+          "heading": "Compare with care",
+          "body": "To follow changes over time, take into account the dates, your treatment and any change of laboratory. A value within the range does not always answer every question, and a value outside it does not explain the cause on its own. Ask your doctor what the result means for you."
+        }
+      ],
+      "takeaways": [
+        "Follow the laboratory’s and your prescriber’s instructions, without assuming you need to fast.",
+        "Read each result together with its unit and the laboratory’s reference range.",
+        "Do not change a treatment based on a single number."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Blood tests",
+          "url": "https://www.nhs.uk/tests-and-treatments/blood-tests/"
+        },
+        {
+          "label": "NHS — Underactive thyroid (hypothyroidism)",
+          "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "biotine-analyses-thyroide",
+      "title": "Biotin and blood tests: remember to mention your supplements",
+      "summary": "Biotin can interfere with some laboratory tests: tell your doctor and the laboratory about any supplements you take.",
+      "tags": ["biotin", "vitamin B7", "supplements", "blood test", "interference"],
+      "intro": "Biotin, also called vitamin B7, is found in some supplements, especially those sold for hair or nails. Depending on the method used, it can interfere with some laboratory tests. Do not change how you take a supplement without asking for advice.",
+      "sections": [
+        {
+          "heading": "Why mention it?",
+          "body": "Biotin can make some laboratory results falsely high or falsely low. The effect depends on the test and the method used: it does not affect every test or every laboratory."
+        },
+        {
+          "heading": "What to do before a blood test",
+          "body": "Tell the doctor who ordered the test, and the laboratory team, about all the supplements and medicines you take, including those bought without a prescription. Follow their instructions for your test."
+        },
+        {
+          "heading": "Should you stop taking biotin?",
+          "body": "Do not stop it or change when you take it on your own initiative. Your doctor or the laboratory will tell you whether any precaution is needed for the planned test."
+        }
+      ],
+      "takeaways": [
+        "Mention supplements containing biotin before a blood test.",
+        "Interference depends on the test and the laboratory’s method.",
+        "Do not stop a supplement without advice from a professional."
+      ],
+      "sources": [
+        {
+          "label": "FDA — Biotin interference with laboratory tests",
+          "url": "https://www.fda.gov/medical-devices/in-vitro-diagnostics/biotin-interference-troponin-lab-tests-assays-subject-biotin-interference"
         }
       ],
       "medicalReviewRequired": true
@@ -72,11 +249,12 @@
       "id": "levothyroxine-prise",
       "title": "Taking levothyroxine properly",
       "summary": "How you take your treatment can affect how well it is absorbed. A few useful everyday pointers.",
+      "tags": ["levothyroxine", "empty stomach", "coffee", "breakfast", "routine"],
       "intro": "Levothyroxine replaces thyroid hormone when the body does not make enough of it. Taking it regularly, under consistent conditions, helps keep the treatment stable.",
       "sections": [
         {
           "heading": "Keep a regular routine",
-          "body": "Follow your prescription and your medicine’s leaflet. Levothyroxine is usually taken on an empty stomach with water, leaving the recommended gap before breakfast."
+          "body": "Follow your prescription and your medicine’s leaflet. Levothyroxine is usually taken on an empty stomach with water, leaving the recommended gap before breakfast. Coffee, tea and meals can also affect absorption: if your morning routine changes or becomes hard to stick to, ask for advice before changing how you take it."
         },
         {
           "heading": "Be careful with some products",
@@ -94,8 +272,8 @@
       ],
       "sources": [
         {
-          "label": "French public medicines database (in French)",
-          "url": "https://base-donnees-publique.medicaments.gouv.fr/"
+          "label": "NHS — Levothyroxine",
+          "url": "https://www.nhs.uk/medicines/levothyroxine/"
         }
       ],
       "medicalReviewRequired": true
@@ -126,8 +304,45 @@
       ],
       "sources": [
         {
-          "label": "French public medicines database (in French)",
-          "url": "https://base-donnees-publique.medicaments.gouv.fr/"
+          "label": "NHS — Levothyroxine",
+          "url": "https://www.nhs.uk/medicines/levothyroxine/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "medicaments-et-thyroide",
+      "title": "Can some medicines affect the thyroid?",
+      "summary": "Some treatments can affect how the thyroid works or how it is monitored: always tell your care team about your medicines.",
+      "tags": ["medicines", "lithium", "amiodarone", "side effects", "follow-up"],
+      "intro": "Some medicines can change how the thyroid works, or lead your doctor to plan regular checks. This does not mean you should stop the treatment: any decision is made with the professional who prescribes it.",
+      "sections": [
+        {
+          "heading": "Which treatments to mention",
+          "body": "Lithium and amiodarone are among the medicines that can affect the thyroid. Other treatments may also matter depending on your situation. Give your doctor and pharmacist an up-to-date list of your medicines, including those you take only now and then."
+        },
+        {
+          "heading": "Why monitoring may be offered",
+          "body": "Your doctor considers the treatment, your medical history and your symptoms to decide whether thyroid blood tests or a check-up are useful. How often depends on the medicine and your situation."
+        },
+        {
+          "heading": "Do not change a treatment yourself",
+          "body": "Do not stop a prescribed medicine or change its dose based on a guide or a single result. If you notice a change in your health or have a question about your treatment, contact the prescriber or your pharmacist."
+        }
+      ],
+      "takeaways": [
+        "Some medicines can affect how the thyroid works.",
+        "Tell the professional who follows you about your treatments and medical history.",
+        "Do not stop or change a treatment without medical advice."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Lithium",
+          "url": "https://www.nhs.uk/medicines/lithium/"
+        },
+        {
+          "label": "NHS — Amiodarone",
+          "url": "https://www.nhs.uk/medicines/amiodarone/"
         }
       ],
       "medicalReviewRequired": true
@@ -158,8 +373,8 @@
       ],
       "sources": [
         {
-          "label": "Assurance Maladie (French national health insurance) — Hypothyroidism (in French)",
-          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
+          "label": "NHS — Underactive thyroid (hypothyroidism)",
+          "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
         }
       ],
       "medicalReviewRequired": true
@@ -222,8 +437,8 @@
       ],
       "sources": [
         {
-          "label": "Assurance Maladie (French national health insurance) — Hypothyroidism (in French)",
-          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
+          "label": "NHS — Underactive thyroid (hypothyroidism)",
+          "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
         }
       ],
       "medicalReviewRequired": true
@@ -256,6 +471,220 @@
         {
           "label": "ANSES (French food safety agency) — Dietary supplements (in French)",
           "url": "https://www.anses.fr/fr/content/les-complements-alimentaires"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "thyroide-grossesse-suivi",
+      "title": "Planning a pregnancy or pregnant: talking about thyroid follow-up",
+      "summary": "Planning a pregnancy, or being pregnant, can change your thyroid follow-up: plan ahead to talk with your doctor or endocrinologist.",
+      "tags": ["pregnancy", "planning a pregnancy", "pregnant", "postpartum", "follow-up"],
+      "intro": "The body’s needs change during pregnancy, and thyroid follow-up may need to be adjusted. If you have a thyroid condition or take a treatment, tell your care team as soon as you are thinking about a pregnancy or find out that you are pregnant.",
+      "sections": [
+        {
+          "heading": "Prepare the conversation",
+          "body": "Share your diagnosis, your treatments, your latest results and any recent change. Do not wait for a routine appointment to tell your care team you are pregnant."
+        },
+        {
+          "heading": "Follow-up suited to your situation",
+          "body": "Your doctor decides which tests are needed and how often, depending on your diagnosis, the stage of pregnancy and your treatment. Reference ranges may differ from those used outside pregnancy."
+        },
+        {
+          "heading": "Do not change your treatment yourself",
+          "body": "Do not start, stop or change a medicine based on this guide. Ask for personal instructions, including for the period after the birth."
+        }
+      ],
+      "takeaways": [
+        "Tell your care team if you are planning a pregnancy or are pregnant.",
+        "How often you are tested, and the targets, are set for you individually.",
+        "Ask for clear instructions before any change to your treatment."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Underactive thyroid (hypothyroidism)",
+          "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
+        },
+        {
+          "label": "NHS — Overactive thyroid (hyperthyroidism)",
+          "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "thyroidite-post-partum",
+      "title": "Can the thyroid change after giving birth?",
+      "summary": "Postpartum thyroiditis can temporarily change how the thyroid works, and it can go unnoticed.",
+      "tags": ["postpartum", "after birth", "pregnancy", "thyroiditis", "follow-up"],
+      "intro": "In the months after giving birth, the way the thyroid works can change. Some symptoms can be mistaken for tiredness or the upheaval of life with a new baby. This guide gives general pointers; only a professional can assess your situation.",
+      "sections": [
+        {
+          "heading": "What is postpartum thyroiditis?",
+          "body": "It is an autoimmune inflammation of the thyroid that can appear after a pregnancy. How it evolves varies: some people go through a phase of hyperthyroidism, of hypothyroidism, or one after the other; others have few symptoms."
+        },
+        {
+          "heading": "Which signs are worth discussing?",
+          "body": "Unusual tiredness, palpitations, feeling on edge or feeling slowed down can have many causes after a birth. If they persist, worry you or get worse, talk to a healthcare professional rather than deciding yourself that your thyroid is the cause."
+        },
+        {
+          "heading": "How to raise it with your care team",
+          "body": "Mention any thyroid history, your treatments, the date of the birth and the changes you have noticed. The professional will decide whether a test or follow-up is useful. Do not stop a treatment without medical advice."
+        }
+      ],
+      "takeaways": [
+        "How the thyroid works can change after a pregnancy.",
+        "Postpartum symptoms alone cannot tell you their cause.",
+        "A professional can decide whether tests are needed."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Underactive thyroid (hypothyroidism)",
+          "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
+        },
+        {
+          "label": "NHS — Overactive thyroid (hyperthyroidism)",
+          "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "thyroidite-subaigue",
+      "title": "Subacute thyroiditis: an inflammation that is often temporary",
+      "summary": "Some types of thyroid inflammation change over time; symptoms alone are not enough to work out the cause.",
+      "tags": ["thyroiditis", "de Quervain", "inflammation", "neck pain", "follow-up"],
+      "intro": "Thyroiditis means inflammation of the thyroid gland. Some types, such as subacute thyroiditis (also called de Quervain’s thyroiditis), can temporarily change thyroid hormone levels. Diagnosis and follow-up require a medical assessment.",
+      "sections": [
+        {
+          "heading": "It can evolve in several phases",
+          "body": "The inflammation may first come with signs of an overactive thyroid, followed by a period of underactivity before things improve. This pattern is not the same for everyone and cannot be confirmed from symptoms alone."
+        },
+        {
+          "heading": "What to tell your doctor",
+          "body": "Tell your doctor about any pain or tenderness in your neck, a recent infection, palpitations, fever or other symptoms. These signs can have several causes and need to be interpreted in context."
+        },
+        {
+          "heading": "Why follow-up may be offered",
+          "body": "Depending on the clinical assessment, your doctor may request blood tests or other investigations. Check-ups help follow how thyroid function changes. Do not start or stop a treatment without medical advice."
+        }
+      ],
+      "takeaways": [
+        "Not all types of thyroiditis have the same cause or course.",
+        "Neck pain or other symptoms are not enough to make a diagnosis.",
+        "Your doctor decides which tests and follow-up are useful."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Overactive thyroid (hyperthyroidism)",
+          "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "nodule-thyroidien-comprendre",
+      "title": "Thyroid nodule: what does finding one mean?",
+      "summary": "A nodule is a localised lump in the thyroid. Finding one sometimes leads to further tests, but it does not, on its own, mean cancer.",
+      "tags": ["nodule", "lump", "neck", "fine-needle aspiration", "tests"],
+      "intro": "A thyroid nodule may be found when a doctor examines your neck, or during a scan done for another reason. How it is assessed depends on several things, including how it looks on ultrasound and how well the thyroid is working. Only the professional who knows your situation can explain which tests are useful.",
+      "sections": [
+        {
+          "heading": "What is a nodule?",
+          "body": "It is a localised change in the structure of the gland. There may be one nodule or several. Finding a nodule does not, on its own, tell you what kind it is."
+        },
+        {
+          "heading": "What tests may be offered?",
+          "body": "Your doctor may request a TSH blood test and an ultrasound scan. Depending on the results, they may suggest monitoring, a specialist opinion or a further test such as a fine-needle aspiration. Not every nodule needs the same tests."
+        },
+        {
+          "heading": "What information to bring",
+          "body": "Bring any results you already have, scan reports, a list of your treatments and your questions. Tell your doctor about any recent change or discomfort in your neck."
+        }
+      ],
+      "takeaways": [
+        "Finding a nodule does not tell you what kind it is.",
+        "The assessment depends on the examination, blood tests and ultrasound.",
+        "Your doctor will explain whether monitoring or a further test is appropriate."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Goitre",
+          "url": "https://www.nhs.uk/conditions/goitre/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "echographie-thyroide",
+      "title": "Thyroid ultrasound: what is it for?",
+      "summary": "An ultrasound scan shows the structure of the thyroid and can help describe a nodule or a goitre.",
+      "tags": ["ultrasound", "scan", "imaging", "nodule", "goitre", "report"],
+      "intro": "An ultrasound scan uses sound waves to look at the thyroid and nearby structures. It does not measure how much hormone the gland makes. A doctor requests it when it can answer a specific question; it is not needed for every thyroid condition.",
+      "sections": [
+        {
+          "heading": "What the scan can show",
+          "body": "The scan describes, among other things, the size and appearance of the gland, any nodules and some lymph nodes in the neck. The report gathers findings that will be interpreted alongside your situation and other tests."
+        },
+        {
+          "heading": "What happens at the appointment",
+          "body": "A small probe is moved over the skin of your neck, usually with some gel. It is painless and does not use X-rays. Follow the instructions given by the imaging centre."
+        },
+        {
+          "heading": "After the scan",
+          "body": "The report is not always a diagnosis on its own. Ask the doctor who requested it what the findings change for your follow-up and whether other tests are useful."
+        }
+      ],
+      "takeaways": [
+        "Ultrasound looks at the structure of the thyroid, not at how much hormone it makes.",
+        "Whether you need one depends on the medical reason.",
+        "The report is read together with the rest of your medical file."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Ultrasound scan",
+          "url": "https://www.nhs.uk/tests-and-treatments/ultrasound-scan/"
+        },
+        {
+          "label": "NHS — Goitre",
+          "url": "https://www.nhs.uk/conditions/goitre/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "contraste-iode-thyroide",
+      "title": "Iodine contrast: what to mention before a scan",
+      "summary": "Some scans use an iodine-based contrast agent: mention any thyroid history and follow the team’s instructions.",
+      "tags": ["iodine", "contrast agent", "CT scan", "imaging", "tests"],
+      "intro": "Some imaging tests, such as CT scans, may use a contrast agent that contains iodine. If you have a thyroid condition or take a thyroid-related treatment, tell the medical team before the scan.",
+      "sections": [
+        {
+          "heading": "Why ask?",
+          "body": "A large amount of iodine can affect how the thyroid works in some people. The risk depends on your medical situation; it does not mean a scan with contrast is ruled out."
+        },
+        {
+          "heading": "What to tell the team",
+          "body": "Mention any history of thyroid disease, your treatments and, if the team asks, any recent tests. If you are not sure whether contrast is planned, ask the imaging centre or the doctor who requested the scan."
+        },
+        {
+          "heading": "Do not change the appointment yourself",
+          "body": "Do not refuse or postpone a scan based on this guide. The team will weigh the benefits, any precautions and whether follow-up is needed in your situation."
+        }
+      ],
+      "takeaways": [
+        "Tell the team about a thyroid condition and its treatment.",
+        "Iodine in a contrast agent does not mean the scan must be cancelled.",
+        "Any precautions are decided by the medical team."
+      ],
+      "sources": [
+        {
+          "label": "American Thyroid Association — Potential risks of excess iodine",
+          "url": "https://www.thyroid.org/ata-statement-on-the-potential-risks-of-excess-iodine-ingestion-and-exposure/"
+        },
+        {
+          "label": "American Thyroid Association — Contrast-induced hyperthyroidism",
+          "url": "https://www.thyroid.org/patient-thyroid-information/ct-for-patients/april-2025/vol-18-issue-4-p-11-12/"
         }
       ],
       "medicalReviewRequired": true
@@ -404,7 +833,7 @@
       "id": "basedow-yeux",
       "title": "Graves’ disease and the eyes: which signs to watch for?",
       "summary": "Thyroid eye disease deserves particular attention.",
-      "tags": ["eyes", "ophthalmology", "Graves’ disease"],
+      "tags": ["eyes", "ophthalmology", "Graves’ disease", "smoking", "thyroid eye disease"],
       "intro": "Graves’ disease can be associated with inflammation of the tissues around the eyes, known as thyroid eye disease (Graves’ orbitopathy). It does not affect everyone with the disease.",
       "sections": [
         {
@@ -418,17 +847,26 @@
         {
           "heading": "Why report it?",
           "body": "Follow-up may require coordination between the doctor who manages your thyroid and an ophthalmologist."
+        },
+        {
+          "heading": "Smoking: talking about it without judgement",
+          "body": "Smoking, including exposure to other people’s smoke, is linked to thyroid eye disease being more common or more severe in Graves’ disease. This does not mean that everyone who smokes will develop it. If you would like to cut down or stop smoking, a healthcare professional can offer support suited to you."
         }
       ],
       "takeaways": [
         "Eye symptoms should be reported.",
         "Do not assume that a vision problem is necessarily caused by Graves’ disease.",
-        "Sudden or significant loss of vision is an emergency."
+        "Sudden or significant loss of vision is an emergency.",
+        "You can ask for support to cut down or stop smoking, without judgement."
       ],
       "sources": [
         {
           "label": "NHS — Thyroid eye disease",
           "url": "https://www.nhs.uk/conditions/thyroid-eye-disease/"
+        },
+        {
+          "label": "American Thyroid Association — Thyroid eye disease",
+          "url": "https://www.thyroid.org/thyroid-eye-disease/"
         }
       ],
       "medicalReviewRequired": true
@@ -462,6 +900,39 @@
         {
           "label": "NHS — Carbimazole",
           "url": "https://www.nhs.uk/medicines/carbimazole/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "iode-radioactif-comprendre",
+      "title": "Radioactive iodine: how the treatment works",
+      "summary": "Radioactive iodine is an option in some cases of hyperthyroidism, with precautions and follow-up set by a specialist team.",
+      "tags": ["radioactive iodine", "radioiodine", "nuclear medicine", "hyperthyroidism"],
+      "intro": "Radioactive iodine (radioiodine) treatment may be offered for some causes of hyperthyroidism. The decision depends on the condition, the other possible treatments and your situation. The treatment is organised by a specialist team.",
+      "sections": [
+        {
+          "heading": "How does it work?",
+          "body": "The thyroid takes up iodine. The treatment aims to reduce the activity of some of the thyroid cells. It does not work straight away, and the result varies from one situation to another."
+        },
+        {
+          "heading": "What precautions should you ask about?",
+          "body": "Whether it suits you, the reasons it might not, and the radiation safety advice should all be explained by the nuclear medicine team. Tell them if you could be pregnant, are breastfeeding or are planning a pregnancy, and about all your treatments, before the treatment is arranged."
+        },
+        {
+          "heading": "Why does follow-up continue?",
+          "body": "How the thyroid works can change after treatment. Check-ups are planned, and thyroid hormone replacement may become necessary if the thyroid no longer makes enough hormones. Do not stop or change a treatment without medical advice."
+        }
+      ],
+      "takeaways": [
+        "Radioactive iodine is not suitable for every thyroid condition.",
+        "Precautions are personal and should come from the specialist team.",
+        "Blood tests are still needed after treatment."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Overactive thyroid: treatment",
+          "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/treatment/"
         }
       ],
       "medicalReviewRequired": true
@@ -561,6 +1032,43 @@
         {
           "label": "NHS — Overactive thyroid (hyperthyroidism)",
           "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "suivi-apres-thyroidectomie",
+      "title": "After thyroid surgery: understanding your follow-up",
+      "summary": "After thyroid surgery, follow-up depends on the operation and why it was done; your team explains the treatment and check-ups you need.",
+      "tags": ["thyroidectomy", "surgery", "operation", "levothyroxine", "discharge"],
+      "intro": "An operation can remove part or all of the thyroid. Recovery and follow-up depend on the operation, the reason for it and the results. Your care team will give you instructions suited to your situation.",
+      "sections": [
+        {
+          "heading": "Hormone treatment after surgery",
+          "body": "After the whole thyroid is removed, thyroid hormone replacement is usually needed. After a partial operation, it depends on how much hormone the remaining thyroid makes and on your follow-up results."
+        },
+        {
+          "heading": "Check-ups and symptoms to report",
+          "body": "The schedule of appointments and blood tests is set for you individually. Follow your discharge instructions and contact the team about any symptom that worries you. Severe or worsening difficulty breathing needs urgent help."
+        },
+        {
+          "heading": "Getting ready to go home",
+          "body": "Before you leave hospital, check who to contact, when to restart your medicines, which appointments are planned and which activities to avoid for now. Ask for an explanation if an instruction is unclear."
+        }
+      ],
+      "takeaways": [
+        "Recovery depends on the type of operation and the reason for it.",
+        "Hormone treatment is not the same for everyone.",
+        "Keep your discharge instructions and your team’s contact details."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Overactive thyroid: treatment",
+          "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/treatment/"
+        },
+        {
+          "label": "NHS — Thyroid cancer",
+          "url": "https://www.nhs.uk/conditions/thyroid-cancer/"
         }
       ],
       "medicalReviewRequired": true
