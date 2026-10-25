@@ -405,8 +405,8 @@
       ],
       "sources": [
         {
-          "label": "Service-Public.fr (French government) — Health (in French)",
-          "url": "https://www.service-public.fr/particuliers/vosdroits/N19806"
+          "label": "AHRQ (US Agency for Healthcare Research and Quality) — Questions to ask your doctor",
+          "url": "https://www.ahrq.gov/questions/index.html"
         }
       ],
       "medicalReviewRequired": true
@@ -469,8 +469,8 @@
       ],
       "sources": [
         {
-          "label": "ANSES (French food safety agency) — Dietary supplements (in French)",
-          "url": "https://www.anses.fr/fr/content/les-complements-alimentaires"
+          "label": "NHS — Iodine",
+          "url": "https://www.nhs.uk/conditions/vitamins-and-minerals/iodine/"
         }
       ],
       "medicalReviewRequired": true
@@ -1096,8 +1096,8 @@
       ],
       "sources": [
         {
-          "label": "Service-Public.fr (French government) — Medical emergencies (in French)",
-          "url": "https://www.service-public.fr/"
+          "label": "European Commission — 112, the European emergency number",
+          "url": "https://digital-strategy.ec.europa.eu/en/policies/112"
         }
       ],
       "medicalReviewRequired": true
