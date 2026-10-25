@@ -34,10 +34,6 @@
       ],
       "sources": [
         {
-          "label": "Assurance Maladie (French national health insurance) — Hypothyroidism (in French)",
-          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
-        },
-        {
           "label": "NHS — Underactive thyroid (hypothyroidism)",
           "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
         }
@@ -103,8 +99,8 @@
       ],
       "sources": [
         {
-          "label": "Assurance Maladie (French national health insurance) — Hypothyroidism (in French)",
-          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
+          "label": "NHS — Underactive thyroid (hypothyroidism)",
+          "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
         }
       ],
       "medicalReviewRequired": true
@@ -381,8 +377,8 @@
       ],
       "sources": [
         {
-          "label": "Assurance Maladie (French national health insurance) — Hypothyroidism (in French)",
-          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
+          "label": "NHS — Underactive thyroid (hypothyroidism)",
+          "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
         }
       ],
       "medicalReviewRequired": true
@@ -445,8 +441,8 @@
       ],
       "sources": [
         {
-          "label": "Assurance Maladie (French national health insurance) — Hypothyroidism (in French)",
-          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
+          "label": "NHS — Underactive thyroid (hypothyroidism)",
+          "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
         }
       ],
       "medicalReviewRequired": true

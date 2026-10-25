@@ -58,8 +58,9 @@ Code à partir des brouillons français : chacune porte son propre `medicalRevie
 son propre `reviewedAt`. La relecture du français ne valide jamais l'anglais (`localize` ne recopie
 pas le statut). Points d'attention propres à l'anglais :
 
-- les sources Ameli, ANSES, Service-Public et base des médicaments sont en français (libellé
-  « (in French) ») : une source anglophone équivalente serait préférable ;
+- les sources Ameli sont remplacées par des pages NHS côté anglais ; celles de l'ANSES, de
+  Service-Public et de la base des médicaments restent en français (libellé « (in French) ») :
+  une source anglophone équivalente serait préférable ;
 - les numéros d'urgence (`urgence-difficulte-respiratoire`) citent le 112 (Union européenne) et le
   15 (France) ; un public britannique ou nord-américain attend le 999 ou le 911 : à décider selon le
   public visé, puis à relire ;
