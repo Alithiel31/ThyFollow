@@ -20,7 +20,8 @@ pas synchronisé avec ces tags.
 - Faire relire les fiches « Comprendre » par un médecin ou un pharmacien, vérifier leurs sources,
   puis renseigner `reviewedAt` et passer `medicalReviewRequired` à `false` (voir
   `frontend/src/content/comprendre/README.md`). Priorité aux 10 fiches Basedow (consignes
-  d'urgence, antithyroïdiens) et aux liens à confirmer listés dans ce README. Les traductions
+  d'urgence, antithyroïdiens) et aux liens à confirmer listés dans ce README, dont les sources NHS
+  des 7 nouvelles fiches et les sujets grossesse, thyroïdectomie et iode radioactif. Les traductions
   anglaises (`content.en.json`) demandent leur propre relecture, notamment les numéros d'urgence
   et des sources anglophones à la place des sources françaises.
 - Étendre la couverture de tests frontend au-delà des formulaires d'auth/médicaments (LogPage,
@@ -59,6 +60,13 @@ pas synchronisé avec ces tags.
 
 ### Added
 
+- **« Comprendre » : 7 nouvelles fiches, en français et en anglais** (brouillons pédagogiques) :
+  anticorps anti-TPO/anti-Tg, prise de sang thyroïdienne (avant et après, valeurs de référence
+  comprises), grossesse, nodule, échographie, iode radioactif, suivi après thyroïdectomie. Chacune
+  est placée à côté des fiches voisines dans l'ordre de lecture. `hashimoto-hypothyroidie` gagne
+  une section sur la surveillance. La fiche « Hyperthyroïdie et cœur » du pack est écartée comme
+  doublon. Les sources anglaises sont des pages NHS ; `learn.test.ts` n'exige plus les mêmes URL
+  de sources dans les deux langues. Toutes portent `medicalReviewRequired: true`.
 - **« Comprendre » en anglais.** Les 18 fiches sont traduites (`content.en.json`, textes seuls,
   par `id` ; la structure reste dans `content.fr.json`) et s'affichent selon la langue de
   l'interface. Une fiche non traduite retombe sur le français avec une note et `lang="fr"`.

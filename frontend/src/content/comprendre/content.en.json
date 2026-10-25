@@ -21,6 +21,10 @@
         {
           "heading": "Symptoms alone are not enough to conclude",
           "body": "Tiredness, feeling cold or difficulty concentrating can have many causes. Diagnosis and follow-up rely on a medical assessment and on tests suited to your situation."
+        },
+        {
+          "heading": "Monitoring suited to you",
+          "body": "You can have Hashimoto’s while your thyroid still makes enough hormones. Your doctor may then monitor how it works with tests chosen for your situation. Ask which results are followed, when to repeat the tests and which changes mean you should get back in touch."
         }
       ],
       "takeaways": [
@@ -32,6 +36,43 @@
         {
           "label": "Assurance Maladie (French national health insurance) — Hypothyroidism (in French)",
           "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
+        },
+        {
+          "label": "NHS — Underactive thyroid (hypothyroidism)",
+          "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "anticorps-anti-tpo-anti-tg",
+      "title": "TPO and thyroglobulin antibodies: what are these tests looking for?",
+      "summary": "These antibodies can help look for an autoimmune cause; on their own, they do not tell the whole story about your thyroid.",
+      "tags": ["anti-TPO", "anti-Tg", "TPOAb", "antibodies", "Hashimoto’s", "autoimmunity"],
+      "intro": "Thyroid peroxidase (TPO) antibodies and thyroglobulin (Tg) antibodies are markers your doctor may request in some situations. They are not the same as TRAb, covered in the guide on Graves’ disease.",
+      "sections": [
+        {
+          "heading": "What do the abbreviations mean?",
+          "body": "Anti-TPO antibodies target thyroid peroxidase, and anti-Tg antibodies target thyroglobulin, two components involved in how the thyroid works. A doctor may test for them when looking for an autoimmune cause of a thyroid problem."
+        },
+        {
+          "heading": "Does a positive result give the full answer?",
+          "body": "No. The result is read alongside TSH, sometimes free T4 (FT4), your symptoms and the rest of your medical history. Having antibodies does not, on its own, show whether treatment is needed."
+        },
+        {
+          "heading": "Why are these tests not always done?",
+          "body": "Which test is ordered depends on the medical question. A doctor may check TPO antibodies first and, in some situations, thyroglobulin antibodies. Ask what the result is meant to clarify in your case."
+        }
+      ],
+      "takeaways": [
+        "TPO and thyroglobulin antibodies are different from TRAb.",
+        "An antibody result is not interpreted on its own.",
+        "Your doctor chooses which tests to order based on the context."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Underactive thyroid (hypothyroidism)",
+          "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
         }
       ],
       "medicalReviewRequired": true
@@ -64,6 +105,47 @@
         {
           "label": "Assurance Maladie (French national health insurance) — Hypothyroidism (in French)",
           "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "preparer-prise-sang-thyroide",
+      "title": "Thyroid blood tests: before and after",
+      "summary": "A few checks before the test, then a careful look at the report, make it easier to discuss the results with your doctor.",
+      "tags": ["blood test", "laboratory", "reference range", "units", "fasting"],
+      "intro": "Instructions can vary depending on the tests ordered and your situation. Before the test, check what the laboratory asks of you; afterwards, read each result with its unit and reference range, without drawing conclusions on your own.",
+      "sections": [
+        {
+          "heading": "Check the instructions",
+          "body": "Look at the request form and the laboratory’s information. Do not assume you need to fast: follow the instructions given for the tests actually ordered, and ask the person who ordered them what to do with your medicines on the day."
+        },
+        {
+          "heading": "Mention your medicines and supplements",
+          "body": "Tell the professional who orders the test, and the team taking the sample, about your medicines, vitamins and supplements. Do not stop a treatment on your own initiative."
+        },
+        {
+          "heading": "Reading the report",
+          "body": "Find the name of the test, the result, its unit and the reference range given by the laboratory. These help you read the report, but they are not enough to make a diagnosis. Different methods can give slightly different values."
+        },
+        {
+          "heading": "Compare with care",
+          "body": "To follow changes over time, take into account the dates, your treatment and any change of laboratory. A value within the range does not always answer every question, and a value outside it does not explain the cause on its own. Ask your doctor what the result means for you."
+        }
+      ],
+      "takeaways": [
+        "Follow the laboratory’s and your prescriber’s instructions, without assuming you need to fast.",
+        "Read each result together with its unit and the laboratory’s reference range.",
+        "Do not change a treatment based on a single number."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Blood tests",
+          "url": "https://www.nhs.uk/tests-and-treatments/blood-tests/"
+        },
+        {
+          "label": "NHS — Underactive thyroid (hypothyroidism)",
+          "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
         }
       ],
       "medicalReviewRequired": true
@@ -256,6 +338,113 @@
         {
           "label": "ANSES (French food safety agency) — Dietary supplements (in French)",
           "url": "https://www.anses.fr/fr/content/les-complements-alimentaires"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "thyroide-grossesse-suivi",
+      "title": "Planning a pregnancy or pregnant: talking about thyroid follow-up",
+      "summary": "Planning a pregnancy, or being pregnant, can change your thyroid follow-up: plan ahead to talk with your doctor or endocrinologist.",
+      "tags": ["pregnancy", "planning a pregnancy", "pregnant", "postpartum", "follow-up"],
+      "intro": "The body’s needs change during pregnancy, and thyroid follow-up may need to be adjusted. If you have a thyroid condition or take a treatment, tell your care team as soon as you are thinking about a pregnancy or find out that you are pregnant.",
+      "sections": [
+        {
+          "heading": "Prepare the conversation",
+          "body": "Share your diagnosis, your treatments, your latest results and any recent change. Do not wait for a routine appointment to tell your care team you are pregnant."
+        },
+        {
+          "heading": "Follow-up suited to your situation",
+          "body": "Your doctor decides which tests are needed and how often, depending on your diagnosis, the stage of pregnancy and your treatment. Reference ranges may differ from those used outside pregnancy."
+        },
+        {
+          "heading": "Do not change your treatment yourself",
+          "body": "Do not start, stop or change a medicine based on this guide. Ask for personal instructions, including for the period after the birth."
+        }
+      ],
+      "takeaways": [
+        "Tell your care team if you are planning a pregnancy or are pregnant.",
+        "How often you are tested, and the targets, are set for you individually.",
+        "Ask for clear instructions before any change to your treatment."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Underactive thyroid (hypothyroidism)",
+          "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
+        },
+        {
+          "label": "NHS — Overactive thyroid (hyperthyroidism)",
+          "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "nodule-thyroidien-comprendre",
+      "title": "Thyroid nodule: what does finding one mean?",
+      "summary": "A nodule is a localised lump in the thyroid. Finding one sometimes leads to further tests, but it does not, on its own, mean cancer.",
+      "tags": ["nodule", "lump", "neck", "fine-needle aspiration", "tests"],
+      "intro": "A thyroid nodule may be found when a doctor examines your neck, or during a scan done for another reason. How it is assessed depends on several things, including how it looks on ultrasound and how well the thyroid is working. Only the professional who knows your situation can explain which tests are useful.",
+      "sections": [
+        {
+          "heading": "What is a nodule?",
+          "body": "It is a localised change in the structure of the gland. There may be one nodule or several. Finding a nodule does not, on its own, tell you what kind it is."
+        },
+        {
+          "heading": "What tests may be offered?",
+          "body": "Your doctor may request a TSH blood test and an ultrasound scan. Depending on the results, they may suggest monitoring, a specialist opinion or a further test such as a fine-needle aspiration. Not every nodule needs the same tests."
+        },
+        {
+          "heading": "What information to bring",
+          "body": "Bring any results you already have, scan reports, a list of your treatments and your questions. Tell your doctor about any recent change or discomfort in your neck."
+        }
+      ],
+      "takeaways": [
+        "Finding a nodule does not tell you what kind it is.",
+        "The assessment depends on the examination, blood tests and ultrasound.",
+        "Your doctor will explain whether monitoring or a further test is appropriate."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Goitre",
+          "url": "https://www.nhs.uk/conditions/goitre/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "echographie-thyroide",
+      "title": "Thyroid ultrasound: what is it for?",
+      "summary": "An ultrasound scan shows the structure of the thyroid and can help describe a nodule or a goitre.",
+      "tags": ["ultrasound", "scan", "imaging", "nodule", "goitre", "report"],
+      "intro": "An ultrasound scan uses sound waves to look at the thyroid and nearby structures. It does not measure how much hormone the gland makes. A doctor requests it when it can answer a specific question; it is not needed for every thyroid condition.",
+      "sections": [
+        {
+          "heading": "What the scan can show",
+          "body": "The scan describes, among other things, the size and appearance of the gland, any nodules and some lymph nodes in the neck. The report gathers findings that will be interpreted alongside your situation and other tests."
+        },
+        {
+          "heading": "What happens at the appointment",
+          "body": "A small probe is moved over the skin of your neck, usually with some gel. It is painless and does not use X-rays. Follow the instructions given by the imaging centre."
+        },
+        {
+          "heading": "After the scan",
+          "body": "The report is not always a diagnosis on its own. Ask the doctor who requested it what the findings change for your follow-up and whether other tests are useful."
+        }
+      ],
+      "takeaways": [
+        "Ultrasound looks at the structure of the thyroid, not at how much hormone it makes.",
+        "Whether you need one depends on the medical reason.",
+        "The report is read together with the rest of your medical file."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Ultrasound scan",
+          "url": "https://www.nhs.uk/tests-and-treatments/ultrasound-scan/"
+        },
+        {
+          "label": "NHS — Goitre",
+          "url": "https://www.nhs.uk/conditions/goitre/"
         }
       ],
       "medicalReviewRequired": true
@@ -467,6 +656,39 @@
       "medicalReviewRequired": true
     },
     {
+      "id": "iode-radioactif-comprendre",
+      "title": "Radioactive iodine: how the treatment works",
+      "summary": "Radioactive iodine is an option in some cases of hyperthyroidism, with precautions and follow-up set by a specialist team.",
+      "tags": ["radioactive iodine", "radioiodine", "nuclear medicine", "hyperthyroidism"],
+      "intro": "Radioactive iodine (radioiodine) treatment may be offered for some causes of hyperthyroidism. The decision depends on the condition, the other possible treatments and your situation. The treatment is organised by a specialist team.",
+      "sections": [
+        {
+          "heading": "How does it work?",
+          "body": "The thyroid takes up iodine. The treatment aims to reduce the activity of some of the thyroid cells. It does not work straight away, and the result varies from one situation to another."
+        },
+        {
+          "heading": "What precautions should you ask about?",
+          "body": "Whether it suits you, the reasons it might not, and the radiation safety advice should all be explained by the nuclear medicine team. Tell them if you could be pregnant, are breastfeeding or are planning a pregnancy, and about all your treatments, before the treatment is arranged."
+        },
+        {
+          "heading": "Why does follow-up continue?",
+          "body": "How the thyroid works can change after treatment. Check-ups are planned, and thyroid hormone replacement may become necessary if the thyroid no longer makes enough hormones. Do not stop or change a treatment without medical advice."
+        }
+      ],
+      "takeaways": [
+        "Radioactive iodine is not suitable for every thyroid condition.",
+        "Precautions are personal and should come from the specialist team.",
+        "Blood tests are still needed after treatment."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Overactive thyroid: treatment",
+          "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/treatment/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
       "id": "basedow-remission-rechute",
       "title": "Remission and relapse: understanding Graves’ disease follow-up",
       "summary": "The course of the disease varies from person to person and calls for tailored follow-up.",
@@ -561,6 +783,43 @@
         {
           "label": "NHS — Overactive thyroid (hyperthyroidism)",
           "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "suivi-apres-thyroidectomie",
+      "title": "After thyroid surgery: understanding your follow-up",
+      "summary": "After thyroid surgery, follow-up depends on the operation and why it was done; your team explains the treatment and check-ups you need.",
+      "tags": ["thyroidectomy", "surgery", "operation", "levothyroxine", "discharge"],
+      "intro": "An operation can remove part or all of the thyroid. Recovery and follow-up depend on the operation, the reason for it and the results. Your care team will give you instructions suited to your situation.",
+      "sections": [
+        {
+          "heading": "Hormone treatment after surgery",
+          "body": "After the whole thyroid is removed, thyroid hormone replacement is usually needed. After a partial operation, it depends on how much hormone the remaining thyroid makes and on your follow-up results."
+        },
+        {
+          "heading": "Check-ups and symptoms to report",
+          "body": "The schedule of appointments and blood tests is set for you individually. Follow your discharge instructions and contact the team about any symptom that worries you. Severe or worsening difficulty breathing needs urgent help."
+        },
+        {
+          "heading": "Getting ready to go home",
+          "body": "Before you leave hospital, check who to contact, when to restart your medicines, which appointments are planned and which activities to avoid for now. Ask for an explanation if an instruction is unclear."
+        }
+      ],
+      "takeaways": [
+        "Recovery depends on the type of operation and the reason for it.",
+        "Hormone treatment is not the same for everyone.",
+        "Keep your discharge instructions and your team’s contact details."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Overactive thyroid: treatment",
+          "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/treatment/"
+        },
+        {
+          "label": "NHS — Thyroid cancer",
+          "url": "https://www.nhs.uk/conditions/thyroid-cancer/"
         }
       ],
       "medicalReviewRequired": true

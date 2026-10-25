@@ -12,8 +12,10 @@ backend et apparaissent en plus, dans la section « Articles de l'équipe ».
   selon la langue de l'interface.
 - Une fiche absente de `content.en.json` s'affiche en français dans l'interface anglaise, avec la
   note `articles.frenchOnlyGuide` et `lang="fr"` pour les lecteurs d'écran. `learn.test.ts` exige
-  aujourd'hui une traduction pour chaque fiche, avec le même nombre de sections et les mêmes URL de
-  sources : ajouter une fiche, c'est l'ajouter aux deux fichiers.
+  aujourd'hui une traduction pour chaque fiche, avec le même nombre de sections et de « À retenir » :
+  ajouter une fiche, c'est l'ajouter aux deux fichiers. Les sources peuvent différer d'une langue à
+  l'autre : les fiches ajoutées depuis le pack « Comprendre — nouvelles fiches » citent l'Assurance
+  Maladie et la HAS en français, le NHS en anglais.
 - Catégories : ordre et teinte dans `CATEGORIES` / `CATEGORY_TONES` (`src/lib/learn.ts`) ; libellé
   et description dans les fichiers de traduction (`articles.categories.<id>` de
   `src/locales/{fr,en}/common.json`). La description s'affiche sous la liste quand le filtre est
@@ -32,9 +34,16 @@ backend et apparaissent en plus, dans la section « Articles de l'équipe ».
 
 ## Relecture médicale — obligatoire avant publication
 
-Les 18 fiches actuelles sont des **brouillons pédagogiques** : les 8 fiches d'origine
-(hypothyroïdie, Hashimoto, lévothyroxine…) et les 10 fiches Basedow issues du pack éditorial
-« ThyroTrack-Comprendre-Extension-Basedow ». Aucune n'a été relue par un professionnel de santé.
+Les 25 fiches actuelles sont des **brouillons pédagogiques** : les 8 fiches d'origine
+(hypothyroïdie, Hashimoto, lévothyroxine…), les 10 fiches Basedow issues du pack éditorial
+« ThyroTrack-Comprendre-Extension-Basedow » et 7 fiches du pack « Comprendre — nouvelles fiches »
+(anti-TPO/anti-Tg, prise de sang, grossesse, nodule, échographie, iode radioactif, suivi après
+thyroïdectomie). Aucune n'a été relue par un professionnel de santé.
+
+Sur les 10 fiches de ce dernier pack, « Préparer une prise de sang » et « Valeurs de référence » ont
+été fusionnées (`preparer-prise-sang-thyroide`) ; « Hashimoto sans hypothyroïdie » est devenue la
+4e section de `hashimoto-hypothyroidie` ; « Hyperthyroïdie et cœur » a été écartée, car elle
+reprenait `basedow-symptomes` et `urgence-difficulte-respiratoire`.
 Chaque fiche porte `"medicalReviewRequired": true`. Tant que ce drapeau est vrai ou que `reviewedAt`
 manque, l'app affiche « Fiche pédagogique en attente de relecture par un professionnel de santé »
 (`isMedicallyReviewed` dans `src/lib/learn.ts`, vérifié par `learn.test.ts`).
@@ -84,5 +93,21 @@ Pour chaque fiche :
    `content.en.json` pour l'anglais, chacun après sa propre relecture. L'app affiche alors « Relue par un professionnel de santé
    le … ». Le test `never presents a draft as medically reviewed` de `learn.test.ts` devra alors
    être adapté.
+
+   Liens du pack « Comprendre — nouvelles fiches » **non vérifiés** (même raison) :
+   - Assurance Maladie : `…/themes/nodule-thyroidien/cas-faut-consulter-examens-realises`,
+     `…/themes/hypothyroidie/symptomes-diagnostic-evolution`, `…/themes/hypothyroidie/grossesse`,
+     `…/themes/hyperthyroidie/symptomes-diagnostic-evolution`, `…/themes/hyperthyroidie/traitement`,
+     `…/themes/cancer-thyroide/surveillance-medicale-vie-quotidienne`,
+     `…/examen/analyse/lire-resultats-prise-sang` (sous `https://www.ameli.fr/assure/sante`) ;
+   - HAS : `https://www.has-sante.fr/jcms/p_3216305/fr/prise-en-charge-des-dysthyroidies-chez-l-adulte` ;
+   - NHS (choisis par Claude Code comme équivalents anglophones, à confirmer en priorité) :
+     `/conditions/goitre/` (nodule, échographie), `/tests-and-treatments/ultrasound-scan/`,
+     `/tests-and-treatments/blood-tests/`, `/conditions/underactive-thyroid-hypothyroidism/`,
+     `/conditions/overactive-thyroid-hyperthyroidism/` et `…/treatment/`, `/conditions/thyroid-cancer/`
+     (sous `https://www.nhs.uk`). Faute de page NHS dédiée identifiée aux nodules et à la grossesse
+     thyroïdienne, les pages citées sont les plus proches.
+   Relecture spécialisée attentive pour `thyroide-grossesse-suivi`, `suivi-apres-thyroidectomie` et
+   `iode-radioactif-comprendre`.
 
 Ne pas ajouter de source qui n'a pas été vérifiée.
