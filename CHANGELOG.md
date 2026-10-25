@@ -41,6 +41,10 @@ pas synchronisé avec ces tags.
 
 ### Fixed
 
+- **CI backend épinglée sur `ubuntu-24.04`.** Sur `ubuntu-latest` (passé à Ubuntu 26.04, qpdf
+  12.3.2), les tests de déchiffrement des PDF protégés échouaient sans se reproduire en local.
+  `decryptPdf` journalise désormais le message de qpdf quand le déchiffrement échoue de façon
+  inattendue (jamais le mot de passe), pour en trouver la cause.
 - **Polices auto-hébergées.** Le service worker relançait les requêtes Google Fonts, bloquées
   par la CSP (`connect-src 'self'`) : les polices ne se chargeaient plus. Elles sont désormais
   servies par l'application (`@fontsource`), disponibles hors ligne, sans appel à Google ; la CSP
