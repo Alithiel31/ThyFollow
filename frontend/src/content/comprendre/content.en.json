@@ -274,10 +274,6 @@
         {
           "label": "NHS — Levothyroxine",
           "url": "https://www.nhs.uk/medicines/levothyroxine/"
-        },
-        {
-          "label": "French public medicines database (in French)",
-          "url": "https://base-donnees-publique.medicaments.gouv.fr/"
         }
       ],
       "medicalReviewRequired": true
@@ -308,8 +304,8 @@
       ],
       "sources": [
         {
-          "label": "French public medicines database (in French)",
-          "url": "https://base-donnees-publique.medicaments.gouv.fr/"
+          "label": "NHS — Levothyroxine",
+          "url": "https://www.nhs.uk/medicines/levothyroxine/"
         }
       ],
       "medicalReviewRequired": true

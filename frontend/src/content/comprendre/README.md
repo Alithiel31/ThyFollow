@@ -58,8 +58,8 @@ Code à partir des brouillons français : chacune porte son propre `medicalRevie
 son propre `reviewedAt`. La relecture du français ne valide jamais l'anglais (`localize` ne recopie
 pas le statut). Points d'attention propres à l'anglais :
 
-- les sources Ameli sont remplacées par des pages NHS côté anglais ; celles de l'ANSES, de
-  Service-Public et de la base des médicaments restent en français (libellé « (in French) ») :
+- les sources Ameli sont remplacées par des pages NHS côté anglais ; la base des médicaments
+  par la page NHS Levothyroxine ; celles de l'ANSES et de Service-Public restent en français (libellé « (in French) ») :
   une source anglophone équivalente serait préférable ;
 - les numéros d'urgence (`urgence-difficulte-respiratoire`) citent le 112 (Union européenne) et le
   15 (France) ; un public britannique ou nord-américain attend le 999 ou le 911 : à décider selon le
