@@ -1,6 +1,6 @@
 # Troubleshooting
 
-🇬🇧 [English version](./TROUBLESHOOTING.md)
+🇬🇧 [English version](./troubleshooting.md)
 
 Ce document revient sur les incidents rencontrés lors de la mise en place de la CI et de la
 suite de tests frontend, avec la démarche de diagnostic suivie — pas seulement le correctif

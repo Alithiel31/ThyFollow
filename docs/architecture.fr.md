@@ -306,6 +306,7 @@ ThyFollow/
 ├── deploy.sh                   # déploiement de production : secrets Infisical, dump de la base, pull, migrations, vérification
 ├── .infisical-identity.env.example  # modèle des identifiants Infisical (ignorés par git) utilisés par deploy.sh
 ├── .nvmrc                      # Node 24
+├── .github/                    # workflows CI, modèles d'issue/PR, CONTRIBUTING, SECURITY, SUPPORT, CODE_OF_CONDUCT
 ├── backend/
 │   ├── Dockerfile              # multi-étapes, node:24-alpine, non-root, dumb-init (migrations : service `migrate`)
 │   ├── prisma/                 # schema.prisma, migrations/, seed.ts

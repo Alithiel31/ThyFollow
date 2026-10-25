@@ -1,0 +1,13 @@
+# Fins de ligne normalisées en LF dans le dépôt, quel que soit l'OS ou l'outil
+* text=auto
+
+# Scripts exécutés sous Linux (Pi, CI) : toujours LF, même sous Windows
+*.sh text eol=lf
+
+# Binaires
+*.png binary
+*.jpg binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.dump binary

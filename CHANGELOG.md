@@ -31,6 +31,15 @@ pas synchronisé avec ces tags.
 - Évaluer la montée de version Prisma 5 → 6 et Express 4 → 5 (aucune faille connue identifiée,
   mais l'écart grandit).
 
+### Changed
+
+- **Rangement de la racine du dépôt.** `CODE_OF_CONDUCT`, `CONTRIBUTING`, `SECURITY` et `SUPPORT`
+  (FR/EN) passent dans `.github/` (GitHub les détecte toujours), `TROUBLESHOOTING` devient
+  `docs/troubleshooting.md` à côté du reste de la documentation. Les fichiers de conception
+  (maquettes, concept art, pack « Comprendre » 04) et la sauvegarde de base vont dans `conception/`,
+  ignoré par Git, comme `*.dump`. Liens mis à jour dans les README, `.github/` et `docs/`. Ajout
+  d'un `.gitattributes` (fins de ligne normalisées en LF, `*.sh` toujours en LF).
+
 ### Security
 
 - **Dépendances du backend : `npm audit` repasse à zéro faille.** `body-parser` et `multer`

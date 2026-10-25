@@ -455,8 +455,8 @@ POST   /graphql                                   (additif à la REST ci-dessus,
 | [`docs/development.fr.md`](./docs/development.fr.md) | Lancer le projet en local, migrations de base, liste complète des routes, tests, CI |
 | [`backend/docs/graphql.md`](./backend/docs/graphql.md) | La couche GraphQL additive |
 | [`docs/handover-guide.fr.md`](./docs/handover-guide.fr.md) | Ce qui tourne où, accès nécessaires, remise en service à partir de zéro, risques connus |
-| [`TROUBLESHOOTING.fr.md`](./TROUBLESHOOTING.fr.md) | Incidents déjà rencontrés, avec la démarche de diagnostic |
-| [`CONTRIBUTING.fr.md`](./CONTRIBUTING.fr.md) · [`SECURITY.fr.md`](./SECURITY.fr.md) · [`SUPPORT.fr.md`](./SUPPORT.fr.md) · [`CODE_OF_CONDUCT.fr.md`](./CODE_OF_CONDUCT.fr.md) | Fichiers communautaires |
+| [`docs/troubleshooting.fr.md`](./docs/troubleshooting.fr.md) | Incidents déjà rencontrés, avec la démarche de diagnostic |
+| [`CONTRIBUTING.fr.md`](./.github/CONTRIBUTING.fr.md) · [`SECURITY.fr.md`](./.github/SECURITY.fr.md) · [`SUPPORT.fr.md`](./.github/SUPPORT.fr.md) · [`CODE_OF_CONDUCT.fr.md`](./.github/CODE_OF_CONDUCT.fr.md) | Fichiers communautaires |
 
 Chaque guide existe aussi en anglais (sans suffixe).
 
@@ -489,8 +489,8 @@ trois variables dans Infisical (et activer le portail client dans le dashboard S
 
 ## 🤝 Contribuer
 
-Voir [`CONTRIBUTING.fr.md`](./CONTRIBUTING.fr.md) pour l'environnement de développement, comment
-reproduire la CI en local, et le format des PR. En cas de problème, [`TROUBLESHOOTING.fr.md`](./TROUBLESHOOTING.fr.md)
+Voir [`CONTRIBUTING.fr.md`](./.github/CONTRIBUTING.fr.md) pour l'environnement de développement, comment
+reproduire la CI en local, et le format des PR. En cas de problème, [`docs/troubleshooting.fr.md`](./docs/troubleshooting.fr.md)
 documente les incidents déjà rencontrés (et leur diagnostic) sur ce projet.
 
 ## 📝 Changelog

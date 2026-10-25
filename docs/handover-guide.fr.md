@@ -21,7 +21,7 @@ sauvegarde ci-dessous sont plus que des formalités.
 3. [environment.fr.md](./environment.fr.md) — toutes les variables d'environnement
 4. [development.fr.md](./development.fr.md) — lancer le projet en local, routes, tests, CI
 5. [`backend/docs/graphql.md`](../backend/docs/graphql.md) — pourquoi la couche GraphQL existe et comment elle fonctionne
-6. [TROUBLESHOOTING.fr.md](../TROUBLESHOOTING.fr.md), [SECURITY.fr.md](../SECURITY.fr.md), [CONTRIBUTING.fr.md](../CONTRIBUTING.fr.md)
+6. [troubleshooting.fr.md](./troubleshooting.fr.md), [SECURITY.fr.md](../.github/SECURITY.fr.md), [CONTRIBUTING.fr.md](../.github/CONTRIBUTING.fr.md)
 7. [CHANGELOG.md](../CHANGELOG.md) — historique détaillé des décisions
 
 ---
@@ -59,7 +59,7 @@ ne tourne que sur `main`.
 
 ## 3. Secrets et accès nécessaires pour agir
 
-Aucun secret réel n'est stocké dans ce dépôt (voir `.gitignore`, [SECURITY.fr.md](../SECURITY.fr.md)).
+Aucun secret réel n'est stocké dans ce dépôt (voir `.gitignore`, [SECURITY.fr.md](../.github/SECURITY.fr.md)).
 Pour reprendre le projet en pratique, il faut obtenir l'accès aux éléments suivants — **à compléter par
 le mainteneur actuel** (gestionnaire de mots de passe utilisé, ou tout autre moyen de transmission
 sécurisée) :

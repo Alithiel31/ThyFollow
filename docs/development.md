@@ -156,4 +156,4 @@ exits; `backend` only starts if it succeeded, and `frontend` waits for the backe
 The seed script needs `ts-node`, a dev dependency that the production image leaves out
 (`npm ci --omit=dev`): run `npm run db:seed` from a development checkout pointed at the target
 database rather than inside the container. When something fails, start with
-[TROUBLESHOOTING.md](../TROUBLESHOOTING.md).
+[troubleshooting.md](./troubleshooting.md).

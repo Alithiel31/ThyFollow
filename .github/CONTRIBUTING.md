@@ -11,7 +11,7 @@ reliability, or clarifies the documentation is welcome.
 - For a non-trivial change (new feature, redesign), open an issue to discuss it before coding.
 - For an obvious fix (typo, dead link, translation mistake), a direct PR is fine.
 - Check that the item isn't already listed in the `[Unreleased] > To do` section of
-  [`CHANGELOG.md`](./CHANGELOG.md).
+  [`CHANGELOG.md`](../CHANGELOG.md).
 
 ## Development environment
 
@@ -43,12 +43,12 @@ cd backend && npm run dev   # http://localhost:3001
 cd frontend && npm run dev  # http://localhost:5173
 ```
 
-See [`README.md`](./README.md) for the details (optional Google OAuth, Docker Compose
+See [`README.md`](../README.md) for the details (optional Google OAuth, Docker Compose
 deployment).
 
 ## Reproducing CI locally
 
-The [`ci.yml`](./.github/workflows/ci.yml) workflow runs, on every PR to `main`, lint +
+The [`ci.yml`](./workflows/ci.yml) workflow runs, on every PR to `main`, lint +
 typecheck/build + tests for both backend and frontend. To reproduce locally:
 
 ```bash
@@ -68,7 +68,7 @@ npm test        # vitest run
 Node 20 is required (`.nvmrc` at the root): both `package.json` files deliberately pin
 `jsdom`/`@testing-library/jest-dom` to versions compatible with Node 20 (the latest majors of
 these two packages require Node ≥22) — don't bump them without re-checking this constraint, see
-[`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md).
+[`docs/troubleshooting.md`](../docs/troubleshooting.md).
 
 ## Opening a Pull Request
 
@@ -77,7 +77,7 @@ these two packages require Node ≥22) — don't bump them without re-checking t
    (`fix(backend): ...`) and more descriptive English messages for larger changes; both are
    accepted, but the message should explain the **why**, not just the what.
 3. If the change is notable for a user or a contributor, add an entry to the `[Unreleased]`
-   section of [`CHANGELOG.md`](./CHANGELOG.md).
+   section of [`CHANGELOG.md`](../CHANGELOG.md).
 4. Make sure CI passes (see above to reproduce it locally before pushing).
 5. Open the PR against `main`.
 
@@ -91,7 +91,7 @@ For a bug, include:
 - Relevant logs (`docker compose logs backend`, browser console) — **with any token, real
   email, or health data stripped out.**
 
-Before opening the issue, take a look at [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md): incidents
+Before opening the issue, take a look at [`docs/troubleshooting.md`](../docs/troubleshooting.md): incidents
 already encountered and their diagnosis are documented there.
 
 ## Secrets and health data
