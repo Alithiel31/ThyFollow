@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-labelledby="title desc">
+  <title id="title">Les professionnels pouvant contribuer au suivi thyroïdien</title>
+  <desc id="desc">Le patient est au centre d’un réseau de professionnels possibles, choisis selon sa situation : médecin traitant, endocrinologue, laboratoire, imagerie et autres spécialistes.</desc>
+  <rect width="800" height="500" rx="32" fill="#f4fbfa"/>
+  <text x="400" y="56" text-anchor="middle" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#267c74">VOTRE PARCOURS, UNE ÉQUIPE SELON VOS BESOINS</text>
+  <g stroke="#a9ddd5" stroke-width="5" fill="none">
+    <path d="M400 264L176 160M400 264L624 160M400 264L176 365M400 264L624 365"/>
+  </g>
+  <circle cx="400" cy="264" r="81" fill="#fff" stroke="#2b9d8f" stroke-width="5"/>
+  <circle cx="400" cy="238" r="22" fill="#d9f4ef"/><path d="M361 300c5-35 73-35 78 0" fill="#d9f4ef" stroke="#2b9d8f" stroke-width="5" stroke-linecap="round"/>
+  <text x="400" y="333" text-anchor="middle" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#267c74">Vous</text>
+  <g font-family="Arial,sans-serif" text-anchor="middle">
+    <rect x="55" y="105" width="242" height="96" rx="22" fill="#fff" stroke="#b9e2dc" stroke-width="3"/>
+    <text x="176" y="145" font-size="19" font-weight="700" fill="#344054">Médecin traitant</text><text x="176" y="173" font-size="15" fill="#667085">suivi et coordination</text>
+    <rect x="503" y="105" width="242" height="96" rx="22" fill="#fff" stroke="#b9e2dc" stroke-width="3"/>
+    <text x="624" y="145" font-size="19" font-weight="700" fill="#344054">Endocrinologue</text><text x="624" y="173" font-size="15" fill="#667085">expertise spécialisée</text>
+    <rect x="55" y="317" width="242" height="96" rx="22" fill="#fff" stroke="#b9e2dc" stroke-width="3"/>
+    <text x="176" y="357" font-size="19" font-weight="700" fill="#344054">Laboratoire</text><text x="176" y="385" font-size="15" fill="#667085">analyses prescrites</text>
+    <rect x="503" y="317" width="242" height="96" rx="22" fill="#fff" stroke="#b9e2dc" stroke-width="3"/>
+    <text x="624" y="357" font-size="19" font-weight="700" fill="#344054">Autres spécialistes</text><text x="624" y="385" font-size="15" fill="#667085">selon la situation</text>
+  </g>
+  <text x="400" y="462" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" fill="#667085">Tout le monde n’a pas besoin de consulter chaque spécialiste.</text>
+</svg>

@@ -151,6 +151,10 @@ describe('filterArticles', () => {
     expect(filterArticles(french, ALL_CATEGORIES, 'trab').map((a) => a.id)).toContain('basedow-trab');
     expect(filterArticles(french, ALL_CATEGORIES, 'orbitopathie').map((a) => a.id))
       .toEqual(['basedow-yeux']);
+    expect(filterArticles(french, ALL_CATEGORIES, 'aiguille fine').map((a) => a.id))
+      .toContain('cytoponction-nodule-thyroidien');
+    expect(filterArticles(english, ALL_CATEGORIES, 'fine-needle').map((a) => a.id))
+      .toContain('cytoponction-nodule-thyroidien');
   });
 
   it('searches the text of the current language and the translated category label', () => {
