@@ -41,6 +41,11 @@ pas synchronisé avec ces tags.
 
 ### Fixed
 
+- **Déchiffrement des PDF protégés sous Ubuntu 26.04.** Le profil AppArmor de qpdf livré par
+  Ubuntu 26.04 ne l'autorise à ouvrir que des `.pdf`, `.json`, `.qdf`, `.in` ou `.out` : le fichier
+  de mot de passe `pw.txt` était refusé (`open pw.txt: Permission denied`). `decryptPdf` transmet
+  désormais le mot de passe sur l'entrée standard de qpdf (`--password-file=-`), sans fichier ni
+  argument de ligne de commande. La CI backend revient sur `ubuntu-latest`.
 - **CI backend épinglée sur `ubuntu-24.04`.** Sur `ubuntu-latest` (passé à Ubuntu 26.04, qpdf
   12.3.2), les tests de déchiffrement des PDF protégés échouaient sans se reproduire en local.
   `decryptPdf` journalise désormais le message de qpdf quand le déchiffrement échoue de façon
