@@ -58,8 +58,8 @@ describe('ArticlesPage — library', () => {
     expect(within(featured).getByRole('link', { name: /La maladie de Basedow, c’est quoi/ }))
       .toHaveAttribute('href', '/learn/basedow-comprendre');
     const latest = screen.getByRole('region', { name: 'articles.latest' });
-    expect(within(latest).getAllByRole('link')).toHaveLength(23);
-    expect(screen.getByText('articles.resultCount:{"count":25}')).toBeInTheDocument();
+    expect(within(latest).getAllByRole('link')).toHaveLength(28);
+    expect(screen.getByText('articles.resultCount:{"count":30}')).toBeInTheDocument();
   });
 
   it('offers the Basedow and safety categories with their description', async () => {
@@ -108,7 +108,7 @@ describe('ArticlesPage — library', () => {
 
     await user.click(screen.getByRole('button', { name: 'articles.resetFilters' }));
     expect(input).toHaveValue('');
-    expect(screen.getByText('articles.resultCount:{"count":25}')).toBeInTheDocument();
+    expect(screen.getByText('articles.resultCount:{"count":30}')).toBeInTheDocument();
   });
 
   it('searches tags and section text', async () => {
@@ -183,7 +183,7 @@ describe('ArticlesPage — reader', () => {
   it('renders sections as icon cards when the guide asks for it', () => {
     renderAt('/learn/tsh-t4-t3');
     expect(screen.getByRole('heading', { level: 2, name: 'La TSH' }).closest('li')).not.toBeNull();
-    expect(screen.getByText('articles.progress:{"current":3,"total":25}')).toBeInTheDocument();
+    expect(screen.getByText('articles.progress:{"current":3,"total":30}')).toBeInTheDocument();
   });
 
   it('opens a Basedow guide as a draft pending medical review, with safe source links', () => {

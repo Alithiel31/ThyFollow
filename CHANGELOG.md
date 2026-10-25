@@ -60,6 +60,10 @@ pas synchronisé avec ces tags.
 
 ### Added
 
+- **« Comprendre » : 5 fiches de plus, en français et en anglais** (brouillons pédagogiques) :
+  TSH et âge, biotine et prise de sang, thyroïdite du post-partum, thyroïdite subaiguë, produit de
+  contraste iodé. Elles réutilisent les illustrations existantes et sont placées à côté des fiches
+  voisines. Toutes portent `medicalReviewRequired: true`.
 - **« Comprendre » : 7 nouvelles fiches, en français et en anglais** (brouillons pédagogiques) :
   anticorps anti-TPO/anti-Tg, prise de sang thyroïdienne (avant et après, valeurs de référence
   comprises), grossesse, nodule, échographie, iode radioactif, suivi après thyroïdectomie. Chacune

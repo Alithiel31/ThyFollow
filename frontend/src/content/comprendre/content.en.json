@@ -110,6 +110,39 @@
       "medicalReviewRequired": true
     },
     {
+      "id": "tsh-et-age",
+      "title": "TSH and age: why context matters",
+      "summary": "How a TSH result is read depends on your age, your symptoms and your medical situation.",
+      "tags": ["TSH", "age", "older adults", "elderly", "blood tests"],
+      "intro": "TSH is a marker used to assess the thyroid. In older people, reading it calls for particular care. A single result is not enough, on its own, to decide that treatment is needed.",
+      "sections": [
+        {
+          "heading": "Symptoms that are less specific",
+          "body": "Tiredness, slowing down or difficulty concentrating can have several explanations, especially with age. Your doctor takes into account all your symptoms, your medical history and your treatments."
+        },
+        {
+          "heading": "A result read with age in mind",
+          "body": "With age, a TSH result may be read differently than in a younger adult. Your doctor considers it alongside your other results, other health conditions and some medicines: the decision is not simply a matter of comparing a number with a range found online."
+        },
+        {
+          "heading": "Questions to ask",
+          "body": "Ask what the result means in your situation, whether a repeat test is useful and which changes you should report. Do not start, stop or change a treatment without medical advice."
+        }
+      ],
+      "takeaways": [
+        "Age is part of the context for interpreting TSH.",
+        "A single symptom or a single value is not enough to draw a conclusion.",
+        "Decisions about follow-up or treatment are for your healthcare professional."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Underactive thyroid (hypothyroidism)",
+          "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
       "id": "preparer-prise-sang-thyroide",
       "title": "Thyroid blood tests: before and after",
       "summary": "A few checks before the test, then a careful look at the report, make it easier to discuss the results with your doctor.",
@@ -146,6 +179,39 @@
         {
           "label": "NHS — Underactive thyroid (hypothyroidism)",
           "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "biotine-analyses-thyroide",
+      "title": "Biotin and blood tests: remember to mention your supplements",
+      "summary": "Biotin can interfere with some laboratory tests: tell your doctor and the laboratory about any supplements you take.",
+      "tags": ["biotin", "vitamin B7", "supplements", "blood test", "interference"],
+      "intro": "Biotin, also called vitamin B7, is found in some supplements, especially those sold for hair or nails. Depending on the method used, it can interfere with some laboratory tests. Do not change how you take a supplement without asking for advice.",
+      "sections": [
+        {
+          "heading": "Why mention it?",
+          "body": "Biotin can make some laboratory results falsely high or falsely low. The effect depends on the test and the method used: it does not affect every test or every laboratory."
+        },
+        {
+          "heading": "What to do before a blood test",
+          "body": "Tell the doctor who ordered the test, and the laboratory team, about all the supplements and medicines you take, including those bought without a prescription. Follow their instructions for your test."
+        },
+        {
+          "heading": "Should you stop taking biotin?",
+          "body": "Do not stop it or change when you take it on your own initiative. Your doctor or the laboratory will tell you whether any precaution is needed for the planned test."
+        }
+      ],
+      "takeaways": [
+        "Mention supplements containing biotin before a blood test.",
+        "Interference depends on the test and the laboratory’s method.",
+        "Do not stop a supplement without advice from a professional."
+      ],
+      "sources": [
+        {
+          "label": "FDA — Biotin interference with laboratory tests",
+          "url": "https://www.fda.gov/medical-devices/in-vitro-diagnostics/biotin-interference-troponin-lab-tests-assays-subject-biotin-interference"
         }
       ],
       "medicalReviewRequired": true
@@ -380,6 +446,76 @@
       "medicalReviewRequired": true
     },
     {
+      "id": "thyroidite-post-partum",
+      "title": "Can the thyroid change after giving birth?",
+      "summary": "Postpartum thyroiditis can temporarily change how the thyroid works, and it can go unnoticed.",
+      "tags": ["postpartum", "after birth", "pregnancy", "thyroiditis", "follow-up"],
+      "intro": "In the months after giving birth, the way the thyroid works can change. Some symptoms can be mistaken for tiredness or the upheaval of life with a new baby. This guide gives general pointers; only a professional can assess your situation.",
+      "sections": [
+        {
+          "heading": "What is postpartum thyroiditis?",
+          "body": "It is an autoimmune inflammation of the thyroid that can appear after a pregnancy. How it evolves varies: some people go through a phase of hyperthyroidism, of hypothyroidism, or one after the other; others have few symptoms."
+        },
+        {
+          "heading": "Which signs are worth discussing?",
+          "body": "Unusual tiredness, palpitations, feeling on edge or feeling slowed down can have many causes after a birth. If they persist, worry you or get worse, talk to a healthcare professional rather than deciding yourself that your thyroid is the cause."
+        },
+        {
+          "heading": "How to raise it with your care team",
+          "body": "Mention any thyroid history, your treatments, the date of the birth and the changes you have noticed. The professional will decide whether a test or follow-up is useful. Do not stop a treatment without medical advice."
+        }
+      ],
+      "takeaways": [
+        "How the thyroid works can change after a pregnancy.",
+        "Postpartum symptoms alone cannot tell you their cause.",
+        "A professional can decide whether tests are needed."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Underactive thyroid (hypothyroidism)",
+          "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/"
+        },
+        {
+          "label": "NHS — Overactive thyroid (hyperthyroidism)",
+          "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "thyroidite-subaigue",
+      "title": "Subacute thyroiditis: an inflammation that is often temporary",
+      "summary": "Some types of thyroid inflammation change over time; symptoms alone are not enough to work out the cause.",
+      "tags": ["thyroiditis", "de Quervain", "inflammation", "neck pain", "follow-up"],
+      "intro": "Thyroiditis means inflammation of the thyroid gland. Some types, such as subacute thyroiditis (also called de Quervain’s thyroiditis), can temporarily change thyroid hormone levels. Diagnosis and follow-up require a medical assessment.",
+      "sections": [
+        {
+          "heading": "It can evolve in several phases",
+          "body": "The inflammation may first come with signs of an overactive thyroid, followed by a period of underactivity before things improve. This pattern is not the same for everyone and cannot be confirmed from symptoms alone."
+        },
+        {
+          "heading": "What to tell your doctor",
+          "body": "Tell your doctor about any pain or tenderness in your neck, a recent infection, palpitations, fever or other symptoms. These signs can have several causes and need to be interpreted in context."
+        },
+        {
+          "heading": "Why follow-up may be offered",
+          "body": "Depending on the clinical assessment, your doctor may request blood tests or other investigations. Check-ups help follow how thyroid function changes. Do not start or stop a treatment without medical advice."
+        }
+      ],
+      "takeaways": [
+        "Not all types of thyroiditis have the same cause or course.",
+        "Neck pain or other symptoms are not enough to make a diagnosis.",
+        "Your doctor decides which tests and follow-up are useful."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Overactive thyroid (hyperthyroidism)",
+          "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
       "id": "nodule-thyroidien-comprendre",
       "title": "Thyroid nodule: what does finding one mean?",
       "summary": "A nodule is a localised lump in the thyroid. Finding one sometimes leads to further tests, but it does not, on its own, mean cancer.",
@@ -445,6 +581,43 @@
         {
           "label": "NHS — Goitre",
           "url": "https://www.nhs.uk/conditions/goitre/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "contraste-iode-thyroide",
+      "title": "Iodine contrast: what to mention before a scan",
+      "summary": "Some scans use an iodine-based contrast agent: mention any thyroid history and follow the team’s instructions.",
+      "tags": ["iodine", "contrast agent", "CT scan", "imaging", "tests"],
+      "intro": "Some imaging tests, such as CT scans, may use a contrast agent that contains iodine. If you have a thyroid condition or take a thyroid-related treatment, tell the medical team before the scan.",
+      "sections": [
+        {
+          "heading": "Why ask?",
+          "body": "A large amount of iodine can affect how the thyroid works in some people. The risk depends on your medical situation; it does not mean a scan with contrast is ruled out."
+        },
+        {
+          "heading": "What to tell the team",
+          "body": "Mention any history of thyroid disease, your treatments and, if the team asks, any recent tests. If you are not sure whether contrast is planned, ask the imaging centre or the doctor who requested the scan."
+        },
+        {
+          "heading": "Do not change the appointment yourself",
+          "body": "Do not refuse or postpone a scan based on this guide. The team will weigh the benefits, any precautions and whether follow-up is needed in your situation."
+        }
+      ],
+      "takeaways": [
+        "Tell the team about a thyroid condition and its treatment.",
+        "Iodine in a contrast agent does not mean the scan must be cancelled.",
+        "Any precautions are decided by the medical team."
+      ],
+      "sources": [
+        {
+          "label": "American Thyroid Association — Potential risks of excess iodine",
+          "url": "https://www.thyroid.org/ata-statement-on-the-potential-risks-of-excess-iodine-ingestion-and-exposure/"
+        },
+        {
+          "label": "American Thyroid Association — Contrast-induced hyperthyroidism",
+          "url": "https://www.thyroid.org/patient-thyroid-information/ct-for-patients/april-2025/vol-18-issue-4-p-11-12/"
         }
       ],
       "medicalReviewRequired": true

@@ -131,6 +131,52 @@
       "medicalReviewRequired": true
     },
     {
+      "id": "tsh-et-age",
+      "category": "analyses",
+      "readMinutes": 2,
+      "title": "TSH et âge : pourquoi le contexte compte",
+      "summary": "L’interprétation d’un résultat de TSH tient compte de l’âge, des symptômes et de la situation médicale.",
+      "tags": [
+        "TSH",
+        "âge",
+        "personnes âgées",
+        "seniors",
+        "analyses"
+      ],
+      "image": "/assets/comprendre/consultation.webp",
+      "intro": "La TSH est un marqueur utilisé pour évaluer la thyroïde. Chez les personnes âgées, son interprétation demande une attention particulière. Un résultat isolé ne permet pas de décider seul qu’un traitement est nécessaire.",
+      "sections": [
+        {
+          "heading": "Des symptômes moins spécifiques",
+          "body": "Fatigue, ralentissement ou troubles de la concentration peuvent avoir plusieurs explications, en particulier avec l’âge. Le médecin tient compte de l’ensemble des symptômes, des antécédents et des traitements."
+        },
+        {
+          "heading": "Un résultat qui se lit avec l’âge",
+          "body": "Avec l’âge, la lecture d’une TSH peut différer de celle retenue chez un adulte plus jeune. Le médecin la rapproche des autres résultats, des maladies associées et de certains médicaments : la décision ne se résume pas à comparer un chiffre à un intervalle trouvé en ligne."
+        },
+        {
+          "heading": "Quelles questions poser ?",
+          "body": "Demandez ce que le résultat signifie dans votre situation, si un contrôle est utile et quels changements doivent être signalés. Ne commencez, n’arrêtez ni ne modifiez un traitement sans avis médical."
+        }
+      ],
+      "takeaways": [
+        "L’âge fait partie du contexte d’interprétation de la TSH.",
+        "Un symptôme isolé ou une valeur seule ne suffit pas à conclure.",
+        "La décision de suivi ou de traitement revient au professionnel de santé."
+      ],
+      "sources": [
+        {
+          "label": "HAS — Dysthyroïdies : cas des personnes de plus de 65 ans",
+          "url": "https://www.has-sante.fr/jcms/p_3420835/fr/"
+        },
+        {
+          "label": "HAS — Prise en charge des hypothyroïdies chez l’adulte",
+          "url": "https://www.has-sante.fr/jcms/p_3418924/fr/prise-en-charge-des-hypothyroidies-chez-l-adulte-recommandations"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
       "id": "preparer-prise-sang-thyroide",
       "category": "analyses",
       "readMinutes": 3,
@@ -180,6 +226,48 @@
         {
           "label": "HAS — Prise en charge des dysthyroïdies chez l’adulte",
           "url": "https://www.has-sante.fr/jcms/p_3216305/fr/prise-en-charge-des-dysthyroidies-chez-l-adulte"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "biotine-analyses-thyroide",
+      "category": "analyses",
+      "readMinutes": 2,
+      "title": "Biotine et prise de sang : pensez à signaler vos compléments",
+      "summary": "La biotine peut perturber certains tests de laboratoire : signalez vos compléments au médecin et au laboratoire.",
+      "tags": [
+        "biotine",
+        "vitamine B7",
+        "compléments",
+        "prise de sang",
+        "interférence"
+      ],
+      "image": "/assets/comprendre/analyses.webp",
+      "intro": "La biotine, aussi appelée vitamine B7 ou B8, se trouve dans certains compléments, notamment ceux vendus pour les cheveux ou les ongles. Selon la méthode utilisée, elle peut interférer avec certains tests de laboratoire. Ne modifiez pas votre prise de complément sans demander conseil.",
+      "sections": [
+        {
+          "heading": "Pourquoi la signaler ?",
+          "body": "La biotine peut fausser certains résultats de laboratoire, à la hausse ou à la baisse. L’effet dépend du test et de la méthode de dosage : il ne concerne pas toutes les analyses ni tous les laboratoires."
+        },
+        {
+          "heading": "Que faire avant un prélèvement ?",
+          "body": "Indiquez au médecin prescripteur et à l’équipe du laboratoire tous les compléments et médicaments que vous prenez, y compris ceux achetés sans ordonnance. Suivez leurs consignes pour votre prélèvement."
+        },
+        {
+          "heading": "Faut-il arrêter la biotine ?",
+          "body": "Ne l’arrêtez pas et ne changez pas l’horaire de prise de votre propre initiative. Le médecin ou le laboratoire vous dira si une précaution est nécessaire pour l’analyse prévue."
+        }
+      ],
+      "takeaways": [
+        "Signalez les compléments contenant de la biotine avant une prise de sang.",
+        "L’interférence dépend du test et de la méthode du laboratoire.",
+        "Ne suspendez pas un complément sans consigne d’un professionnel."
+      ],
+      "sources": [
+        {
+          "label": "FDA — Biotin interference with laboratory tests (in English)",
+          "url": "https://www.fda.gov/medical-devices/in-vitro-diagnostics/biotin-interference-troponin-lab-tests-assays-subject-biotin-interference"
         }
       ],
       "medicalReviewRequired": true
@@ -444,6 +532,94 @@
       "medicalReviewRequired": true
     },
     {
+      "id": "thyroidite-post-partum",
+      "category": "suivi",
+      "readMinutes": 3,
+      "title": "Après l’accouchement, la thyroïde peut-elle changer ?",
+      "summary": "La thyroïdite du post-partum peut modifier temporairement le fonctionnement de la thyroïde et passer inaperçue.",
+      "tags": [
+        "post-partum",
+        "accouchement",
+        "grossesse",
+        "thyroïdite",
+        "suivi"
+      ],
+      "image": "/assets/comprendre/consultation.webp",
+      "intro": "Dans les mois qui suivent un accouchement, le fonctionnement de la thyroïde peut changer. Certains symptômes peuvent être confondus avec la fatigue ou les bouleversements du post-partum. Cette fiche donne des repères généraux ; seul un professionnel peut évaluer votre situation.",
+      "sections": [
+        {
+          "heading": "Qu’appelle-t-on thyroïdite du post-partum ?",
+          "body": "C’est une inflammation de la thyroïde, d’origine auto-immune, qui peut apparaître après une grossesse. Son évolution varie : certaines personnes traversent une phase d’hyperthyroïdie, d’hypothyroïdie, ou les deux successivement ; d’autres ont peu de symptômes."
+        },
+        {
+          "heading": "Quels signes peuvent motiver un échange ?",
+          "body": "Fatigue inhabituelle, palpitations, nervosité ou sensation de ralentissement peuvent avoir de nombreuses causes après une naissance. S’ils persistent, vous inquiètent ou s’aggravent, parlez-en à un professionnel de santé plutôt que d’en attribuer vous-même la cause à la thyroïde."
+        },
+        {
+          "heading": "Comment en parler à l’équipe médicale ?",
+          "body": "Mentionnez vos antécédents thyroïdiens, vos traitements, la date de l’accouchement et les changements ressentis. Le professionnel décidera si un examen ou un suivi est utile. N’interrompez pas un traitement sans consigne médicale."
+        }
+      ],
+      "takeaways": [
+        "Le fonctionnement de la thyroïde peut évoluer après une grossesse.",
+        "Les symptômes du post-partum ne permettent pas, seuls, d’en identifier la cause.",
+        "Un professionnel peut décider si un bilan est indiqué."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie — Comprendre l’hypothyroïdie et ses causes",
+          "url": "https://www.ameli.fr/assure/sante/themes/hypothyroidie/comprendre-hypothyroidie"
+        },
+        {
+          "label": "Assurance Maladie — Comprendre l’hyperthyroïdie et ses causes",
+          "url": "https://www.ameli.fr/assure/sante/themes/hyperthyroidie/comprendre-hyperthyroidie"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "thyroidite-subaigue",
+      "category": "thyroide",
+      "readMinutes": 3,
+      "title": "Thyroïdite subaiguë : une inflammation parfois temporaire",
+      "summary": "Certaines inflammations de la thyroïde évoluent dans le temps ; les symptômes seuls ne suffisent pas à en déterminer la cause.",
+      "tags": [
+        "thyroïdite",
+        "De Quervain",
+        "inflammation",
+        "douleur du cou",
+        "suivi"
+      ],
+      "image": "/assets/comprendre/thyroide.webp",
+      "intro": "Une thyroïdite est une inflammation de la glande thyroïde. Certaines formes, comme la thyroïdite subaiguë (dite de De Quervain), peuvent modifier temporairement les hormones thyroïdiennes. Leur diagnostic et leur suivi nécessitent une évaluation médicale.",
+      "sections": [
+        {
+          "heading": "Une évolution parfois en plusieurs phases",
+          "body": "L’inflammation peut d’abord s’accompagner de signes d’hyperthyroïdie, puis d’une période d’hypothyroïdie avant une amélioration. Cette évolution n’est pas la même chez tout le monde et ne peut pas être confirmée par les symptômes seuls."
+        },
+        {
+          "heading": "Quels éléments signaler ?",
+          "body": "Parlez au médecin d’une douleur ou d’une sensibilité au niveau du cou, d’un épisode infectieux récent, de palpitations, de fièvre ou d’autres symptômes. Ces signes peuvent avoir plusieurs causes et doivent être interprétés dans leur contexte."
+        },
+        {
+          "heading": "Pourquoi un suivi peut-il être proposé ?",
+          "body": "Le professionnel peut demander des analyses ou d’autres examens selon l’évaluation clinique. Des contrôles aident à suivre l’évolution de la fonction thyroïdienne. Ne commencez ni n’arrêtez de traitement sans avis médical."
+        }
+      ],
+      "takeaways": [
+        "Toutes les thyroïdites n’ont pas la même cause ni la même évolution.",
+        "Une douleur du cou ou des symptômes ne suffisent pas à établir un diagnostic.",
+        "Le professionnel décide des examens et du suivi utiles."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie — Comprendre l’hyperthyroïdie et ses causes",
+          "url": "https://www.ameli.fr/assure/sante/themes/hyperthyroidie/comprendre-hyperthyroidie"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
       "id": "nodule-thyroidien-comprendre",
       "category": "thyroide",
       "readMinutes": 3,
@@ -526,6 +702,52 @@
         {
           "label": "Assurance Maladie — Hyperthyroïdie : diagnostic et examens",
           "url": "https://www.ameli.fr/assure/sante/themes/hyperthyroidie/symptomes-diagnostic-evolution"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "contraste-iode-thyroide",
+      "category": "analyses",
+      "readMinutes": 2,
+      "title": "Produit de contraste iodé : que signaler avant un examen ?",
+      "summary": "Certains examens utilisent un produit de contraste iodé : signalez vos antécédents thyroïdiens et suivez les consignes de l’équipe.",
+      "tags": [
+        "iode",
+        "produit de contraste",
+        "scanner",
+        "imagerie",
+        "examens"
+      ],
+      "image": "/assets/comprendre/analyses.webp",
+      "intro": "Certains examens d’imagerie, comme des scanners, peuvent utiliser un produit de contraste contenant de l’iode. Si vous avez une maladie de la thyroïde ou un traitement lié à la thyroïde, signalez-le à l’équipe médicale avant l’examen.",
+      "sections": [
+        {
+          "heading": "Pourquoi poser la question ?",
+          "body": "Une quantité importante d’iode peut modifier le fonctionnement de la thyroïde chez certaines personnes. Le risque dépend du contexte médical ; cela ne signifie pas qu’un examen avec contraste est contre-indiqué."
+        },
+        {
+          "heading": "Quelles informations communiquer ?",
+          "body": "Mentionnez vos antécédents de maladie thyroïdienne, vos traitements et, si l’équipe vous le demande, vos examens récents. Si vous ne savez pas si un produit de contraste est prévu, posez la question au centre d’imagerie ou au médecin prescripteur."
+        },
+        {
+          "heading": "Ne pas modifier le rendez-vous de vous-même",
+          "body": "Ne refusez pas et ne reportez pas un examen sur la base de cette fiche. L’équipe évaluera les bénéfices, les précautions et la nécessité éventuelle d’un suivi selon votre situation."
+        }
+      ],
+      "takeaways": [
+        "Signalez une maladie thyroïdienne et ses traitements à l’équipe.",
+        "La présence d’iode dans un produit de contraste ne signifie pas qu’il faut annuler l’examen.",
+        "Les précautions éventuelles sont décidées par l’équipe médicale."
+      ],
+      "sources": [
+        {
+          "label": "American Thyroid Association — Risques d’un excès d’iode (en anglais)",
+          "url": "https://www.thyroid.org/ata-statement-on-the-potential-risks-of-excess-iodine-ingestion-and-exposure/"
+        },
+        {
+          "label": "American Thyroid Association — Hyperthyroïdie après produit de contraste iodé (en anglais)",
+          "url": "https://www.thyroid.org/patient-thyroid-information/ct-for-patients/april-2025/vol-18-issue-4-p-11-12/"
         }
       ],
       "medicalReviewRequired": true
