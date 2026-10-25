@@ -22,6 +22,10 @@ backend et apparaissent en plus, dans la section « Articles de l'équipe ».
   actif. L'avertissement du lecteur est `articles.disclaimerReader`.
 - Illustrations : `frontend/public/assets/comprendre/*.webp`, référencées par `image`
   (`/assets/comprendre/…`). `src/lib/learn.test.ts` vérifie que chaque chemin existe.
+  Seul le WebP est accepté (test et cache PWA de `vite.config.ts`). Les illustrations sont
+  recadrées (`object-fit: cover`, hauteur limitée) et estompées sur les bords, et partagées entre
+  les langues : un schéma contenant du texte y perd son titre et reste en français. Les schémas du
+  pack 04 n'ont donc pas été branchés (voir `docs/comprendre-pack-04/README.md`).
 - L'`id` d'une fiche sert d'URL (`/learn/<id>`) et passe avant un article API qui aurait le même slug
   (`fin` est réservé à l'écran de fin).
 - `tags` (optionnel) : mots-clés pris en compte par la recherche, qui couvre aussi le titre, le
@@ -34,7 +38,7 @@ backend et apparaissent en plus, dans la section « Articles de l'équipe ».
 
 ## Relecture médicale — obligatoire avant publication
 
-Les 32 fiches actuelles sont des **brouillons pédagogiques** : les 8 fiches d'origine
+Les 36 fiches actuelles sont des **brouillons pédagogiques** : les 8 fiches d'origine
 (hypothyroïdie, Hashimoto, lévothyroxine…), les 10 fiches Basedow issues du pack éditorial
 « ThyroTrack-Comprendre-Extension-Basedow », 7 fiches du pack « Comprendre — nouvelles fiches »
 (anti-TPO/anti-Tg, prise de sang, grossesse, nodule, échographie, iode radioactif, suivi après
@@ -42,8 +46,10 @@ thyroïdectomie) et les 5 fiches du pack « Comprendre — pack suivant » (TSH 
 thyroïdite du post-partum, thyroïdite subaiguë, produit de contraste iodé). Le pack
 « Comprendre » 03 a ajouté `medicaments-et-thyroide` et `hypothyroidie-fruste` ; sa fiche « Basedow,
 tabac et santé des yeux » est devenue la 4e section de `basedow-yeux`, et son complément sur le café
-et le petit-déjeuner a été ajouté à la première section de `levothyroxine-prise`. Aucune n'a été
-relue par un professionnel de santé.
+et le petit-déjeuner a été ajouté à la première section de `levothyroxine-prise`. Le pack
+« Comprendre » 04 (livraison et schémas sources dans `docs/comprendre-pack-04/`) a ajouté
+`cytoponction-nodule-thyroidien`, `cancer-thyroide-parcours`, `basedow-choix-traitement` et
+`equipe-suivi-thyroide`. Aucune n'a été relue par un professionnel de santé.
 
 Sur les 10 fiches de ce dernier pack, « Préparer une prise de sang » et « Valeurs de référence » ont
 été fusionnées (`preparer-prise-sang-thyroide`) ; « Hashimoto sans hypothyroïdie » est devenue la
@@ -132,6 +138,19 @@ Pour chaque fiche :
    `/medicines/levothyroxine/`, American Thyroid Association `https://www.thyroid.org/thyroid-eye-disease/`.
    La notice française de la lévothyroxine n'a pas pu être consultée : le passage sur le café, le
    thé et les repas reste volontairement sans délai chiffré, à confirmer par le relecteur.
+   Liens du pack « Comprendre » 04 **non vérifiés** (même raison) : Assurance Maladie
+   `…/themes/cancer-thyroide/diagnostic-evolution`, `…/themes/cancer-thyroide/traitement` (sous
+   `https://www.ameli.fr/assure/sante`) ; Institut national du cancer
+   `https://www.cancer.fr/personnes-malades/les-cancers/thyroide` et
+   `…/comprendre-la-maladie/diagnostic-d-un-cancer-de-la-thyroide` ; HAS
+   `https://www.has-sante.fr/upload/docs/application/pdf/2023-03/recommandation_prise_en_charge_des_hyperthyroidies_chez_ladulte_mel.pdf`.
+   Le libellé « Hyperthyroïdie : quelle équipe médicale ? » (`equipe-suivi-thyroide`) pointe vers
+   la page diagnostic d'Ameli : confirmer qu'elle parle bien des professionnels. Côté anglais, ces
+   fiches ne citent que des pages NHS déjà utilisées ailleurs (`/conditions/goitre/`,
+   `/conditions/thyroid-cancer/`, `/conditions/overactive-thyroid-hyperthyroidism/` et `…/treatment/`).
+   Relecture spécialisée attentive pour `cancer-thyroide-parcours`, `cytoponction-nodule-thyroidien`
+   (générales, sans interpréter un dossier) et `basedow-choix-traitement` (aucune option présentée
+   comme préférable).
    Relecture attentive : l'interférence de la biotine selon les méthodes (`biotine-analyses-thyroide`),
    la lecture de la TSH avec l'âge (`tsh-et-age`, sans seuil chiffré), et l'évolution en phases des
    thyroïdites (`thyroidite-post-partum`, `thyroidite-subaigue`).

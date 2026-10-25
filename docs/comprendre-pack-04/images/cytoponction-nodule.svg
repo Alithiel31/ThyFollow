@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-labelledby="title desc">
+  <title id="title">Schéma éducatif d’une cytoponction thyroïdienne</title>
+  <desc id="desc">Une échographie repère un nodule de la thyroïde pendant qu’un professionnel réalise un prélèvement à l’aiguille fine.</desc>
+  <rect width="800" height="500" rx="32" fill="#f5f3ff"/>
+  <circle cx="110" cy="95" r="46" fill="#e5e1ff"/><circle cx="690" cy="400" r="70" fill="#d9f4ef"/>
+  <text x="60" y="62" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#4f46a5">EXAMEN GUIDÉ PAR ÉCHOGRAPHIE</text>
+  <rect x="66" y="108" width="298" height="250" rx="22" fill="#fff" stroke="#d8d4f0" stroke-width="3"/>
+  <text x="94" y="146" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#344054">Image échographique</text>
+  <path d="M118 228c40-53 83-45 113-1s73 52 113 6" fill="none" stroke="#a8a3c7" stroke-width="12" stroke-linecap="round"/>
+  <ellipse cx="232" cy="253" rx="42" ry="31" fill="#d9f4ef" stroke="#2b9d8f" stroke-width="5"/>
+  <circle cx="246" cy="251" r="10" fill="#f2b95e"/>
+  <text x="202" y="315" font-family="Arial,sans-serif" font-size="17" fill="#475467">nodule</text>
+  <path d="M490 157c37-34 94-31 127 5 25 28 28 65 18 105-8 31-22 56-39 83l-12 47h-57l-7-53c-25-23-45-57-49-94-5-39 2-72 19-93z" fill="#ffe3d3" stroke="#e8a98d" stroke-width="5"/>
+  <path d="M567 289c-20-6-32-24-31-43 1-20 15-38 33-38s32 18 33 38c1 19-11 37-35 43z" fill="#f2b95e" stroke="#fff" stroke-width="6"/>
+  <path d="M300 207L529 248" stroke="#6875b8" stroke-width="8" stroke-linecap="round"/>
+  <path d="M296 198l-19-7 9 19" fill="#6875b8"/>
+  <circle cx="529" cy="248" r="8" fill="#2b9d8f"/>
+  <rect x="433" y="400" width="282" height="48" rx="24" fill="#e8e6fa"/>
+  <text x="574" y="431" text-anchor="middle" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#4f46a5">prélèvement de cellules</text>
+  <text x="64" y="425" font-family="Arial,sans-serif" font-size="17" fill="#667085">Illustration simplifiée — l’examen n’est proposé que dans certaines situations.</text>
+</svg>

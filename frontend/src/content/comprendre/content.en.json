@@ -412,6 +412,43 @@
       "medicalReviewRequired": true
     },
     {
+      "id": "equipe-suivi-thyroide",
+      "title": "Who may be involved in thyroid care?",
+      "summary": "Depending on the situation, several professionals may contribute to tests, treatment and follow-up.",
+      "tags": ["care team", "endocrinologist", "GP", "family doctor", "follow-up"],
+      "intro": "Care for a thyroid condition may involve different professionals. Not everyone needs to see each of them: the team depends on the diagnosis, the tests and the treatments being considered.",
+      "sections": [
+        {
+          "heading": "Your GP and the endocrinologist",
+          "body": "Your GP (family doctor) may handle part of your follow-up and coordinate your care. An endocrinologist may be asked to assess a hormone problem or discuss specialist options. Their exact role depends on your care pathway."
+        },
+        {
+          "heading": "The professionals behind your tests",
+          "body": "A laboratory carries out the blood tests that have been requested. A radiologist may perform and interpret an ultrasound scan or another imaging test. Depending on the results and the context, other specialists may be asked for their opinion."
+        },
+        {
+          "heading": "Specialists when needed",
+          "body": "An ophthalmologist may help monitor eye problems linked to Graves’ disease. A surgeon is involved when an operation is being considered. A nuclear medicine team carries out some tests and radioactive iodine treatments. After surgery or a cancer diagnosis, the team may grow. Ask who coordinates your care and who to contact."
+        }
+      ],
+      "takeaways": [
+        "Not everyone sees each of these professionals: it depends on the situation.",
+        "Your GP and the endocrinologist may contribute to your follow-up and its coordination.",
+        "Ask which professional to contact for each question or result."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Overactive thyroid (hyperthyroidism)",
+          "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/"
+        },
+        {
+          "label": "NHS — Thyroid cancer",
+          "url": "https://www.nhs.uk/conditions/thyroid-cancer/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
       "id": "suivi-tsh",
       "title": "Why check TSH after a change?",
       "summary": "Lab follow-up is planned over time: the right moment depends on your situation and your prescription.",
@@ -653,6 +690,76 @@
       "medicalReviewRequired": true
     },
     {
+      "id": "cytoponction-nodule-thyroidien",
+      "title": "Fine-needle aspiration of a nodule: what to expect",
+      "summary": "A sample taken with a fine needle may be offered to look at cells from a thyroid nodule.",
+      "tags": ["nodule", "fine-needle aspiration", "FNA", "biopsy", "ultrasound", "test"],
+      "intro": "When a thyroid nodule needs further assessment, your doctor may suggest a fine-needle aspiration. Not every nodule needs this test. The decision depends in particular on the ultrasound scan and the medical assessment.",
+      "sections": [
+        {
+          "heading": "What does the test involve?",
+          "body": "The doctor takes cells from the nodule with a fine needle, usually guided by ultrasound. The sample is then examined. The team will explain how it works, any instructions to follow and any precautions that apply to you."
+        },
+        {
+          "heading": "Why is it not done every time?",
+          "body": "The decision takes into account the features of the nodule, the ultrasound scan and other parts of the assessment. Some nodules are monitored or do not need a sample. Being offered this test does not mean that cancer is present."
+        },
+        {
+          "heading": "How is the result understood?",
+          "body": "Your doctor interprets the report together with your scan results and medical history. If the sample does not give a clear enough answer, monitoring or another test may be discussed. Ask who will explain the result to you and when."
+        }
+      ],
+      "takeaways": [
+        "Fine-needle aspiration is only offered in some situations.",
+        "The test collects cells; on its own, it is not a complete diagnosis.",
+        "The result is discussed with your doctor in the light of the whole assessment."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Goitre",
+          "url": "https://www.nhs.uk/conditions/goitre/"
+        },
+        {
+          "label": "NHS — Thyroid cancer",
+          "url": "https://www.nhs.uk/conditions/thyroid-cancer/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "cancer-thyroide-parcours",
+      "title": "If thyroid cancer is diagnosed: understanding the next steps",
+      "summary": "The path ahead depends on the type of cancer and your situation; the specialist team explains the tests and options.",
+      "tags": ["cancer", "nodule", "care pathway", "follow-up"],
+      "intro": "Finding a nodule does not mean it is cancer: most thyroid nodules are benign. If cancer is diagnosed, the next steps depend on its type and on the test results. This guide describes a general pathway, which may differ from one person to another.",
+      "sections": [
+        {
+          "heading": "Confirming and describing the diagnosis",
+          "body": "The team brings together information from the physical examination, imaging and, where appropriate, the analysis of cells or tissue. Further tests may be offered depending on the type of cancer suspected and the first findings."
+        },
+        {
+          "heading": "Discussing a care plan suited to you",
+          "body": "A specialist team reviews the medical information and discusses the options that suit your situation. The plan is then presented to you so you can ask questions and understand the next steps. Treatment is not the same for every type of thyroid cancer."
+        },
+        {
+          "heading": "Knowing who to contact and what to ask",
+          "body": "Ask for the name of your main contact, the planned timetable, which results are still awaited and who to contact if you have a question. You can ask for things to be explained again or bring someone close to you to appointments."
+        }
+      ],
+      "takeaways": [
+        "Most thyroid nodules are benign.",
+        "A confirmed diagnosis leads to a pathway tailored to the type of cancer and to each person.",
+        "Your care team can explain the plan and who your contacts are."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Thyroid cancer",
+          "url": "https://www.nhs.uk/conditions/thyroid-cancer/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
       "id": "contraste-iode-thyroide",
       "title": "Iodine contrast: what to mention before a scan",
       "summary": "Some scans use an iodine-based contrast agent: mention any thyroid history and follow the team’s instructions.",
@@ -867,6 +974,39 @@
         {
           "label": "American Thyroid Association — Thyroid eye disease",
           "url": "https://www.thyroid.org/thyroid-eye-disease/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "basedow-choix-traitement",
+      "title": "Graves’ disease: discussing treatment options",
+      "summary": "Medicines, radioactive iodine and surgery may be discussed, depending on the situation and the person’s preferences.",
+      "tags": ["Graves’ disease", "treatment", "shared decision", "follow-up"],
+      "intro": "Several options may be considered for Graves’ disease. They do not have the same aims, constraints or consequences. The decision is made with the medical team, taking into account the person’s situation and preferences.",
+      "sections": [
+        {
+          "heading": "Different options",
+          "body": "Depending on the situation, the team may discuss antithyroid medicines, radioactive iodine (radioiodine) treatment or surgery. This guide cannot help you choose an option: some situations make one option more or less suitable."
+        },
+        {
+          "heading": "Weighing benefits, constraints and follow-up",
+          "body": "Ask what each option aims to do, what check-ups it involves, what side effects or precautions to be aware of and how it may affect the way your thyroid works. The answers depend on your own situation and cannot be reduced to a general comparison."
+        },
+        {
+          "heading": "Making a shared decision",
+          "body": "You can ask for time to think, write down what matters most to you and come back with questions. Tell the team about any plans for pregnancy, eye problems, other health conditions and your preferences about treatment and follow-up."
+        }
+      ],
+      "takeaways": [
+        "There are several options, but not all of them suit every situation.",
+        "The choice takes into account both medical factors and the patient’s preferences.",
+        "Ask for a clear explanation of the effects, constraints and check-ups of each option."
+      ],
+      "sources": [
+        {
+          "label": "NHS — Overactive thyroid: treatment",
+          "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/treatment/"
         }
       ],
       "medicalReviewRequired": true

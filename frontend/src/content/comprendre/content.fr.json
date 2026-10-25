@@ -519,6 +519,51 @@
       "medicalReviewRequired": true
     },
     {
+      "id": "equipe-suivi-thyroide",
+      "category": "suivi",
+      "readMinutes": 3,
+      "title": "Qui peut intervenir dans le suivi de la thyroïde ?",
+      "summary": "Selon la situation, plusieurs professionnels peuvent contribuer aux examens, aux traitements et au suivi.",
+      "image": "/assets/comprendre/consultation.webp",
+      "tags": [
+        "équipe médicale",
+        "endocrinologue",
+        "médecin traitant",
+        "suivi"
+      ],
+      "intro": "Le suivi d’une maladie thyroïdienne peut faire intervenir différents professionnels. Toutes les personnes n’ont pas besoin de consulter chacun d’eux : l’équipe dépend du diagnostic, des examens et des traitements envisagés.",
+      "sections": [
+        {
+          "heading": "Le médecin traitant et l’endocrinologue",
+          "body": "Le médecin traitant peut assurer une partie du suivi et coordonner les soins. Un endocrinologue peut être sollicité pour évaluer une situation hormonale ou discuter d’options spécialisées. Leur rôle précis dépend de votre parcours."
+        },
+        {
+          "heading": "Les professionnels des examens",
+          "body": "Un laboratoire réalise les analyses prescrites. Un radiologue peut effectuer et interpréter une échographie ou un autre examen d’imagerie. Selon les résultats et le contexte, d’autres spécialistes peuvent être sollicités."
+        },
+        {
+          "heading": "Des spécialistes selon les besoins",
+          "body": "Un ophtalmologue peut contribuer au suivi d’une atteinte oculaire liée à Basedow. Un chirurgien intervient lorsqu’une opération est envisagée. Une équipe de médecine nucléaire intervient pour certains examens ou traitements à l’iode radioactif. Après une chirurgie ou un diagnostic de cancer, l’équipe peut s’élargir. Demandez qui coordonne votre parcours et qui contacter."
+        }
+      ],
+      "takeaways": [
+        "Tout le monde ne consulte pas chacun de ces professionnels : cela dépend de la situation.",
+        "Le médecin traitant et l’endocrinologue peuvent contribuer au suivi et à sa coordination.",
+        "Demandez quel professionnel contacter pour chaque question ou résultat."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie — Hyperthyroïdie : quelle équipe médicale ?",
+          "url": "https://www.ameli.fr/assure/sante/themes/hyperthyroidie/symptomes-diagnostic-evolution"
+        },
+        {
+          "label": "Assurance Maladie — Traitement du cancer de la thyroïde et équipe de soins",
+          "url": "https://www.ameli.fr/assure/sante/themes/cancer-thyroide/traitement"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
       "id": "suivi-tsh",
       "category": "analyses",
       "readMinutes": 2,
@@ -810,6 +855,100 @@
       "medicalReviewRequired": true
     },
     {
+      "id": "cytoponction-nodule-thyroidien",
+      "category": "analyses",
+      "readMinutes": 3,
+      "title": "Cytoponction d’un nodule : à quoi s’attendre ?",
+      "summary": "Un prélèvement à l’aiguille fine peut être proposé pour analyser des cellules d’un nodule thyroïdien.",
+      "image": "/assets/comprendre/analyses.webp",
+      "tags": [
+        "nodule",
+        "cytoponction",
+        "échographie",
+        "examen"
+      ],
+      "intro": "Quand un nodule thyroïdien nécessite une analyse complémentaire, le médecin peut proposer une cytoponction. Cet examen ne concerne pas tous les nodules. Le choix dépend notamment de l’échographie et de l’évaluation médicale.",
+      "sections": [
+        {
+          "heading": "En quoi consiste l’examen ?",
+          "body": "Le médecin prélève des cellules du nodule avec une aiguille fine, généralement guidée par échographie. L’échantillon est ensuite analysé. L’équipe vous explique le déroulement, les consignes et les éventuelles précautions selon votre situation."
+        },
+        {
+          "heading": "Pourquoi n’est-elle pas systématique ?",
+          "body": "La décision tient compte des caractéristiques du nodule, de l’échographie et d’autres éléments du bilan. Certains nodules sont surveillés ou ne nécessitent pas de prélèvement. Une cytoponction ne signifie pas qu’un cancer est présent."
+        },
+        {
+          "heading": "Comment comprendre le résultat ?",
+          "body": "Le compte rendu est interprété par le médecin avec les résultats d’imagerie et votre dossier. Si le prélèvement n’apporte pas une réponse suffisante, une surveillance ou un autre examen peut être discuté. Demandez qui vous expliquera le résultat et dans quel délai."
+        }
+      ],
+      "takeaways": [
+        "La cytoponction est proposée seulement dans certaines situations.",
+        "L’examen prélève des cellules et ne constitue pas à lui seul un diagnostic complet.",
+        "Le résultat se discute avec le médecin à la lumière du bilan entier."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie — Nodule thyroïdien : le bilan",
+          "url": "https://www.ameli.fr/assure/sante/themes/nodule-thyroidien/cas-faut-consulter-examens-realises"
+        },
+        {
+          "label": "Institut national du cancer — Diagnostic d’un cancer de la thyroïde",
+          "url": "https://www.cancer.fr/personnes-malades/les-cancers/thyroide/comprendre-la-maladie/diagnostic-d-un-cancer-de-la-thyroide"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "cancer-thyroide-parcours",
+      "category": "suivi",
+      "readMinutes": 3,
+      "title": "Si un cancer de la thyroïde est diagnostiqué : comprendre les étapes",
+      "summary": "Le parcours dépend du type de cancer et de la situation ; les examens et les options sont expliqués par l’équipe spécialisée.",
+      "image": "/assets/comprendre/consultation.webp",
+      "tags": [
+        "cancer",
+        "nodule",
+        "parcours de soins",
+        "suivi"
+      ],
+      "intro": "La découverte d’un nodule ne signifie pas qu’il s’agit d’un cancer : la plupart des nodules thyroïdiens sont bénins. Si un cancer est diagnostiqué, les prochaines étapes dépendent de son type et des résultats du bilan. Cette fiche présente un parcours général, qui peut différer d’une personne à l’autre.",
+      "sections": [
+        {
+          "heading": "Confirmer et caractériser le diagnostic",
+          "body": "L’équipe rassemble les informations de l’examen clinique, de l’imagerie et, si elle est indiquée, de l’analyse de cellules ou de tissus. Des examens complémentaires peuvent être proposés selon le type de cancer suspecté et les premières conclusions."
+        },
+        {
+          "heading": "Discuter d’un plan de soins adapté",
+          "body": "Une équipe spécialisée examine les éléments médicaux et discute des options adaptées. Le plan est présenté au patient afin qu’il puisse poser ses questions et comprendre les prochaines étapes. Les traitements ne sont pas identiques pour tous les cancers thyroïdiens."
+        },
+        {
+          "heading": "Savoir qui contacter et quoi demander",
+          "body": "Demandez le nom de votre interlocuteur, le calendrier prévu, les résultats encore attendus et la personne à contacter en cas de question. Vous pouvez demander que les explications soient reformulées ou qu’un proche vous accompagne."
+        }
+      ],
+      "takeaways": [
+        "La plupart des nodules thyroïdiens sont bénins.",
+        "Un diagnostic confirmé ouvre un parcours adapté au type de cancer et au dossier individuel.",
+        "L’équipe soignante peut expliquer le plan et les interlocuteurs."
+      ],
+      "sources": [
+        {
+          "label": "Assurance Maladie — Diagnostic et évolution du cancer de la thyroïde",
+          "url": "https://www.ameli.fr/assure/sante/themes/cancer-thyroide/diagnostic-evolution"
+        },
+        {
+          "label": "Institut national du cancer — Cancers de la thyroïde",
+          "url": "https://www.cancer.fr/personnes-malades/les-cancers/thyroide"
+        },
+        {
+          "label": "Institut national du cancer — Diagnostic d’un cancer de la thyroïde",
+          "url": "https://www.cancer.fr/personnes-malades/les-cancers/thyroide/comprendre-la-maladie/diagnostic-d-un-cancer-de-la-thyroide"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
       "id": "contraste-iode-thyroide",
       "category": "analyses",
       "readMinutes": 2,
@@ -1071,6 +1210,51 @@
         {
           "label": "American Thyroid Association — Thyroid eye disease (en anglais)",
           "url": "https://www.thyroid.org/thyroid-eye-disease/"
+        }
+      ],
+      "medicalReviewRequired": true
+    },
+    {
+      "id": "basedow-choix-traitement",
+      "category": "traitements",
+      "readMinutes": 3,
+      "title": "Basedow : discuter les options de traitement",
+      "summary": "Médicaments, iode radioactif et chirurgie peuvent être discutés selon la situation et les préférences de la personne.",
+      "image": "/assets/comprendre/traitement.webp",
+      "tags": [
+        "Basedow",
+        "traitement",
+        "décision partagée",
+        "suivi"
+      ],
+      "intro": "Plusieurs options peuvent être envisagées dans la maladie de Basedow. Elles n’ont pas les mêmes objectifs, contraintes ni conséquences. La décision se prend avec l’équipe médicale en tenant compte de la situation et des préférences de la personne.",
+      "sections": [
+        {
+          "heading": "Des options différentes",
+          "body": "Selon le contexte, l’équipe peut discuter d’un traitement médicamenteux par antithyroïdiens de synthèse, d’un traitement par iode radioactif (irathérapie) ou d’une chirurgie. Cette fiche ne permet pas de choisir une option : certaines situations rendent une option plus ou moins adaptée."
+        },
+        {
+          "heading": "Comparer bénéfices, contraintes et suivi",
+          "body": "Demandez ce que chaque option vise, quels contrôles elle implique, quels effets ou précautions sont à connaître et quelles conséquences elle peut avoir sur le fonctionnement de la thyroïde. Les réponses dépendent de votre dossier et ne se résument pas à une comparaison générale."
+        },
+        {
+          "heading": "Prendre une décision partagée",
+          "body": "Vous pouvez demander du temps pour réfléchir, noter vos priorités et revenir avec des questions. Informez l’équipe d’un projet de grossesse, d’une atteinte oculaire, d’autres problèmes de santé et de vos préférences concernant les traitements et le suivi."
+        }
+      ],
+      "takeaways": [
+        "Il existe plusieurs options, mais elles ne conviennent pas toutes à chaque situation.",
+        "Le choix tient compte des données médicales et des préférences du patient.",
+        "Demandez une explication claire des effets, contraintes et contrôles de chaque option."
+      ],
+      "sources": [
+        {
+          "label": "HAS — Prise en charge des hyperthyroïdies chez l’adulte, choix du traitement de Basedow",
+          "url": "https://www.has-sante.fr/upload/docs/application/pdf/2023-03/recommandation_prise_en_charge_des_hyperthyroidies_chez_ladulte_mel.pdf"
+        },
+        {
+          "label": "HAS — Dysthyroïdies : recommandations",
+          "url": "https://www.has-sante.fr/jcms/p_3420835/fr/"
         }
       ],
       "medicalReviewRequired": true
