@@ -18,9 +18,7 @@ concurrency:
 jobs:
   backend:
     name: Backend (lint, typecheck, test)
-    # Épinglé : sur ubuntu-latest (Ubuntu 26.04, qpdf 12.3.2), les tests de
-    # lib/pdfDecrypt échouent sans que l'échec se reproduise en local.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
       run:
