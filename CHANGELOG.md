@@ -69,6 +69,10 @@ pas synchronisé avec ces tags.
 
 ### Added
 
+- **« Comprendre » : cytoponction, cancer, choix du traitement de Basedow, équipe soignante**, en
+  français et en anglais (brouillons pédagogiques). Elles réutilisent les illustrations existantes ;
+  les schémas du pack, convertis en WebP, restent dans `docs/comprendre-pack-04/`. Toutes portent
+  `medicalReviewRequired: true`.
 - **« Comprendre » : médicaments et thyroïde, hypothyroïdie fruste**, en français et en anglais
   (brouillons pédagogiques). `basedow-yeux` gagne une section sur le tabac, et
   `levothyroxine-prise` une phrase sur le café, le thé et les repas, sans délai chiffré. Toutes
