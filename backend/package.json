@@ -39,7 +39,7 @@
     "i18next-http-middleware": "^3.9.11",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.4.0",
-    "openid-client": "^6.8.8",
+    "openid-client": "^6.8.9",
     "pdfjs-dist": "^6.4.299",
     "prisma": "^5.10.0",
     "resend": "^4.8.0",
