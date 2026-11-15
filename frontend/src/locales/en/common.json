@@ -44,6 +44,13 @@
     "notSpecified": "Not specified",
     "yesterday": "Yesterday"
   },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "subtitle": "This part of the app could not be displayed. Your data is safe: reload the page or go back to the dashboard.",
+    "reload": "Reload the page",
+    "home": "Dashboard",
+    "details": "Technical detail"
+  },
   "auth": {
     "login": {
       "title": "Welcome back",

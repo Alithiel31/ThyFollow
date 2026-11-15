@@ -227,9 +227,11 @@ La saisie manuelle et l'export sont gratuits ; l'**import de bilans PDF** est r�
 
 Une requête traverse toujours la même pile, dans `src/index.ts` :
 
-`helmet` → détection de langue i18next (`Accept-Language` ou `?lng=`) → CORS (liste blanche issue de
-`FRONTEND_URL`, credentials activés) → limite de débit globale → `express.json` → `cookie-parser` →
-`express-xss-sanitizer` → routeur → `errorHandler`.
+`pino-http` (journal d'accès, `X-Request-Id`) → `helmet` → détection de langue i18next
+(`Accept-Language` ou `?lng=`) → CORS (liste blanche issue de `FRONTEND_URL`, credentials activés) →
+limite de débit globale → `express.json` → `cookie-parser` → routeur → `errorHandler`. Les corps de
+requête sont stockés tels que saisis : la protection XSS est côté affichage (React échappe chaque
+nœud texte, `react-markdown` n'injecte jamais de HTML brut, les emails échappent le nom).
 
 - **Routeurs** (`routers/*.router.ts`) déclarent les routes et enveloppent les contrôleurs dans
   `asyncHandler` ; presque tous sont derrière `authenticate`.

@@ -7,7 +7,7 @@ import { buildContext } from './context.js';
 import type { GraphQLContext } from './context.js';
 
 // Monte /graphql sur une app Express existante, en plus de la REST API.
-// Doit être appelé APRÈS express.json()/cookieParser()/xss (le body doit
+// Doit être appelé APRÈS express.json()/cookieParser() (le body doit
 // déjà être parsé) et AVANT le error handler REST (Apollo formate ses
 // propres erreurs et n'appelle jamais next(err)) — voir src/index.ts.
 // Retourne le serveur Apollo pour que l'arrêt du processus puisse l'arrêter

@@ -10,6 +10,7 @@ import {
   Sun, Moon, MonitorSmartphone, BookOpen, PenLine, Languages, MoreHorizontal,
 } from 'lucide-react';
 import { LogoMark } from './LogoMark';
+import { ErrorBoundary } from './ErrorBoundary';
 import styles from './AppShell.module.css';
 
 /* Logo « papillon » dans son écrin (cadre clair le jour, halo bleuté la nuit) */
@@ -156,9 +157,13 @@ export function AppShell() {
         </div>
       </header>
 
-      {/* ── Contenu */}
+      {/* ── Contenu. Le filet d'erreur est recréé à chaque changement de route
+          (key) : une page cassée laisse la navigation utilisable, et aller
+          sur une autre page suffit à repartir. */}
       <main className={styles.main}>
-        <Outlet />
+        <ErrorBoundary key={pathname}>
+          <Outlet />
+        </ErrorBoundary>
       </main>
 
       {/* ── Navigation basse (mobile) */}
