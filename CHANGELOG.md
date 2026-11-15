@@ -33,6 +33,23 @@ pas synchronisé avec ces tags.
 
 ### Changed
 
+- **Emails normalisés.** L'adresse est passée en minuscules et débarrassée de ses espaces avant
+  toute validation ou recherche (inscription, connexion, renvoi de vérification, mot de passe
+  oublié, connexion Google). Jusqu'ici `Foo@x.fr` et `foo@x.fr` étaient deux comptes distincts et
+  un lien de réinitialisation pouvait ne pas retrouver le compte selon la casse saisie. La migration
+  `normalize_user_emails` aligne l'existant ; elle échoue volontairement si deux comptes ne
+  diffèrent que par la casse (à traiter à la main avant de redéployer).
+- **Index sur les clés étrangères** (`lab_results`, `medications`, `appointments`,
+  `symptom_library`, `symptom_logs`, `oauth_accounts`, `promo_redemptions`) : PostgreSQL n'en crée
+  pas tout seul, chaque lecture « par utilisateur » parcourait la table entière.
+- **Mot de passe plafonné à 128 caractères** à l'inscription et à la réinitialisation (bcrypt ne
+  lit que les 72 premiers octets). Pas de plafond à la connexion : un mot de passe existant plus
+  long reste accepté.
+- **Compte de démo utilisable.** `npm run db:seed` le créait sans email vérifié, le login le
+  refusait. Le commentaire « Railway » de `backend/.env.example` est remplacé par la configuration
+  réelle.
+- **Job `audit` frontend de nouveau vert** : `axios` passe en 1.21.1 (`follow-redirects`, sévérité
+  haute, non exploitable ici mais bloquant pour `npm audit --audit-level=high`).
 - **Rangement de la racine du dépôt.** `CODE_OF_CONDUCT`, `CONTRIBUTING`, `SECURITY` et `SUPPORT`
   (FR/EN) passent dans `.github/` (GitHub les détecte toujours), `TROUBLESHOOTING` devient
   `docs/troubleshooting.md` à côté du reste de la documentation. Les fichiers de conception

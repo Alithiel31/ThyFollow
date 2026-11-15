@@ -104,7 +104,10 @@ export async function handleGoogleCallback(
 
   return {
     providerAccountId: claims.sub,
-    email: userinfo.email ?? '',
+    // Même normalisation que les formulaires email/mot de passe
+    // (controllers/auth.controller.ts) : la liaison d'un compte existant se
+    // fait par `users.email`, qui est stocké en minuscules.
+    email: (userinfo.email ?? '').trim().toLowerCase(),
     emailVerified: userinfo.email_verified === true,
     name: userinfo.name ?? userinfo.email ?? 'Utilisateur Google',
   };

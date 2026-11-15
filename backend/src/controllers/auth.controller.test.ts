@@ -120,6 +120,31 @@ describe('register', () => {
     expect(res.status).toBe(400);
     expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
   });
+
+  it('rejects a password longer than 128 characters', async () => {
+    const app = await buildApp();
+
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ email: 'long@example.com', password: 'a'.repeat(129), name: 'Someone' });
+
+    expect(res.status).toBe(400);
+    expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
+  });
+
+  it('stores the email trimmed and lower-cased, and checks uniqueness on that form', async () => {
+    prismaMock.user.findUnique.mockResolvedValue(null);
+    prismaMock.user.create.mockResolvedValue({ id: 'user-1', email: 'mixed@example.com', name: 'New User' });
+    const app = await buildApp();
+
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ email: '  Mixed@Example.COM ', password: 'password123', name: 'New User' });
+
+    expect(res.status).toBe(201);
+    expect(prismaMock.user.findUnique).toHaveBeenCalledWith({ where: { email: 'mixed@example.com' } });
+    expect(prismaMock.user.create.mock.calls[0][0].data.email).toBe('mixed@example.com');
+  });
 });
 
 describe('login', () => {
@@ -191,6 +216,27 @@ describe('login', () => {
     expect(res.body.user.id).toBe('user-1');
     const decoded = jwt.verify(res.body.token, JWT_SECRET) as { userId: string; tv: number };
     expect(decoded).toMatchObject({ userId: 'user-1', tv: 3 });
+  });
+
+  it('looks the account up by the normalized email whatever the casing typed', async () => {
+    const hashed = await bcrypt.hash('correct-password', 12);
+    prismaMock.user.findUnique.mockResolvedValue({
+      id: 'user-1',
+      email: 'user@example.com',
+      name: 'User',
+      role: 'USER',
+      password: hashed,
+      emailVerified: true,
+      tokenVersion: 0,
+    });
+    const app = await buildApp();
+
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'User@Example.com ', password: 'correct-password' });
+
+    expect(res.status).toBe(200);
+    expect(prismaMock.user.findUnique).toHaveBeenCalledWith({ where: { email: 'user@example.com' } });
   });
 });
 

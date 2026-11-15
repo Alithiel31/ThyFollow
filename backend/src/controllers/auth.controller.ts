@@ -11,17 +11,31 @@ import { ConflictError, AuthenticationError, EmailNotVerifiedError, ValidationEr
 import { getEntitlements } from '../lib/entitlements.js';
 import { sendVerificationEmail, sendResetPasswordEmail } from '../lib/resend.js';
 
+// Email normalisé (espaces retirés, minuscules) AVANT validation et avant
+// toute recherche en base : `users.email` est unique et comparé tel quel par
+// PostgreSQL, donc sans cette étape « Foo@x.fr » et « foo@x.fr » seraient deux
+// comptes, et un reset de mot de passe échouerait selon la casse saisie. Même
+// règle côté OIDC (lib/oidc.ts) et dans la migration qui a normalisé l'existant.
+const emailSchema = (message?: string) => z.string().trim().toLowerCase().email(message);
+
+// Bornes du mot de passe : bcrypt ne regarde que les 72 premiers octets, un
+// plafond explicite évite d'accepter (et de hacher) des chaînes arbitrairement
+// longues. Pas appliqué au login : un mot de passe existant plus long doit
+// pouvoir continuer à ouvrir la session.
+const passwordSchema = (t: TFunction) =>
+  z.string().min(8, t('validation.passwordTooShort')).max(128, t('validation.passwordTooLong'));
+
 // Les schémas dépendent de `t` (messages traduits selon la langue de la
 // requête), d'où les fonctions plutôt que des constantes de module.
 const registerSchema = (t: TFunction) => z.object({
-  email: z.string().email(t('validation.emailInvalid')),
-  password: z.string().min(8, t('validation.passwordTooShort')),
+  email: emailSchema(t('validation.emailInvalid')),
+  password: passwordSchema(t),
   name: z.string().min(2, t('validation.nameTooShort')),
   birthDate: z.string().optional(),
 });
 
 const loginSchema = z.object({
-  email: z.string().email(),
+  email: emailSchema(),
   password: z.string(),
 });
 
@@ -30,16 +44,16 @@ const verifyEmailSchema = z.object({
 });
 
 const resendVerificationSchema = z.object({
-  email: z.string().email(),
+  email: emailSchema(),
 });
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email(),
+  email: emailSchema(),
 });
 
 const resetPasswordSchema = (t: TFunction) => z.object({
   token: z.string().min(1),
-  password: z.string().min(8, t('validation.passwordTooShort')),
+  password: passwordSchema(t),
 });
 
 // Durée de validité du lien de vérification envoyé par email.

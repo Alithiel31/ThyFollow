@@ -15,6 +15,9 @@ async function main() {
     create: {
       email: 'demo@thyrotrack.com',
       password,
+      // Sans cela, le login répond « email non vérifié » et le compte de démo
+      // annoncé par le README est inutilisable.
+      emailVerified: true,
       name: 'Sophie Martin',
       birthDate: new Date('1988-03-15'),
       profile: {

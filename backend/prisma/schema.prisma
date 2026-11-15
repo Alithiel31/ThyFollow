@@ -123,6 +123,7 @@ model PromoRedemption {
 
   // Un même compte ne peut utiliser un code qu'une seule fois
   @@unique([codeId, userId])
+  @@index([userId])
   @@map("promo_redemptions")
 }
 
@@ -143,6 +144,7 @@ model OAuthAccount {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
   @@map("oauth_accounts")
 }
 
@@ -323,6 +325,7 @@ model SymptomLibrary {
   user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   logs SymptomLog[]
 
+  @@index([userId])
   @@map("symptom_library")
 }
 
@@ -336,6 +339,8 @@ model SymptomLog {
   entry   DailyEntry     @relation(fields: [entryId], references: [id], onDelete: Cascade)
   symptom SymptomLibrary @relation(fields: [symptomId], references: [id], onDelete: Cascade)
 
+  @@index([entryId])
+  @@index([symptomId])
   @@map("symptom_logs")
 }
 
@@ -362,6 +367,7 @@ model Medication {
   user    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   intakes MedicationIntake[]
 
+  @@index([userId])
   @@map("medications")
 }
 
@@ -424,6 +430,7 @@ model LabResult {
   user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   documents LabDocument[]
 
+  @@index([userId])
   @@map("lab_results")
 }
 
@@ -490,6 +497,7 @@ model Appointment {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@map("appointments")
 }
 
