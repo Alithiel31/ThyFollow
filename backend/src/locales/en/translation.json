@@ -69,6 +69,7 @@
   "validation": {
     "emailInvalid": "Invalid email",
     "passwordTooShort": "Password too short (min 8 characters)",
+    "passwordTooLong": "Password too long (max 128 characters)",
     "nameTooShort": "Name too short",
     "titleTooShort": "Title too short",
     "contentRequired": "Content required",
