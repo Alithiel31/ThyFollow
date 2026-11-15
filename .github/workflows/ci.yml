@@ -42,7 +42,17 @@ jobs:
       - name: Typecheck + build
         run: npm run build
 
-      - run: npm test
+      - name: Tests + couverture
+        run: npm run test:coverage
+
+      # Rapport lcov consultable depuis la page du run (pas de seuil bloquant).
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: coverage-backend
+          path: backend/coverage/lcov.info
+          if-no-files-found: ignore
+          retention-days: 14
 
   frontend:
     name: Frontend (lint, typecheck, build)
@@ -67,7 +77,16 @@ jobs:
       - name: Typecheck + build
         run: npm run build
 
-      - run: npm test
+      - name: Tests + couverture
+        run: npm run test:coverage
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: coverage-frontend
+          path: frontend/coverage/lcov.info
+          if-no-files-found: ignore
+          retention-days: 14
 
   docker:
     name: Docker build (${{ matrix.service }})

@@ -78,15 +78,20 @@ README is maintained by hand; the routers (`backend/src/routers/`) are the sourc
 ### Tests (backend)
 
 ```bash
-npm test          # vitest run
-npm run lint      # eslint
-npm run build     # tsc — type-check and compile to dist/
+npm test                # vitest run
+npm run test:coverage   # same, plus a coverage summary and coverage/lcov.info
+npm run lint            # eslint
+npm run build           # tsc — type-check and compile to dist/
 ```
 
-The suite covers the auth and OIDC controllers, the Google Health webhook and subscriber, token
-encryption, and the GraphQL resolvers and DataLoaders. It uses mocks and needs neither a database
-nor the network. `vitest.config.ts` excludes `dist/`: without it, the compiled copy produced by
-`npm run build` would run every test a second time.
+The suite covers the auth and OIDC controllers, the PDF lab report import, the Google Health
+webhook and subscriber, token encryption, `/health`, and the GraphQL resolvers and DataLoaders. It
+uses mocks and needs neither a database nor the network. One exception: `lib/pdfDecrypt.test.ts`
+drives the real `qpdf` binary and is skipped with a warning when it is not installed (`apt-get
+install qpdf`, `brew install qpdf`); the import controller tests replace `decryptPdf` with an
+in-memory fake so they run everywhere. `vitest.config.ts` excludes `dist/`: without it, the
+compiled copy produced by `npm run build` would run every test a second time. Coverage has no
+blocking threshold yet: CI publishes each package's `lcov.info` as a run artifact.
 
 ## Frontend (port 5173)
 
@@ -106,6 +111,7 @@ stays on one origin exactly as in production.
 | `npm run preview` | Serves the build                                      |
 | `npm run lint`    | eslint                                                |
 | `npm test`        | vitest (jsdom + Testing Library)                      |
+| `npm run test:coverage` | same, plus a coverage summary and `coverage/lcov.info` |
 | `npm run format`  | prettier                                              |
 
 The tests cover the authentication screens, the daily log, the dashboard, medications, the profile
@@ -118,8 +124,8 @@ under `[Unreleased] > To do` in the CHANGELOG.
 
 | Job          | What it checks                                                                                                           |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| `backend`    | `npm ci`, lint, `npm run build` (type-check), `npm test`                                                                 |
-| `frontend`   | `npm ci`, lint, `npm run build`, `npm test`                                                                              |
+| `backend`    | `npm ci`, lint, `npm run build` (type-check), `npm run test:coverage` (installs `qpdf` first); `lcov.info` uploaded as the `coverage-backend` artifact |
+| `frontend`   | `npm ci`, lint, `npm run build`, `npm run test:coverage`; `lcov.info` uploaded as the `coverage-frontend` artifact        |
 | `docker`     | Builds both `linux/arm64` images on an ARM runner (no push), with a GitHub Actions layer cache                          |
 | `migrations` | Starts PostgreSQL 17, runs `prisma migrate deploy`, then fails if `schema.prisma` and the migrations have drifted apart  |
 | `audit`      | `npm audit --omit=dev --audit-level=high` on both packages                                                               |

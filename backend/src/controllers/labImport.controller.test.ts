@@ -1,17 +1,39 @@
 // src/controllers/labImport.controller.test.ts
-// Pipeline réel (qpdf, pdfjs, règles d'extraction, chiffrement) avec Prisma
+// Pipeline réel (pdfjs, règles d'extraction, chiffrement) avec Prisma
 // remplacé par un faux en mémoire et le LLM mocké. Les PDF sont fabriqués à
-// la volée (pdf-lib + qpdf --encrypt) : aucune donnée réelle.
+// la volée (pdf-lib) : aucune donnée réelle.
+//
+// Seul le déchiffrement par qpdf (lib/pdfDecrypt.ts) est remplacé par un faux
+// en mémoire, pour que ces tests ne dépendent pas du binaire : un PDF
+// « protégé » est ici un PDF ordinaire précédé d'un en-tête qui porte le mot
+// de passe attendu (voir makePdf), et le faux reproduit le contrat de
+// decryptPdf (PdfPasswordRequiredError / PdfWrongPasswordError / octets en
+// clair). Le vrai qpdf est couvert par lib/pdfDecrypt.test.ts.
 import express from 'express';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import crypto from 'node:crypto';
-import { execFileSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import path from 'node:path';
 import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
+
+const FAKE_ENCRYPTED_MARKER = '%PDF-FAKE-ENCRYPTED:';
+
+vi.mock('../lib/pdfDecrypt.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../lib/pdfDecrypt.js')>();
+  const marker = '%PDF-FAKE-ENCRYPTED:';
+  return {
+    ...actual,
+    decryptPdf: async (data: Buffer, password?: string): Promise<Buffer> => {
+      if (!actual.hasPdfSignature(data)) throw new actual.InvalidPdfError();
+      if (data.subarray(0, marker.length).toString() !== marker) return data;
+      const end = data.indexOf('\n', marker.length);
+      const expected = data.subarray(marker.length, end).toString();
+      if (password === undefined) throw new actual.PdfPasswordRequiredError();
+      if (password !== expected) throw new actual.PdfWrongPasswordError();
+      return data.subarray(end + 1);
+    },
+  };
+});
 
 const JWT_SECRET = 'test-secret-at-least-32-characters-long-ok';
 const USER_ID = 'user-1';
@@ -142,14 +164,8 @@ async function makePdf(lines: string[], password?: string): Promise<Buffer> {
   lines.forEach((t, i) => page.drawText(t, { x: 50, y: 750 - i * 20, size: 11, font }));
   const plain = Buffer.from(await doc.save());
   if (!password) return plain;
-  const dir = mkdtempSync(path.join(tmpdir(), 'fx-'));
-  try {
-    writeFileSync(path.join(dir, 'a.pdf'), plain);
-    execFileSync('qpdf', ['--encrypt', password, 'owner-pw', '256', '--', path.join(dir, 'a.pdf'), path.join(dir, 'b.pdf')]);
-    return readFileSync(path.join(dir, 'b.pdf'));
-  } finally {
-    rmSync(dir, { recursive: true, force: true });
-  }
+  // « Protégé » au sens du faux decryptPdf (voir le vi.mock en tête de fichier)
+  return Buffer.concat([Buffer.from(`${FAKE_ENCRYPTED_MARKER}${password}\n`), plain]);
 }
 
 const bilan = (tag: string) => [`Biogroup ${tag}`, 'Prélevé le 12/03/2026', 'TSH ultrasensible 2,35 mUI/L', 'Ferritine 64 µg/L'];
@@ -177,6 +193,8 @@ beforeEach(() => {
     profile: { aiExtractionConsentAt: null },
   };
   prismaMock.labResult.findFirst.mockResolvedValue(null);
+  // `clearAllMocks` garde l'implémentation : on défait celle posée par holdUserReadsUntil
+  prismaMock.user.findUnique.mockImplementation(async () => user);
 });
 
 async function storePassword(value: string) {
@@ -550,12 +568,29 @@ describe('accès Pro et quotas', () => {
     expect(user.freeImportsUsed).toBe(0);
   });
 
+  // Retient les `count` premières lectures de l'utilisateur jusqu'à ce qu'elles
+  // soient toutes arrivées : les requêtes passent ainsi le pré-contrôle du
+  // solde ensemble, avant que l'une d'elles ne réserve quoi que ce soit. Sans
+  // cela, l'ordre dépend du temps de traitement de chaque requête (le vrai
+  // qpdf, lent, rendait la course « naturelle » ; le faux est instantané).
+  function holdUserReadsUntil(count: number) {
+    let arrived = 0;
+    const release: (() => void)[] = [];
+    prismaMock.user.findUnique.mockImplementation(async () => {
+      arrived += 1;
+      if (arrived < count) await new Promise<void>((resolve) => release.push(resolve));
+      else release.forEach((resolve) => resolve());
+      return user;
+    });
+  }
+
   it('requêtes simultanées : le dernier import offert n’est consommé qu’une fois', async () => {
     user.proUntil = null;
     user.freeImportsUsed = 2;
     const app = await buildApp();
     // Les deux requêtes passent le pré-contrôle (solde lu = 1) avant que l'une
     // ou l'autre n'ait décompté quoi que ce soit.
+    holdUserReadsUntil(2);
     const [a, b] = await Promise.all([send(app, ['I']), send(app, ['J'])]);
     const statuses = [a, b].map((res) => res.body.results[0].status).sort();
     expect(statuses).toEqual(['quota_exceeded', 'ready']);
@@ -566,6 +601,7 @@ describe('accès Pro et quotas', () => {
   it('Pro : le plafond mensuel ne peut pas être dépassé par des requêtes simultanées', async () => {
     monthlyCount = 24;
     const app = await buildApp();
+    holdUserReadsUntil(2);
     const [a, b] = await Promise.all([send(app, ['K']), send(app, ['L'])]);
     const statuses = [a, b].map((res) => res.body.results[0].status).sort();
     expect(statuses).toEqual(['quota_exceeded', 'ready']);

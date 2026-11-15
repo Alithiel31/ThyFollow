@@ -17,7 +17,8 @@
     "db:generate": "prisma generate",
     "db:seed": "ts-node prisma/seed.ts",
     "db:studio": "prisma studio",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.137.0",
@@ -58,6 +59,7 @@
     "@types/multer": "^2.3.0",
     "@types/node": "^22.20.5",
     "@types/supertest": "^7.2.1",
+    "@vitest/coverage-v8": "^5.1.0",
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.13.0",

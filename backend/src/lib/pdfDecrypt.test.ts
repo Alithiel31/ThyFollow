@@ -1,6 +1,9 @@
 // src/lib/pdfDecrypt.test.ts
 // Les fixtures sont fabriquées à la volée : `pdf-lib` crée un PDF, `qpdf
-// --encrypt` le protège (le binaire qpdf est donc requis pour ces tests).
+// --encrypt` le protège. Le binaire qpdf est donc requis : sans lui, la suite
+// est sautée avec un avertissement (elle tourne toujours en CI, qui l'installe).
+// C'est la seule suite qui en dépend : les tests du contrôleur d'import
+// (controllers/labImport.controller.test.ts) remplacent decryptPdf par un faux.
 import { describe, it, expect, vi, beforeAll } from 'vitest';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdtempSync, writeFileSync, readFileSync, readdirSync, rmSync } from 'node:fs';
@@ -29,22 +32,27 @@ const PASSWORD = 's3cret-Pa$$ w0rd';
 let plainPdf: Buffer;
 let protectedPdf: Buffer;
 
-beforeAll(async () => {
-  const doc = await PDFDocument.create();
-  doc.addPage().drawText('TSH 2.35 mUI/L');
-  plainPdf = Buffer.from(await doc.save());
+const qpdfAvailable = spawnSync('qpdf', ['--version']).status === 0;
+if (!qpdfAvailable) {
+  console.warn('qpdf introuvable : tests de lib/pdfDecrypt sautés (apt-get install qpdf / brew install qpdf)');
+}
 
-  const dir = mkdtempSync(path.join(tmpdir(), 'fixture-'));
-  try {
-    writeFileSync(path.join(dir, 'a.pdf'), plainPdf);
-    execFileSync('qpdf', ['--encrypt', PASSWORD, 'owner-pw', '256', '--', path.join(dir, 'a.pdf'), path.join(dir, 'b.pdf')]);
-    protectedPdf = readFileSync(path.join(dir, 'b.pdf'));
-  } finally {
-    rmSync(dir, { recursive: true, force: true });
-  }
-});
+describe.skipIf(!qpdfAvailable)('lib/pdfDecrypt', () => {
+  beforeAll(async () => {
+    const doc = await PDFDocument.create();
+    doc.addPage().drawText('TSH 2.35 mUI/L');
+    plainPdf = Buffer.from(await doc.save());
 
-describe('lib/pdfDecrypt', () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'fixture-'));
+    try {
+      writeFileSync(path.join(dir, 'a.pdf'), plainPdf);
+      execFileSync('qpdf', ['--encrypt', PASSWORD, 'owner-pw', '256', '--', path.join(dir, 'a.pdf'), path.join(dir, 'b.pdf')]);
+      protectedPdf = readFileSync(path.join(dir, 'b.pdf'));
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
   it('returns an unprotected PDF unchanged', async () => {
     const out = await decryptPdf(plainPdf);
     expect(out.equals(plainPdf)).toBe(true);
