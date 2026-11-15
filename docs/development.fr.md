@@ -80,15 +80,21 @@ ne sont pas configurés. La liste REST du README est tenue à la main ; les rout
 ### Tests (backend)
 
 ```bash
-npm test          # vitest run
-npm run lint      # eslint
-npm run build     # tsc — vérification des types et compilation vers dist/
+npm test                # vitest run
+npm run test:coverage   # idem, plus un résumé de couverture et coverage/lcov.info
+npm run lint            # eslint
+npm run build           # tsc — vérification des types et compilation vers dist/
 ```
 
-La suite couvre les contrôleurs d'authentification et OIDC, le webhook et l'abonné Google Health, le
-chiffrement des jetons, ainsi que les resolvers et DataLoaders GraphQL. Elle utilise des simulacres et
-n'a besoin ni d'une base de données ni du réseau. `vitest.config.ts` exclut `dist/` : sans cela, la copie
-compilée produite par `npm run build` ferait tourner chaque test une seconde fois.
+La suite couvre les contrôleurs d'authentification et OIDC, l'import de bilans PDF, le webhook et
+l'abonné Google Health, le chiffrement des jetons, `/health`, ainsi que les resolvers et DataLoaders
+GraphQL. Elle utilise des simulacres et n'a besoin ni d'une base de données ni du réseau. Une
+exception : `lib/pdfDecrypt.test.ts` pilote le vrai binaire `qpdf` et est sautée avec un avertissement
+s'il n'est pas installé (`apt-get install qpdf`, `brew install qpdf`) ; les tests du contrôleur
+d'import remplacent `decryptPdf` par un faux en mémoire et tournent donc partout. `vitest.config.ts`
+exclut `dist/` : sans cela, la copie compilée produite par `npm run build` ferait tourner chaque test
+une seconde fois. La couverture n'a pas encore de seuil bloquant : la CI publie le `lcov.info` de
+chaque paquet en artefact du run.
 
 ## Frontend (port 5173)
 
@@ -108,6 +114,7 @@ navigateur reste sur une seule origine, exactement comme en production.
 | `npm run preview` | Sert le build                                            |
 | `npm run lint`    | eslint                                                   |
 | `npm test`        | vitest (jsdom + Testing Library)                         |
+| `npm run test:coverage` | idem, plus un résumé de couverture et `coverage/lcov.info` |
 | `npm run format`  | prettier                                                 |
 
 Les tests couvrent les écrans d'authentification, le journal quotidien, le tableau de bord, les
@@ -120,8 +127,8 @@ rendez-vous figure dans `[Unreleased] > À faire` du CHANGELOG.
 
 | Job          | Ce qu'il vérifie                                                                                                          |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `backend`    | `npm ci`, lint, `npm run build` (types), `npm test`                                                                       |
-| `frontend`   | `npm ci`, lint, `npm run build`, `npm test`                                                                               |
+| `backend`    | `npm ci`, lint, `npm run build` (types), `npm run test:coverage` (après installation de `qpdf`) ; `lcov.info` publié en artefact `coverage-backend` |
+| `frontend`   | `npm ci`, lint, `npm run build`, `npm run test:coverage` ; `lcov.info` publié en artefact `coverage-frontend`             |
 | `docker`     | Construit les deux images `linux/arm64` sur un runner ARM (sans push), avec un cache de couches GitHub Actions            |
 | `migrations` | Démarre PostgreSQL 17, lance `prisma migrate deploy`, puis échoue si `schema.prisma` et les migrations ont divergé        |
 | `audit`      | `npm audit --omit=dev --audit-level=high` sur les deux paquets                                                            |

@@ -33,6 +33,16 @@ pas synchronisé avec ces tags.
 
 ### Changed
 
+- **Tests du backend sans dépendance au binaire qpdf.** Les tests du contrôleur d'import de bilans
+  remplacent `decryptPdf` par un faux en mémoire qui reproduit son contrat (mot de passe requis,
+  mot de passe erroné, octets en clair) : pdfjs, règles d'extraction, chiffrement et quotas restent
+  réels, mais la suite tourne sans `qpdf` (29 tests échouaient sur un poste sans lui). Seule
+  `lib/pdfDecrypt.test.ts` pilote le vrai binaire ; elle est sautée avec un avertissement s'il
+  manque, et tourne toujours en CI.
+- **Couverture de tests mesurée.** `npm run test:coverage` (backend et frontend, `@vitest/coverage-v8`)
+  affiche un résumé et produit `coverage/lcov.info` ; la CI l'exécute à la place de `npm test` et
+  publie le rapport en artefact (`coverage-backend`, `coverage-frontend`, 14 jours). Pas de seuil
+  bloquant pour l'instant.
 - **Journaux structurés et identifiant de requête.** Le logger maison (console + couleurs ANSI) est
   remplacé par `pino` : une ligne JSON par évènement en production, sortie colorée en développement,
   niveau réglable par `LOG_LEVEL`. `pino-http` journalise chaque requête (méthode, URL, statut, durée,

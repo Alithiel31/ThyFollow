@@ -57,13 +57,15 @@ typecheck/build + tests pour le backend et pour le frontend. Reproduction locale
 cd backend
 npm run lint
 npm run build   # tsc — typecheck
-npm test        # vitest run
+npm test        # vitest run (les tests de lib/pdfDecrypt exigent qpdf, sautés sinon)
+npm run test:coverage   # idem, avec un résumé de couverture
 
 # Frontend
 cd frontend
 npm run lint
 npm run build   # tsc && vite build — typecheck + build
 npm test        # vitest run
+npm run test:coverage   # idem, avec un résumé de couverture
 ```
 
 Node 20 est requis (`.nvmrc` à la racine) : les deux `package.json` pinnent volontairement
