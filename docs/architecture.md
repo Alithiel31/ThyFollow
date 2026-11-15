@@ -226,9 +226,11 @@ Manual entry and the export are free; **PDF lab report import** is reserved for 
 
 A request goes through the same stack in `src/index.ts`:
 
-`helmet` → i18next language detection (`Accept-Language` or `?lng=`) → CORS (allow-list from
-`FRONTEND_URL`, credentials on) → global rate limit → `express.json` → `cookie-parser` →
-`express-xss-sanitizer` → router → `errorHandler`.
+`pino-http` (access log, `X-Request-Id`) → `helmet` → i18next language detection (`Accept-Language`
+or `?lng=`) → CORS (allow-list from `FRONTEND_URL`, credentials on) → global rate limit →
+`express.json` → `cookie-parser` → router → `errorHandler`. Request bodies are stored as typed:
+XSS protection lives on the rendering side (React escapes every text node, `react-markdown` never
+injects raw HTML, emails escape the name).
 
 - **Routers** (`routers/*.router.ts`) declare routes and wrap controllers in `asyncHandler`; nearly
   all of them sit behind `authenticate`.

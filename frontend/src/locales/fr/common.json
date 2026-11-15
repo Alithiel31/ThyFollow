@@ -44,6 +44,13 @@
     "notSpecified": "Non précisé",
     "yesterday": "Hier"
   },
+  "errorBoundary": {
+    "title": "Quelque chose s'est mal passé",
+    "subtitle": "Cette partie de l'application n'a pas pu s'afficher. Vos données ne sont pas affectées : rechargez la page ou revenez au tableau de bord.",
+    "reload": "Recharger la page",
+    "home": "Tableau de bord",
+    "details": "Détail technique"
+  },
   "auth": {
     "login": {
       "title": "Bon retour",

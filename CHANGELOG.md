@@ -33,6 +33,20 @@ pas synchronisé avec ces tags.
 
 ### Changed
 
+- **Écran de repli en cas d'erreur de rendu.** Une exception dans un composant affichait une page
+  blanche. Un `ErrorBoundary` entoure l'application (écran entier) et le contenu de chaque page
+  (la navigation reste utilisable), avec un message, « Recharger la page », « Tableau de bord » et
+  le détail technique repliable ; changer de page suffit à repartir.
+- **Bundle frontend découpé.** Les écrans d'inscription et de récupération de compte, le callback
+  Google, les fiches « Comprendre » (et leurs ~150 Ko de contenu), l'administration et le rapport
+  imprimable sont chargés à la demande ; React, Recharts et react-markdown ont leurs propres
+  morceaux, mis en cache indépendamment des mises à jour de l'application. Le service worker
+  précache toujours l'ensemble : rien ne manque hors ligne.
+- **Retrait de `express-xss-sanitizer`.** Le « nettoyage » global des corps de requête réécrivait en
+  silence les champs libres (notes du journal, instructions de prise, markdown des articles) alors
+  que la protection est côté affichage : React échappe chaque nœud texte, `react-markdown`
+  n'injecte jamais de HTML brut, les emails échappent le nom. Les données sont stockées telles que
+  saisies. L'`overrides` sur `sanitize-html`, qui ne servait qu'à ce paquet, disparaît avec lui.
 - **Tests du backend sans dépendance au binaire qpdf.** Les tests du contrôleur d'import de bilans
   remplacent `decryptPdf` par un faux en mémoire qui reproduit son contrat (mot de passe requis,
   mot de passe erroné, octets en clair) : pdfjs, règles d'extraction, chiffrement et quotas restent

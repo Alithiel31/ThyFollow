@@ -53,5 +53,21 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
+    rollupOptions: {
+      output: {
+        // Bibliothèques lourdes et stables dans leurs propres morceaux : une
+        // mise à jour de l'application ne force pas à retélécharger React ou
+        // Recharts, déjà en cache du navigateur et du service worker. Forme
+        // fonction : Vite 8 (rolldown) n'accepte plus l'objet. react-markdown
+        // n'a pas besoin d'entrée : seule la page « Comprendre », chargée à la
+        // demande, l'importe, il part donc dans son morceau.
+        manualChunks(id: string) {
+          if (!id.includes('/node_modules/')) return undefined;
+          if (/\/node_modules\/(react|react-dom|react-router|react-router-dom|scheduler)\//.test(id)) return 'react';
+          if (/\/node_modules\/(recharts|d3-[a-z-]+|victory-vendor|internmap)\//.test(id)) return 'recharts';
+          return undefined;
+        },
+      },
+    },
   },
 });

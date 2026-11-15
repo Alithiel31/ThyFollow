@@ -4,7 +4,6 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import { xss } from 'express-xss-sanitizer';
 import { config } from './config.js';
 import { logger } from './lib/logger.js';
 import i18next, { middleware as i18nextMiddleware } from './lib/i18n.js';
@@ -123,8 +122,12 @@ app.use(express.json());
 // contient rien de sensible côté utilisateur (pas de secret partagé).
 app.use(cookieParser());
 
-// ── Nettoyage des payloads contre les injections XSS
-app.use(xss());
+// Pas de « nettoyage XSS » global des corps de requête : il réécrivait en
+// silence les champs libres (notes du journal, instructions de prise,
+// markdown des articles) alors que la protection est côté affichage — React
+// échappe tout texte, react-markdown n'injecte jamais de HTML brut, et les
+// emails échappent le nom (lib/resend.ts). Les données sont stockées telles
+// que saisies.
 
 // ── Health check (backend + base de données, voir controllers/health.controller.ts)
 app.get('/health', healthController.check);
