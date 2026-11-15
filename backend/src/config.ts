@@ -2,6 +2,7 @@
 // Centralise la lecture des variables d'environnement pour éviter les
 // `process.env.X!` (assertion non-null) dispersés dans tout le code.
 import dotenv from 'dotenv';
+import { logger } from './lib/logger.js';
 
 dotenv.config();
 
@@ -106,17 +107,15 @@ export const config = {
 // court : un secret par défaut/faible en prod permettrait à n'importe qui
 // de forger des tokens valides (accès à n'importe quel compte).
 if (config.isProd && (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32)) {
-  console.error(
-    '❌ JWT_SECRET manquant ou trop court (< 32 caractères) en production. ' +
+  logger.error(
+    'JWT_SECRET manquant ou trop court (< 32 caractères) en production. ' +
       "Définissez un secret fort via la variable d'environnement JWT_SECRET."
   );
   process.exit(1);
 }
 
 if (!config.isProd && (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32)) {
-  console.warn(
-    '⚠️  JWT_SECRET manquant ou trop court (< 32 caractères). Secret de développement utilisé.'
-  );
+  logger.warn('JWT_SECRET manquant ou trop court (< 32 caractères). Secret de développement utilisé.');
 }
 
 // La clé de chiffrement n'est requise que si Google Health est activé
@@ -127,10 +126,10 @@ if (config.googleHealthClientId && !/^[0-9a-f]{64}$/i.test(config.tokenEncryptio
     'TOKEN_ENCRYPTION_KEY manquante ou invalide (attendu : 64 caractères hexadécimaux / 32 octets) ' +
     'alors que GOOGLE_HEALTH_CLIENT_ID est configuré.';
   if (config.isProd) {
-    console.error(`❌ ${message}`);
+    logger.error(message);
     process.exit(1);
   } else {
-    console.warn(`⚠️  ${message}`);
+    logger.warn(message);
   }
 }
 
@@ -140,9 +139,9 @@ if (config.googleHealthClientId && !/^[0-9a-f]{64}$/i.test(config.tokenEncryptio
 if (config.pdfEncryptionKey && !/^[0-9a-f]{64}$/i.test(config.pdfEncryptionKey)) {
   const message = 'PDF_ENCRYPTION_KEY invalide (attendu : 64 caractères hexadécimaux / 32 octets).';
   if (config.isProd) {
-    console.error(`❌ ${message}`);
+    logger.error(message);
     process.exit(1);
   } else {
-    console.warn(`⚠️  ${message}`);
+    logger.warn(message);
   }
 }

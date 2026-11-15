@@ -42,7 +42,12 @@ export const errorHandler = (
     return;
   }
 
-  // Tout le reste : erreur inattendue, on ne fuite pas le détail au client
-  logger.error('Erreur non gérée', err);
-  res.status(500).json({ error: req.t('errors.internalError') });
+  // Tout le reste : erreur inattendue, on ne fuite pas le détail au client.
+  // `req.log` (pino-http, voir middleware/requestLogger.ts) porte l'identifiant
+  // de requête ; absent dans les tests qui montent le routeur sans lui.
+  (req.log ?? logger).error({ err }, 'Erreur non gérée');
+  // L'identifiant de requête est renvoyé pour qu'un utilisateur puisse le
+  // citer : il retrouve la ligne de journal correspondante.
+  const requestId = req.id;
+  res.status(500).json({ error: req.t('errors.internalError'), ...(requestId ? { requestId } : {}) });
 };

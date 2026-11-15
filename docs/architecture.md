@@ -241,8 +241,15 @@ A request goes through the same stack in `src/index.ts`:
   uses DataLoaders to avoid the N+1 trap, and is described in [`backend/docs/graphql.md`](../backend/docs/graphql.md).
 - **Rate limiting** — `express-rate-limit`: 100 requests / 15 min / IP overall, and 20 / 15 min on
   `/api/auth` (failed attempts only — successful requests are not counted).
-- **Health check** — `GET /health` → `{status: "ok", timestamp}`, used by the Docker healthcheck and
-  exposed by nginx at `/health`.
+- **Health check** — `GET /health` → `200 {status: "ok", db: "ok", timestamp}` when PostgreSQL answers
+  a `SELECT 1` within 2 s, otherwise `503 {status: "degraded", db: "unreachable"}`. Used by the Docker
+  healthcheck (`wget --spider` fails on a 503, so the container turns *unhealthy* and `deploy.sh` does
+  not report success) and exposed by nginx at `/health`.
+- **Logs and shutdown** — `pino` writes one JSON line per event in production; `pino-http` adds an
+  access-log line and an `X-Request-Id` to every request (see `LOG_LEVEL` in
+  [`environment.md`](./environment.md)). On `SIGTERM`/`SIGINT` (a `docker stop` or a redeploy), the
+  backend stops accepting connections, lets in-flight requests finish, stops the reminder loop, then
+  closes Apollo and Prisma; after 8 s it exits anyway, before Docker's 10 s grace period.
 
 ---
 

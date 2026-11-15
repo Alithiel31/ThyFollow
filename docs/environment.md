@@ -71,7 +71,8 @@ Read by `src/config.ts`, which centralises every access to `process.env`. The Co
 | `JWT_SECRET`    | ✅ in production | a dev-only value        | Secret that signs session tokens. **In production the server refuses to start if it is missing or shorter than 32 characters**; elsewhere it warns and uses a development value. |
 | `JWT_EXPIRES_IN`| ❌              | `30d`                    | Session token lifetime.                                                                                                                           |
 | `PORT`          | ❌              | `3001`                   | Port the API listens on.                                                                                                                          |
-| `NODE_ENV`      | ❌              | `development`            | `production` enables the production guards (`JWT_SECRET`, `TOKEN_ENCRYPTION_KEY`).                                                              |
+| `NODE_ENV`      | ❌              | `development`            | `production` enables the production guards (`JWT_SECRET`, `TOKEN_ENCRYPTION_KEY`) and switches the logs to one JSON line per event (pretty-printed otherwise). |
+| `LOG_LEVEL`     | ❌              | `info` (`debug` in dev)  | Minimum level written to the logs: `fatal`, `error`, `warn`, `info`, `debug`, `trace` or `silent`. Every request gets an access-log line and an `X-Request-Id` (echoed in the response, and in the body of a `500`). `/health` is never logged. |
 | `FRONTEND_URL`  | ❌              | `http://localhost:5173`  | CORS allow-list, comma-separated. In Compose: `http://caesura:8082,https://thyrotrack.alithiel31.dev`. Only a safety net in production, where nginx makes everything same-origin. |
 | `APP_URL`       | ❌              | first entry of `FRONTEND_URL` | Canonical public URL of the frontend, used to build the links sent by email (verification, password reset). A single address, unlike `FRONTEND_URL`. |
 
