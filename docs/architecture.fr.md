@@ -243,8 +243,16 @@ Une requête traverse toujours la même pile, dans `src/index.ts` :
   dans [`backend/docs/graphql.md`](../backend/docs/graphql.md).
 - **Limitation de débit** — `express-rate-limit` : 100 requêtes / 15 min / IP au global, et 20 / 15 min
   sur `/api/auth` (seules les tentatives échouées comptent — les requêtes réussies ne sont pas comptées).
-- **Health check** — `GET /health` → `{status: "ok", timestamp}`, utilisé par le healthcheck Docker et
-  exposé par nginx sur `/health`.
+- **Health check** — `GET /health` → `200 {status: "ok", db: "ok", timestamp}` quand PostgreSQL répond
+  à un `SELECT 1` sous 2 s, sinon `503 {status: "degraded", db: "unreachable"}`. Utilisé par le
+  healthcheck Docker (`wget --spider` échoue sur un 503 : le conteneur passe *unhealthy* et `deploy.sh`
+  ne conclut pas au succès) et exposé par nginx sur `/health`.
+- **Journaux et arrêt** — `pino` écrit une ligne JSON par évènement en production ; `pino-http` ajoute
+  une ligne de journal d'accès et un `X-Request-Id` à chaque requête (voir `LOG_LEVEL` dans
+  [`environment.fr.md`](./environment.fr.md)). Sur `SIGTERM`/`SIGINT` (`docker stop`, redéploiement),
+  le backend cesse d'accepter des connexions, laisse finir les requêtes en cours, arrête la boucle des
+  rappels, puis ferme Apollo et Prisma ; au bout de 8 s il sort quand même, avant le délai de grâce de
+  10 s de Docker.
 
 ---
 

@@ -33,6 +33,22 @@ pas synchronisé avec ces tags.
 
 ### Changed
 
+- **Journaux structurés et identifiant de requête.** Le logger maison (console + couleurs ANSI) est
+  remplacé par `pino` : une ligne JSON par évènement en production, sortie colorée en développement,
+  niveau réglable par `LOG_LEVEL`. `pino-http` journalise chaque requête (méthode, URL, statut, durée,
+  IP, jamais le corps) et pose un `X-Request-Id`, renvoyé dans la réponse et dans le corps d'un `500`,
+  pour retrouver une requête signalée par un utilisateur. `/health` n'est pas journalisé (appelé
+  toutes les 30 s par Docker). Les erreurs de démarrage de `config.ts` passent par le même logger.
+- **`/health` vérifie la base.** Répond `503 {status: "degraded"}` si PostgreSQL ne répond pas à un
+  `SELECT 1` sous 2 s : le conteneur passe *unhealthy* et `deploy.sh` ne conclut plus au succès d'un
+  déploiement dont le backend tourne sans base.
+- **Arrêt propre du backend.** Sur `SIGTERM`/`SIGINT` (`docker stop`, redéploiement), le serveur cesse
+  d'accepter des connexions, laisse finir les requêtes en cours, arrête la boucle des rappels, ferme
+  Apollo et Prisma, puis sort ; sortie forcée après 8 s. Apollo n'installe plus ses propres
+  écouteurs de signaux (`stopOnTerminationSignals: false`) : ils relançaient le signal et coupaient
+  l'arrêt à mi-chemin. Une promesse rejetée sans rattrapage ou une
+  exception hors requête fait sortir le processus (code 1) au lieu de le laisser dans un état inconnu,
+  Docker le relance.
 - **Emails normalisés.** L'adresse est passée en minuscules et débarrassée de ses espaces avant
   toute validation ou recherche (inscription, connexion, renvoi de vérification, mot de passe
   oublié, connexion Google). Jusqu'ici `Foo@x.fr` et `foo@x.fr` étaient deux comptes distincts et

@@ -23,8 +23,11 @@ import billingRouter from './routers/billing.router.js';
 import adminPromoRouter from './routers/adminPromo.router.js';
 import accountRouter from './routers/account.router.js';
 import { stripeWebhookController } from './controllers/stripeWebhook.controller.js';
+import { healthController } from './controllers/health.controller.js';
 import { ensureProjectSubscriber } from './lib/googleHealthSubscriber.js';
-import { startReminderScheduler } from './lib/reminders.js';
+import { startReminderScheduler, stopReminderScheduler } from './lib/reminders.js';
+import { prisma } from './lib/prisma.js';
+import { requestLogger } from './middleware/requestLogger.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { mountGraphQL } from './graphql/index.js';
 
@@ -35,6 +38,10 @@ const app = express();
 // Un seul saut suffit : nginx remplace X-Forwarded-For par l'IP réelle du
 // visiteur, tirée de CF-Connecting-IP (voir frontend/nginx.conf).
 app.set('trust proxy', 1);
+
+// ── Journal d'accès + X-Request-Id, en tout premier : chaque requête, même
+// refusée par helmet/CORS/rate-limit, a sa ligne et son identifiant.
+app.use(requestLogger);
 
 // ── Sécurité : en-têtes HTTP standards
 app.use(helmet());
@@ -119,10 +126,8 @@ app.use(cookieParser());
 // ── Nettoyage des payloads contre les injections XSS
 app.use(xss());
 
-// ── Health check
-app.get('/health', (_, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+// ── Health check (backend + base de données, voir controllers/health.controller.ts)
+app.get('/health', healthController.check);
 
 // ── Routes
 app.use('/api/auth', authLimiter, authRouter);
@@ -144,12 +149,12 @@ app.use('/api/webhooks/google-health', googleHealthWebhookRouter);
 // backend/docs/graphql.md). Monté après le parsing du body / avant le error
 // handler REST : Apollo formate ses propres erreurs et n'appelle jamais
 // next(err), donc errorHandler ne le concerne pas.
-await mountGraphQL(app);
+const apollo = await mountGraphQL(app);
 
 // ── Error handler
 app.use(errorHandler);
 
-app.listen(config.port, () => {
+const server = app.listen(config.port, () => {
   logger.success(`🦋 ThyroTrack API running on port ${config.port}`);
   logger.info(`Environnement: ${config.nodeEnv}`);
 
@@ -166,6 +171,61 @@ app.listen(config.port, () => {
   // Rappels par email (journal, médicaments, bilan, rendez-vous) : boucle
   // toutes les 5 minutes, sautée si Resend n'est pas configuré.
   startReminderScheduler();
+});
+
+// ── Arrêt propre. `docker stop` / un redéploiement envoient SIGTERM (relayé
+// par dumb-init) : on cesse d'accepter des connexions, on laisse finir les
+// requêtes en cours (un import PDF peut durer plusieurs secondes), puis on
+// ferme Apollo et Prisma. Au-delà de SHUTDOWN_TIMEOUT_MS, sortie forcée :
+// Docker tuerait de toute façon le processus à la fin de son délai de grâce
+// (10 s par défaut), autant partir avec un journal explicite.
+const SHUTDOWN_TIMEOUT_MS = 8_000;
+let shuttingDown = false;
+
+async function shutdown(signal: NodeJS.Signals): Promise<void> {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  logger.info(`Signal ${signal} reçu : arrêt en cours`);
+
+  const forceExit = setTimeout(() => {
+    logger.error(`Arrêt forcé après ${SHUTDOWN_TIMEOUT_MS} ms : des requêtes n'ont pas fini`);
+    process.exit(1);
+  }, SHUTDOWN_TIMEOUT_MS);
+  forceExit.unref();
+
+  stopReminderScheduler();
+  await new Promise<void>((resolve) => {
+    server.close(() => resolve());
+    // Les connexions keep-alive inactives n'empêchent plus `close` d'aboutir.
+    server.closeIdleConnections();
+  });
+  logger.debug('Serveur HTTP fermé');
+  await apollo.stop().catch((err) => logger.error('Arrêt d’Apollo en erreur', err));
+  logger.debug('Apollo arrêté');
+  await prisma.$disconnect().catch((err) => logger.error('Déconnexion de Prisma en erreur', err));
+  logger.debug('Prisma déconnecté');
+  logger.info('Arrêt terminé');
+  process.exit(0);
+}
+
+// `on` et non `once` : tant qu'un écouteur est enregistré, un second signal
+// (Ctrl+C répété, `docker stop` qui insiste) ne tue pas le processus avant la
+// fin de l'arrêt en cours ; le garde `shuttingDown` le rend inerte. Apollo
+// n'installe pas ses propres écouteurs (voir graphql/server.ts) : c'est ici
+// que tout l'arrêt est orchestré.
+process.on('SIGTERM', () => void shutdown('SIGTERM'));
+process.on('SIGINT', () => void shutdown('SIGINT'));
+
+// Une promesse rejetée sans rattrapage ou une exception hors requête laisse
+// le processus dans un état inconnu : on journalise et on sort, Docker
+// (`restart: unless-stopped`) relance un processus sain.
+process.on('unhandledRejection', (reason) => {
+  logger.error('Promesse rejetée sans rattrapage', reason);
+  process.exit(1);
+});
+process.on('uncaughtException', (err) => {
+  logger.error('Exception non rattrapée', err);
+  process.exit(1);
 });
 
 export default app;

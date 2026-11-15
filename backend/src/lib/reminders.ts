@@ -297,3 +297,11 @@ export function startReminderScheduler(): void {
   timer.unref();
   void tick();
 }
+
+// Arrêt du serveur (voir index.ts) : plus aucun passage ne démarre. Un
+// passage en cours va à son terme ou est coupé par la sortie forcée.
+export function stopReminderScheduler(): void {
+  if (!timer) return;
+  clearInterval(timer);
+  timer = null;
+}
