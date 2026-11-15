@@ -411,7 +411,8 @@ DELETE /api/integrations/google-health/link
 POST   /api/integrations/google-health/resync    (relit les N derniers jours, 30 par défaut, 90 max)
 POST   /api/webhooks/google-health                (notifications Google + négociation de validation de l'abonné)
 
-POST   /graphql                                   (additif à la REST ci-dessus, ne la remplace pas — voir backend/docs/graphql.md)
+POST   /graphql                                   (additif à la REST ci-dessus, ne la remplace pas — voir backend/docs/graphql.md ;
+                                                   backend seul, non proxifié par nginx : injoignable par l'URL publique en production)
 ```
 
 ---
@@ -430,7 +431,7 @@ POST   /graphql                                   (additif à la REST ci-dessus,
 |---|---|
 | Runtime | Node.js 20 |
 | API | Express 4 + TypeScript |
-| API GraphQL | Apollo Server 5 + DataLoader (additif à REST, démo technique — voir [`backend/docs/graphql.md`](./backend/docs/graphql.md)) |
+| API GraphQL | Apollo Server 5 + DataLoader (additif à REST, démo technique, développement seulement : nginx ne le proxifie pas — voir [`backend/docs/graphql.md`](./backend/docs/graphql.md)) |
 | ORM | Prisma 5 |
 | BDD | PostgreSQL |
 | Auth | JWT (jsonwebtoken) + bcryptjs, OAuth2 + OpenID Connect (Google, via `openid-client`) |

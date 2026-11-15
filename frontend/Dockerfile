@@ -12,7 +12,10 @@ COPY . .
 RUN npm run build
 
 # ── Runtime ──────────────────────────────────────────────────
-FROM nginx:alpine
+# Version épinglée (mineure) : un `nginx:alpine` flottant changeait de version
+# à chaque build sans trace dans Git. Dependabot (écosystème docker) propose
+# les montées de version.
+FROM nginx:1.31-alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 

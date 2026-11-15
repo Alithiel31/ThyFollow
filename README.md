@@ -412,7 +412,8 @@ DELETE /api/integrations/google-health/link
 POST   /api/integrations/google-health/resync    (re-reads the last N days, 30 by default, 90 max)
 POST   /api/webhooks/google-health                (Google notifications + subscriber validation handshake)
 
-POST   /graphql                                   (additive to the REST API above, doesn't replace it — see backend/docs/graphql.md)
+POST   /graphql                                   (additive to the REST API above, doesn't replace it — see backend/docs/graphql.md ;
+                                                   backend only, not proxied by nginx: unreachable through the public URL in production)
 ```
 
 ---
@@ -431,7 +432,7 @@ POST   /graphql                                   (additive to the REST API abov
 |---|---|
 | Runtime | Node.js 20 |
 | API | Express 4 + TypeScript |
-| GraphQL API | Apollo Server 5 + DataLoader (additive to REST, technical demo — see [`backend/docs/graphql.md`](./backend/docs/graphql.md)) |
+| GraphQL API | Apollo Server 5 + DataLoader (additive to REST, technical demo, development only: nginx does not proxy it — see [`backend/docs/graphql.md`](./backend/docs/graphql.md)) |
 | ORM | Prisma 5 |
 | Database | PostgreSQL |
 | Auth | JWT (jsonwebtoken) + bcryptjs, OAuth2 + OpenID Connect (Google, via `openid-client`) |

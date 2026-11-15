@@ -33,6 +33,14 @@ pas synchronisé avec ces tags.
 
 ### Changed
 
+- **Documentation : mono-instance et GraphQL.** `docs/architecture` (FR/EN) liste ce qui suppose un
+  seul processus backend (codes d'échange OIDC en mémoire, limitation de débit, boucle des rappels,
+  cache de discovery) et ce qu'il faudrait déplacer pour en faire tourner deux. Le README,
+  `architecture` et `backend/docs/graphql.md` disent désormais clairement que `/graphql` n'est pas
+  proxifié par nginx : joignable en développement ou depuis le réseau Docker, pas par l'URL publique.
+- **Conteneur frontend surveillé.** Healthcheck Docker sur nginx (`wget --spider http://localhost/`) :
+  un conteneur qui ne sert rien apparaît *unhealthy* au lieu de passer pour sain. L'image nginx est
+  épinglée sur `1.31-alpine` au lieu du tag flottant `alpine` ; Dependabot suit les montées de version.
 - **Écran de repli en cas d'erreur de rendu.** Une exception dans un composant affichait une page
   blanche. Un `ErrorBoundary` entoure l'application (écran entier) et le contenu de chaque page
   (la navigation reste utilisable), avec un message, « Recharger la page », « Tableau de bord » et

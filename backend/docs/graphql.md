@@ -84,6 +84,13 @@ Deux comportements différents à connaître (et à savoir expliquer) :
 
 ## Comment l'essayer
 
+En production, l'endpoint n'est **pas** joignable par l'URL publique : nginx
+(`frontend/nginx.conf`) ne proxifie que `/api/*` et `/health`, et `/graphql`
+retombe sur le `index.html` de l'application. Il n'est servi que par le
+processus backend lui-même (`:3001`), donc en développement ou depuis le
+réseau Docker interne. C'est voulu pour une démo technique : l'exposer
+demanderait au minimum une limite de profondeur/complexité des queries.
+
 En développement (`npm run dev`), l'introspection est activée et [Apollo
 Sandbox](https://www.apollographql.com/docs/graphql-software/apollo-sandbox)
 est accessible en pointant un client GraphQL vers `http://localhost:3001/graphql`.
