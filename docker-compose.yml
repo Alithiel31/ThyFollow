@@ -69,6 +69,16 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+    # nginx sert index.html : un conteneur qui démarre mais ne répond pas
+    # (config nginx invalide, build vide) apparaît unhealthy dans
+    # `docker compose ps` au lieu de passer pour sain. wget vient de busybox,
+    # présent dans l'image nginx:alpine.
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
     networks:
       - thyrotrack-network
       - traefik-net

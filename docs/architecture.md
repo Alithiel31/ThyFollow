@@ -47,6 +47,19 @@ projects on the host, reached from the backend container through `host.docker.in
 `extra_hosts` entry maps it to the host gateway). The application role `thyrotrack_app` and the
 `thyrotrack` database must therefore exist before the first start.
 
+### Single instance by design
+
+The backend runs as **one** process, and several pieces assume it. Running two backends behind the
+same nginx would need each of them moved to a shared store (Redis or the database):
+
+| Piece | Where it lives | Consequence with two instances |
+| --- | --- | --- |
+| OIDC exchange codes (`lib/oidcExchange.ts`) | in-memory `Map`, 60 s TTL | the Google callback and the `/auth/oidc/exchange` call could land on different instances: login fails |
+| OIDC discovery cache (`lib/oidc.ts`) | module-level | harmless (one extra discovery call per instance) |
+| Rate limiting (`express-rate-limit`) | in-memory store | quotas counted per instance, so effectively doubled |
+| Email reminder loop (`lib/reminders.ts`) | `setInterval` in the process | every reminder sent twice; set `REMINDERS_ENABLED=false` on all but one instance (the `ReminderLog` unique key is the last safety net) |
+| Google Health project subscriber (`lib/googleHealthSubscriber.ts`) | created once at startup | idempotent: the second instance finds it already there |
+
 ---
 
 ## Authentication
@@ -241,6 +254,9 @@ injects raw HTML, emails escape the name).
 - **GraphQL** — `POST /graphql` (Apollo Server 5) is a deliberate technical demo, **additive** to the
   REST API: no REST route was removed and the frontend uses REST only. It reproduces the JWT check,
   uses DataLoaders to avoid the N+1 trap, and is described in [`backend/docs/graphql.md`](../backend/docs/graphql.md).
+  It is served by the backend process only (`:3001`): nginx proxies `/api/*` and `/health`, not
+  `/graphql`, so the endpoint is **not reachable through the public URL** in production. Use it in
+  development, or from inside the Docker network.
 - **Rate limiting** — `express-rate-limit`: 100 requests / 15 min / IP overall, and 20 / 15 min on
   `/api/auth` (failed attempts only — successful requests are not counted).
 - **Health check** — `GET /health` → `200 {status: "ok", db: "ok", timestamp}` when PostgreSQL answers

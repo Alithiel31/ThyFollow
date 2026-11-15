@@ -47,6 +47,20 @@ d'autres projets de l'hôte, jointe depuis le conteneur backend via `host.docker
 `extra_hosts` la fait pointer vers la passerelle de l'hôte). Le rôle applicatif `thyrotrack_app` et
 la base `thyrotrack` doivent donc exister avant le premier démarrage.
 
+### Mono-instance par construction
+
+Le backend tourne en **un seul** processus, et plusieurs mécanismes le supposent. Faire tourner deux
+backends derrière le même nginx demanderait de déplacer chacun d'eux vers un store partagé (Redis ou
+la base) :
+
+| Mécanisme | Où il vit | Conséquence à deux instances |
+| --- | --- | --- |
+| Codes d'échange OIDC (`lib/oidcExchange.ts`) | `Map` en mémoire, TTL 60 s | le retour de Google et l'appel `/auth/oidc/exchange` peuvent tomber sur deux instances différentes : connexion refusée |
+| Cache de discovery OIDC (`lib/oidc.ts`) | niveau module | sans effet (un appel de discovery de plus par instance) |
+| Limitation de débit (`express-rate-limit`) | store en mémoire | quotas comptés par instance, donc doublés de fait |
+| Boucle des rappels par email (`lib/reminders.ts`) | `setInterval` dans le processus | chaque rappel partirait deux fois ; mettre `REMINDERS_ENABLED=false` sur toutes les instances sauf une (la clé unique de `ReminderLog` reste le dernier filet) |
+| Abonné projet Google Health (`lib/googleHealthSubscriber.ts`) | créé une fois au démarrage | idempotent : la seconde instance le trouve déjà en place |
+
 ---
 
 ## Authentification
@@ -242,7 +256,10 @@ nœud texte, `react-markdown` n'injecte jamais de HTML brut, les emails échappe
 - **GraphQL** — `POST /graphql` (Apollo Server 5) est une démonstration technique assumée,
   **additive** à la REST API : aucune route REST n'a été retirée et le frontend n'utilise que REST. Il
   reproduit la vérification du JWT, utilise des DataLoaders pour éviter le piège du N+1, et est décrit
-  dans [`backend/docs/graphql.md`](../backend/docs/graphql.md).
+  dans [`backend/docs/graphql.md`](../backend/docs/graphql.md). Il n'est servi que par le processus
+  backend (`:3001`) : nginx proxifie `/api/*` et `/health`, pas `/graphql`, l'endpoint n'est donc
+  **pas joignable par l'URL publique** en production. À utiliser en développement, ou depuis le
+  réseau Docker.
 - **Limitation de débit** — `express-rate-limit` : 100 requêtes / 15 min / IP au global, et 20 / 15 min
   sur `/api/auth` (seules les tentatives échouées comptent — les requêtes réussies ne sont pas comptées).
 - **Health check** — `GET /health` → `200 {status: "ok", db: "ok", timestamp}` quand PostgreSQL répond
