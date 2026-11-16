@@ -364,11 +364,33 @@ model Medication {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
-  user    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  intakes MedicationIntake[]
+  user        User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  intakes     MedicationIntake[]
+  doseChanges MedicationDoseChange[]
 
   @@index([userId])
   @@map("medications")
+}
+
+// ─────────────────────────────────────────────
+// MEDICATION DOSE CHANGES (historique de posologie : une ligne par dose,
+// datée de son entrée en vigueur ; Medication.dosage reste la valeur courante)
+// ─────────────────────────────────────────────
+model MedicationDoseChange {
+  id            String     @id @default(cuid())
+  medicationId  String
+  dosage        Float
+  dosageUnit    DosageUnit
+  effectiveFrom DateTime   @db.Date // premier jour à cette dose
+  reason        String? // "TSH à 6,2 le 3 mars", "avis endocrino"...
+  createdAt     DateTime   @default(now())
+
+  medication Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+
+  // Deux changements le même jour se remplacent (upsert) au lieu de s'empiler
+  @@unique([medicationId, effectiveFrom])
+  @@index([medicationId])
+  @@map("medication_dose_changes")
 }
 
 // ─────────────────────────────────────────────
