@@ -26,6 +26,8 @@
     "googleHealthNotConfigured": "Google Health sync is not configured on this server",
     "googleHealthNotLinked": "Google Health is not connected to this account",
     "googleHealthResyncRunning": "A Google Health history sync is already running",
+    "doseChangeFirstRow": "The first dose of a treatment cannot be deleted",
+    "doseChangeBeforeLatest": "The effective date must be after the latest dose change",
     "labImport": {
       "fileTooLarge": "File too large",
       "badUpload": "Invalid upload (maximum {{max}} PDF files)",
@@ -64,6 +66,7 @@
     "entry": "Entry",
     "labResult": "Lab result",
     "medication": "Medication",
+    "doseChange": "Dose change",
     "pdfPassword": "Password"
   },
   "validation": {

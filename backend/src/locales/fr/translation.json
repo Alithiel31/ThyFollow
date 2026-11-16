@@ -26,6 +26,8 @@
     "googleHealthNotConfigured": "La synchronisation Google Health n'est pas configurée sur ce serveur",
     "googleHealthNotLinked": "Google Health n'est pas connecté à ce compte",
     "googleHealthResyncRunning": "Une synchronisation de l'historique Google Health est déjà en cours",
+    "doseChangeFirstRow": "La première dose d'un traitement ne peut pas être supprimée",
+    "doseChangeBeforeLatest": "La date d'effet doit être postérieure au dernier changement de dose",
     "labImport": {
       "fileTooLarge": "Fichier trop volumineux",
       "badUpload": "Envoi invalide (maximum {{max}} fichiers PDF)",
@@ -64,6 +66,7 @@
     "entry": "Entrée",
     "labResult": "Résultat",
     "medication": "Médicament",
+    "doseChange": "Changement de dose",
     "pdfPassword": "Mot de passe"
   },
   "validation": {

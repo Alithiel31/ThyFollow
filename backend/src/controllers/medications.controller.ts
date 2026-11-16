@@ -3,9 +3,20 @@ import { Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { AuthRequest } from '../middleware/auth.js';
-import { NotFoundError } from '../lib/errors.js';
+import { ConflictError, NotFoundError, ValidationError } from '../lib/errors.js';
 
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+// Historique de posologie renvoyé avec chaque médicament, du plus récent au plus ancien
+const DOSE_CHANGES_INCLUDE = { doseChanges: { orderBy: { effectiveFrom: 'desc' as const } } };
+
+// Déclaration explicite d'un changement de dose (par opposition à une
+// correction de saisie) lors d'un PUT /medications/:id
+const doseChangeSchema = z.object({
+  effectiveFrom: z.string().regex(DATE_RE),
+  reason: z.string().max(200).optional().nullable(),
+});
 
 const medSchema = z.object({
   name: z.string().min(1),
@@ -31,19 +42,25 @@ export const medicationsController = {
     const meds = await prisma.medication.findMany({
       where: { userId: req.userId },
       orderBy: [{ active: 'desc' }, { startDate: 'desc' }],
+      include: DOSE_CHANGES_INCLUDE,
     });
     res.json(meds);
   },
 
   create: async (req: AuthRequest, res: Response): Promise<void> => {
     const { startDate, endDate, ...data } = medSchema.parse(req.body);
+    // Le médicament naît avec sa première ligne d'historique, à la dose saisie
     const med = await prisma.medication.create({
       data: {
         userId: req.userId!,
         startDate: new Date(startDate),
         endDate: endDate ? new Date(endDate) : null,
         ...data,
+        doseChanges: {
+          create: { dosage: data.dosage, dosageUnit: data.dosageUnit, effectiveFrom: new Date(startDate) },
+        },
       },
+      include: DOSE_CHANGES_INCLUDE,
     });
     res.status(201).json(med);
   },
@@ -51,19 +68,90 @@ export const medicationsController = {
   update: async (req: AuthRequest, res: Response): Promise<void> => {
     const existing = await prisma.medication.findFirst({
       where: { id: req.params.id, userId: req.userId },
+      include: { doseChanges: { orderBy: { effectiveFrom: 'desc' }, take: 1 } },
     });
     if (!existing) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.medication') }));
 
-    const { startDate, endDate, ...data } = medSchema.partial().parse(req.body);
-    const med = await prisma.medication.update({
-      where: { id: req.params.id },
-      data: {
-        ...(startDate && { startDate: new Date(startDate) }),
-        ...(endDate !== undefined && { endDate: endDate ? new Date(endDate) : null }),
-        ...data,
-      },
+    const { startDate, endDate, doseChange, ...data } = medSchema
+      .partial()
+      .extend({ doseChange: doseChangeSchema.optional() })
+      .parse(req.body);
+
+    // Dose/unité demandées, comparées à la ligne d'historique la plus récente
+    // (la migration de reprise garantit qu'il y en a toujours une).
+    const latest = existing.doseChanges[0];
+    const nextDosage = data.dosage ?? existing.dosage;
+    const nextUnit = data.dosageUnit ?? existing.dosageUnit;
+    const doseDiffers = latest ? nextDosage !== latest.dosage || nextUnit !== latest.dosageUnit : false;
+
+    if (doseChange && latest && new Date(doseChange.effectiveFrom) < latest.effectiveFrom) {
+      throw new ValidationError(req.t('errors.doseChangeBeforeLatest'));
+    }
+
+    const med = await prisma.$transaction(async (tx) => {
+      if (doseDiffers && latest) {
+        if (doseChange) {
+          // Vrai changement de posologie : nouvelle ligne datée (deux changements
+          // le même jour se remplacent)
+          await tx.medicationDoseChange.upsert({
+            where: { medicationId_effectiveFrom: { medicationId: existing.id, effectiveFrom: new Date(doseChange.effectiveFrom) } },
+            create: {
+              medicationId: existing.id,
+              dosage: nextDosage,
+              dosageUnit: nextUnit,
+              effectiveFrom: new Date(doseChange.effectiveFrom),
+              reason: doseChange.reason ?? null,
+            },
+            update: { dosage: nextDosage, dosageUnit: nextUnit, reason: doseChange.reason ?? null },
+          });
+        } else {
+          // Correction de saisie : la ligne courante est rectifiée en place
+          await tx.medicationDoseChange.update({
+            where: { id: latest.id },
+            data: { dosage: nextDosage, dosageUnit: nextUnit },
+          });
+        }
+      }
+      return tx.medication.update({
+        where: { id: existing.id },
+        data: {
+          ...(startDate && { startDate: new Date(startDate) }),
+          ...(endDate !== undefined && { endDate: endDate ? new Date(endDate) : null }),
+          ...data,
+        },
+        include: DOSE_CHANGES_INCLUDE,
+      });
     });
     res.json(med);
+  },
+
+  // DELETE /api/medications/:id/dose-changes/:changeId - retire une ligne d'historique
+  // (jamais la plus ancienne) ; la dose courante suit la ligne la plus récente restante
+  removeDoseChange: async (req: AuthRequest, res: Response): Promise<void> => {
+    const med = await prisma.medication.findFirst({
+      where: { id: req.params.id, userId: req.userId },
+      include: DOSE_CHANGES_INCLUDE,
+    });
+    if (!med) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.medication') }));
+
+    const target = med.doseChanges.find((c) => c.id === req.params.changeId);
+    if (!target) throw new NotFoundError(req.t('errors.notFound', { resource: req.t('resources.doseChange') }));
+
+    const oldest = med.doseChanges[med.doseChanges.length - 1];
+    if (target.id === oldest.id) throw new ConflictError(req.t('errors.doseChangeFirstRow'));
+
+    const wasLatest = target.id === med.doseChanges[0].id;
+    const nextLatest = med.doseChanges[1];
+    await prisma.$transaction(async (tx) => {
+      await tx.medicationDoseChange.delete({ where: { id: target.id } });
+      if (wasLatest) {
+        await tx.medication.update({
+          where: { id: med.id },
+          data: { dosage: nextLatest.dosage, dosageUnit: nextLatest.dosageUnit },
+        });
+      }
+    });
+    res.json({ success: true });
   },
 
   remove: async (req: AuthRequest, res: Response): Promise<void> => {
