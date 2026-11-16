@@ -96,7 +96,7 @@ function medicationLabel(med: { name: string; dosage: number; dosageUnit: Dosage
   return unit ? `${med.name} ${med.dosage} ${unit}` : med.name;
 }
 
-interface PendingReminder {
+export interface PendingReminder {
   key: string;
   email: ReminderEmail;
 }
@@ -104,6 +104,36 @@ interface PendingReminder {
 type SettingWithUser = Prisma.NotificationSettingGetPayload<{
   include: { user: { select: { id: true; email: true; name: true; profile: { select: { timezone: true } } } } };
 }>;
+
+// Destinataire d'un rappel, indépendant du canal qui le livre
+export interface ReminderRecipient {
+  userId: string;
+  email: string;
+}
+
+// Un canal livre un rappel déjà calculé (email aujourd'hui, push demain).
+// Le calcul (pendingReminders) ne connaît pas les canaux.
+export interface ReminderChannel {
+  name: string;
+  // Préfixe des clés ReminderLog réservées par ce canal. Vide pour l'email :
+  // ses clés existantes ("log:2026-11-16", "med:...") restent valables telles
+  // quelles, sans migration des logs ni double envoi le jour du déploiement.
+  // Tout autre canal préfixe les siennes (ex. "push:") pour que le même rappel
+  // puisse partir une fois par canal.
+  keyPrefix: string;
+  send(recipient: ReminderRecipient, reminder: PendingReminder): Promise<boolean>;
+}
+
+export const emailChannel: ReminderChannel = {
+  name: 'email',
+  keyPrefix: '',
+  send: (recipient, reminder) => sendReminderEmail(recipient.email, reminder.email),
+};
+
+// Canaux actifs pour un réglage donné. Un seul aujourd'hui : l'email.
+export function channelsFor(_setting: SettingWithUser): ReminderChannel[] {
+  return [emailChannel];
+}
 
 function buildEmail(
   t: TFunction,
@@ -222,19 +252,21 @@ export async function pendingReminders(setting: SettingWithUser, now: Date): Pro
   return pending;
 }
 
-// Réserve la clé puis envoie ; la réservation est rendue si l'envoi échoue.
-async function deliver(userId: string, to: string, reminder: PendingReminder): Promise<boolean> {
+// Réserve la clé (préfixée par le canal) puis envoie ; la réservation est
+// rendue si l'envoi échoue.
+export async function deliver(channel: ReminderChannel, recipient: ReminderRecipient, reminder: PendingReminder): Promise<boolean> {
+  const key = channel.keyPrefix + reminder.key;
   try {
-    await prisma.reminderLog.create({ data: { userId, key: reminder.key } });
+    await prisma.reminderLog.create({ data: { userId: recipient.userId, key } });
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') return false; // déjà envoyé
     throw err;
   }
   let sent = false;
   try {
-    sent = await sendReminderEmail(to, reminder.email);
+    sent = await channel.send(recipient, reminder);
   } finally {
-    if (!sent) await prisma.reminderLog.deleteMany({ where: { userId, key: reminder.key } });
+    if (!sent) await prisma.reminderLog.deleteMany({ where: { userId: recipient.userId, key } });
   }
   return sent;
 }
@@ -257,8 +289,12 @@ export async function runReminders(now = new Date()): Promise<number> {
   let sent = 0;
   for (const setting of settings) {
     try {
+      const recipient: ReminderRecipient = { userId: setting.userId, email: setting.user.email };
+      const channels = channelsFor(setting);
       for (const reminder of await pendingReminders(setting, now)) {
-        if (await deliver(setting.userId, setting.user.email, reminder)) sent += 1;
+        for (const channel of channels) {
+          if (await deliver(channel, recipient, reminder)) sent += 1;
+        }
       }
     } catch (err) {
       // Un utilisateur en erreur (fuseau invalide...) ne bloque pas les autres
