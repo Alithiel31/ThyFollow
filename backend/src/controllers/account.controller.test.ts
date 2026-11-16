@@ -28,7 +28,7 @@ const prismaMock = {
   },
   dailyEntry: { findMany: vi.fn(async () => [{ id: 'e1', date: new Date('2026-10-01'), energyLevel: 3, symptomLogs: [] }]) },
   symptomLibrary: { findMany: vi.fn(async () => []) },
-  medication: { findMany: vi.fn(async () => []) },
+  medication: { findMany: vi.fn(async () => [] as unknown[]) },
   labResult: { findMany: vi.fn(async () => [{ id: 'l1', tsh: 2.1 }]) },
   labDocument: { findMany: vi.fn(async () => [] as unknown[]) },
   appointment: { findMany: vi.fn(async () => []) },
@@ -113,6 +113,22 @@ describe('GET /api/account/export', () => {
     for (const secret of ['password', 'verificationToken', 'resetToken', 'tokenVersion', 'stripeCustomerId']) {
       expect(select).not.toHaveProperty(secret);
     }
+  });
+
+  it('export : l’historique de posologie est inclus', async () => {
+    const doseChanges = [
+      { dosage: 75, dosageUnit: 'MCG', effectiveFrom: new Date('2026-01-10'), reason: null, createdAt: new Date() },
+      { dosage: 88, dosageUnit: 'MCG', effectiveFrom: new Date('2026-03-03'), reason: 'TSH 6,2', createdAt: new Date() },
+    ];
+    prismaMock.medication.findMany.mockResolvedValueOnce([{ id: 'm1', name: 'Levothyrox', dosage: 88, intakes: [], doseChanges }]);
+    const app = await buildApp();
+    const res = await request(app).get('/api/account/export').set('Authorization', token(ME));
+    expect(res.status).toBe(200);
+    expect(res.body.medications[0].doseChanges).toHaveLength(2);
+    expect(res.body.medications[0].doseChanges[1].reason).toBe('TSH 6,2');
+    // La requête demande bien l'historique, du plus ancien au plus récent
+    const include = (prismaMock.medication.findMany.mock.calls[0] as unknown as [{ include: { doseChanges: { orderBy: unknown } } }])[0].include;
+    expect(include.doseChanges.orderBy).toEqual({ effectiveFrom: 'asc' });
   });
 });
 
