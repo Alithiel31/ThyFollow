@@ -210,6 +210,16 @@ export interface PdfPasswordEntry {
 
 export type DosageUnit = 'MCG' | 'MG' | 'IU' | 'TABLET' | 'DROP' | 'ML' | 'OTHER';
 
+// Une ligne de l'historique de posologie : la dose en vigueur à partir d'une date.
+export interface MedicationDoseChange {
+  id: string;
+  dosage: number;
+  dosageUnit: DosageUnit;
+  effectiveFrom: string;
+  reason?: string | null;
+  createdAt: string;
+}
+
 export interface Medication {
   id: string;
   name: string;
@@ -223,6 +233,15 @@ export interface Medication {
   active: boolean;
   instructions?: string | null;
   notes?: string | null;
+  // Du plus récent au plus ancien ; toujours au moins une ligne
+  doseChanges: MedicationDoseChange[];
+}
+
+// Déclaration d'un vrai changement de dose lors d'une modification
+// (sans elle, une dose différente corrige la ligne courante en place)
+export interface DoseChangeInput {
+  effectiveFrom: string;
+  reason?: string;
 }
 
 // Une prise validée (checklist) pour un médicament donné, un jour et un créneau donnés.
