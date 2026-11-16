@@ -143,6 +143,23 @@ pas synchronisé avec ces tags.
 
 ### Added
 
+- **Historique de posologie.** Jusqu'ici, modifier la dose d'un médicament écrasait l'ancienne :
+  impossible de retrouver « 75 µg jusqu'au 3 mars, 88 µg depuis ». Nouvelle table
+  `medication_dose_changes` (une ligne par dose, datée de son entrée en vigueur, motif facultatif) ;
+  la migration crée une première ligne par médicament existant à sa dose courante depuis sa date de
+  début. `Medication.dosage` reste la valeur courante, aucune rupture d'API. En édition, une dose
+  différente fait apparaître la case « C'est un changement de dose (et non une correction) » avec
+  date d'effet et motif : cochée, une ligne datée est ajoutée (deux changements le même jour se
+  remplacent) ; non cochée, la ligne courante est corrigée en place. La carte affiche « 88 µg depuis
+  le 3 mars » et un historique repliable dont chaque ligne se supprime, sauf la plus ancienne
+  (`DELETE /api/medications/:id/dose-changes/:changeId`, la dose courante suit la ligne la plus
+  récente restante). L'export RGPD inclut l'historique. Prépare la frise des doses sur la courbe TSH
+  et le rappel de bilan après changement de dose.
+- **Canal de livraison des rappels abstrait.** `lib/reminders.ts` sépare le calcul des rappels
+  (`pendingReminders`, inchangé) de leur livraison : une interface `ReminderChannel` avec l'email
+  comme seul canal pour l'instant. Préparation des notifications push. L'email garde ses clés
+  `ReminderLog` telles quelles (un futur canal préfixera les siennes) : aucune migration des logs,
+  aucun double envoi au déploiement.
 - **« Comprendre » : cytoponction, cancer, choix du traitement de Basedow, équipe soignante**, en
   français et en anglais (brouillons pédagogiques). Elles réutilisent les illustrations existantes ;
   les schémas du pack, convertis en WebP, restent dans `docs/comprendre-pack-04/`. Toutes portent

@@ -44,7 +44,7 @@ A web app for tracking thyroid health, inspired by the Clue app.
 |---|---|
 | **Daily log** | Energy, mood, anxiety, brain fog, 11 thyroid symptoms, medication taken, physical measurements (weight/heart rate/sleep, syncable via Google Health, e.g. Pixel Watch) |
 | **Lab results** | TSH, FT4, FT3, Anti-TPO, Anti-TG, deficiencies (Ferritin, Vit D, B12…) with trend charts; **PDF import, Pro accounts only** after 3 free trial imports (batch, password-protected PDFs supported, review before adding, encrypted storage, optional AI fallback) |
-| **Medications** | Treatment management (Levothyroxine, etc.), dosage, frequency, adherence |
+| **Medications** | Treatment management (Levothyroxine, etc.), dosage, frequency, adherence, dose history (each change dated from when it took effect) |
 | **Appointments** | Medical calendar with reminders, statuses, specialized types |
 | **Dashboard** | Medication streak, adherence, averages, next appointment, TSH history |
 | **Profile** | Diagnosis, thyroid status, TSH/FT4/FT3 target ranges set by your doctor |
@@ -344,6 +344,7 @@ User ──┬── UserProfile             (diagnosis, target ranges)
        │     └── SymptomLog[]      (custom symptoms)
        ├── LabResult[]             (TSH, FT4, FT3, antibodies, deficiencies)
        ├── Medication[]            (treatments)
+       │     └── MedicationDoseChange[] (dose history, one row per dose from its effective date)
        ├── Appointment[]           (medical appointments)
        ├── GoogleHealthConnection  (encrypted tokens, Pixel Watch sync...)
        └── NotificationSetting
@@ -389,6 +390,7 @@ GET    /api/medications
 POST   /api/medications
 PUT    /api/medications/:id
 DELETE /api/medications/:id
+DELETE /api/medications/:id/dose-changes/:changeId  (remove a dose-history row, never the oldest)
 
 GET    /api/appointments
 POST   /api/appointments
