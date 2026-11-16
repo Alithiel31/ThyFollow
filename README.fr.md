@@ -44,7 +44,7 @@ Application web de suivi thyroïdien, inspirée de l'app Clue.
 |---|---|
 | **Journal quotidien** | Énergie, humeur, anxiété, brouillard mental, 11 symptômes thyroïdiens, médicament pris, mesures physiques (poids/FC/sommeil synchronisables via Google Health, ex: Pixel Watch) |
 | **Analyses sanguines** | TSH, FT4, FT3, Anti-TPO, Anti-TG, carences (Ferritine, Vit D, B12…) avec graphiques d'évolution ; **import de PDF, réservé aux comptes Pro** après 3 imports d'essai (par lot, PDF protégés par mot de passe pris en charge, relecture avant ajout, stockage chiffré, repli IA optionnel) |
-| **Médicaments** | Gestion du traitement (Levothyrox, etc.), dosage, fréquence, observance |
+| **Médicaments** | Gestion du traitement (Levothyrox, etc.), dosage, fréquence, observance, historique de posologie (chaque changement daté de son entrée en vigueur) |
 | **Rendez-vous** | Agenda médical avec rappels, statuts, types spécialisés |
 | **Tableau de bord** | Streak médicament, observance, moyennes, prochain RDV, historique TSH |
 | **Profil** | Diagnostic, état thyroïde, plages TSH/FT4/FT3 personnalisées par votre médecin |
@@ -343,6 +343,7 @@ User ──┬── UserProfile             (diagnostic, plages cibles)
        │     └── SymptomLog[]      (symptômes personnalisés)
        ├── LabResult[]             (TSH, FT4, FT3, anticorps, carences)
        ├── Medication[]            (traitements)
+       │     └── MedicationDoseChange[] (historique de posologie, une ligne par dose depuis sa date d'effet)
        ├── Appointment[]           (rendez-vous médicaux)
        ├── GoogleHealthConnection  (tokens chiffrés, synchro Pixel Watch...)
        └── NotificationSetting
@@ -388,6 +389,7 @@ GET    /api/medications
 POST   /api/medications
 PUT    /api/medications/:id
 DELETE /api/medications/:id
+DELETE /api/medications/:id/dose-changes/:changeId  (retire une ligne d'historique, jamais la plus ancienne)
 
 GET    /api/appointments
 POST   /api/appointments

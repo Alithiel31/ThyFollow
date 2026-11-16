@@ -59,7 +59,13 @@ export const accountController = {
         prisma.medication.findMany({
           where: { userId },
           orderBy: { startDate: 'asc' },
-          include: { intakes: { select: { date: true, time: true, takenAt: true }, orderBy: { date: 'asc' } } },
+          include: {
+            intakes: { select: { date: true, time: true, takenAt: true }, orderBy: { date: 'asc' } },
+            doseChanges: {
+              select: { dosage: true, dosageUnit: true, effectiveFrom: true, reason: true, createdAt: true },
+              orderBy: { effectiveFrom: 'asc' },
+            },
+          },
         }),
         prisma.labResult.findMany({ where: { userId }, orderBy: { date: 'asc' } }),
         prisma.labDocument.findMany({

@@ -12,6 +12,7 @@ router.get('/', asyncHandler(medicationsController.list));
 router.post('/', asyncHandler(medicationsController.create));
 router.post('/:id/intake', asyncHandler(medicationsController.markTaken));
 router.delete('/:id/intake', asyncHandler(medicationsController.markUntaken));
+router.delete('/:id/dose-changes/:changeId', asyncHandler(medicationsController.removeDoseChange));
 router.put('/:id', asyncHandler(medicationsController.update));
 router.delete('/:id', asyncHandler(medicationsController.remove));
 

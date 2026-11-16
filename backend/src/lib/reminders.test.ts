@@ -29,7 +29,7 @@ const prismaMock = {
 };
 vi.mock('./prisma.js', () => ({ prisma: prismaMock }));
 
-const { localNow, isDueAt, isMedicationDay, runReminders } = await import('./reminders.js');
+const { localNow, isDueAt, isMedicationDay, runReminders, deliver, emailChannel } = await import('./reminders.js');
 
 const setting = (overrides: Record<string, unknown> = {}) => ({
   id: 's1',
@@ -143,5 +143,24 @@ describe('runReminders', () => {
       setting({ dailyLogReminder: true }),
     ]);
     expect(await runReminders(new Date('2026-10-18T18:10:00Z'))).toBe(1);
+  });
+});
+
+describe('canaux', () => {
+  it('un canal avec préfixe réserve une clé distincte de celle de l’email', async () => {
+    const pushSend = vi.fn(async () => true);
+    const pushChannel = { name: 'push', keyPrefix: 'push:', send: pushSend };
+    const recipient = { userId: 'u1', email: 'a@example.com' };
+    const reminder = { key: 'log:2026-10-18', email: { subject: 's', greeting: 'g', lines: [], cta: 'c', ctaPath: '/', footer: 'f', settingsLabel: 'l' } };
+
+    expect(await deliver(emailChannel, recipient, reminder)).toBe(true);
+    expect(await deliver(pushChannel, recipient, reminder)).toBe(true);
+    // Les deux canaux partent chacun une fois : l'email garde sa clé nue, le push la sienne préfixée
+    expect(sentKeys).toEqual(['log:2026-10-18', 'push:log:2026-10-18']);
+    expect(sendReminderEmail).toHaveBeenCalledTimes(1);
+    expect(pushSend).toHaveBeenCalledTimes(1);
+    // Un second passage ne renvoie rien sur aucun des deux canaux
+    expect(await deliver(emailChannel, recipient, reminder)).toBe(false);
+    expect(await deliver(pushChannel, recipient, reminder)).toBe(false);
   });
 });

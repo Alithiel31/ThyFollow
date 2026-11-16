@@ -63,6 +63,23 @@
 
 .medDate { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
 
+/* Historique de posologie, replié par défaut */
+.doseHistory { margin-top: 8px; font-size: 0.78rem; }
+.doseHistorySummary { cursor: pointer; color: var(--text-dim); user-select: none; }
+.doseHistoryList { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.doseHistoryRow { display: flex; align-items: center; gap: 10px; min-height: 28px; }
+.doseHistoryDate { color: var(--text-muted); min-width: 90px; }
+.doseHistoryDose { font-weight: 500; }
+.doseHistoryReason { color: var(--text-muted); font-style: italic; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Déclaration d'un changement de dose (formulaire d'édition) */
+.doseChangeBox {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 12px; border-radius: 10px;
+  background: var(--bg-raised); border: 1px dashed var(--border);
+}
+.checkboxLabel { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer; }
+
 .medActions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
 
 .iconBtn {
