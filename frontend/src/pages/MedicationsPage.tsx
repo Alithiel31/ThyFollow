@@ -6,10 +6,17 @@ import toast from 'react-hot-toast';
 import { Plus, Pill, Trash2, ToggleLeft, ToggleRight, CheckCircle2, Circle } from 'lucide-react';
 import { medApi } from '../lib/api';
 import { formatDate, toISODate } from '../lib/utils';
-import type { Medication, MedicationIntake } from '../types';
+import type { DoseChangeInput, Medication, MedicationIntake } from '../types';
 import styles from './MedicationsPage.module.css';
 
 const DEFAULT_TIMES = ['08:00', '14:00', '20:00', '22:00', '06:00', '12:00', '18:00', '23:00'];
+
+// Déclaration d'un changement de dose dans le formulaire d'édition
+interface DoseChangeForm {
+  declared: boolean;
+  effectiveFrom: string;
+  reason: string;
+}
 
 const EMPTY: Partial<Medication> = {
   name: '', brand: '', dosage: undefined, dosageUnit: 'MCG', frequency: 'DAILY',
@@ -24,6 +31,8 @@ export function MedicationsPage() {
   const [editItem, setEditItem] = useState<Medication | null>(null);
   const [form, setForm] = useState<Partial<Medication>>(EMPTY);
   const today = toISODate(new Date());
+  const emptyDoseChange: DoseChangeForm = { declared: false, effectiveFrom: today, reason: '' };
+  const [doseChange, setDoseChange] = useState<DoseChangeForm>(emptyDoseChange);
 
   const FREQ_LABELS: Record<Medication['frequency'], string> = {
     DAILY: t('medications.frequency.DAILY'),
@@ -59,8 +68,14 @@ export function MedicationsPage() {
   });
 
   const updateMut = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Medication> }) => medApi.update(id, data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<Medication> & { doseChange?: DoseChangeInput } }) => medApi.update(id, data),
     onSuccess: () => { toast.success(t('medications.updated')); qc.invalidateQueries({ queryKey: ['medications'] }); resetForm(); },
+    onError: () => toast.error(t('medications.error')),
+  });
+
+  const deleteDoseChangeMut = useMutation({
+    mutationFn: ({ id, changeId }: { id: string; changeId: string }) => medApi.deleteDoseChange(id, changeId),
+    onSuccess: () => { toast.success(t('medications.doseChange.deleted')); qc.invalidateQueries({ queryKey: ['medications'] }); },
     onError: () => toast.error(t('medications.error')),
   });
 
@@ -82,7 +97,7 @@ export function MedicationsPage() {
     onError: () => toast.error(t('medications.error')),
   });
 
-  const resetForm = () => { setShowForm(false); setEditItem(null); setForm(EMPTY); };
+  const resetForm = () => { setShowForm(false); setEditItem(null); setForm(EMPTY); setDoseChange(emptyDoseChange); };
 
   const openEdit = (m: Medication) => {
     setEditItem(m);
@@ -98,8 +113,20 @@ export function MedicationsPage() {
     e.preventDefault();
     if (!form.name || !form.dosage || !form.startDate) return toast.error(t('medications.missingFields'));
     const payload = { ...form } as Partial<Medication> & { name: string; dosage: number; startDate: string };
-    if (editItem) updateMut.mutate({ id: editItem.id, data: payload });
-    else createMut.mutate(payload);
+    if (editItem) {
+      // Le changement n'est transmis que s'il est déclaré : sinon la dose
+      // différente est une correction, rectifiée en place côté serveur.
+      const declared = doseDiffers && doseChange.declared;
+      const reason = doseChange.reason.trim();
+      updateMut.mutate({
+        id: editItem.id,
+        data: declared
+          ? { ...payload, doseChange: { effectiveFrom: doseChange.effectiveFrom, ...(reason && { reason }) } }
+          : payload,
+      });
+    } else {
+      createMut.mutate(payload);
+    }
   };
 
   const set = (key: keyof Medication) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -126,6 +153,11 @@ export function MedicationsPage() {
   const activeMeds = meds.filter((m) => m.active);
   const inactiveMeds = meds.filter((m) => !m.active);
   const timesPerDay = (form.intakeTimes ?? ['07:00']).length;
+  // En édition : la dose saisie diffère-t-elle de la dose courante ?
+  const doseDiffers = editItem !== null && (form.dosage !== editItem.dosage || form.dosageUnit !== editItem.dosageUnit);
+  const onDeleteDoseChange = (id: string, changeId: string) => {
+    if (confirm(t('medications.doseChange.deleteConfirm'))) deleteDoseChangeMut.mutate({ id, changeId });
+  };
 
   return (
     <div className={styles.page}>
@@ -176,6 +208,40 @@ export function MedicationsPage() {
                   </select>
                 </div>
               </div>
+
+              {doseDiffers && (
+                <div className={styles.doseChangeBox}>
+                  <label className={styles.checkboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={doseChange.declared}
+                      onChange={(e) => setDoseChange((d) => ({ ...d, declared: e.target.checked }))}
+                    />
+                    {t('medications.doseChange.declare')}
+                  </label>
+                  {doseChange.declared && (
+                    <div className={styles.grid2}>
+                      <div className={styles.field}>
+                        <label className={styles.label} htmlFor="med-dose-change-date">{t('medications.doseChange.effectiveFrom')}</label>
+                        <input
+                          id="med-dose-change-date" className={styles.input} type="date" max={today} required
+                          value={doseChange.effectiveFrom}
+                          onChange={(e) => setDoseChange((d) => ({ ...d, effectiveFrom: e.target.value }))}
+                        />
+                      </div>
+                      <div className={styles.field}>
+                        <label className={styles.label} htmlFor="med-dose-change-reason">{t('medications.doseChange.reason')}</label>
+                        <input
+                          id="med-dose-change-reason" className={styles.input} maxLength={200}
+                          placeholder={t('medications.doseChange.reasonPlaceholder')}
+                          value={doseChange.reason}
+                          onChange={(e) => setDoseChange((d) => ({ ...d, reason: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className={styles.field}>
                 <label className={styles.label} htmlFor="med-times-per-day">{t('medications.timesPerDay')}</label>
@@ -236,6 +302,7 @@ export function MedicationsPage() {
                     onToggle={toggleActive}
                     onTake={(id, time) => takeMut.mutate({ id, time })}
                     onUntake={(id, time) => untakeMut.mutate({ id, time })}
+                    onDeleteDoseChange={onDeleteDoseChange}
                   />
                 ))}
               </div>
@@ -252,6 +319,7 @@ export function MedicationsPage() {
                     onToggle={toggleActive}
                     onTake={(id, time) => takeMut.mutate({ id, time })}
                     onUntake={(id, time) => untakeMut.mutate({ id, time })}
+                    onDeleteDoseChange={onDeleteDoseChange}
                   />
                 ))}
               </div>
@@ -263,7 +331,7 @@ export function MedicationsPage() {
   );
 }
 
-function MedCard({ med, freqLabels, unitLabels, intakes, onEdit, onDelete, onToggle, onTake, onUntake }: {
+function MedCard({ med, freqLabels, unitLabels, intakes, onEdit, onDelete, onToggle, onTake, onUntake, onDeleteDoseChange }: {
   med: Medication;
   freqLabels: Record<Medication['frequency'], string>;
   unitLabels: Record<Medication['dosageUnit'], string>;
@@ -273,9 +341,15 @@ function MedCard({ med, freqLabels, unitLabels, intakes, onEdit, onDelete, onTog
   onToggle: (m: Medication) => void;
   onTake: (id: string, time: string) => void;
   onUntake: (id: string, time: string) => void;
+  onDeleteDoseChange: (id: string, changeId: string) => void;
 }) {
   const { t } = useTranslation();
   const takenTimes = new Set(intakes.filter((i) => i.medicationId === med.id).map((i) => i.time));
+  // Historique du plus récent au plus ancien ; la ligne la plus ancienne ne se supprime pas
+  const doseChanges = med.doseChanges;
+  const latestDose = doseChanges[0];
+  const oldestDoseId = doseChanges[doseChanges.length - 1]?.id;
+  const hasDoseHistory = doseChanges.length > 1;
 
   return (
     <div className={`${styles.medCard} ${!med.active ? styles.medCardInactive : ''}`} onClick={() => onEdit(med)}>
@@ -288,7 +362,41 @@ function MedCard({ med, freqLabels, unitLabels, intakes, onEdit, onDelete, onTog
           {med.intakeTimes.length > 0 && ` · ${med.intakeTimes.join(', ')}`}
           {med.instructions && ` · ${med.instructions}`}
         </div>
-        <div className={styles.medDate}>{t('medications.since', { date: formatDate(med.startDate) })}</div>
+        <div className={styles.medDate}>
+          {hasDoseHistory
+            ? t('medications.doseSince', {
+                dose: `${latestDose.dosage} ${unitLabels[latestDose.dosageUnit]}`,
+                date: formatDate(latestDose.effectiveFrom),
+                start: formatDate(med.startDate),
+              })
+            : t('medications.since', { date: formatDate(med.startDate) })}
+        </div>
+
+        {hasDoseHistory && (
+          <details className={styles.doseHistory} onClick={(e) => e.stopPropagation()}>
+            <summary className={styles.doseHistorySummary}>{t('medications.doseChange.history', { count: doseChanges.length })}</summary>
+            <ul className={styles.doseHistoryList}>
+              {doseChanges.map((c) => (
+                <li key={c.id} className={styles.doseHistoryRow}>
+                  <span className={styles.doseHistoryDate}>{formatDate(c.effectiveFrom)}</span>
+                  <span className={styles.doseHistoryDose}>{c.dosage} {unitLabels[c.dosageUnit]}</span>
+                  {c.reason && <span className={styles.doseHistoryReason}>{c.reason}</span>}
+                  {c.id !== oldestDoseId && (
+                    <button
+                      type="button"
+                      className={styles.iconBtn}
+                      title={t('medications.doseChange.delete')}
+                      aria-label={t('medications.doseChange.delete')}
+                      onClick={() => onDeleteDoseChange(med.id, c.id)}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
 
         {med.active && med.intakeTimes.length > 0 && (
           <div className={styles.doseChecklist} onClick={(e) => e.stopPropagation()}>

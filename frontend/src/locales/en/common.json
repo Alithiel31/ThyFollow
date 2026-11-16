@@ -352,6 +352,17 @@
     "activeSection": "Active treatments",
     "pastSection": "Past treatments",
     "since": "Since {{date}}",
+    "doseSince": "{{dose}} since {{date}} · treatment since {{start}}",
+    "doseChange": {
+      "declare": "This is a dose change (not a correction)",
+      "effectiveFrom": "Effective from",
+      "reason": "Reason (optional)",
+      "reasonPlaceholder": "TSH 6.2 on March 3",
+      "history": "Dose history ({{count}})",
+      "delete": "Delete this row",
+      "deleteConfirm": "Delete this row from the history?",
+      "deleted": "Row deleted"
+    },
     "deactivate": "Deactivate",
     "reactivate": "Reactivate",
     "delete": "Delete",
